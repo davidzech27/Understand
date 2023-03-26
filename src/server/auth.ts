@@ -1,4 +1,5 @@
-import { type NextAuthOptions } from "next-auth";
+import { type NextAuthOptions, getServerSession } from "next-auth";
+import { type GetServerSidePropsContext } from "next";
 import GoogleProvider from "next-auth/providers/google";
 import { env } from "~/env.mjs";
 
@@ -21,4 +22,11 @@ export const authOptions: NextAuthOptions = {
 			return true;
 		},
 	},
+};
+
+export const getServerAuthSession = (ctx: {
+	req: GetServerSidePropsContext["req"];
+	res: GetServerSidePropsContext["res"];
+}) => {
+	return getServerSession(ctx.req, ctx.res, authOptions);
 };
