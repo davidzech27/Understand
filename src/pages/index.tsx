@@ -3,10 +3,13 @@ import Head from "next/head";
 import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
 import colors from "colors.cjs";
+import { api } from "~/lib/api";
 
-import { api } from "~/utils/api";
+const Index: NextPage = () => {
+	const onSignIn = () => {
+		signIn("google", { callbackUrl: "/home" });
+	};
 
-const Home: NextPage = () => {
 	return (
 		<>
 			<Head>
@@ -42,8 +45,11 @@ const Home: NextPage = () => {
 							</p>
 
 							<div className="ml-1 flex">
-								<button className="group relative flex h-16 w-48 items-center justify-center">
-									<span className="select-none text-2xl font-medium text-black transition-colors duration-150 group-hover:text-white">
+								<button
+									onClick={onSignIn}
+									className="group relative flex h-16 w-48 items-center justify-center"
+								>
+									<span className="select-none text-2xl text-black transition-colors duration-150 group-hover:text-white">
 										Sign in
 									</span>
 
@@ -51,7 +57,7 @@ const Home: NextPage = () => {
 
 									<div
 										style={{
-											border: "3px solid transparent",
+											border: "4px solid transparent",
 											background: `linear-gradient(45deg, ${colors.primary}, ${colors.secondary}) border-box`,
 											WebkitMask:
 												"linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)",
@@ -70,7 +76,7 @@ const Home: NextPage = () => {
 											backgroundClip: "text",
 											color: "transparent",
 										}}
-										className="cursor-pointer select-none text-2xl font-medium transition-opacity duration-150 hover:opacity-60"
+										className="cursor-pointer select-none text-2xl font-semibold transition-opacity duration-150 hover:opacity-60"
 									>
 										Learn more
 									</span>
@@ -93,32 +99,4 @@ const Home: NextPage = () => {
 	);
 };
 
-export default Home;
-
-const AuthShowcase: React.FC = () => {
-	const { data: sessionData } = useSession();
-
-	const { data: secretMessage } = api.example.getSecretMessage.useQuery(
-		undefined, // no input
-		{ enabled: sessionData?.user !== undefined }
-	);
-
-	return (
-		<div className="flex flex-col items-center justify-center gap-4">
-			<p className="text-center text-2xl text-white">
-				{sessionData && (
-					<span>Logged in as {sessionData.user?.name}</span>
-				)}
-				{secretMessage && <span> - {secretMessage}</span>}
-			</p>
-			<button
-				className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
-				onClick={
-					sessionData ? () => void signOut() : () => void signIn()
-				}
-			>
-				{sessionData ? "Sign out" : "Sign in"}
-			</button>
-		</div>
-	);
-};
+export default Index;
