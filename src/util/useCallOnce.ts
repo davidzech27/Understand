@@ -9,7 +9,7 @@ const useCallOnce = (fn: () => void) => {
 		fn();
 
 		called.current = true;
-	}, []);
+	}, [fn]);
 };
 
 export default useCallOnce;

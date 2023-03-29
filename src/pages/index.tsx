@@ -88,8 +88,11 @@ const Index: NextPage = () => {
 						<div className="flex h-screen w-2/3 flex-col gap-1">
 							{Array(6)
 								.fill(0)
-								.map(() => (
-									<div className="w-full flex-1 rounded-lg border-x border-y"></div>
+								.map((_, index) => (
+									<div
+										key={index}
+										className="w-full flex-1 rounded-lg border-x border-y"
+									></div>
 								))}
 						</div>
 					</div>

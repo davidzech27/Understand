@@ -77,7 +77,7 @@ const SideBar: React.FC<Props> = ({
 						</>
 					) : (
 						<span className="my-1.5 ml-1.5 text-sm font-medium opacity-60">
-							You're not teaching any classes
+							You&apos;re not teaching any classes
 						</span>
 					)}
 					{/* later only have message if not teaching or enrolled */}

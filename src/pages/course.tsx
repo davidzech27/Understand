@@ -137,7 +137,7 @@ const Course: NextPage = () => {
 									))
 								) : (
 									<span className="font-medium italic opacity-60">
-										This is where you'll see created
+										This is where you&apos;ll see created
 										assignments
 									</span>
 									// changed to "assigned" on student's end
@@ -206,7 +206,8 @@ const Course: NextPage = () => {
 									</>
 								) : (
 									<span className="font-medium italic opacity-60">
-										This class doesn't have any students yet
+										This class doesn&apos;t have any
+										students yet
 									</span>
 								)}
 							</div>
