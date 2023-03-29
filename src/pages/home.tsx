@@ -9,10 +9,15 @@ import { api } from "~/lib/api";
 // todo - make page protected
 const Home: NextPage = () => {
 	return (
-		<DefaultLayout
-			routeName="home"
-			children={({ profile, coursesTeaching }) => null}
-		/>
+		<DefaultLayout>
+			<div className="flex h-screen flex-col space-y-2.5 py-2.5 pr-3">
+				<div className="bg-surface flex h-full flex-col justify-between rounded-md py-5 px-6">
+					<span className="font-medium italic opacity-60">
+						Overview page coming soon...
+					</span>
+				</div>
+			</div>
+		</DefaultLayout>
 	);
 };
 

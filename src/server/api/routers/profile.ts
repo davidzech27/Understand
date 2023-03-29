@@ -4,6 +4,7 @@ import { createTRPCRouter, authedProcedure } from "~/server/api/trpc";
 import db from "~/db/db";
 import { eq } from "drizzle-orm/expressions";
 import { user } from "~/db/schema";
+import { profileSchema } from "~/server/schemas";
 
 export const profileRouter = createTRPCRouter({
 	me: authedProcedure.query(async ({ ctx: { email, people } }) => {
@@ -34,4 +35,33 @@ export const profileRouter = createTRPCRouter({
 			photo,
 		};
 	}),
+	get: authedProcedure
+		.input(z.object({ email: z.string() }))
+		.query(async ({ input: { email }, ctx: { classroom } }) => {
+			const [
+				[userRow],
+				{
+					data: { photoUrl: photo, name: googleName },
+				},
+			] = await Promise.all([
+				db
+					.select({ name: user.name })
+					.from(user)
+					.where(eq(user.email, email)),
+
+				classroom.userProfiles.get({
+					userId: email,
+				}),
+			]);
+
+			if (!userRow && !googleName) {
+				throw new TRPCError({ code: "NOT_FOUND" });
+			}
+
+			return profileSchema.parse({
+				email,
+				name: userRow?.name ?? googleName?.fullName,
+				photo: typeof photo === "string" ? `https:${photo}` : undefined,
+			});
+		}),
 });

@@ -1,53 +1,39 @@
 import Head from "next/head";
 import SideBar from "./SideBar";
-import { api, type RouterOutputs } from "~/lib/api";
+import { api } from "~/lib/api";
 
-type Props =
-	| {
-			routeName: "home";
-			children: (props: {
-				profile: RouterOutputs["profile"]["me"];
-				coursesTeaching: RouterOutputs["courses"]["teaching"];
-			}) => React.ReactNode;
-	  }
-	| {
-			routeName: "course";
-			courseId: string;
-			children: (props: {
-				profile: RouterOutputs["profile"]["me"];
-				coursesTeaching: RouterOutputs["courses"]["teaching"];
-				assignments: RouterOutputs["courses"]["assignments"];
-				roster: RouterOutputs["courses"]["roster"];
-			}) => React.ReactNode;
-	  };
+type Props = {
+	children: React.ReactNode;
+	selectedCourseId?: string;
+	forceLoading?: boolean;
+};
 
-const DefaultLayout: React.FC<Props> = (props) => {
+const DefaultLayout: React.FC<Props> = ({
+	children,
+	selectedCourseId,
+	forceLoading,
+}) => {
 	const { data: profile } = api.profile.me.useQuery();
 
-	const { data: coursesTeaching } = api.courses.teaching.useQuery();
+	const { data: coursesTeaching } = api.courses.teaching.useQuery(undefined, {
+		onSuccess: (courses) => {
+			for (const course of courses) {
+				queryClient.assignments.byCourse
+					.ensureData({
+						courseId: course.id,
+					})
+					.catch(console.error);
 
-	let assignments: RouterOutputs["courses"]["assignments"] | undefined;
-	let roster: RouterOutputs["courses"]["roster"] | undefined;
+				queryClient.roster.get
+					.ensureData({
+						courseId: course.id,
+					})
+					.catch(console.error);
+			}
+		},
+	});
 
-	if (props.routeName === "course") {
-		const { courseId } = props;
-
-		assignments = api.courses.assignments.useQuery({
-			courseId,
-		}).data;
-
-		roster = api.courses.roster.useQuery({
-			courseId,
-		}).data;
-	}
-
-	const loading = (
-		<div className="flex h-screen w-full items-center justify-center bg-gradient-to-tr from-primary to-secondary pb-12">
-			<span className="w-min text-[10rem] font-semibold text-white">
-				Understand
-			</span>
-		</div>
-	);
+	const queryClient = api.useContext();
 
 	return (
 		<>
@@ -60,36 +46,22 @@ const DefaultLayout: React.FC<Props> = (props) => {
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
 
-			{profile &&
-			coursesTeaching &&
-			(props.routeName !== "course" || (assignments && roster)) ? (
+			{!forceLoading && profile && coursesTeaching ? (
 				<div className="bg-background flex min-h-screen">
 					<SideBar
-						currentRoute={props} // a bit weird
+						selectedCourseId={selectedCourseId}
 						profile={profile}
 						coursesTeaching={coursesTeaching}
 					/>
 
-					<main className="flex-1">
-						{(() => {
-							if (props.routeName === "home") {
-								return props.children({
-									profile,
-									coursesTeaching,
-								});
-							} else if (props.routeName === "course") {
-								return props.children({
-									profile,
-									coursesTeaching,
-									assignments: assignments!, // typescript can't narrow types here as expected
-									roster: roster!,
-								});
-							}
-						})()}
-					</main>
+					<main className="flex-1">{children}</main>
 				</div>
 			) : (
-				loading
+				<div className="flex h-screen w-full items-center justify-center bg-gradient-to-tr from-primary to-secondary pb-12">
+					<span className="w-min text-[10rem] font-semibold text-white">
+						Understand
+					</span>
+				</div>
 			)}
 		</>
 	);

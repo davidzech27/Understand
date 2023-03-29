@@ -5,7 +5,7 @@ import { api } from "~/lib/api";
 import { type Route } from "~/Route";
 
 interface Props {
-	currentRoute: Route;
+	selectedCourseId: string | undefined;
 	profile: {
 		email: string;
 		name: string;
@@ -19,20 +19,20 @@ interface Props {
 }
 
 const SideBar: React.FC<Props> = ({
-	currentRoute,
+	selectedCourseId,
 	profile,
 	coursesTeaching,
 }) => {
 	return (
 		<nav className="h-screen w-80">
 			<div className="fixed h-screen w-80 px-3 py-2.5">
-				<div className="bg-surface flex h-full flex-col rounded-md py-3 px-3">
+				<div className="bg-surface flex h-full select-none flex-col rounded-md py-3 px-3">
 					<Link
 						href="/" // possibly redirect to about page in future
-						className="flex justify-center rounded-md pt-0.5 pb-1 transition-opacity duration-150 hover:opacity-75"
+						className="flex justify-center rounded-md pt-1 pb-1.5 transition-opacity duration-150 hover:opacity-75"
 					>
 						<span // no gradient because gradient is used elsewhere and we shouldn't overdo it. reconsider later
-							className="cursor-pointer select-none text-2xl font-semibold text-primary"
+							className="cursor-pointer text-2xl font-semibold text-primary"
 						>
 							Understand
 						</span>
@@ -43,12 +43,12 @@ const SideBar: React.FC<Props> = ({
 						subtext={profile.email}
 						photo={
 							<img
-								className="h-full w-full select-none rounded-full"
+								className="h-full w-full rounded-full"
 								src={profile.photo}
 							/>
 						}
-						href="/home" // change later
-						selected={currentRoute.routeName === "home"}
+						href="/home" // change later once there is a separate home and account buttons
+						selected={selectedCourseId === undefined}
 					/>
 
 					{coursesTeaching.length > 0 ? (
@@ -62,15 +62,13 @@ const SideBar: React.FC<Props> = ({
 										text={course.name}
 										subtext={course.section}
 										photo={
-											<div className="flex h-9 w-9 select-none items-center justify-center rounded-full bg-blue-700 text-[1.16rem] text-white">
+											<div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-700 text-[1.16rem] text-white">
 												{course.name[0]?.toUpperCase()}
 											</div>
 										}
 										href={`/course/${course.id}`}
 										selected={
-											currentRoute.routeName ===
-												"course" &&
-											currentRoute.courseId === course.id
+											selectedCourseId === course.id
 										}
 										key={course.id}
 									/>

@@ -49,7 +49,7 @@ const Index: NextPage = () => {
 									onClick={onSignIn}
 									className="group relative flex h-16 w-48 items-center justify-center"
 								>
-									<span className="select-none text-2xl text-black transition-colors duration-150 group-hover:text-white">
+									<span className="select-none text-2xl font-medium text-black opacity-80 transition-all duration-150 group-hover:text-white group-hover:opacity-100">
 										Sign in
 									</span>
 
@@ -68,7 +68,7 @@ const Index: NextPage = () => {
 									/>
 								</button>
 
-								<div className="ml-10 flex items-center">
+								<div className="ml-9 flex items-center">
 									<span
 										style={{
 											background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`,
@@ -76,7 +76,7 @@ const Index: NextPage = () => {
 											backgroundClip: "text",
 											color: "transparent",
 										}}
-										className="cursor-pointer select-none text-2xl font-semibold transition-opacity duration-150 hover:opacity-60"
+										className="cursor-pointer select-none text-2xl font-semibold transition-opacity duration-150 hover:opacity-75"
 									>
 										Learn more
 									</span>

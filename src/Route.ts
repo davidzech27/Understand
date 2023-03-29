@@ -5,4 +5,9 @@ export type Route =
 	| {
 			routeName: "course";
 			courseId: string;
+	  }
+	| {
+			routeName: "assignment";
+			courseId: string;
+			assignmentId: string;
 	  };
