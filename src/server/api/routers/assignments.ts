@@ -4,6 +4,9 @@ import { createTRPCRouter, authedProcedure } from "~/server/api/trpc";
 import { assignmentSchema, assignmentListSchema } from "~/server/schemas";
 import { classroom_v1 } from "googleapis";
 import undefinedTypeGuard from "~/util/undefinedTypeGuard";
+import db from "~/db/db";
+import { feedbackConfig } from "~/db/schema";
+import { eq, and } from "drizzle-orm/expressions";
 
 const transformAssignment = ({
 	id,
@@ -99,16 +102,30 @@ export const assignmentsRouter = createTRPCRouter({
 			})
 		)
 		.query(async ({ input: { id, courseId }, ctx: { classroom } }) => {
-			return assignmentSchema.parse(
-				transformAssignment(
-					(
-						await classroom.courses.courseWork.get({
-							id,
-							courseId,
-						})
-					).data
-				)
+			const [assignmentResponse, [feedbackConfigRow]] = await Promise.all(
+				[
+					classroom.courses.courseWork.get({
+						id,
+						courseId,
+					}),
+					db
+						.select({ instructions: feedbackConfig.instructions })
+						.from(feedbackConfig)
+						.where(
+							and(
+								eq(feedbackConfig.courseId, courseId),
+								eq(feedbackConfig.assignmentId, id)
+							)
+						),
+				]
 			);
+
+			return {
+				...assignmentSchema.parse(
+					transformAssignment(assignmentResponse.data)
+				),
+				feedbackConfig: feedbackConfigRow,
+			};
 		}),
 	byCourse: authedProcedure
 		.input(
@@ -117,18 +134,54 @@ export const assignmentsRouter = createTRPCRouter({
 			})
 		)
 		.query(async ({ input: { courseId }, ctx: { classroom } }) => {
-			return assignmentListSchema.parse(
-				(
-					(
-						await classroom.courses.courseWork.list({
-							courseId,
-							courseWorkStates: ["PUBLISHED", "DRAFT"], // decide how to handle/display draft assignments later
-							orderBy: "dueDate",
+			const [assignmentsResponse, feedbackConfigRows] = await Promise.all(
+				[
+					classroom.courses.courseWork.list({
+						courseId,
+						courseWorkStates: ["PUBLISHED", "DRAFT"],
+						orderBy: "dueDate",
+					}),
+					db
+						.select({
+							id: feedbackConfig.assignmentId,
+							instructions: feedbackConfig.instructions,
 						})
-					).data.courseWork ?? []
-				)
+						.from(feedbackConfig)
+						.where(eq(feedbackConfig.courseId, courseId)),
+				]
+			);
+
+			const assignments = assignmentListSchema.parse(
+				(assignmentsResponse.data.courseWork ?? [])
 					.map(transformAssignment)
 					.filter(undefinedTypeGuard)
 			);
+
+			const feedbackConfigByIdMap = new Map<
+				string,
+				(typeof feedbackConfigRows)[0]
+			>();
+
+			for (const feedbackConfigRow of feedbackConfigRows) {
+				feedbackConfigByIdMap.set(
+					feedbackConfigRow.id,
+					feedbackConfigRow
+				);
+			}
+
+			return assignments.map((assignment) => {
+				const feedbackConfigRow = feedbackConfigByIdMap.get(
+					assignment.id
+				);
+
+				return {
+					...assignment,
+					feedbackConfig: feedbackConfigRow
+						? {
+								instructions: feedbackConfigRow.instructions,
+						  }
+						: undefined,
+				};
+			});
 		}),
 });

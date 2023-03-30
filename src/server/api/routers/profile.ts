@@ -7,7 +7,7 @@ import { user } from "~/db/schema";
 import { profileSchema } from "~/server/schemas";
 
 export const profileRouter = createTRPCRouter({
-	me: authedProcedure.query(async ({ ctx: { email, people } }) => {
+	me: authedProcedure.query(async ({ ctx: { email, classroom } }) => {
 		const [[userRow], photo] = await Promise.all([
 			db
 				.select({ name: user.name })
@@ -15,13 +15,12 @@ export const profileRouter = createTRPCRouter({
 				.where(eq(user.email, email)),
 			(async () => {
 				const photo = (
-					await people.people.get({
-						resourceName: "people/me",
-						personFields: "photos",
+					await classroom.userProfiles.get({
+						userId: email,
 					})
-				).data.photos?.[0]?.url;
+				).data.photoUrl;
 
-				return typeof photo === "string" ? photo : undefined;
+				return typeof photo === "string" ? `https:${photo}` : undefined;
 			})(),
 		]);
 
@@ -48,7 +47,6 @@ export const profileRouter = createTRPCRouter({
 					.select({ name: user.name })
 					.from(user)
 					.where(eq(user.email, email)),
-
 				classroom.userProfiles.get({
 					userId: email,
 				}),

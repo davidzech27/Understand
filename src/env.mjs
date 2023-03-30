@@ -20,6 +20,7 @@ const server = z.object({
 	DATABASE_URL: z.string(),
 	GOOGLE_CLIENT_ID: z.string(),
 	GOOGLE_CLIENT_SECRET: z.string(),
+	OPENAI_SECRET_KEY: z.string(),
 });
 
 /**
@@ -41,6 +42,7 @@ const processEnv = {
 	DATABASE_URL: process.env.DATABASE_URL,
 	GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
 	GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+	OPENAI_SECRET_KEY: process.env.OPENAI_SECRET_KEY,
 };
 
 // Don't touch the part below

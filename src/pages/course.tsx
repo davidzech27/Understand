@@ -8,6 +8,7 @@ import { api } from "~/lib/api";
 import DefaultLayout from "~/components/layout/DefaultLayout";
 import clsx from "clsx";
 import formatDate from "~/util/formatDate";
+import ToggleButton from "~/components/shared/ToggleButton";
 
 // todo - make page protected
 // todo - replace subpage's useState with useStickyState (custom hook for saving state to local storage). include courseId in key
@@ -45,7 +46,7 @@ const Course: NextPage = () => {
 		>
 			{course && assignments && roster && (
 				<div className="flex flex-col space-y-2.5 py-2.5 pr-3">
-					<div className="bg-surface flex flex-col justify-between rounded-md py-5 px-6">
+					<div className="flex flex-col justify-between rounded-md bg-surface py-5 px-6">
 						<div className="flex items-baseline justify-between">
 							<span
 								style={{
@@ -67,45 +68,30 @@ const Course: NextPage = () => {
 						</div>
 
 						<div className="flex space-x-1.5">
-							<button
+							<ToggleButton
 								onClick={() => setSubpage("assignments")}
-								className={clsx(
-									"select-none rounded-md py-2.5 px-6 text-lg font-medium transition-all duration-150",
-									subpage === "assignments"
-										? "bg-surface-selected hover:bg-surface-selected-hover opacity-80"
-										: "hover:bg-surface-hover opacity-60 hover:opacity-80"
-								)}
+								toggled={subpage === "assignments"}
 							>
 								Assignments
-							</button>
+							</ToggleButton>
 
-							<button
+							<ToggleButton
 								onClick={() => setSubpage("people")}
-								className={clsx(
-									"select-none rounded-md py-2.5 px-6 text-lg font-medium transition-all duration-150",
-									subpage === "people"
-										? "bg-surface-selected hover:bg-surface-selected-hover opacity-80"
-										: "hover:bg-surface-hover opacity-60 hover:opacity-80"
-								)}
+								toggled={subpage === "people"}
 							>
 								People
-							</button>
+							</ToggleButton>
 
-							<button
+							<ToggleButton
 								onClick={() => setSubpage("insights")}
-								className={clsx(
-									"select-none rounded-md py-2.5 px-6 text-lg font-medium transition-all duration-150",
-									subpage === "insights"
-										? "bg-surface-selected hover:bg-surface-selected-hover opacity-80"
-										: "hover:bg-surface-hover opacity-60 hover:opacity-80"
-								)}
+								toggled={subpage === "insights"}
 							>
 								Insights
-							</button>
+							</ToggleButton>
 						</div>
 					</div>
 
-					<div className="bg-surface flex flex-col rounded-md py-5 px-6">
+					<div className="flex flex-col rounded-md bg-surface py-5 px-6">
 						{subpage === "assignments" ? (
 							<div className="space-y-2.5">
 								{assignments.length > 0 ? (
@@ -113,7 +99,7 @@ const Course: NextPage = () => {
 										<Link
 											href={`/course/${courseId}/assignment/${assignment.id}`}
 											key={assignment.id}
-											className="hover:bg-surface-hover border-border flex h-20 items-center justify-between rounded-md border-[0.75px] pl-6 pr-8 transition-colors duration-150"
+											className="flex h-20 items-center justify-between rounded-md border-[0.75px] border-border pl-6 pr-8 transition-colors duration-150 hover:bg-surface-hover"
 										>
 											<span className="text-lg font-medium opacity-90">
 												{assignment.title}
@@ -153,7 +139,7 @@ const Course: NextPage = () => {
 									{roster.teachers.map((teacher) => (
 										<div
 											key={teacher.email}
-											className="border-border flex h-20 items-center rounded-md border-[0.75px] pl-6 pr-8"
+											className="flex h-20 items-center rounded-md border-[0.75px] border-border pl-6 pr-8"
 										>
 											<img
 												src={teacher.photo}
@@ -184,7 +170,7 @@ const Course: NextPage = () => {
 												<Link
 													href={`/course/${courseId}/student/${student.email}`}
 													key={student.email}
-													className="hover:bg-surface-hover border-border flex h-20 items-center rounded-md border-[0.75px] pl-6 pr-8 transition-colors duration-150"
+													className="flex h-20 items-center rounded-md border-[0.75px] border-border pl-6 pr-8 transition-colors duration-150 hover:bg-surface-hover"
 												>
 													<img
 														src={student.photo}

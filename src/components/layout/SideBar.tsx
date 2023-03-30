@@ -31,8 +31,14 @@ const SideBar: React.FC<Props> = ({
 						href="/" // possibly redirect to about page in future
 						className="flex justify-center rounded-md pt-1 pb-1.5 transition-opacity duration-150 hover:opacity-75"
 					>
-						<span // no gradient because gradient is used elsewhere and we shouldn't overdo it. reconsider later
-							className="cursor-pointer text-2xl font-semibold text-primary"
+						<span
+							style={{
+								background: `linear-gradient(45deg, ${colors.primary}, ${colors.secondary})`,
+								WebkitBackgroundClip: "text",
+								backgroundClip: "text",
+								color: "transparent",
+							}}
+							className="cursor-pointer text-2xl font-semibold"
 						>
 							Understand
 						</span>

@@ -126,13 +126,13 @@ const isAuthed = t.middleware(({ ctx, next }) => {
 
 	const classroom = google.classroom({ version: "v1", auth: oauth2Client });
 
-	const people = google.people({ version: "v1", auth: oauth2Client });
+	const drive = google.drive({ version: "v3", auth: oauth2Client });
 
 	return next({
 		ctx: {
 			email: ctx.session.user.email,
 			classroom,
-			people,
+			drive,
 		},
 	});
 });

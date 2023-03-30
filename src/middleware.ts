@@ -26,6 +26,13 @@ export const middleware = (request: NextRequest) => {
 			)
 		);
 
+	if (request.nextUrl.pathname.indexOf("/feedback/") !== -1)
+		return NextResponse.rewrite(
+			new URL(
+				`${request.nextUrl.protocol}//${request.nextUrl.host}/feedback`
+			)
+		);
+
 	//! must be below other routes that begin with /course
 	if (request.nextUrl.pathname.startsWith("/course"))
 		return NextResponse.rewrite(
