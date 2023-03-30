@@ -1,8 +1,6 @@
 import Link from "next/link";
 import PreviewDisplay from "../shared/PreviewDisplay";
 import colors from "colors.cjs";
-import { api } from "~/lib/api";
-import { type Route } from "~/Route";
 
 interface Props {
 	selectedCourseId: string | undefined;
@@ -26,7 +24,7 @@ const SideBar: React.FC<Props> = ({
 	return (
 		<nav className="h-screen w-80">
 			<div className="fixed h-screen w-80 px-3 py-2.5">
-				<div className="bg-surface flex h-full select-none flex-col rounded-md py-3 px-3">
+				<div className="flex h-full select-none flex-col rounded-md bg-surface py-3 px-3">
 					<Link
 						href="/" // possibly redirect to about page in future
 						className="flex justify-center rounded-md pt-1 pb-1.5 transition-opacity duration-150 hover:opacity-75"
