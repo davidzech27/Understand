@@ -1,15 +1,10 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import { signIn, signOut, useSession } from "next-auth/react";
+import FancyButton from "~/components/shared/FancyButton";
 import colors from "colors.cjs";
-import { api } from "~/lib/api";
 
 const Index: NextPage = () => {
-	const onSignIn = () => {
-		signIn("google", { callbackUrl: "/home" });
-	};
-
 	return (
 		<>
 			<Head>
@@ -45,28 +40,11 @@ const Index: NextPage = () => {
 							</p>
 
 							<div className="ml-1 flex">
-								<button
-									onClick={onSignIn}
-									className="group relative flex h-16 w-48 items-center justify-center"
-								>
-									<span className="select-none text-2xl font-medium text-black opacity-80 transition-all duration-150 group-hover:text-white group-hover:opacity-100">
-										Sign in
-									</span>
-
-									<div className="absolute -z-10 h-full w-full rounded-xl bg-gradient-to-tr from-primary to-secondary opacity-0 transition-opacity duration-150 group-hover:opacity-100" />
-
-									<div
-										style={{
-											border: "4px solid transparent",
-											background: `linear-gradient(45deg, ${colors.primary}, ${colors.secondary}) border-box`,
-											WebkitMask:
-												"linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)",
-											WebkitMaskComposite: "xor",
-											maskComposite: "exclude",
-										}}
-										className="absolute h-full w-full rounded-xl"
-									/>
-								</button>
+								<div className="h-16 w-48">
+									<FancyButton href="/signIn">
+										Get started
+									</FancyButton>
+								</div>
 
 								<div className="ml-9 flex items-center">
 									<span

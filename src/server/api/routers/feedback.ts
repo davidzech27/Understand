@@ -1,11 +1,11 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { createTRPCRouter, authedProcedure } from "~/server/api/trpc";
+import { createRouter, authedProcedure } from "~/server/api/trpc";
 import db from "~/db/db";
 import { eq } from "drizzle-orm/expressions";
 import { feedbackConfig } from "~/db/schema";
 
-export const feedbackRouter = createTRPCRouter({
+export const feedbackRouter = createRouter({
 	getGoogleDocText: authedProcedure
 		.input(
 			z.object({

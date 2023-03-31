@@ -47,7 +47,7 @@ const DefaultLayout: React.FC<Props> = ({
 			</Head>
 
 			{!forceLoading && profile && coursesTeaching ? (
-				<div className="bg-background flex min-h-screen">
+				<div className="flex min-h-screen bg-background">
 					<SideBar
 						selectedCourseId={selectedCourseId}
 						profile={profile}

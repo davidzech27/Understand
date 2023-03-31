@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { createTRPCRouter, authedProcedure } from "~/server/api/trpc";
+import { createRouter, authedProcedure } from "~/server/api/trpc";
 import { courseListSchema } from "~/server/schemas";
 
-export const coursesRouter = createTRPCRouter({
+export const coursesRouter = createRouter({
 	teaching: authedProcedure.query(async ({ ctx: { classroom } }) => {
 		return courseListSchema.parse(
 			(

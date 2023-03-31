@@ -1,12 +1,12 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { createTRPCRouter, authedProcedure } from "~/server/api/trpc";
+import { createRouter, authedProcedure } from "~/server/api/trpc";
 import db from "~/db/db";
 import { eq } from "drizzle-orm/expressions";
 import { user } from "~/db/schema";
 import { profileSchema } from "~/server/schemas";
 
-export const profileRouter = createTRPCRouter({
+export const profileRouter = createRouter({
 	me: authedProcedure.query(async ({ ctx: { email, classroom } }) => {
 		const [[userRow], photo] = await Promise.all([
 			db
@@ -61,5 +61,10 @@ export const profileRouter = createTRPCRouter({
 				name: userRow?.name ?? googleName?.fullName,
 				photo: typeof photo === "string" ? `https:${photo}` : undefined,
 			});
+		}),
+	update: authedProcedure
+		.input(z.object({ name: z.string().optional() }))
+		.mutation(async ({ input: { name }, ctx: { email } }) => {
+			await db.update(user).set({ name }).where(eq(user.email, email));
 		}),
 });

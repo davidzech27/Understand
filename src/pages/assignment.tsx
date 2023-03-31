@@ -15,6 +15,7 @@ import ToggleButton from "~/components/shared/ToggleButton";
 import Button from "~/components/shared/Button";
 import fetchOpenaiStream from "~/util/fetchOpenaiStream";
 import { summarizeInstructionsPrompt } from "~/prompts";
+import authenticate from "~/util/authenticate";
 
 // todo - make page protected
 // todo - make loading screens
@@ -51,24 +52,32 @@ const Assignment: NextPage = () => {
 		.filter(undefinedTypeGuard);
 
 	const onPickAttachment = async ({ id }: { id: string }) => {
-		const googleDocText = await queryClient.feedback.getGoogleDocText.fetch(
-			{
-				id,
-			}
-		);
-
-		fetchOpenaiStream({
-			...summarizeInstructionsPrompt({ text: googleDocText }),
-			onContent: (content) => {
-				setModal(undefined);
-				console.log(content);
-				setFeedbackInstructionsInput((prev) => prev + content);
-
-				instructionsInputRef.current?.scroll({
-					top: instructionsInputRef.current?.scrollHeight,
+		try {
+			const googleDocText =
+				await queryClient.feedback.getGoogleDocText.fetch({
+					id,
 				});
-			},
-		});
+
+			fetchOpenaiStream({
+				...summarizeInstructionsPrompt({
+					text: googleDocText,
+				}),
+				onContent: (content) => {
+					setModal(undefined);
+
+					setFeedbackInstructionsInput((prev) => prev + content);
+
+					instructionsInputRef.current?.scroll({
+						top: instructionsInputRef.current?.scrollHeight,
+					});
+				},
+			});
+		} catch {
+			authenticate({
+				permissions: ["drive"],
+				redirectTo: window.location.href,
+			});
+		}
 	};
 
 	const configureFeedback =

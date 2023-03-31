@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { createTRPCRouter, authedProcedure } from "~/server/api/trpc";
+import { createRouter, authedProcedure } from "~/server/api/trpc";
 import { assignmentSchema, assignmentListSchema } from "~/server/schemas";
 import { classroom_v1 } from "googleapis";
 import undefinedTypeGuard from "~/util/undefinedTypeGuard";
@@ -93,7 +93,7 @@ const transformAssignment = ({
 		  }
 		: undefined;
 
-export const assignmentsRouter = createTRPCRouter({
+export const assignmentsRouter = createRouter({
 	get: authedProcedure
 		.input(
 			z.object({
