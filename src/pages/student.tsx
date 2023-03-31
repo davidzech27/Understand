@@ -4,7 +4,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import colors from "colors.cjs";
-import { api } from "~/lib/api";
+import { api } from "~/lib/trpc";
 import DefaultLayout from "~/components/layout/DefaultLayout";
 import clsx from "clsx";
 import formatDate from "~/util/formatDate";
@@ -37,7 +37,7 @@ const Student: NextPage = () => {
 		<DefaultLayout forceLoading={!student} selectedCourseId={courseId}>
 			{student && (
 				<div className="flex h-screen flex-col space-y-2.5 py-2.5 pr-3">
-					<div className="bg-surface flex items-center rounded-md py-5 px-6">
+					<div className="flex items-center rounded-md bg-surface py-5 px-6">
 						<img
 							src={student.photo}
 							className="h-20 w-20 rounded-full"
@@ -62,7 +62,7 @@ const Student: NextPage = () => {
 						</div>
 					</div>
 
-					<div className="bg-surface flex flex-col rounded-md py-5 px-6">
+					<div className="flex flex-col rounded-md bg-surface py-5 px-6">
 						<span className="font-medium italic opacity-60">
 							Student insights coming soon...
 						</span>

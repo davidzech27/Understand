@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createRouter, authedProcedure } from "~/server/api/trpc";
-import { courseListSchema } from "~/server/schemas";
+import { courseListSchema } from "~/server/validationSchemas";
 
 export const coursesRouter = createRouter({
 	teaching: authedProcedure.query(async ({ ctx: { classroom } }) => {

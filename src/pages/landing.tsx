@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import FancyButton from "~/components/shared/FancyButton";
 import TextInput from "~/components/shared/TextInput";
-import { api } from "~/lib/api";
+import { api } from "~/lib/trpc";
 
 // todo - add extra content to fill awkward whitespace
 

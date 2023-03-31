@@ -4,7 +4,7 @@ import { createRouter, authedProcedure } from "~/server/api/trpc";
 import db from "~/db/db";
 import { eq } from "drizzle-orm/expressions";
 import { user } from "~/db/schema";
-import { profileSchema } from "~/server/schemas";
+import { profileSchema } from "~/server/validationSchemas";
 
 export const profileRouter = createRouter({
 	me: authedProcedure.query(async ({ ctx: { email, classroom } }) => {

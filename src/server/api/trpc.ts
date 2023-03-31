@@ -3,8 +3,8 @@ import { google } from "googleapis";
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
-import { createAuthedOAuth2Client, getAuth } from "../auth";
-import { env } from "~/env.mjs";
+import { getAuth } from "../auth/jwt";
+import { createAuthedOAuth2Client } from "../auth/google";
 
 export const createContext = async ({
 	req,

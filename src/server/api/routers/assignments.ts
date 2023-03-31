@@ -1,7 +1,10 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { createRouter, authedProcedure } from "~/server/api/trpc";
-import { assignmentSchema, assignmentListSchema } from "~/server/schemas";
+import {
+	assignmentSchema,
+	assignmentListSchema,
+} from "~/server/validationSchemas";
 import { classroom_v1 } from "googleapis";
 import undefinedTypeGuard from "~/util/undefinedTypeGuard";
 import db from "~/db/db";

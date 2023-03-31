@@ -1,6 +1,6 @@
 import { type NextPage } from "next";
 import Head from "next/head";
-import authenticate from "~/util/authenticate";
+import authenticateWithGoogle from "~/lib/authenticateWithGoogle";
 import WideButton from "~/components/shared/WideButton";
 import { useState } from "react";
 import FancyButton from "~/components/shared/FancyButton";
@@ -10,7 +10,7 @@ import FancyButton from "~/components/shared/FancyButton";
 const SignIn: NextPage = () => {
 	const onSignIn = () => {
 		selectedRole &&
-			authenticate({
+			authenticateWithGoogle({
 				permissions:
 					selectedRole === "student"
 						? ["courses", "rosters", "selfAssignments"]

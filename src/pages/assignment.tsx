@@ -4,7 +4,7 @@ import { type NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import colors from "colors.cjs";
-import { api } from "~/lib/api";
+import { api } from "~/lib/trpc";
 import DefaultLayout from "~/components/layout/DefaultLayout";
 import clsx from "clsx";
 import formatDate from "~/util/formatDate";
@@ -13,9 +13,9 @@ import undefinedTypeGuard from "~/util/undefinedTypeGuard";
 import TextArea from "~/components/shared/TextArea";
 import ToggleButton from "~/components/shared/ToggleButton";
 import Button from "~/components/shared/Button";
-import fetchOpenaiStream from "~/util/fetchOpenaiStream";
+import fetchOpenaiStream from "~/lib/fetchOpenaiStream";
 import { summarizeInstructionsPrompt } from "~/prompts";
-import authenticate from "~/util/authenticate";
+import authenticateWithGoogle from "~/lib/authenticateWithGoogle";
 
 // todo - make page protected
 // todo - make loading screens
@@ -73,7 +73,7 @@ const Assignment: NextPage = () => {
 				},
 			});
 		} catch {
-			authenticate({
+			authenticateWithGoogle({
 				permissions: ["drive"],
 				redirectTo: window.location.href,
 			});

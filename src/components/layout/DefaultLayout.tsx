@@ -1,6 +1,6 @@
 import Head from "next/head";
 import SideBar from "./SideBar";
-import { api } from "~/lib/api";
+import { api } from "~/lib/trpc";
 
 type Props = {
 	children: React.ReactNode;

@@ -1,12 +1,8 @@
 import { type NextApiHandler } from "next";
 import Cookies from "cookies";
-import { createUnauthedOAuth2Client } from "~/server/auth";
+import { createUnauthedOAuth2Client, redirectUrl } from "~/server/auth/google";
 import { google } from "googleapis";
-import {
-	redirectUrl,
-	authorizationCookieKey,
-	encodeAccessToken,
-} from "~/server/auth";
+import { authorizationCookieKey, encodeAccessToken } from "~/server/auth/jwt";
 import db from "~/db/db";
 import { user } from "~/db/schema";
 

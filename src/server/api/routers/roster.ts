@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createRouter, authedProcedure } from "~/server/api/trpc";
-import { rosterSchema } from "~/server/schemas";
+import { rosterSchema } from "~/server/validationSchemas";
 import db from "~/db/db";
 import { user } from "~/db/schema";
 import { sql } from "drizzle-orm";

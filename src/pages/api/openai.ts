@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { env } from "~/env.mjs";
-import { decodeAccessToken, authorizationCookieKey } from "~/server/auth";
+import { decodeAccessToken, authorizationCookieKey } from "~/server/auth/jwt";
 
 export const config = {
 	runtime: "edge",

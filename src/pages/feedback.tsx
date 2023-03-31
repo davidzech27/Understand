@@ -3,7 +3,7 @@ import Head from "next/head";
 import Link from "next/link";
 import DefaultLayout from "~/components/layout/DefaultLayout";
 import colors from "colors.cjs";
-import { api } from "~/lib/api";
+import { api } from "~/lib/trpc";
 
 // todo - make page protected
 const Feedback: NextPage = () => {
