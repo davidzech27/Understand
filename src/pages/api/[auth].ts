@@ -86,7 +86,7 @@ const handler: NextApiHandler = async (req, res) => {
 				},
 			});
 
-		const accessToken = encodeAccessToken({
+		const accessToken = await encodeAccessToken({
 			email: emailAddress,
 			googleAccessToken: tokens.access_token,
 			googleRefreshToken: tokens.refresh_token,

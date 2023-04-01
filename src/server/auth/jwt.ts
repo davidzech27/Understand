@@ -1,5 +1,5 @@
 import { type NextApiRequest, type NextApiResponse } from "next";
-import jwt from "jsonwebtoken";
+import * as jose from "jose";
 import Cookies from "cookies";
 import { z } from "zod";
 import { env } from "~/env.mjs";
@@ -12,38 +12,48 @@ const accessTokenPayloadSchema = z.object({
 	googleRefreshToken: z.string(),
 });
 
-export const encodeAccessToken = (
+export const encodeAccessToken = async (
 	payload: z.infer<typeof accessTokenPayloadSchema>
-) => jwt.sign(payload, env.JWT_SECRET);
+) =>
+	await new jose.SignJWT(payload)
+		.setProtectedHeader({ alg: "HS256" })
+		.setIssuedAt()
+		.sign(new TextEncoder().encode(env.JWT_SECRET));
 
-export const decodeAccessToken = ({ accessToken }: { accessToken: string }) =>
-	accessTokenPayloadSchema.parse(jwt.verify(accessToken, env.JWT_SECRET));
+export const decodeAccessToken = async ({
+	accessToken,
+}: {
+	accessToken: string;
+}) =>
+	accessTokenPayloadSchema.parse(
+		(
+			await jose.jwtVerify(
+				accessToken,
+				new TextEncoder().encode(env.JWT_SECRET)
+			)
+		).payload
+	);
 
-export const getAuth = ({
+export const getAuth = async ({
 	req,
 	res,
 }: {
 	req: NextApiRequest;
 	res: NextApiResponse;
-}):
-	| { authed: false }
-	| ({ authed: true } & z.infer<typeof accessTokenPayloadSchema>) => {
+}): Promise<z.infer<typeof accessTokenPayloadSchema> | undefined> => {
 	const cookies = Cookies(req, res);
 
 	const authorization = cookies.get(authorizationCookieKey);
 
-	if (!authorization) return { authed: false };
+	if (!authorization) return undefined;
 
 	const accessToken = authorization.replace("Bearer ", "");
 
 	try {
-		const accessTokenPayload = decodeAccessToken({ accessToken });
+		const accessTokenPayload = await decodeAccessToken({ accessToken });
 
-		return {
-			authed: true,
-			...accessTokenPayload,
-		};
+		return accessTokenPayload;
 	} catch {
-		return { authed: false };
+		return undefined;
 	}
 };

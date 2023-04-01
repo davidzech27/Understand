@@ -34,10 +34,10 @@ export const createRouter = t.router;
 
 export const publicProcedure = t.procedure;
 
-const isAuthed = t.middleware(({ ctx: { req, res }, next }) => {
-	const auth = getAuth({ req, res });
+const isAuthed = t.middleware(async ({ ctx: { req, res }, next }) => {
+	const auth = await getAuth({ req, res });
 
-	if (!auth.authed) throw new TRPCError({ code: "UNAUTHORIZED" });
+	if (!auth) throw new TRPCError({ code: "UNAUTHORIZED" });
 
 	const { email, googleAccessToken, googleRefreshToken } = auth;
 
