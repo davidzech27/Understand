@@ -4,8 +4,8 @@ import { authorizationCookieKey, getAuth } from "./server/auth/jwt";
 
 export const middleware = (request: NextRequest) => {
 	if (
-		request.nextUrl.pathname === "/" ||
-		request.nextUrl.pathname === "/signIn"
+		request.nextUrl.pathname !== "/" &&
+		request.nextUrl.pathname !== "/signIn"
 	) {
 		const authorization = request.cookies.get(
 			authorizationCookieKey

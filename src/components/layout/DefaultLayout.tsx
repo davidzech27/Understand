@@ -88,7 +88,7 @@ const DefaultLayout: React.FC<Props> = ({
 						coursesEnrolled={coursesEnrolled}
 					/>
 
-					<main className="flex-1 select-none">{children}</main>
+					<main className="flex-1">{children}</main>
 				</div>
 			) : (
 				<div className="flex h-screen w-full flex-col items-center bg-gradient-to-tr from-primary to-secondary">
