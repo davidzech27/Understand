@@ -52,7 +52,9 @@ const SignIn: NextPage = () => {
 					<div className="flex-[0.875]" />
 
 					<div className="w-full text-center text-7xl font-bold leading-[1.05] tracking-tight text-white">
-						Welcome to Understand! Let&apos;s get started.
+						Welcome to Understand!
+						<br />
+						Let&apos;s get started.
 					</div>
 
 					<div className="flex-1" />
