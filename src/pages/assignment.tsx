@@ -19,6 +19,8 @@ import authenticateWithGoogle from "~/lib/authenticateWithGoogle";
 import useStickyState from "~/util/useStickyState";
 import useSelectedCourse from "~/util/useSelectedCourse";
 
+// perhaps completely abstract away the creation of feedback instructions, and instead of showing actual instructions, just have user see list of things model is taking into account. not as transparent though, and users don't get to see summary being created
+// put some more thought into how to bring external content into site. perhaps not always the best idea for input to show up on main screen, and maybe would be better for it to show up as an attachment that can be opened up with a modal
 // consider letting users delete feedback
 // todo - make page protected
 // todo - make loading screens
@@ -495,32 +497,38 @@ const Assignment: NextPage = () => {
 
 											<div className="flex h-64 space-x-2.5">
 												<div className="flex-1">
-													<TextArea
-														value={
-															demoAssignmentInput
-														}
-														setValue={
-															setDemoAssignmentInput
-														}
-														placeholder="Enter a test assignment to try out feedback"
-														ref={
-															demoAssignmentInputRef
-														}
-													/>
+													{generatingDemoFeedback ||
+													processedDemoFeedback !==
+														"" ? (
+														<div className="h-full overflow-y-scroll whitespace-pre-wrap rounded-md border-[1px] border-border bg-surface-bright py-1.5 px-3 font-medium opacity-80">
+															{
+																demoAssignmentInput
+															}
+														</div>
+													) : (
+														<TextArea
+															value={
+																demoAssignmentInput
+															}
+															setValue={
+																setDemoAssignmentInput
+															}
+															placeholder="Enter a test assignment to try out feedback"
+															ref={
+																demoAssignmentInputRef
+															}
+														/>
+													)}
 												</div>
 
 												<div
 													ref={demoFeedbackRef}
 													className={clsx(
 														"h-full flex-1 overflow-y-scroll whitespace-pre-wrap rounded-md border-[1px] border-border py-1.5 px-3 font-medium",
-														processedDemoFeedback.length >
-															0 ||
-															(generatingDemoFeedback &&
-																"bg-surface-bright"),
 														processedDemoFeedback ===
 															""
 															? "opacity-30"
-															: "opacity-80"
+															: "bg-surface-bright opacity-80"
 													)}
 												>
 													{processedDemoFeedback ===
@@ -536,8 +544,8 @@ const Assignment: NextPage = () => {
 													<Button
 														onClick={onGetFeedback}
 														disabled={
-															demoAssignmentInput.length ===
-																0 ||
+															demoAssignmentInput ===
+																"" ||
 															generatingDemoFeedback ||
 															processedDemoFeedback !==
 																""
@@ -548,7 +556,7 @@ const Assignment: NextPage = () => {
 													</Button>
 												</div>
 
-												{demoFeedback.length > 0 &&
+												{demoFeedback !== "" &&
 													!generatingDemoFeedback && (
 														<div className="w-48">
 															<Button
