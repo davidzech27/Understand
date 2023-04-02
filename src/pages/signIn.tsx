@@ -111,7 +111,7 @@ const SignIn: NextPage = () => {
 								<br />
 								for Google account access or Understand
 								<br />
-								won't be able to work properly
+								won&apos;t be able to work properly
 							</span>
 						</div>
 
