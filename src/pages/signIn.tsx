@@ -5,7 +5,7 @@ import WideButton from "~/components/shared/WideButton";
 import { useState } from "react";
 import FancyButton from "~/components/shared/FancyButton";
 
-// todo - add extra content to fill awkward whitespace
+// todo - add extra content to fill awkward whitespace. or perhaps make panel smaller, but this would make the gradient section too big
 
 const SignIn: NextPage = () => {
 	const onSignIn = () => {
@@ -97,7 +97,7 @@ const SignIn: NextPage = () => {
 							</div>
 						</div>
 
-						<div className="h-20 w-96">
+						<div className="relative h-20 w-96">
 							<FancyButton
 								onClick={onSignIn}
 								disabled={selectedRole === undefined}
@@ -105,6 +105,14 @@ const SignIn: NextPage = () => {
 							>
 								Sign in with Google
 							</FancyButton>
+
+							<span className="absolute left-0 right-0 mt-4 text-center text-sm font-medium opacity-60">
+								Make sure that you check all the checkboxes
+								<br />
+								for Google account access or Understand
+								<br />
+								won't be able to work properly
+							</span>
 						</div>
 
 						<div className="flex-1" />

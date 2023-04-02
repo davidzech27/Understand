@@ -1,6 +1,7 @@
 import Head from "next/head";
 import SideBar from "./SideBar";
 import { api } from "~/lib/trpc";
+import { useRouter } from "next/router";
 
 type Props = {
 	children: React.ReactNode;
@@ -15,7 +16,13 @@ const DefaultLayout: React.FC<Props> = ({
 	forceLoading,
 	notFoundMessage,
 }) => {
-	const { data: profile } = api.profile.me.useQuery();
+	const router = useRouter();
+
+	const { data: profile } = api.profile.me.useQuery(undefined, {
+		onError: (error) => {
+			if (error.data?.code === "UNAUTHORIZED") router.push("/signIn");
+		},
+	});
 
 	const { data: coursesTeaching } = api.courses.teaching.useQuery(undefined, {
 		onSuccess: (courses) => {

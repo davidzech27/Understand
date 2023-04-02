@@ -11,7 +11,7 @@ import formatDate from "~/util/formatDate";
 import ToggleButton from "~/components/shared/ToggleButton";
 import useStickyState from "~/util/useStickyState";
 import useSelectedCourse from "~/util/useSelectedCourse";
-
+// consider adding borders or shadows on surfaces
 // todo - figure out why students subpage only shows current user if user is student
 // todo - place links to corresponding google classroom pages in a bunch of places
 const Course: NextPage = () => {
@@ -50,7 +50,7 @@ const Course: NextPage = () => {
 			notFoundMessage={notFoundMessage}
 		>
 			{course && assignments && roster && (
-				<div className="flex flex-col space-y-2.5 py-2.5 pr-3">
+				<div className="flex min-h-full flex-col space-y-2.5 py-2.5 pr-3">
 					<div className="flex flex-col justify-between rounded-md bg-surface py-5 px-6">
 						<div className="flex items-baseline justify-between">
 							<span
@@ -98,7 +98,7 @@ const Course: NextPage = () => {
 						</div>
 					</div>
 
-					<div className="flex flex-col rounded-md bg-surface py-5 px-6">
+					<div className="flex flex-1 flex-col rounded-md bg-surface py-5 px-6">
 						{subpage === "assignments" ? (
 							<div className="space-y-2.5">
 								{assignments.length > 0 ? (
@@ -154,13 +154,16 @@ const Course: NextPage = () => {
 											/>
 
 											<div className="ml-3 flex flex-col">
-												<span className="mb-[1px] font-medium leading-none opacity-90">
+												<span className="mb-[1px] select-text font-medium leading-none opacity-90">
 													{teacher.name}
 												</span>
 
-												<span className="text-sm opacity-60">
-													{teacher.email}
-												</span>
+												{teacher.email !==
+													undefined && (
+													<span className="select-text text-sm opacity-60">
+														{teacher.email}
+													</span>
+												)}
 											</div>
 										</div>
 									))}

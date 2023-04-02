@@ -14,17 +14,12 @@ export const middleware = async (request: NextRequest) => {
 			authorizationCookieKey
 		)?.value;
 
-		if (
-			!authorization ||
-			(await getAuth({ authorization })) === undefined
-		) {
-			console.log("111111111", request.nextUrl.pathname, authorization);
+		if (!authorization || (await getAuth({ authorization })) === undefined)
 			return NextResponse.redirect(
 				new URL(
 					`${request.nextUrl.protocol}//${request.nextUrl.host}/signIn`
 				)
 			);
-		}
 	}
 
 	if (

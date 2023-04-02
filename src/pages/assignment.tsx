@@ -256,7 +256,7 @@ const Assignment: NextPage = () => {
 							)}
 						</div>
 
-						<p className="px-1 pb-5 text-sm opacity-80">
+						<p className="select-text px-1 pb-5 text-sm opacity-80">
 							{assignment.description}
 						</p>
 
@@ -346,6 +346,7 @@ const Assignment: NextPage = () => {
 																					className="aspect-square h-12 rounded-full border-[0.75px] border-border"
 																				/>
 
+																				{/* select text not working here */}
 																				<div className="ml-3 flex flex-shrink flex-col">
 																					<span className="mb-[1px] font-medium leading-none opacity-90">
 																						{
@@ -432,7 +433,7 @@ const Assignment: NextPage = () => {
 												/>
 											</div>
 										) : (
-											<div className="whitespace-pre-wrap rounded-md border-[1px] border-border bg-surface-bright py-1.5 px-3 font-medium opacity-80">
+											<div className="select-text whitespace-pre-wrap rounded-md border-[1px] border-border bg-surface-bright py-1.5 px-3 font-medium opacity-80">
 												{
 													assignment.feedbackConfig
 														?.instructions
@@ -515,7 +516,7 @@ const Assignment: NextPage = () => {
 													{generatingDemoFeedback ||
 													processedDemoFeedback !==
 														"" ? (
-														<div className="h-full overflow-y-scroll whitespace-pre-wrap rounded-md border-[1px] border-border bg-surface-bright py-1.5 px-3 font-medium opacity-80">
+														<div className="h-full select-text overflow-y-scroll whitespace-pre-wrap rounded-md border-[1px] border-border bg-surface-bright py-1.5 px-3 font-medium opacity-80">
 															{
 																demoAssignmentInput
 															}
@@ -539,7 +540,7 @@ const Assignment: NextPage = () => {
 												<div
 													ref={demoFeedbackRef}
 													className={clsx(
-														"h-full flex-1 overflow-y-scroll whitespace-pre-wrap rounded-md border-[1px] border-border py-1.5 px-3 font-medium",
+														"h-full flex-1 select-text overflow-y-scroll whitespace-pre-wrap rounded-md border-[1px] border-border py-1.5 px-3 font-medium",
 														processedDemoFeedback ===
 															""
 															? "opacity-30"

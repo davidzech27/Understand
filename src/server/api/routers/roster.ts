@@ -6,6 +6,7 @@ import { rosterSchema } from "~/server/validationSchemas";
 import db from "~/db/db";
 import { user } from "~/db/schema";
 import { sql } from "drizzle-orm";
+//! limitation - names set up through understand aren't being used on non-workspace/school google classrooms because students can't view their teachers' email addresses so they can't be associated to their user database row
 // errors going on in this router but frontend seems to be fine
 export const rosterRouter = createRouter({
 	get: authedProcedure // unfortunately we are making nonconcurrent roundtrips here
@@ -47,7 +48,11 @@ export const rosterRouter = createRouter({
 					.from(user)
 					.where(
 						sql`user.email in ${roster.students
-							.concat(roster.teachers)
+							.concat(
+								roster.teachers.filter(
+									(teacher) => teacher.email !== undefined
+								) as typeof roster.students
+							)
 							.map((user) => user.email)}`
 					); // inArray expression causes errno 1241
 
@@ -62,6 +67,8 @@ export const rosterRouter = createRouter({
 
 				return {
 					teachers: roster.teachers.map((teacher) => {
+						if (teacher.email === undefined) return teacher;
+
 						const chosenName = chosenNameByEmailMap.get(
 							teacher.email
 						);

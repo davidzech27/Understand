@@ -32,7 +32,7 @@ const Index: NextPage = () => {
 								Supercharge{"\n"}student learning
 							</h1>
 
-							<p className="ml-1 text-xl font-medium opacity-60">
+							<p className="ml-1 select-text text-xl font-medium opacity-60">
 								With our next-generation student learning
 								platform, provide your students with tailored
 								learning experiences and your teachers with

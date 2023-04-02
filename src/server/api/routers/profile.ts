@@ -9,31 +9,44 @@ import { profileSchema } from "~/server/validationSchemas";
 
 export const profileRouter = createRouter({
 	me: authedProcedure.query(async ({ ctx: { email, classroom } }) => {
-		const [[userRow], photo] = await Promise.all([
-			db
-				.select({ name: user.name })
-				.from(user)
-				.where(eq(user.email, email)),
-			(async () => {
-				const photo = (
-					await classroom.userProfiles.get({
-						userId: email,
-					})
-				).data.photoUrl;
+		try {
+			const [[userRow], photo] = await Promise.all([
+				db
+					.select({ name: user.name })
+					.from(user)
+					.where(eq(user.email, email)),
+				(async () => {
+					const photo = (
+						await classroom.userProfiles.get({
+							userId: email,
+						})
+					).data.photoUrl;
 
-				return typeof photo === "string" ? `https:${photo}` : undefined;
-			})(),
-		]);
+					return typeof photo === "string"
+						? `https:${photo}`
+						: undefined;
+				})(),
+			]);
 
-		if (!userRow) {
-			throw new TRPCError({ code: "NOT_FOUND" });
+			if (!userRow) {
+				throw new TRPCError({ code: "NOT_FOUND" });
+			}
+
+			return {
+				email,
+				name: userRow.name,
+				photo,
+			};
+		} catch (error) {
+			if (error instanceof googleapis.Common.GaxiosError) {
+				if (error.response?.data?.error === "invalid_grant")
+					throw new TRPCError({
+						code: "UNAUTHORIZED",
+						message: "Refresh token expired or revoked",
+					});
+				else throw error;
+			} else throw error;
 		}
-
-		return {
-			email,
-			name: userRow.name,
-			photo,
-		};
 	}),
 	get: authedProcedure
 		.input(z.object({ email: z.string() }))

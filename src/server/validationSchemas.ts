@@ -14,9 +14,21 @@ export const profileSchema = z.object({
 	photo: z.string(),
 });
 
+export const studentSchema = z.object({
+	email: z.string(),
+	name: z.string(),
+	photo: z.string(),
+});
+
+export const teacherSchema = z.object({
+	email: z.string().optional(),
+	name: z.string(),
+	photo: z.string(),
+});
+
 export const rosterSchema = z.object({
-	teachers: z.array(profileSchema),
-	students: z.array(profileSchema),
+	teachers: z.array(teacherSchema),
+	students: z.array(studentSchema),
 });
 
 export const materialSchema = z.discriminatedUnion("type", [

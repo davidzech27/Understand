@@ -131,7 +131,8 @@ export default async (request: NextRequest) => {
 							}
 						} else {
 							console.error(
-								"This also shouldn't happen, because controller should be close()ed before getting to end of stream"
+								"This also shouldn't happen, because controller should be close()ed before getting to end of stream. Result: " +
+									JSON.stringify(result, null, 4)
 							);
 						}
 					}

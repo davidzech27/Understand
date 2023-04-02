@@ -20,7 +20,7 @@ const TextInput = forwardRef<HTMLInputElement, Props>(
 				autoFocus={autofocus}
 				ref={ref}
 				className={clsx(
-					"-mb-1.5 h-full w-full cursor-pointer resize-none rounded-md border-[1px] border-border bg-surface py-1.5 px-3 font-medium opacity-80 outline-none transition-colors duration-150 focus:cursor-auto focus:bg-surface-bright",
+					"-mb-1.5 h-full w-full cursor-pointer select-text resize-none rounded-md border-[1px] border-border bg-surface py-1.5 px-3 font-medium opacity-80 outline-none transition-colors duration-150 focus:cursor-auto focus:bg-surface-bright",
 					bigText && "text-xl"
 				)}
 			/>
