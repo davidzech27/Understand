@@ -26,8 +26,8 @@ const requestSchema = z.object({
 
 export type OpenAIStreamRequest = z.infer<typeof requestSchema>;
 
-export default async (req: NextRequest) => {
-	const authorization = req.cookies.get(authorizationCookieKey)?.value;
+export default async (request: NextRequest) => {
+	const authorization = request.cookies.get(authorizationCookieKey)?.value;
 
 	if (!authorization)
 		return new Response("Missing access token", { status: 401 });
@@ -35,11 +35,11 @@ export default async (req: NextRequest) => {
 	if ((await getAuth({ authorization })) === undefined)
 		return new Response("Invalid access token", { status: 401 });
 
-	if (req.method !== "POST") {
+	if (request.method !== "POST") {
 		return new Response("Method Not Allowed", { status: 405 });
 	}
 
-	const requestParsed = requestSchema.safeParse(await req.json());
+	const requestParsed = requestSchema.safeParse(await request.json());
 
 	if (!requestParsed.success) {
 		return new Response("Bad Request", { status: 400 });

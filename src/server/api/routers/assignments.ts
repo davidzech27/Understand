@@ -5,7 +5,7 @@ import {
 	assignmentSchema,
 	assignmentListSchema,
 } from "~/server/validationSchemas";
-import { classroom_v1 } from "googleapis";
+import * as googleapis from "googleapis";
 import undefinedTypeGuard from "~/util/undefinedTypeGuard";
 import db from "~/db/db";
 import { feedbackConfig } from "~/db/schema";
@@ -21,7 +21,7 @@ const transformAssignment = ({
 	workType,
 	state,
 	alternateLink,
-}: classroom_v1.Schema$CourseWork) =>
+}: googleapis.classroom_v1.Schema$CourseWork) =>
 	workType === "ASSIGNMENT"
 		? {
 				id,
@@ -105,30 +105,41 @@ export const assignmentsRouter = createRouter({
 			})
 		)
 		.query(async ({ input: { id, courseId }, ctx: { classroom } }) => {
-			const [assignmentResponse, [feedbackConfigRow]] = await Promise.all(
-				[
-					classroom.courses.courseWork.get({
-						id,
-						courseId,
-					}),
-					db
-						.select({ instructions: feedbackConfig.instructions })
-						.from(feedbackConfig)
-						.where(
-							and(
-								eq(feedbackConfig.courseId, courseId),
-								eq(feedbackConfig.assignmentId, id)
-							)
-						),
-				]
-			);
+			try {
+				const [assignmentResponse, [feedbackConfigRow]] =
+					await Promise.all([
+						classroom.courses.courseWork.get({
+							id,
+							courseId,
+						}),
+						db
+							.select({
+								instructions: feedbackConfig.instructions,
+							})
+							.from(feedbackConfig)
+							.where(
+								and(
+									eq(feedbackConfig.courseId, courseId),
+									eq(feedbackConfig.assignmentId, id)
+								)
+							),
+					]);
 
-			return {
-				...assignmentSchema.parse(
-					transformAssignment(assignmentResponse.data)
-				),
-				feedbackConfig: feedbackConfigRow,
-			};
+				return {
+					...assignmentSchema.parse(
+						transformAssignment(assignmentResponse.data)
+					),
+					feedbackConfig: feedbackConfigRow,
+				};
+			} catch (error) {
+				if (error instanceof googleapis.Common.GaxiosError) {
+					if (error.code === "404")
+						throw new TRPCError({
+							code: "NOT_FOUND",
+						});
+					else throw error;
+				} else throw error;
+			}
 		}),
 	byCourse: authedProcedure
 		.input(
@@ -137,58 +148,68 @@ export const assignmentsRouter = createRouter({
 			})
 		)
 		.query(async ({ input: { courseId }, ctx: { classroom } }) => {
-			const [assignmentsResponse, feedbackConfigRows] = await Promise.all(
-				[
-					classroom.courses.courseWork.list({
-						courseId,
-						courseWorkStates: ["PUBLISHED", "DRAFT"],
-						orderBy: "dueDate",
-					}),
-					db
-						.select({
-							id: feedbackConfig.assignmentId,
-							instructions: feedbackConfig.instructions,
-						})
-						.from(feedbackConfig)
-						.where(eq(feedbackConfig.courseId, courseId)),
-				]
-			);
+			try {
+				const [assignmentsResponse, feedbackConfigRows] =
+					await Promise.all([
+						classroom.courses.courseWork.list({
+							courseId,
+							courseWorkStates: ["PUBLISHED", "DRAFT"],
+							orderBy: "dueDate",
+						}),
+						db
+							.select({
+								id: feedbackConfig.assignmentId,
+								instructions: feedbackConfig.instructions,
+							})
+							.from(feedbackConfig)
+							.where(eq(feedbackConfig.courseId, courseId)),
+					]);
 
-			const assignmentsTransformed = (
-				assignmentsResponse.data.courseWork ?? []
-			)
-				.map(transformAssignment)
-				.filter(undefinedTypeGuard);
+				const assignmentsTransformed = (
+					assignmentsResponse.data.courseWork ?? []
+				)
+					.map(transformAssignment)
+					.filter(undefinedTypeGuard);
 
-			const assignments = assignmentListSchema.parse(
-				assignmentsTransformed
-			);
-
-			const feedbackConfigByIdMap = new Map<
-				string,
-				(typeof feedbackConfigRows)[0]
-			>();
-
-			for (const feedbackConfigRow of feedbackConfigRows) {
-				feedbackConfigByIdMap.set(
-					feedbackConfigRow.id,
-					feedbackConfigRow
+				const assignments = assignmentListSchema.parse(
+					assignmentsTransformed
 				);
+
+				const feedbackConfigByIdMap = new Map<
+					string,
+					(typeof feedbackConfigRows)[0]
+				>();
+
+				for (const feedbackConfigRow of feedbackConfigRows) {
+					feedbackConfigByIdMap.set(
+						feedbackConfigRow.id,
+						feedbackConfigRow
+					);
+				}
+
+				return assignments.map((assignment) => {
+					const feedbackConfigRow = feedbackConfigByIdMap.get(
+						assignment.id
+					);
+
+					return {
+						...assignment,
+						feedbackConfig: feedbackConfigRow
+							? {
+									instructions:
+										feedbackConfigRow.instructions,
+							  }
+							: undefined,
+					};
+				});
+			} catch (error) {
+				if (error instanceof googleapis.Common.GaxiosError) {
+					if (error.code === "404")
+						throw new TRPCError({
+							code: "NOT_FOUND",
+						});
+					else throw error;
+				} else throw error;
 			}
-
-			return assignments.map((assignment) => {
-				const feedbackConfigRow = feedbackConfigByIdMap.get(
-					assignment.id
-				);
-
-				return {
-					...assignment,
-					feedbackConfig: feedbackConfigRow
-						? {
-								instructions: feedbackConfigRow.instructions,
-						  }
-						: undefined,
-				};
-			});
 		}),
 });

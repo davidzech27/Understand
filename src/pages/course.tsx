@@ -21,9 +21,17 @@ const Course: NextPage = () => {
 
 	const courseId = router.asPath.split("/").at(-1) as string;
 
+	const [notFoundMessage, setNotFoundMessage] = useState<string>();
+
 	const { selectedCourse: course, role } = useSelectedCourse({
 		selectedCourseId: courseId,
 	});
+
+	if (role === "none")
+		notFoundMessage === undefined &&
+			setNotFoundMessage(
+				"You either do not have access to this course or it does not exist."
+			);
 
 	const [subpage, setSubpage] = useStickyState<
 		"assignments" | "people" | "insights"
@@ -41,6 +49,7 @@ const Course: NextPage = () => {
 		<DefaultLayout
 			selectedCourseId={courseId}
 			forceLoading={!assignments || !roster || !course}
+			notFoundMessage={notFoundMessage}
 		>
 			{course && assignments && roster && (
 				<div className="flex flex-col space-y-2.5 py-2.5 pr-3">

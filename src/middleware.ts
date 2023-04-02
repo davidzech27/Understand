@@ -1,14 +1,31 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { authorizationCookieKey, getAuth } from "./server/auth/jwt";
 
 export const middleware = (request: NextRequest) => {
+	if (
+		request.nextUrl.pathname === "/" ||
+		request.nextUrl.pathname === "/signIn"
+	) {
+		const authorization = request.cookies.get(
+			authorizationCookieKey
+		)?.value;
+
+		if (!authorization || getAuth({ authorization }) === undefined)
+			return NextResponse.redirect(
+				new URL(
+					`${request.nextUrl.protocol}//${request.nextUrl.host}/signIn`
+				)
+			);
+	}
+
 	if (
 		request.nextUrl.pathname === "/course" ||
 		request.nextUrl.pathname === "/assignment" ||
 		request.nextUrl.pathname === "/student"
 	) {
-		return NextResponse.redirect(
-			new URL(`${request.nextUrl.protocol}//${request.nextUrl.host}/home`) // later rewrite to 404 page
+		return NextResponse.rewrite(
+			new URL(`${request.nextUrl.protocol}//${request.nextUrl.host}/404`)
 		);
 	}
 

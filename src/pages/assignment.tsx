@@ -1,4 +1,4 @@
-import { TextareaHTMLAttributes, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { type NextPage } from "next";
 import Link from "next/link";
@@ -19,11 +19,10 @@ import authenticateWithGoogle from "~/lib/authenticateWithGoogle";
 import useStickyState from "~/util/useStickyState";
 import useSelectedCourse from "~/util/useSelectedCourse";
 
-// perhaps completely abstract away the creation of feedback instructions, and instead of showing actual instructions, just have user see list of things model is taking into account. not as transparent though, and users don't get to see summary being created
 // put some more thought into how to bring external content into site. perhaps not always the best idea for input to show up on main screen, and maybe would be better for it to show up as an attachment that can be opened up with a modal
+// perhaps completely abstract away the creation of feedback instructions, and instead of showing actual instructions, just have user see list of things model is taking into account. not as transparent though, and users don't get to see summary being created
 // consider letting users delete feedback
-// todo - make page protected
-// todo - make loading screens
+// todo - make loading indicators
 const Assignment: NextPage = () => {
 	const router = useRouter();
 
@@ -31,9 +30,17 @@ const Assignment: NextPage = () => {
 
 	const courseId = router.asPath.split("/").at(-3) as string;
 
+	const [notFoundMessage, setNotFoundMessage] = useState<string>();
+
 	const { selectedCourse, role } = useSelectedCourse({
 		selectedCourseId: courseId,
 	});
+
+	if (role === "none")
+		notFoundMessage === undefined &&
+			setNotFoundMessage(
+				"You either do not have access to this course or it does not exist."
+			);
 
 	const [subpage, setSubpage] = useStickyState<"feedback" | "insights">(
 		"feedback",
@@ -51,7 +58,11 @@ const Assignment: NextPage = () => {
 			initialData: () =>
 				queryClient.assignments.byCourse
 					.getData({ courseId })
-					?.find((assignment) => assignment.id === assignmentId),
+					?.find((assignment) => assignment.id === assignmentId), //! providing initialData, even if it returns undefined, makes data not undefined. be careful!!
+			onError: (error) =>
+				error.data?.code === "NOT_FOUND" &&
+				notFoundMessage === undefined &&
+				setNotFoundMessage("This assignment does not exist"),
 		}
 	);
 
@@ -209,7 +220,11 @@ const Assignment: NextPage = () => {
 	})();
 
 	return (
-		<DefaultLayout forceLoading={!assignment} selectedCourseId={courseId}>
+		<DefaultLayout
+			forceLoading={!assignment}
+			selectedCourseId={courseId}
+			notFoundMessage={notFoundMessage}
+		>
 			{assignment && (
 				<div className="flex min-h-screen flex-col space-y-2.5 py-2.5 pr-3">
 					<div className="flex flex-col rounded-md bg-surface py-5 px-6">

@@ -18,9 +18,17 @@ const Student: NextPage = () => {
 
 	const courseId = router.asPath.split("/").at(-3) as string;
 
-	const { selectedCourse, role } = useSelectedCourse({
+	const [notFoundMessage, setNotFoundMessage] = useState<string>();
+
+	const { role } = useSelectedCourse({
 		selectedCourseId: useRouter().asPath.split("/").at(-3) as string,
 	});
+
+	if (role === "none")
+		notFoundMessage === undefined &&
+			setNotFoundMessage(
+				"You either do not have access to this course or it does not exist."
+			);
 
 	if (role === "student") router.push(`/course/${courseId}`);
 
@@ -37,11 +45,19 @@ const Student: NextPage = () => {
 					?.students.find(
 						(student) => student.email === studentEmail
 					),
+			onError: (error) =>
+				error.data?.code === "NOT_FOUND" &&
+				notFoundMessage === undefined &&
+				setNotFoundMessage("This assignment does not exist"),
 		}
 	);
 
 	return (
-		<DefaultLayout forceLoading={!student} selectedCourseId={courseId}>
+		<DefaultLayout
+			forceLoading={!student}
+			selectedCourseId={courseId}
+			notFoundMessage={notFoundMessage}
+		>
 			{student && (
 				<div className="flex h-screen flex-col space-y-2.5 py-2.5 pr-3">
 					<div className="flex items-center rounded-md bg-surface py-5 px-6">

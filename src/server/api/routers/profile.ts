@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+import * as googleapis from "googleapis";
 import { createRouter, authedProcedure } from "~/server/api/trpc";
 import db from "~/db/db";
 import { eq } from "drizzle-orm/expressions";
@@ -37,30 +38,43 @@ export const profileRouter = createRouter({
 	get: authedProcedure
 		.input(z.object({ email: z.string() }))
 		.query(async ({ input: { email }, ctx: { classroom } }) => {
-			const [
-				[userRow],
-				{
-					data: { photoUrl: photo, name: googleName },
-				},
-			] = await Promise.all([
-				db
-					.select({ name: user.name })
-					.from(user)
-					.where(eq(user.email, email)),
-				classroom.userProfiles.get({
-					userId: email,
-				}),
-			]);
+			try {
+				const [
+					[userRow],
+					{
+						data: { photoUrl: photo, name: googleName },
+					},
+				] = await Promise.all([
+					db
+						.select({ name: user.name })
+						.from(user)
+						.where(eq(user.email, email)),
+					classroom.userProfiles.get({
+						userId: email,
+					}),
+				]);
 
-			if (!userRow && !googleName) {
-				throw new TRPCError({ code: "NOT_FOUND" });
+				if (!userRow && !googleName) {
+					throw new TRPCError({ code: "NOT_FOUND" });
+				}
+
+				return profileSchema.parse({
+					email,
+					name: userRow?.name ?? googleName?.fullName,
+					photo:
+						typeof photo === "string"
+							? `https:${photo}`
+							: undefined,
+				});
+			} catch (error) {
+				if (error instanceof googleapis.Common.GaxiosError) {
+					if (error.code === "404")
+						throw new TRPCError({
+							code: "NOT_FOUND",
+						});
+					else throw error;
+				} else throw error;
 			}
-
-			return profileSchema.parse({
-				email,
-				name: userRow?.name ?? googleName?.fullName,
-				photo: typeof photo === "string" ? `https:${photo}` : undefined,
-			});
 		}),
 	update: authedProcedure
 		.input(z.object({ name: z.string().optional() }))

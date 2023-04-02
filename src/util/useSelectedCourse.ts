@@ -28,9 +28,5 @@ export default ({ selectedCourseId }: { selectedCourseId: string }) => {
 		return [undefined, "none"] as const;
 	}, [coursesEnrolled, coursesTeaching, selectedCourseId]);
 
-	if (role === "none") {
-		router.push(`/course/${selectedCourseId}`);
-	}
-
 	return { selectedCourse, role };
 };

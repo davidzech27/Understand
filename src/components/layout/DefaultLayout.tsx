@@ -6,12 +6,14 @@ type Props = {
 	children: React.ReactNode;
 	selectedCourseId?: string;
 	forceLoading?: boolean;
+	notFoundMessage?: string;
 };
 
 const DefaultLayout: React.FC<Props> = ({
 	children,
 	selectedCourseId,
 	forceLoading,
+	notFoundMessage,
 }) => {
 	const { data: profile } = api.profile.me.useQuery();
 
@@ -64,7 +66,20 @@ const DefaultLayout: React.FC<Props> = ({
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
 
-			{!forceLoading && profile && coursesTeaching && coursesEnrolled ? (
+			{notFoundMessage !== undefined ? (
+				<div className="flex h-screen w-full flex-col items-center bg-gradient-to-tr from-primary to-secondary">
+					<div className="flex-[0.875]" />
+
+					<span className="px-48 text-[5rem] font-semibold leading-none text-white">
+						{notFoundMessage}
+					</span>
+
+					<div className="flex-1" />
+				</div>
+			) : !forceLoading &&
+			  profile &&
+			  coursesTeaching &&
+			  coursesEnrolled ? (
 				<div className="flex min-h-screen bg-background">
 					<SideBar
 						selectedCourseId={selectedCourseId}
@@ -73,13 +88,17 @@ const DefaultLayout: React.FC<Props> = ({
 						coursesEnrolled={coursesEnrolled}
 					/>
 
-					<main className="flex-1">{children}</main>
+					<main className="flex-1 select-none">{children}</main>
 				</div>
 			) : (
-				<div className="flex h-screen w-full items-center justify-center bg-gradient-to-tr from-primary to-secondary pb-12">
-					<span className="w-min text-[10rem] font-semibold text-white">
+				<div className="flex h-screen w-full flex-col items-center bg-gradient-to-tr from-primary to-secondary">
+					<div className="flex-[0.875]" />
+
+					<span className="w-min text-[10rem] font-semibold leading-none text-white">
 						Understand
 					</span>
+
+					<div className="flex-1" />
 				</div>
 			)}
 		</>
