@@ -3,7 +3,6 @@ import DefaultLayout from "~/components/layout/DefaultLayout";
 import colors from "colors.cjs";
 import { api } from "~/lib/trpc";
 
-// todo - make page protected
 const Home: NextPage = () => {
 	return (
 		<DefaultLayout>

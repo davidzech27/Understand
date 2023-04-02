@@ -6,11 +6,8 @@ import { useRouter } from "next/router";
 import colors from "colors.cjs";
 import { api } from "~/lib/trpc";
 import DefaultLayout from "~/components/layout/DefaultLayout";
-import clsx from "clsx";
-import formatDate from "~/util/formatDate";
 import useSelectedCourse from "~/util/useSelectedCourse";
 
-// todo - make page protected
 const Student: NextPage = () => {
 	const router = useRouter();
 

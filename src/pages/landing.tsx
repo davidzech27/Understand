@@ -6,8 +6,7 @@ import FancyButton from "~/components/shared/FancyButton";
 import TextInput from "~/components/shared/TextInput";
 import { api } from "~/lib/trpc";
 
-// todo - add extra content to fill awkward whitespace
-
+// perhaps add extra content to fill awkward whitespace
 const SignIn: NextPage = () => {
 	api.profile.me.useQuery(undefined, {
 		onSuccess: ({ name }) => nameInput.length === 0 && setNameInput(name),

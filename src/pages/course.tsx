@@ -12,9 +12,7 @@ import ToggleButton from "~/components/shared/ToggleButton";
 import useStickyState from "~/util/useStickyState";
 import useSelectedCourse from "~/util/useSelectedCourse";
 
-// todo - figure out why students subpage only shows user if user is student
-// todo - make page protected
-// todo - replace subpage's useState with useStickyState (custom hook for saving state to local storage). include courseId in key
+// todo - figure out why students subpage only shows current user if user is student
 // todo - place links to corresponding google classroom pages in a bunch of places
 const Course: NextPage = () => {
 	const router = useRouter();

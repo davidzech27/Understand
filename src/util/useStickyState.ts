@@ -40,7 +40,7 @@ export default <S>(
 				? JSON.parse(stickyValue)
 				: defaultValue;
 		});
-	}, [key]);
+	}, [key, defaultValue]);
 
 	return [value, setValue];
 };
