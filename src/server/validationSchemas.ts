@@ -26,7 +26,7 @@ export const materialSchema = z.discriminatedUnion("type", [
 			id: z.string(),
 			title: z.string(),
 			url: z.string().url(),
-			thumbnailUrl: z.string().url(),
+			thumbnailUrl: z.string().url().optional(),
 		}),
 	}),
 	z.object({
@@ -35,15 +35,15 @@ export const materialSchema = z.discriminatedUnion("type", [
 			id: z.string(),
 			title: z.string(),
 			url: z.string().url(),
-			thumbnailUrl: z.string().url(),
+			thumbnailUrl: z.string().url().optional(),
 		}),
 	}),
 	z.object({
 		type: z.literal("link"),
 		link: z.object({
 			url: z.string().url(),
-			title: z.string(),
-			thumbnailUrl: z.string().url(),
+			title: z.string().optional(),
+			thumbnailUrl: z.string().url().optional(),
 		}),
 	}),
 	z.object({
@@ -52,7 +52,7 @@ export const materialSchema = z.discriminatedUnion("type", [
 			formUrl: z.string().url(),
 			responseUrl: z.string().url().optional(),
 			title: z.string(),
-			thumbnailUrl: z.string().url(),
+			thumbnailUrl: z.string().url().optional(),
 		}),
 	}),
 ]);

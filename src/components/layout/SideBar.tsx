@@ -14,12 +14,18 @@ interface Props {
 		name: string;
 		section?: string;
 	}[];
+	coursesEnrolled: {
+		id: string;
+		name: string;
+		section?: string;
+	}[];
 }
 
 const SideBar: React.FC<Props> = ({
 	selectedCourseId,
 	profile,
 	coursesTeaching,
+	coursesEnrolled,
 }) => {
 	return (
 		<nav className="h-screen w-80">
@@ -55,33 +61,66 @@ const SideBar: React.FC<Props> = ({
 						selected={selectedCourseId === undefined}
 					/>
 
-					{coursesTeaching.length > 0 ? (
+					{coursesTeaching.length > 0 ||
+					coursesEnrolled.length > 0 ? (
 						<>
-							<span className="my-1.5 ml-1.5 text-sm font-medium opacity-60">
-								Teaching
-							</span>
-							<div>
-								{coursesTeaching.map((course) => (
-									<PreviewDisplay
-										text={course.name}
-										subtext={course.section}
-										photo={
-											<div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-700 text-[1.16rem] text-white">
-												{course.name[0]?.toUpperCase()}
-											</div>
-										}
-										href={`/course/${course.id}`}
-										selected={
-											selectedCourseId === course.id
-										}
-										key={course.id}
-									/>
-								))}
-							</div>
+							{coursesTeaching.length > 0 && (
+								<>
+									<span className="my-1.5 ml-1.5 text-sm font-medium opacity-60">
+										Teaching
+									</span>
+									<div>
+										{coursesTeaching.map((course) => (
+											<PreviewDisplay
+												text={course.name}
+												subtext={course.section}
+												photo={
+													<div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-700 text-[1.16rem] text-white">
+														{course.name[0]?.toUpperCase()}
+													</div>
+												}
+												href={`/course/${course.id}`}
+												selected={
+													selectedCourseId ===
+													course.id
+												}
+												key={course.id}
+											/>
+										))}
+									</div>
+								</>
+							)}
+
+							{coursesEnrolled.length > 0 && (
+								<>
+									<span className="my-1.5 ml-1.5 text-sm font-medium opacity-60">
+										Enrolled
+									</span>
+									<div>
+										{coursesEnrolled.map((course) => (
+											<PreviewDisplay
+												text={course.name}
+												subtext={course.section}
+												photo={
+													<div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-700 text-[1.16rem] text-white">
+														{course.name[0]?.toUpperCase()}
+													</div>
+												}
+												href={`/course/${course.id}`}
+												selected={
+													selectedCourseId ===
+													course.id
+												}
+												key={course.id}
+											/>
+										))}
+									</div>
+								</>
+							)}
 						</>
 					) : (
 						<span className="my-1.5 ml-1.5 text-sm font-medium opacity-60">
-							You&apos;re not teaching any classes
+							You&apos;re not teaching or enrolled in any classes
 						</span>
 					)}
 					{/* later only have message if not teaching or enrolled */}

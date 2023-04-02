@@ -2,7 +2,7 @@ import { type NextApiHandler } from "next";
 import Cookies from "cookies";
 import { createUnauthedOAuth2Client, redirectUrl } from "~/server/auth/google";
 import { google } from "googleapis";
-import { authorizationCookieKey, encodeAccessToken } from "~/server/auth/jwt";
+import { authorizationCookieKey, setAuth } from "~/server/auth/jwt";
 import db from "~/db/db";
 import { user } from "~/db/schema";
 
@@ -86,14 +86,14 @@ const handler: NextApiHandler = async (req, res) => {
 				},
 			});
 
-		const accessToken = await encodeAccessToken({
-			email: emailAddress,
-			googleAccessToken: tokens.access_token,
-			googleRefreshToken: tokens.refresh_token,
-		});
-
-		cookies.set(authorizationCookieKey, `Bearer ${accessToken}`, {
-			sameSite: true,
+		await setAuth({
+			req,
+			res,
+			auth: {
+				email: emailAddress,
+				googleAccessToken: tokens.access_token,
+				googleRefreshToken: tokens.refresh_token,
+			},
 		});
 
 		const redirectTo = cookies.get(redirectToCookieKey);

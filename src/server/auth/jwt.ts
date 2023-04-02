@@ -12,7 +12,7 @@ const accessTokenPayloadSchema = z.object({
 	googleRefreshToken: z.string(),
 });
 
-export const encodeAccessToken = async (
+const encodeAccessToken = async (
 	payload: z.infer<typeof accessTokenPayloadSchema>
 ) =>
 	await new jose.SignJWT(payload)
@@ -20,11 +20,7 @@ export const encodeAccessToken = async (
 		.setIssuedAt()
 		.sign(new TextEncoder().encode(env.JWT_SECRET));
 
-export const decodeAccessToken = async ({
-	accessToken,
-}: {
-	accessToken: string;
-}) =>
+const decodeAccessToken = async ({ accessToken }: { accessToken: string }) =>
 	accessTokenPayloadSchema.parse(
 		(
 			await jose.jwtVerify(
@@ -34,26 +30,57 @@ export const decodeAccessToken = async ({
 		).payload
 	);
 
-export const getAuth = async ({
-	req,
-	res,
-}: {
-	req: NextApiRequest;
-	res: NextApiResponse;
-}): Promise<z.infer<typeof accessTokenPayloadSchema> | undefined> => {
-	const cookies = Cookies(req, res);
+export const getAuth = async (
+	args:
+		| {
+				req: NextApiRequest;
+				res: NextApiResponse;
+		  }
+		| { authorization: string }
+): Promise<z.infer<typeof accessTokenPayloadSchema> | undefined> => {
+	let authorization: string;
 
-	const authorization = cookies.get(authorizationCookieKey);
+	if ("req" in args) {
+		const { req, res } = args;
 
-	if (!authorization) return undefined;
+		const cookies = Cookies(req, res);
+
+		const authorizationCookie = cookies.get(authorizationCookieKey);
+
+		if (!authorizationCookie) return undefined;
+
+		authorization = authorizationCookie;
+	} else {
+		authorization = args.authorization;
+	}
 
 	const accessToken = authorization.replace("Bearer ", "");
 
 	try {
-		const accessTokenPayload = await decodeAccessToken({ accessToken });
+		const accessTokenPayload = await decodeAccessToken({
+			accessToken,
+		});
 
 		return accessTokenPayload;
 	} catch {
 		return undefined;
 	}
+};
+
+export const setAuth = async ({
+	req,
+	res,
+	auth,
+}: {
+	req: NextApiRequest;
+	res: NextApiResponse;
+	auth: z.infer<typeof accessTokenPayloadSchema>;
+}) => {
+	const accessToken = await encodeAccessToken(auth);
+
+	const authorization = `Bearer ${accessToken}`;
+
+	const cookies = Cookies(req, res);
+
+	cookies.set(authorizationCookieKey, authorization, { sameSite: true });
 };

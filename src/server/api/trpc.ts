@@ -3,7 +3,7 @@ import { google } from "googleapis";
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
-import { getAuth } from "../auth/jwt";
+import { getAuth, setAuth } from "../auth/jwt";
 import { createAuthedOAuth2Client } from "../auth/google";
 
 export const createContext = async ({
@@ -45,6 +45,26 @@ const isAuthed = t.middleware(async ({ ctx: { req, res }, next }) => {
 		accessToken: googleAccessToken,
 		refreshToken: googleRefreshToken,
 	});
+
+	oauth2Client.setCredentials({
+		...oauth2Client.credentials,
+		access_token: (await oauth2Client.getAccessToken()).token,
+	});
+
+	if (
+		oauth2Client.credentials.access_token !== googleAccessToken &&
+		oauth2Client.credentials.access_token
+	) {
+		await setAuth({
+			req,
+			res,
+			auth: {
+				email,
+				googleAccessToken: oauth2Client.credentials.access_token,
+				googleRefreshToken,
+			},
+		});
+	}
 
 	const classroom = google.classroom({ version: "v1", auth: oauth2Client });
 

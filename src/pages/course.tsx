@@ -1,15 +1,18 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { type NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import colors from "colors.cjs";
-import { api } from "~/lib/trpc";
+import { RouterOutputs, api } from "~/lib/trpc";
 import DefaultLayout from "~/components/layout/DefaultLayout";
 import clsx from "clsx";
 import formatDate from "~/util/formatDate";
 import ToggleButton from "~/components/shared/ToggleButton";
+import useStickyState from "~/util/useStickyState";
+import useSelectedCourse from "~/util/useSelectedCourse";
 
+// todo - figure out why students subpage only shows user if user is student
 // todo - make page protected
 // todo - replace subpage's useState with useStickyState (custom hook for saving state to local storage). include courseId in key
 // todo - place links to corresponding google classroom pages in a bunch of places
@@ -18,18 +21,13 @@ const Course: NextPage = () => {
 
 	const courseId = router.asPath.split("/").at(-1) as string;
 
-	const [subpage, setSubpage] = useState<
+	const { selectedCourse: course, role } = useSelectedCourse({
+		selectedCourseId: courseId,
+	});
+
+	const [subpage, setSubpage] = useStickyState<
 		"assignments" | "people" | "insights"
-	>("assignments");
-
-	const { data: coursesTeaching } = api.courses.teaching.useQuery();
-
-	const course = coursesTeaching?.find((course) => course.id === courseId);
-
-	if (coursesTeaching && !course) {
-		router.push("/home"); // happens if course isn't found. change later
-		return null;
-	}
+	>("assignments", `course:${courseId}:subpage`); // for some reason state is transfering from course to course
 
 	const { data: assignments } = api.assignments.byCourse.useQuery({
 		courseId,
@@ -42,7 +40,7 @@ const Course: NextPage = () => {
 	return (
 		<DefaultLayout
 			selectedCourseId={courseId}
-			forceLoading={!assignments || !roster}
+			forceLoading={!assignments || !roster || !course}
 		>
 			{course && assignments && roster && (
 				<div className="flex flex-col space-y-2.5 py-2.5 pr-3">
@@ -82,12 +80,14 @@ const Course: NextPage = () => {
 								People
 							</ToggleButton>
 
-							<ToggleButton
-								onClick={() => setSubpage("insights")}
-								toggled={subpage === "insights"}
-							>
-								Insights
-							</ToggleButton>
+							{role === "teacher" && (
+								<ToggleButton
+									onClick={() => setSubpage("insights")}
+									toggled={subpage === "insights"}
+								>
+									Insights
+								</ToggleButton>
+							)}
 						</div>
 					</div>
 
@@ -166,28 +166,47 @@ const Course: NextPage = () => {
 										</div>
 
 										<div className="space-y-2.5">
-											{roster.students.map((student) => (
-												<Link
-													href={`/course/${courseId}/student/${student.email}`}
-													key={student.email}
-													className="flex h-20 items-center rounded-md border-[0.75px] border-border pl-6 pr-8 transition-colors duration-150 hover:bg-surface-hover"
-												>
-													<img
-														src={student.photo}
-														className="h-11 w-11 rounded-full"
-													/>
+											{roster.students.map((student) => {
+												const inner = (
+													<>
+														<img
+															src={student.photo}
+															className="h-11 w-11 rounded-full"
+														/>
 
-													<div className="ml-3 flex flex-col">
-														<span className="mb-[1px] font-medium leading-none opacity-90">
-															{student.name}
-														</span>
+														<div className="ml-3 flex flex-col">
+															<span className="mb-[1px] font-medium leading-none opacity-90">
+																{student.name}
+															</span>
 
-														<span className="text-sm opacity-60">
-															{student.email}
-														</span>
-													</div>
-												</Link>
-											))}
+															<span className="text-sm opacity-60">
+																{student.email}
+															</span>
+														</div>
+													</>
+												);
+
+												if (role === "teacher") {
+													return (
+														<Link
+															href={`/course/${courseId}/student/${student.email}`}
+															key={student.email}
+															className="flex h-20 items-center rounded-md border-[0.75px] border-border pl-6 pr-8 transition-colors duration-150 hover:bg-surface-hover"
+														>
+															{inner}
+														</Link>
+													);
+												} else {
+													return (
+														<div
+															key={student.email}
+															className="flex h-20 items-center rounded-md border-[0.75px] border-border pl-6 pr-8"
+														>
+															{inner}
+														</div>
+													);
+												}
+											})}
 										</div>
 									</>
 								) : (

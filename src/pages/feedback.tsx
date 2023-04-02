@@ -4,9 +4,16 @@ import Link from "next/link";
 import DefaultLayout from "~/components/layout/DefaultLayout";
 import colors from "colors.cjs";
 import { api } from "~/lib/trpc";
+import useSelectedCourse from "~/util/useSelectedCourse";
+import { useRouter } from "next/router";
 
+//! page probably not going to be used actually
 // todo - make page protected
 const Feedback: NextPage = () => {
+	const { selectedCourse, role } = useSelectedCourse({
+		selectedCourseId: useRouter().asPath.split("/").at(-3) as string,
+	});
+
 	return (
 		<DefaultLayout>
 			<div className="flex h-screen flex-col space-y-2.5 py-2.5 pr-3">

@@ -7,11 +7,7 @@ import { z } from "zod";
 const server = z.object({
 	NODE_ENV: z.enum(["development", "test", "production"]),
 	JWT_SECRET: z.string(),
-	URL: z.preprocess(
-		(str) => process.env.VERCEL_URL ?? str,
-		// VERCEL_URL doesn't include `https` so it cant be validated as a URL
-		process.env.VERCEL ? z.string().min(1) : z.string().url()
-	),
+	URL: z.string().url(),
 	DATABASE_URL: z.string(),
 	GOOGLE_CLIENT_ID: z.string(),
 	GOOGLE_CLIENT_SECRET: z.string(),

@@ -8,6 +8,7 @@ import { api } from "~/lib/trpc";
 import DefaultLayout from "~/components/layout/DefaultLayout";
 import clsx from "clsx";
 import formatDate from "~/util/formatDate";
+import useSelectedCourse from "~/util/useSelectedCourse";
 
 // todo - make page protected
 const Student: NextPage = () => {
@@ -16,6 +17,12 @@ const Student: NextPage = () => {
 	const studentEmail = router.asPath.split("/").at(-1) as string;
 
 	const courseId = router.asPath.split("/").at(-3) as string;
+
+	const { selectedCourse, role } = useSelectedCourse({
+		selectedCourseId: useRouter().asPath.split("/").at(-3) as string,
+	});
+
+	if (role === "student") router.push(`/course/${courseId}`);
 
 	const queryClient = api.useContext();
 

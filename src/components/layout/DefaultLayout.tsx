@@ -33,6 +33,24 @@ const DefaultLayout: React.FC<Props> = ({
 		},
 	});
 
+	const { data: coursesEnrolled } = api.courses.enrolled.useQuery(undefined, {
+		onSuccess: (courses) => {
+			for (const course of courses) {
+				queryClient.assignments.byCourse
+					.ensureData({
+						courseId: course.id,
+					})
+					.catch(console.error);
+
+				queryClient.roster.get
+					.ensureData({
+						courseId: course.id,
+					})
+					.catch(console.error);
+			}
+		},
+	});
+
 	const queryClient = api.useContext();
 
 	return (
@@ -46,12 +64,13 @@ const DefaultLayout: React.FC<Props> = ({
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
 
-			{!forceLoading && profile && coursesTeaching ? (
+			{!forceLoading && profile && coursesTeaching && coursesEnrolled ? (
 				<div className="flex min-h-screen bg-background">
 					<SideBar
 						selectedCourseId={selectedCourseId}
 						profile={profile}
 						coursesTeaching={coursesTeaching}
+						coursesEnrolled={coursesEnrolled}
 					/>
 
 					<main className="flex-1">{children}</main>

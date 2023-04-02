@@ -154,10 +154,14 @@ export const assignmentsRouter = createRouter({
 				]
 			);
 
+			const assignmentsTransformed = (
+				assignmentsResponse.data.courseWork ?? []
+			)
+				.map(transformAssignment)
+				.filter(undefinedTypeGuard);
+
 			const assignments = assignmentListSchema.parse(
-				(assignmentsResponse.data.courseWork ?? [])
-					.map(transformAssignment)
-					.filter(undefinedTypeGuard)
+				assignmentsTransformed
 			);
 
 			const feedbackConfigByIdMap = new Map<

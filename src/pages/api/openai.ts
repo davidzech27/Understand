@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { env } from "~/env.mjs";
-import { decodeAccessToken, authorizationCookieKey } from "~/server/auth/jwt";
+import { getAuth, authorizationCookieKey } from "~/server/auth/jwt";
 
 export const config = {
 	runtime: "edge",
@@ -29,16 +29,11 @@ export type OpenAIStreamRequest = z.infer<typeof requestSchema>;
 export default async (req: NextRequest) => {
 	const authorization = req.cookies.get(authorizationCookieKey)?.value;
 
-	const accessToken = authorization?.replace("Bearer ", "");
-
-	if (!accessToken)
+	if (!authorization)
 		return new Response("Missing access token", { status: 401 });
 
-	try {
-		decodeAccessToken({ accessToken });
-	} catch {
+	if ((await getAuth({ authorization })) === undefined)
 		return new Response("Invalid access token", { status: 401 });
-	}
 
 	if (req.method !== "POST") {
 		return new Response("Method Not Allowed", { status: 405 });

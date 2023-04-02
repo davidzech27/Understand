@@ -4,7 +4,7 @@ import { rosterSchema } from "~/server/validationSchemas";
 import db from "~/db/db";
 import { user } from "~/db/schema";
 import { sql } from "drizzle-orm";
-
+// errors going on in this router but frontend seems to be fine
 export const rosterRouter = createRouter({
 	get: authedProcedure // unfortunately we are making nonconcurrent roundtrips here
 		.input(
