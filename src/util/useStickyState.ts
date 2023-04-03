@@ -16,7 +16,7 @@ export default <S>(
 					const stickyValue = window.localStorage.getItem(key);
 
 					return stickyValue !== null
-						? JSON.parse(stickyValue)
+						? (JSON.parse(stickyValue) as S)
 						: defaultValue;
 			  }
 			: defaultValue
@@ -37,7 +37,7 @@ export default <S>(
 			const stickyValue = window.localStorage.getItem(key);
 
 			return stickyValue !== null
-				? JSON.parse(stickyValue)
+				? (JSON.parse(stickyValue) as S)
 				: defaultValue;
 		});
 	}, [key, defaultValue]);
