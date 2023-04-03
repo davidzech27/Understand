@@ -149,12 +149,18 @@ const StudentFeedback: React.FC<Props> = ({
 			)}
 
 			<div className="h-64">
-				<TextArea
-					value={assignmentInput}
-					setValue={setAssignmentInput}
-					placeholder="Your assignment goes here..."
-					ref={assignmentInputRef}
-				/>
+				{generatingFeedback || processedFeedback !== "" ? (
+					<div className="h-full select-text overflow-y-scroll whitespace-pre-wrap rounded-md border-[1px] border-border bg-surface-bright py-1.5 px-3 font-medium opacity-80">
+						{assignmentInput}
+					</div>
+				) : (
+					<TextArea
+						value={assignmentInput}
+						setValue={setAssignmentInput}
+						placeholder="Your assignment goes here..."
+						ref={assignmentInputRef}
+					/>
+				)}
 			</div>
 
 			<div
@@ -186,7 +192,7 @@ const StudentFeedback: React.FC<Props> = ({
 					</Button>
 				</div>
 
-				{feedback !== "" && !generatingFeedback && (
+				{processedFeedback !== "" && !generatingFeedback && (
 					<div className="w-48">
 						<Button onClick={onTryAgain} fullWidth>
 							Try again
