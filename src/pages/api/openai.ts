@@ -106,7 +106,9 @@ export default async (request: NextRequest) => {
 							for (const part of parts) {
 								if (part !== "[DONE]") {
 									try {
-										const partParsed = JSON.parse(part);
+										const partParsed = JSON.parse(
+											part
+										) as any;
 
 										if (
 											typeof partParsed.choices[0].delta
