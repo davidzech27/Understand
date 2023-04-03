@@ -17,7 +17,7 @@ const scopes = {
 	drive: ["https://www.googleapis.com/auth/drive.readonly"],
 };
 
-export default async ({
+const authenticateWithGoogle = async ({
 	permissions,
 	redirectTo,
 }: {
@@ -43,3 +43,5 @@ export default async ({
 
 	window.location.href = url;
 };
+
+export default authenticateWithGoogle;

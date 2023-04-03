@@ -6,7 +6,6 @@ import {
 	assignmentListSchema,
 } from "~/server/validationSchemas";
 import * as googleapis from "googleapis";
-import undefinedTypeGuard from "~/util/undefinedTypeGuard";
 import db from "~/db/db";
 import { feedbackConfig } from "~/db/schema";
 import { eq, and } from "drizzle-orm/expressions";
@@ -169,7 +168,7 @@ export const assignmentsRouter = createRouter({
 					assignmentsResponse.data.courseWork ?? []
 				)
 					.map(transformAssignment)
-					.filter(undefinedTypeGuard);
+					.filter(Boolean);
 
 				const assignments = assignmentListSchema.parse(
 					assignmentsTransformed

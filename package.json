@@ -6,7 +6,8 @@
 		"build": "next build",
 		"dev": "next dev",
 		"lint": "next lint",
-		"start": "next start"
+		"start": "next start",
+		"dbpush": "drizzle-kit push:mysql --config=./src/db/drizzle.config.ts"
 	},
 	"dependencies": {
 		"@planetscale/database": "^1.6.0",
@@ -30,6 +31,7 @@
 		"zod": "^3.20.6"
 	},
 	"devDependencies": {
+		"@total-typescript/ts-reset": "^0.4.2",
 		"@types/cookies": "^0.7.7",
 		"@types/eslint": "^8.21.1",
 		"@types/jsonwebtoken": "^9.0.1",
@@ -40,6 +42,8 @@
 		"@typescript-eslint/eslint-plugin": "^5.53.0",
 		"@typescript-eslint/parser": "^5.53.0",
 		"autoprefixer": "^10.4.7",
+		"dotenv": "^16.0.3",
+		"drizzle-kit": "^0.17.1-609a4f0",
 		"eslint": "^8.34.0",
 		"eslint-config-next": "^13.2.1",
 		"postcss": "^8.4.14",

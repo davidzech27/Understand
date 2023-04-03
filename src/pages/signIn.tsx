@@ -13,7 +13,12 @@ const SignIn: NextPage = () => {
 			authenticateWithGoogle({
 				permissions:
 					selectedRole === "student"
-						? ["courses", "rosters", "selfAssignments"]
+						? [
+								"courses",
+								"rosters",
+								"selfAssignments",
+								"assignmentAttachments", // perhaps later check if user has this permission on backend instead of requesting it on first signIn
+						  ]
 						: selectedRole === "teacher"
 						? [
 								"courses",

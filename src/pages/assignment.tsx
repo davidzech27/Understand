@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { type NextPage } from "next";
-import Link from "next/link";
+import { TRPCClientError } from "@trpc/client";
 import { useRouter } from "next/router";
 import colors from "colors.cjs";
 import { api } from "~/lib/trpc";
@@ -9,7 +9,6 @@ import DefaultLayout from "~/components/layout/DefaultLayout";
 import clsx from "clsx";
 import formatDate from "~/util/formatDate";
 import Modal from "~/components/shared/Modal";
-import undefinedTypeGuard from "~/util/undefinedTypeGuard";
 import TextArea from "~/components/shared/TextArea";
 import ToggleButton from "~/components/shared/ToggleButton";
 import Button from "~/components/shared/Button";
@@ -18,6 +17,8 @@ import { getFeedbackPrompt, summarizeInstructionsPrompt } from "~/prompts";
 import authenticateWithGoogle from "~/lib/authenticateWithGoogle";
 import useStickyState from "~/util/useStickyState";
 import useSelectedCourse from "~/util/useSelectedCourse";
+import StudentFeedback from "~/components/feedback/StudentFeedback";
+import Attachment from "~/components/shared/Attachment";
 
 // put some more thought into how to bring external content into site. perhaps not always the best idea for input to show up on main screen, and maybe would be better for it to show up as an attachment that can be opened up with a modal
 // perhaps completely abstract away the creation of feedback instructions, and instead of showing actual instructions, just have user see list of things model is taking into account. not as transparent though, and users don't get to see summary being created
@@ -72,7 +73,7 @@ const Assignment: NextPage = () => {
 		.map((material) =>
 			material.type === "driveFile" ? material.driveFile : undefined
 		)
-		.filter(undefinedTypeGuard);
+		.filter(Boolean);
 
 	const onPickAttachment = async ({ id }: { id: string }) => {
 		try {
@@ -95,11 +96,15 @@ const Assignment: NextPage = () => {
 					});
 				},
 			});
-		} catch {
-			authenticateWithGoogle({
-				permissions: ["drive"],
-				redirectTo: window.location.href,
-			});
+		} catch (error) {
+			if (
+				error instanceof TRPCClientError &&
+				error.message === "FORBIDDEN"
+			)
+				authenticateWithGoogle({
+					permissions: ["drive"],
+					redirectTo: window.location.href,
+				});
 		}
 	};
 
@@ -176,6 +181,16 @@ const Assignment: NextPage = () => {
 
 	const { data: profile } = api.profile.me.useQuery();
 
+	const { data: priorFeedback } = api.feedback.getPriorFeedback.useQuery({
+		courseId,
+		assignmentId,
+	}); // will return all student submissions if user is teacher of course. design more elegant solution later
+
+	const { data: submissions } = api.feedback.getSubmissions.useQuery({
+		courseId,
+		assignmentId,
+	});
+
 	const onGetFeedback = () => {
 		setGeneratingDemoFeedback(true);
 
@@ -221,160 +236,175 @@ const Assignment: NextPage = () => {
 
 	return (
 		<DefaultLayout
-			forceLoading={!assignment}
+			forceLoading={
+				!assignment ||
+				(role === "student" &&
+					(priorFeedback === undefined || submissions === undefined))
+			}
 			selectedCourseId={courseId}
 			notFoundMessage={notFoundMessage}
 		>
-			{assignment && (
-				<div className="flex min-h-screen flex-col space-y-2.5 py-2.5 pr-3">
-					<div className="flex flex-col rounded-md bg-surface py-5 px-6">
-						<div className="flex items-baseline justify-between">
-							<span
-								style={{
-									background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`,
-									WebkitBackgroundClip: "text",
-									backgroundClip: "text",
-									color: "transparent",
-								}}
-								className="pb-5 text-6xl font-semibold"
-							>
-								{assignment.title}
-							</span>
-
-							{assignment.state === "PUBLISHED" ? (
-								<span className="relative bottom-[1px] mr-3 ml-6 flex-shrink-0 text-lg font-medium leading-none opacity-60">
-									{assignment.dueDate
-										? `Due ${formatDate(
-												assignment.dueDate
-										  )}`
-										: "No due date"}
+			{assignment &&
+				(role !== "student" ||
+					(priorFeedback !== undefined &&
+						submissions !== undefined)) && (
+					<div className="flex min-h-screen flex-col space-y-2.5 py-2.5 pr-3">
+						<div className="flex flex-col rounded-md bg-surface py-5 px-6">
+							<div className="flex items-baseline justify-between">
+								<span
+									style={{
+										background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`,
+										WebkitBackgroundClip: "text",
+										backgroundClip: "text",
+										color: "transparent",
+									}}
+									className="pb-5 text-6xl font-semibold"
+								>
+									{assignment.title}
 								</span>
-							) : (
-								<span className="relative bottom-[1px] mr-3 ml-6 flex-shrink-0 text-lg font-medium italic leading-none opacity-60">
-									Draft
-								</span>
-							)}
-						</div>
 
-						<p className="select-text px-1 pb-5 text-sm opacity-80">
-							{assignment.description}
-						</p>
+								{assignment.state === "PUBLISHED" ? (
+									<span className="relative bottom-[1px] mr-3 ml-6 flex-shrink-0 text-lg font-medium leading-none opacity-60">
+										{assignment.dueDate
+											? `Due ${formatDate(
+													assignment.dueDate
+											  )}`
+											: "No due date"}
+									</span>
+								) : (
+									<span className="relative bottom-[1px] mr-3 ml-6 flex-shrink-0 text-lg font-medium italic leading-none opacity-60">
+										Draft
+									</span>
+								)}
+							</div>
 
-						<div className="flex space-x-1.5">
-							<ToggleButton
-								onClick={() => setSubpage("feedback")}
-								toggled={subpage === "feedback"}
-							>
-								Feedback
-							</ToggleButton>
+							<p className="select-text px-1 text-sm opacity-80">
+								{assignment.description}
+							</p>
 
 							{role === "teacher" && (
-								<ToggleButton
-									onClick={() => setSubpage("insights")}
-									toggled={subpage === "insights"}
-								>
-									Insights
-								</ToggleButton>
+								<div className="mt-5 flex space-x-1.5">
+									<ToggleButton
+										onClick={() => setSubpage("feedback")}
+										toggled={subpage === "feedback"}
+									>
+										Feedback
+									</ToggleButton>
+
+									<ToggleButton
+										onClick={() => setSubpage("insights")}
+										toggled={subpage === "insights"}
+									>
+										Insights
+									</ToggleButton>
+								</div>
 							)}
 						</div>
-					</div>
 
-					<div className="flex flex-1 flex-col rounded-md bg-surface py-5 px-6">
-						{subpage === "feedback" ? (
-							role === "teacher" ? (
-								<div>
-									<div className="ml-1 mb-2 text-lg font-medium opacity-60">
-										Instructions
-									</div>
+						<div className="flex h-full flex-1 flex-col rounded-md bg-surface py-5 px-6">
+							{subpage === "feedback" ? (
+								role === "teacher" ? (
+									<div>
+										<div className="ml-1 mb-2 text-lg font-medium opacity-60">
+											Instructions
+										</div>
 
-									{modal &&
-										createPortal(modal, document.body)}
+										{modal &&
+											createPortal(modal, document.body)}
 
-									{editingFeedbackInstructions && (
-										<div className="flex space-x-1.5">
-											{assignment.description && (
-												<Button
-													onClick={() =>
-														assignment.description &&
-														setFeedbackInstructionsInput(
-															assignment.description
-														)
-													}
-													disabled={
-														(feedbackInstructionsInput?.length ??
-															0) > 0
-													}
-												>
-													Use assignment description
-												</Button>
-											)}
+										{editingFeedbackInstructions && (
+											<div className="flex space-x-1.5">
+												{assignment.description && (
+													<Button
+														onClick={() =>
+															assignment.description &&
+															setFeedbackInstructionsInput(
+																assignment.description
+															)
+														}
+														disabled={
+															(feedbackInstructionsInput?.length ??
+																0) > 0
+														}
+													>
+														Use assignment
+														description
+													</Button>
+												)}
 
-											{driveFiles.length > 0 && (
+												{driveFiles.length > 0 && (
+													<Button
+														onClick={() =>
+															setModal(
+																<Modal
+																	title="Pick an attachment"
+																	onClose={() =>
+																		setModal(
+																			undefined
+																		)
+																	}
+																>
+																	<div className="flex flex-col space-y-2.5">
+																		{driveFiles.map(
+																			(
+																				driveFile
+																			) => (
+																				<Attachment
+																					title={
+																						driveFile.title
+																					}
+																					url={
+																						driveFile.url
+																					}
+																					thumbnailUrl={
+																						driveFile.thumbnailUrl
+																					}
+																					onClick={() =>
+																						onPickAttachment(
+																							{
+																								id: driveFile.id,
+																							}
+																						)
+																					}
+																					key={
+																						driveFile.id
+																					}
+																				/>
+																			)
+																		)}
+																	</div>
+																</Modal>
+															)
+														}
+														disabled={
+															(feedbackInstructionsInput?.length ??
+																0) > 0
+														}
+													>
+														Use summary of
+														assignment attachment
+													</Button>
+												)}
+
 												<Button
 													onClick={() =>
 														setModal(
 															<Modal
-																title="Pick an attachment"
+																title="Coming soon..."
 																onClose={() =>
 																	setModal(
 																		undefined
 																	)
 																}
 															>
-																<div className="flex flex-col space-y-2.5">
-																	{driveFiles.map(
-																		(
-																			driveFile
-																		) => (
-																			<div
-																				onClick={() =>
-																					onPickAttachment(
-																						{
-																							id: driveFile.id,
-																						}
-																					)
-																				}
-																				key={
-																					driveFile.id
-																				}
-																				className="flex h-20 cursor-pointer items-center rounded-md border-[0.75px] border-border pl-6 pr-8 transition-colors duration-150 hover:bg-surface-hover"
-																			>
-																				<img
-																					src={
-																						driveFile.thumbnailUrl
-																					}
-																					className="aspect-square h-12 rounded-full border-[0.75px] border-border"
-																				/>
-
-																				{/* select text not working here */}
-																				<div className="ml-3 flex flex-shrink flex-col">
-																					<span className="mb-[1px] font-medium leading-none opacity-90">
-																						{
-																							driveFile.title
-																						}
-																					</span>
-
-																					<Link
-																						href={
-																							driveFile.url
-																						}
-																						onClick={(
-																							e
-																						) =>
-																							e.stopPropagation()
-																						}
-																						target="_blank"
-																						className="w-min overflow-hidden overflow-ellipsis whitespace-nowrap text-sm opacity-60 hover:underline" // ellipsis not working yet
-																					>
-																						{
-																							driveFile.url
-																						}
-																					</Link>
-																				</div>
-																			</div>
-																		)
-																	)}
-																</div>
+																<span className="font-medium italic opacity-60">
+																	Ability to
+																	use summary
+																	of Drive
+																	document
+																	coming
+																	soon...
+																</span>
 															</Modal>
 														)
 													}
@@ -383,223 +413,223 @@ const Assignment: NextPage = () => {
 															0) > 0
 													}
 												>
-													Use summary of assignment
-													attachment
+													Use summary from Drive
+													document
 												</Button>
-											)}
-
-											<Button
-												onClick={() =>
-													setModal(
-														<Modal
-															title="Coming soon..."
-															onClose={() =>
-																setModal(
-																	undefined
-																)
-															}
-														>
-															<span className="font-medium italic opacity-60">
-																Ability to use
-																summary of Drive
-																document coming
-																soon...
-															</span>
-														</Modal>
-													)
-												}
-												disabled={
-													(feedbackInstructionsInput?.length ??
-														0) > 0
-												}
-											>
-												Use summary from Drive document
-											</Button>
-										</div>
-									)}
-
-									<div className="mt-2.5">
-										{editingFeedbackInstructions ? (
-											<div className="h-48">
-												<TextArea
-													value={
-														feedbackInstructionsInput
-													}
-													setValue={
-														setFeedbackInstructionsInput
-													}
-													placeholder="Instructions to set up feedback"
-													ref={instructionsInputRef}
-												/>
-											</div>
-										) : (
-											<div className="select-text whitespace-pre-wrap rounded-md border-[1px] border-border bg-surface-bright py-1.5 px-3 font-medium opacity-80">
-												{
-													assignment.feedbackConfig
-														?.instructions
-													// not sure why typescript can't narrow type here
-												}
 											</div>
 										)}
 
 										<div className="mt-2.5">
 											{editingFeedbackInstructions ? (
-												<div className="flex space-x-2.5">
+												<div className="h-48">
+													<TextArea
+														value={
+															feedbackInstructionsInput
+														}
+														setValue={
+															setFeedbackInstructionsInput
+														}
+														placeholder="Instructions to set up feedback"
+														ref={
+															instructionsInputRef
+														}
+													/>
+												</div>
+											) : (
+												<div className="select-text whitespace-pre-wrap rounded-md border-[1px] border-border bg-surface-bright py-1.5 px-3 font-medium opacity-80">
+													{
+														assignment
+															.feedbackConfig
+															?.instructions
+														// not sure why typescript can't narrow type here
+													}
+												</div>
+											)}
+
+											<div className="mt-2.5">
+												{editingFeedbackInstructions ? (
+													<div className="flex space-x-2.5">
+														<div className="w-48">
+															<Button
+																onClick={onDone}
+																disabled={
+																	feedbackInstructionsInput.length ===
+																	0
+																}
+																fullWidth
+															>
+																Done
+															</Button>
+														</div>
+
+														{changingFeedbackInstructions && (
+															<div className="w-48">
+																<Button
+																	onClick={
+																		onCancel
+																	}
+																	fullWidth
+																>
+																	Cancel
+																</Button>
+															</div>
+														)}
+													</div>
+												) : (
 													<div className="w-48">
 														<Button
-															onClick={onDone}
+															onClick={onChange}
+															fullWidth
+														>
+															Change
+														</Button>
+													</div>
+												)}
+											</div>
+										</div>
+
+										{assignment.feedbackConfig && (
+											<>
+												<div className="ml-1 mb-2 mt-2.5 text-lg font-medium opacity-60">
+													Feedback link
+												</div>
+
+												<div className="w-48">
+													<Button
+														onClick={() => {
+															navigator.clipboard.writeText(
+																window.location
+																	.href
+															);
+
+															setShowLinkCopied(
+																true
+															);
+														}}
+														fullWidth
+													>
+														{showLinkCopied
+															? "Link copied"
+															: "Copy link"}
+													</Button>
+												</div>
+
+												<div className="ml-1 mb-2 mt-2.5 text-lg font-medium opacity-60">
+													Try out feedback
+												</div>
+
+												<div className="flex h-64 space-x-2.5">
+													<div className="flex-1">
+														{/*//! not sure if the extra button and not letting users type during generation is actually helpful */}
+														{generatingDemoFeedback ||
+														processedDemoFeedback !==
+															"" ? (
+															<div className="h-full select-text overflow-y-scroll whitespace-pre-wrap rounded-md border-[1px] border-border bg-surface-bright py-1.5 px-3 font-medium opacity-80">
+																{
+																	demoAssignmentInput
+																}
+															</div>
+														) : (
+															<TextArea
+																value={
+																	demoAssignmentInput
+																}
+																setValue={
+																	setDemoAssignmentInput
+																}
+																placeholder="Enter a test assignment to try out feedback"
+																ref={
+																	demoAssignmentInputRef
+																}
+															/>
+														)}
+													</div>
+
+													<div
+														ref={demoFeedbackRef}
+														className={clsx(
+															"h-full flex-1 select-text overflow-y-scroll whitespace-pre-wrap rounded-md border-[1px] border-border py-1.5 px-3 font-medium",
+															processedDemoFeedback ===
+																""
+																? "opacity-30"
+																: "bg-surface-bright opacity-80"
+														)}
+													>
+														{processedDemoFeedback ===
+															"" &&
+														generatingDemoFeedback
+															? "Analyzing document..."
+															: processedDemoFeedback}
+													</div>
+												</div>
+
+												<div className="mt-2.5 flex space-x-2.5">
+													<div className="w-48">
+														<Button
+															onClick={
+																onGetFeedback
+															}
 															disabled={
-																feedbackInstructionsInput.length ===
-																0
+																demoAssignmentInput ===
+																	"" ||
+																generatingDemoFeedback ||
+																processedDemoFeedback !==
+																	""
 															}
 															fullWidth
 														>
-															Done
+															Get feedback
 														</Button>
 													</div>
 
-													{changingFeedbackInstructions && (
-														<div className="w-48">
-															<Button
-																onClick={
-																	onCancel
-																}
-																fullWidth
-															>
-																Cancel
-															</Button>
-														</div>
-													)}
+													{demoFeedback !== "" &&
+														!generatingDemoFeedback && (
+															<div className="w-48">
+																<Button
+																	onClick={
+																		onTryAgain
+																	}
+																	fullWidth
+																>
+																	Try again
+																</Button>
+															</div>
+														)}
 												</div>
-											) : (
-												<div className="w-48">
-													<Button
-														onClick={onChange}
-														fullWidth
-													>
-														Change
-													</Button>
-												</div>
-											)}
-										</div>
+											</>
+										)}
 									</div>
-
-									{assignment.feedbackConfig && (
-										<>
-											<div className="ml-1 mb-2 mt-2.5 text-lg font-medium opacity-60">
-												Feedback link
-											</div>
-
-											<div className="w-48">
-												<Button
-													onClick={() => {
-														navigator.clipboard.writeText(
-															window.location.href
-														);
-
-														setShowLinkCopied(true);
-													}}
-													fullWidth
-												>
-													{showLinkCopied
-														? "Link copied"
-														: "Copy link"}
-												</Button>
-											</div>
-
-											<div className="ml-1 mb-2 mt-2.5 text-lg font-medium opacity-60">
-												Try out feedback
-											</div>
-
-											<div className="flex h-64 space-x-2.5">
-												<div className="flex-1">
-													{generatingDemoFeedback ||
-													processedDemoFeedback !==
-														"" ? (
-														<div className="h-full select-text overflow-y-scroll whitespace-pre-wrap rounded-md border-[1px] border-border bg-surface-bright py-1.5 px-3 font-medium opacity-80">
-															{
-																demoAssignmentInput
-															}
-														</div>
-													) : (
-														<TextArea
-															value={
-																demoAssignmentInput
-															}
-															setValue={
-																setDemoAssignmentInput
-															}
-															placeholder="Enter a test assignment to try out feedback"
-															ref={
-																demoAssignmentInputRef
-															}
-														/>
-													)}
-												</div>
-
-												<div
-													ref={demoFeedbackRef}
-													className={clsx(
-														"h-full flex-1 select-text overflow-y-scroll whitespace-pre-wrap rounded-md border-[1px] border-border py-1.5 px-3 font-medium",
-														processedDemoFeedback ===
-															""
-															? "opacity-30"
-															: "bg-surface-bright opacity-80"
-													)}
-												>
-													{processedDemoFeedback ===
-														"" &&
-													generatingDemoFeedback
-														? "Generating..."
-														: processedDemoFeedback}
-												</div>
-											</div>
-
-											<div className="mt-2.5 flex space-x-2.5">
-												<div className="w-48">
-													<Button
-														onClick={onGetFeedback}
-														disabled={
-															demoAssignmentInput ===
-																"" ||
-															generatingDemoFeedback ||
-															processedDemoFeedback !==
-																""
-														}
-														fullWidth
-													>
-														Get feedback
-													</Button>
-												</div>
-
-												{demoFeedback !== "" &&
-													!generatingDemoFeedback && (
-														<div className="w-48">
-															<Button
-																onClick={
-																	onTryAgain
-																}
-																fullWidth
-															>
-																Try again
-															</Button>
-														</div>
-													)}
-											</div>
-										</>
-									)}
-								</div>
+								) : (
+									priorFeedback &&
+									submissions && // again, typescript can't narrow away undefined here
+									selectedCourse &&
+									profile &&
+									(assignment.feedbackConfig !== undefined ? (
+										<StudentFeedback
+											priorFeedback={priorFeedback}
+											submissions={submissions}
+											instructions={
+												assignment.feedbackConfig
+													.instructions
+											}
+											courseName={selectedCourse.name}
+											studentName={profile.name}
+										/>
+									) : (
+										<span className="font-medium italic opacity-60">
+											Your teacher hasn&apos;t set up
+											feedback on this assignment yet
+										</span>
+									))
+								)
 							) : (
-								<div></div>
-							)
-						) : (
-							<span className="font-medium italic opacity-60">
-								Assignment insights coming soon...
-							</span>
-						)}
+								<span className="font-medium italic opacity-60">
+									Assignment insights coming soon...
+								</span>
+							)}
+						</div>
 					</div>
-				</div>
-			)}
+				)}
 		</DefaultLayout>
 	);
 };

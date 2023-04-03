@@ -69,6 +69,46 @@ export const materialSchema = z.discriminatedUnion("type", [
 	}),
 ]);
 
+export const attachmentSchema = z.discriminatedUnion("type", [
+	z.object({
+		type: z.literal("driveFile"),
+		driveFile: z.object({
+			id: z.string(),
+			title: z.string(),
+			url: z.string().url(),
+			thumbnailUrl: z.string().url().optional(),
+		}),
+	}),
+	z.object({
+		type: z.literal("youTubeVideo"), // the capital t is the only difference between this is and materialSchema
+		youtubeVideo: z.object({
+			id: z.string(),
+			title: z.string(),
+			url: z.string().url(),
+			thumbnailUrl: z.string().url().optional(),
+		}),
+	}),
+	z.object({
+		type: z.literal("link"),
+		link: z.object({
+			url: z.string().url(),
+			title: z.string().optional(),
+			thumbnailUrl: z.string().url().optional(),
+		}),
+	}),
+	z.object({
+		type: z.literal("form"),
+		form: z.object({
+			formUrl: z.string().url(),
+			responseUrl: z.string().url().optional(),
+			title: z.string(),
+			thumbnailUrl: z.string().url().optional(),
+		}),
+	}),
+]);
+
+export const attachmentListSchema = z.array(attachmentSchema);
+
 export const assignmentSchema = z.intersection(
 	// assuming that DELETED assignments are not being fetched, or parse will throw
 	z.object({
