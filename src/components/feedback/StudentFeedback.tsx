@@ -173,7 +173,7 @@ const StudentFeedback: React.FC<Props> = ({
 				)}
 			>
 				{processedFeedback === "" && generatingFeedback
-					? "Analyzing document..."
+					? "Analyzing document, this may take a minute..."
 					: processedFeedback}
 			</div>
 

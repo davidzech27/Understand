@@ -558,7 +558,7 @@ const Assignment: NextPage = () => {
 														{processedDemoFeedback ===
 															"" &&
 														generatingDemoFeedback
-															? "Analyzing document..."
+															? "Analyzing document, this may take a minute..."
 															: processedDemoFeedback}
 													</div>
 												</div>

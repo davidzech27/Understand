@@ -66,6 +66,7 @@ WORD COUNT: ${
 						.filter((string) => string !== "").length
 				}
 STUDENT'S NAME: ${studentName}
+YOUR NAME: Understand
 COURSE NAME: ${courseName}
 ANALYSIS FORMAT: FOCUSED PARAGRAPHS
 FEEDBACK FORMAT: INFORMAL. DO NOT FORMAT LIKE A LETTER
