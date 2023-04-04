@@ -555,11 +555,12 @@ const Assignment: NextPage = () => {
 																: "bg-surface-bright opacity-80"
 														)}
 													>
-														{processedDemoFeedback ===
+														{demoFeedback}
+														{/* {processedDemoFeedback ===
 															"" &&
 														generatingDemoFeedback
 															? "Analyzing document..."
-															: processedDemoFeedback}
+															: processedDemoFeedback} */}
 													</div>
 												</div>
 
