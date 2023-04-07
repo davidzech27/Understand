@@ -3,10 +3,6 @@ import { z } from "zod";
 import { env } from "~/env.mjs";
 import { getAuth, authorizationCookieKey } from "~/server/modules/auth/jwt";
 
-export const config = {
-	runtime: "edge",
-};
-
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder();
 
