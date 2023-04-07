@@ -1,6 +1,5 @@
 import { type NextPage } from "next";
 import Head from "next/head";
-import Link from "next/link";
 import FancyButton from "~/client/modules/shared/FancyButton";
 import colors from "colors.cjs";
 

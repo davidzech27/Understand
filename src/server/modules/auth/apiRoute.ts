@@ -5,7 +5,7 @@ import {
 	redirectUrl,
 } from "~/server/modules/auth/google";
 import { google } from "googleapis";
-import { authorizationCookieKey, setAuth } from "~/server/modules/auth/jwt";
+import { setAuth } from "~/server/modules/auth/jwt";
 import db from "~/server/modules/db/db";
 import { user } from "~/server/modules/db/schema";
 

@@ -6,7 +6,7 @@ import {
 	useRef,
 } from "react";
 
-export default <S>(
+const useStickyState = <S>(
 	defaultValue: S,
 	key: string
 ): [S, Dispatch<SetStateAction<S>>] => {
@@ -44,3 +44,5 @@ export default <S>(
 
 	return [value, setValue];
 };
+
+export default useStickyState;

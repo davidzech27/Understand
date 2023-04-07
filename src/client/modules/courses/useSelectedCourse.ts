@@ -2,9 +2,11 @@ import { useMemo } from "react";
 import { useRouter } from "next/router";
 import { api } from "~/client/api";
 
-export default ({ selectedCourseId }: { selectedCourseId: string }) => {
-	const router = useRouter();
-
+const useSelectedCourse = ({
+	selectedCourseId,
+}: {
+	selectedCourseId: string;
+}) => {
 	const { data: coursesTeaching } = api.courses.teaching.useQuery();
 
 	const { data: coursesEnrolled } = api.courses.enrolled.useQuery();
@@ -30,3 +32,5 @@ export default ({ selectedCourseId }: { selectedCourseId: string }) => {
 
 	return { selectedCourse, role };
 };
+
+export default useSelectedCourse;

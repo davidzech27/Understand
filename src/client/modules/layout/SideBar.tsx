@@ -1,5 +1,6 @@
 import Link from "next/link";
-import PreviewDisplay from "../../../components/shared/PreviewDisplay";
+import Image from "next/image";
+import PreviewDisplay from "../shared/PreviewDisplay";
 import colors from "colors.cjs";
 
 interface Props {
@@ -52,10 +53,15 @@ const SideBar: React.FC<Props> = ({
 						text={profile.name}
 						subtext={profile.email}
 						photo={
-							<img
-								className="h-full w-full rounded-full"
-								src={profile.photo}
-							/>
+							profile.photo !== undefined ? (
+								<Image
+									className="h-full w-full rounded-full"
+									src={profile.photo}
+									alt="Your profile photo"
+								/>
+							) : (
+								<div className="h-full w-full" />
+							)
 						}
 						href="/home" // change later once there is a separate home and account buttons
 						selected={selectedCourseId === undefined}

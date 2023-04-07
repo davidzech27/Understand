@@ -1,11 +1,11 @@
 import { useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import { TRPCClientError } from "@trpc/client";
-import TextArea from "../../../components/shared/TextArea";
-import Button from "../../../components/shared/Button";
+import TextArea from "../shared/TextArea";
+import Button from "../shared/Button";
 import clsx from "clsx";
 import { type RouterOutputs } from "~/client/api";
-import Modal from "../../../components/shared/Modal";
+import Modal from "../shared/Modal";
 import Attachment from "../shared/Attachment";
 import { api } from "~/client/api";
 import fetchOpenaiStream from "~/client/modules/openai/fetchOpenAIStream";

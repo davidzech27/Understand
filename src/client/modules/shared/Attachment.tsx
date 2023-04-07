@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 interface Props {
 	title?: string;
@@ -14,8 +15,11 @@ const Attachment: React.FC<Props> = ({ title, url, thumbnailUrl, onClick }) => {
 			className="flex h-20 cursor-pointer items-center rounded-md border-[0.75px] border-border pl-6 pr-8 transition-colors duration-150 hover:bg-surface-hover"
 		>
 			{thumbnailUrl !== undefined ? (
-				<img
+				<Image
 					src={thumbnailUrl}
+					alt={`Thumbnail of attachment with ${
+						title !== undefined ? `title ${title}` : "no title"
+					}`}
 					className="aspect-square h-12 rounded-full border-[0.75px] border-border"
 				/>
 			) : (

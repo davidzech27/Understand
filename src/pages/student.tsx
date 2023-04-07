@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { type NextPage } from "next";
 import { useRouter } from "next/router";
+import Image from "next/image";
 import colors from "colors.cjs";
 import { api } from "~/client/api";
 import DefaultLayout from "~/client/modules/layout/DefaultLayout";
@@ -56,8 +57,9 @@ const Student: NextPage = () => {
 			{student && (
 				<div className="flex h-screen flex-col space-y-2.5 py-2.5 pr-3">
 					<div className="flex items-center rounded-md bg-surface py-5 px-6">
-						<img
+						<Image
 							src={student.photo}
+							alt={`${student.name}'s profile photo`}
 							className="h-20 w-20 rounded-full"
 						/>
 
