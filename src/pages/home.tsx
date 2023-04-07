@@ -1,7 +1,7 @@
 import { type NextPage } from "next";
-import DefaultLayout from "~/components/layout/DefaultLayout";
+import DefaultLayout from "~/client/modules/layout/DefaultLayout";
 import colors from "colors.cjs";
-import { api } from "~/lib/trpc";
+import { api } from "~/client/api";
 
 const Home: NextPage = () => {
 	return (

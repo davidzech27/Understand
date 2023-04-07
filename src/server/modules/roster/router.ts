@@ -1,14 +1,14 @@
 import { z } from "zod";
 import * as googleapis from "googleapis";
 import { TRPCError } from "@trpc/server";
-import { createRouter, authedProcedure } from "~/server/api/trpc";
-import { rosterSchema } from "~/server/validationSchemas";
-import db from "~/db/db";
-import { user } from "~/db/schema";
+import { createRouter, authedProcedure } from "~/server/trpc";
+import { rosterSchema } from "~/server/modules/shared/validation";
+import db from "~/server/modules/db/db";
+import { user } from "~/server/modules/db/schema";
 import { sql } from "drizzle-orm";
 //! limitation - names set up through understand aren't being used on non-workspace/school google classrooms because students can't view their teachers' email addresses so they can't be associated to their user database row
 // errors going on in this router but frontend seems to be fine
-export const rosterRouter = createRouter({
+const rosterRouter = createRouter({
 	get: authedProcedure // unfortunately we are making nonconcurrent roundtrips here
 		.input(
 			z.object({
@@ -104,3 +104,5 @@ export const rosterRouter = createRouter({
 			}
 		}),
 });
+
+export default rosterRouter;

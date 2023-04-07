@@ -1,13 +1,13 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { createRouter, authedProcedure } from "~/server/api/trpc";
+import { createRouter, authedProcedure } from "~/server/trpc";
 import {
 	assignmentSchema,
 	assignmentListSchema,
-} from "~/server/validationSchemas";
+} from "~/server/modules/shared/validation";
 import * as googleapis from "googleapis";
-import db from "~/db/db";
-import { feedbackConfig } from "~/db/schema";
+import db from "~/server/modules/db/db";
+import { feedbackConfig } from "~/server/modules/db/schema";
 import { eq, and } from "drizzle-orm/expressions";
 
 const transformAssignment = ({
@@ -95,7 +95,7 @@ const transformAssignment = ({
 		  }
 		: undefined;
 
-export const assignmentsRouter = createRouter({
+const assignmentsRouter = createRouter({
 	get: authedProcedure
 		.input(
 			z.object({
@@ -212,3 +212,5 @@ export const assignmentsRouter = createRouter({
 			}
 		}),
 });
+
+export default assignmentsRouter;

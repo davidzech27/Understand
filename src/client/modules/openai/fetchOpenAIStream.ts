@@ -1,9 +1,9 @@
-import { type OpenAIStreamRequest } from "~/pages/api/openai";
+import { type OpenAIStreamRequest } from "~/server/modules/openai/edgeRoute";
 
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder();
 
-export default async ({
+const fetchOpenAIStream = async ({
 	messages,
 	model,
 	temperature,
@@ -42,3 +42,5 @@ export default async ({
 		console.error("This shouldn't happen");
 	}
 };
+
+export default fetchOpenAIStream;

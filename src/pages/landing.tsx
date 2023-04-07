@@ -2,9 +2,9 @@ import { type NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import FancyButton from "~/components/shared/FancyButton";
-import TextInput from "~/components/shared/TextInput";
-import { api } from "~/lib/trpc";
+import FancyButton from "~/client/modules/shared/FancyButton";
+import TextInput from "~/client/modules/shared/TextInput";
+import { api } from "~/client/api";
 
 // perhaps add extra content to fill awkward whitespace
 const SignIn: NextPage = () => {

@@ -4,13 +4,13 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import colors from "colors.cjs";
-import { RouterOutputs, api } from "~/lib/trpc";
-import DefaultLayout from "~/components/layout/DefaultLayout";
+import { RouterOutputs, api } from "~/client/api";
+import DefaultLayout from "~/client/modules/layout/DefaultLayout";
 import clsx from "clsx";
-import formatDate from "~/util/formatDate";
-import ToggleButton from "~/components/shared/ToggleButton";
-import useStickyState from "~/util/useStickyState";
-import useSelectedCourse from "~/util/useSelectedCourse";
+import formatDate from "~/client/modules/shared/formatDate";
+import ToggleButton from "~/client/modules/shared/ToggleButton";
+import useStickyState from "~/client/modules/shared/useStickyState";
+import useSelectedCourse from "~/client/modules/courses/useSelectedCourse";
 // consider adding borders or shadows on surfaces
 // todo - figure out why students subpage only shows current user if user is student
 // todo - place links to corresponding google classroom pages in a bunch of places

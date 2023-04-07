@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { createRouter, authedProcedure } from "~/server/api/trpc";
-import { courseListSchema } from "~/server/validationSchemas";
+import { createRouter, authedProcedure } from "~/server/trpc";
+import { courseListSchema } from "~/server/modules/shared/validation";
 
-export const coursesRouter = createRouter({
+const coursesRouter = createRouter({
 	teaching: authedProcedure.query(async ({ ctx: { classroom } }) => {
 		return courseListSchema.parse(
 			(
@@ -24,3 +24,5 @@ export const coursesRouter = createRouter({
 		);
 	}),
 });
+
+export default coursesRouter;

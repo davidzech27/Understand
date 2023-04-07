@@ -1,13 +1,13 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import * as googleapis from "googleapis";
-import { createRouter, authedProcedure } from "~/server/api/trpc";
-import db from "~/db/db";
+import { createRouter, authedProcedure } from "~/server/trpc";
+import db from "~/server/modules/db/db";
 import { eq } from "drizzle-orm/expressions";
-import { user } from "~/db/schema";
-import { profileSchema } from "~/server/validationSchemas";
+import { user } from "~/server/modules/db/schema";
+import { profileSchema } from "~/server/modules/shared/validation";
 
-export const profileRouter = createRouter({
+const profileRouter = createRouter({
 	me: authedProcedure.query(async ({ ctx: { email, classroom } }) => {
 		try {
 			const [[userRow], photo] = await Promise.all([
@@ -95,3 +95,5 @@ export const profileRouter = createRouter({
 			await db.update(user).set({ name }).where(eq(user.email, email));
 		}),
 });
+
+export default profileRouter;

@@ -7,7 +7,7 @@
 		"dev": "next dev",
 		"lint": "next lint",
 		"start": "next start",
-		"dbpush": "drizzle-kit push:mysql --config=./src/db/drizzle.config.ts"
+		"dbpush": "drizzle-kit push:mysql --config=./src/modules/db/drizzle.config.ts"
 	},
 	"dependencies": {
 		"@planetscale/database": "^1.6.0",

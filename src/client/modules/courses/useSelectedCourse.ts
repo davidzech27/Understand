@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useRouter } from "next/router";
-import { api } from "~/lib/trpc";
+import { api } from "~/client/api";
 
 export default ({ selectedCourseId }: { selectedCourseId: string }) => {
 	const router = useRouter();

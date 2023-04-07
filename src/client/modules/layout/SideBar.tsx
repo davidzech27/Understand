@@ -1,5 +1,5 @@
 import Link from "next/link";
-import PreviewDisplay from "../shared/PreviewDisplay";
+import PreviewDisplay from "../../../components/shared/PreviewDisplay";
 import colors from "colors.cjs";
 
 interface Props {

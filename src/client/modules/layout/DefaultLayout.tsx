@@ -1,6 +1,6 @@
 import Head from "next/head";
 import SideBar from "./SideBar";
-import { api } from "~/lib/trpc";
+import { api } from "~/client/api";
 import { useRouter } from "next/router";
 
 type Props = {

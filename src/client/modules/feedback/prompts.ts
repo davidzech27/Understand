@@ -1,4 +1,4 @@
-import { type OpenAIStreamRequest } from "./pages/api/openai";
+import { type OpenAIStreamRequest } from "~/server/modules/openai/edgeRoute";
 
 export const summarizeInstructionsPrompt = ({
 	text,
@@ -43,6 +43,8 @@ export const getFeedbackPrompt = ({
 			},
 			{
 				// If necessary include something like "However, analyses should not critique the student's unique style of writing unless absolutely necessary."
+				// have it address flow rather than style. potentially have suggestions avoid making any revisions for the reader, rather just point out what should change and why. encourage a deeper understanding of writing so that the student can learn from the feedback
+				// ensure that suggestions don't alter the student's unique style of writing, unless absolutely necessary.
 				role: "user",
 
 				content: `You will be shown the prompt for an assignment and a student's progress on this assignment. Your role will be to provide thoughtful, engaging, and actionable feedback on the student's work, serving to guide them to reach their potential as a writer. The process by which you will accomplish this will consist of 2 steps:

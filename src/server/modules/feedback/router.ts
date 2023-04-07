@@ -1,20 +1,16 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import * as googleapis from "googleapis";
-import {
-	createRouter,
-	authedProcedure,
-	publicProcedure,
-} from "~/server/api/trpc";
-import db from "~/db/db";
+import { createRouter, authedProcedure } from "~/server/trpc";
+import db from "~/server/modules/db/db";
 import { and, eq } from "drizzle-orm/expressions";
-import { feedback, feedbackConfig } from "~/db/schema";
+import { feedback, feedbackConfig } from "~/server/modules/db/schema";
 import {
 	attachmentListSchema,
 	attachmentSchema,
-} from "~/server/validationSchemas";
+} from "~/server/modules/shared/validation";
 
-export const feedbackRouter = createRouter({
+const feedbackRouter = createRouter({
 	getGoogleDocText: authedProcedure
 		.input(
 			z.object({
@@ -163,3 +159,5 @@ export const feedbackRouter = createRouter({
 			}
 		),
 });
+
+export default feedbackRouter;

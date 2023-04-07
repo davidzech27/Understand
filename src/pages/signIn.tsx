@@ -1,9 +1,9 @@
 import { type NextPage } from "next";
-import Head from "next/head";
-import authenticateWithGoogle from "~/lib/authenticateWithGoogle";
-import WideButton from "~/components/shared/WideButton";
 import { useState } from "react";
-import FancyButton from "~/components/shared/FancyButton";
+import Head from "next/head";
+import authenticateWithGoogle from "~/client/modules/auth/authenticateWithGoogle";
+import WideButton from "~/client/modules/shared/WideButton";
+import FancyButton from "~/client/modules/shared/FancyButton";
 
 // todo - add extra content to fill awkward whitespace. or perhaps make panel smaller, but this would make the gradient section too big
 

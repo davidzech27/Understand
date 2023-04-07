@@ -1,8 +1,8 @@
 import { type AppType } from "next/app";
 import Head from "next/head";
 import { Analytics } from "@vercel/analytics/react";
-import { api } from "~/lib/trpc";
-import "~/styles/globals.css";
+import { api } from "~/client/api";
+import "~/client/globals.css";
 
 const App: AppType = ({ Component }) => {
 	return (

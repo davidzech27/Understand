@@ -4,21 +4,24 @@ import { type NextPage } from "next";
 import { TRPCClientError } from "@trpc/client";
 import { useRouter } from "next/router";
 import colors from "colors.cjs";
-import { api } from "~/lib/trpc";
-import DefaultLayout from "~/components/layout/DefaultLayout";
+import { api } from "~/client/api";
+import DefaultLayout from "~/client/modules/layout/DefaultLayout";
 import clsx from "clsx";
-import formatDate from "~/util/formatDate";
-import Modal from "~/components/shared/Modal";
-import TextArea from "~/components/shared/TextArea";
-import ToggleButton from "~/components/shared/ToggleButton";
-import Button from "~/components/shared/Button";
-import fetchOpenaiStream from "~/lib/fetchOpenaiStream";
-import { getFeedbackPrompt, summarizeInstructionsPrompt } from "~/prompts";
-import authenticateWithGoogle from "~/lib/authenticateWithGoogle";
-import useStickyState from "~/util/useStickyState";
-import useSelectedCourse from "~/util/useSelectedCourse";
-import StudentFeedback from "~/components/feedback/StudentFeedback";
-import Attachment from "~/components/shared/Attachment";
+import formatDate from "~/client/modules/shared/formatDate";
+import Modal from "~/client/modules/shared/Modal";
+import TextArea from "~/client/modules/shared/TextArea";
+import ToggleButton from "~/client/modules/shared/ToggleButton";
+import Button from "~/client/modules/shared/Button";
+import fetchOpenaiStream from "~/client/modules/openai/fetchOpenAIStream";
+import {
+	getFeedbackPrompt,
+	summarizeInstructionsPrompt,
+} from "~/client/modules/feedback/prompts";
+import authenticateWithGoogle from "~/client/modules/auth/authenticateWithGoogle";
+import useStickyState from "~/client/modules/shared/useStickyState";
+import useSelectedCourse from "~/client/modules/courses/useSelectedCourse";
+import StudentFeedback from "~/client/modules/feedback/StudentFeedback";
+import Attachment from "~/client/modules/shared/Attachment";
 
 // put some more thought into how to bring external content into site. perhaps not always the best idea for input to show up on main screen, and maybe would be better for it to show up as an attachment that can be opened up with a modal
 // perhaps completely abstract away the creation of feedback instructions, and instead of showing actual instructions, just have user see list of things model is taking into account. not as transparent though, and users don't get to see summary being created

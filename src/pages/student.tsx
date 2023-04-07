@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { type NextPage } from "next";
-import Head from "next/head";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import colors from "colors.cjs";
-import { api } from "~/lib/trpc";
-import DefaultLayout from "~/components/layout/DefaultLayout";
-import useSelectedCourse from "~/util/useSelectedCourse";
+import { api } from "~/client/api";
+import DefaultLayout from "~/client/modules/layout/DefaultLayout";
+import useSelectedCourse from "~/client/modules/courses/useSelectedCourse";
 
 const Student: NextPage = () => {
 	const router = useRouter();
