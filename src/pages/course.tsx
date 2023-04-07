@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { type NextPage } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "next/router";
 import colors from "colors.cjs";
 import { api } from "~/client/api";
@@ -147,7 +146,7 @@ const Course: NextPage = () => {
 											key={teacher.email}
 											className="flex h-20 items-center rounded-md border-[0.75px] border-border pl-6 pr-8"
 										>
-											<Image
+											<img
 												src={teacher.photo}
 												alt={`${teacher.name}'s profile photo`}
 												className="h-11 w-11 rounded-full"
@@ -179,7 +178,7 @@ const Course: NextPage = () => {
 											{roster.students.map((student) => {
 												const inner = (
 													<>
-														<Image
+														<img
 															src={student.photo}
 															alt={`${student.name}'s profile photo`}
 															className="h-11 w-11 rounded-full"

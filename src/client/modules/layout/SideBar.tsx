@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import PreviewDisplay from "../shared/PreviewDisplay";
 import colors from "colors.cjs";
 
@@ -54,10 +53,10 @@ const SideBar: React.FC<Props> = ({
 						subtext={profile.email}
 						photo={
 							profile.photo !== undefined ? (
-								<Image
-									className="h-full w-full rounded-full"
+								<img
 									src={profile.photo}
 									alt="Your profile photo"
+									className="h-full w-full rounded-full"
 								/>
 							) : (
 								<div className="h-full w-full" />
