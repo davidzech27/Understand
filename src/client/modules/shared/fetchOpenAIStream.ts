@@ -11,7 +11,7 @@ const fetchOpenAIStream = async ({
 	onFinish,
 }: OpenAIStreamRequest & {
 	onContent: (content: string) => void;
-	onFinish: (content) => void;
+	onFinish: (content: string) => void;
 }) => {
 	const response = await fetch("/api/openai", {
 		method: "POST",
