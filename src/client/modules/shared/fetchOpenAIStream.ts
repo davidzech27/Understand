@@ -11,7 +11,7 @@ const fetchOpenAIStream = async ({
 	onFinish,
 }: OpenAIStreamRequest & {
 	onContent: (content: string) => void;
-	onFinish?: () => void;
+	onFinish: (content) => void;
 }) => {
 	const response = await fetch("/api/openai", {
 		method: "POST",
@@ -27,13 +27,19 @@ const fetchOpenAIStream = async ({
 	if (response.body) {
 		const reader = response.body.getReader();
 
+		let streamedContent = "";
+
 		while (true) {
 			const result = await reader.read();
 
 			if (!result.done) {
-				onContent(textDecoder.decode(result.value));
+				const content = textDecoder.decode(result.value);
+
+				streamedContent += content;
+
+				onContent(content);
 			} else {
-				onFinish && onFinish();
+				onFinish && onFinish(streamedContent);
 
 				break;
 			}

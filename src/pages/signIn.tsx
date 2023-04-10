@@ -4,6 +4,7 @@ import Head from "next/head";
 import authenticateWithGoogle from "~/client/modules/auth/authenticateWithGoogle";
 import WideButton from "~/client/modules/shared/WideButton";
 import FancyButton from "~/client/modules/shared/FancyButton";
+import { event } from "~/client/modules/analytics/mixpanel";
 
 // todo - add extra content to fill awkward whitespace. or perhaps make panel smaller, but this would make the gradient section too big
 
@@ -35,6 +36,8 @@ const SignIn: NextPage = () => {
 						  ],
 				redirectTo: "/landing",
 			});
+
+		event.startGoogleOAuth();
 	};
 
 	const [selectedRole, setSelectedRole] = useState<

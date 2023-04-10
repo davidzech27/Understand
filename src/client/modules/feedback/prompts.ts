@@ -80,3 +80,5 @@ Now, begin the begin the described 2 step process of analyzing the students work
 		temperature: 0,
 	};
 };
+
+export const getFollowUpPrompt = () => {};

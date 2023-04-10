@@ -12,7 +12,7 @@ import Modal from "~/client/modules/shared/Modal";
 import TextArea from "~/client/modules/shared/TextArea";
 import ToggleButton from "~/client/modules/shared/ToggleButton";
 import Button from "~/client/modules/shared/Button";
-import fetchOpenaiStream from "~/client/modules/openai/fetchOpenAIStream";
+import fetchOpenaiStream from "~/client/modules/shared/fetchOpenAIStream";
 import {
 	getFeedbackPrompt,
 	summarizeInstructionsPrompt,
@@ -22,6 +22,7 @@ import useStickyState from "~/client/modules/shared/useStickyState";
 import useSelectedCourse from "~/client/modules/courses/useSelectedCourse";
 import StudentFeedback from "~/client/modules/feedback/StudentFeedback";
 import Attachment from "~/client/modules/shared/Attachment";
+import { event } from "~/client/modules/analytics/mixpanel";
 
 // put some more thought into how to bring external content into site. perhaps not always the best idea for input to show up on main screen, and maybe would be better for it to show up as an attachment that can be opened up with a modal
 // perhaps completely abstract away the creation of feedback instructions, and instead of showing actual instructions, just have user see list of things model is taking into account. not as transparent though, and users don't get to see summary being created
@@ -98,6 +99,7 @@ const Assignment: NextPage = () => {
 						top: instructionsInputRef.current?.scrollHeight,
 					});
 				},
+				onFinish: () => {},
 			});
 		} catch (error) {
 			if (
@@ -166,6 +168,12 @@ const Assignment: NextPage = () => {
 
 			return prev;
 		});
+
+		event.feedbackConfig({
+			courseId,
+			assignmentId,
+			instructions: feedbackInstructionsInput,
+		});
 	};
 
 	const onCancel = () => setChangingFeedbackInstructions(false);
@@ -214,7 +222,15 @@ const Assignment: NextPage = () => {
 						top: demoFeedbackRef.current?.scrollHeight,
 					});
 				},
-				onFinish: () => setGeneratingDemoFeedback(false),
+				onFinish: (rawFeedback) => {
+					setGeneratingDemoFeedback(false);
+
+					event.feedbackDemo({
+						courseId,
+						assignmentId,
+						rawFeedback,
+					});
+				},
 			});
 	};
 
@@ -617,6 +633,8 @@ const Assignment: NextPage = () => {
 											}
 											courseName={selectedCourse.name}
 											studentName={profile.name}
+											courseId={courseId}
+											assignmentId={assignmentId}
 										/>
 									) : (
 										<span className="font-medium italic opacity-60">

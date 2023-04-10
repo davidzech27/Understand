@@ -5,11 +5,16 @@ import { useState } from "react";
 import FancyButton from "~/client/modules/shared/FancyButton";
 import TextInput from "~/client/modules/shared/TextInput";
 import { api } from "~/client/api";
+import { event } from "~/client/modules/analytics/mixpanel";
 
 // perhaps add extra content to fill awkward whitespace
 const SignIn: NextPage = () => {
 	api.profile.me.useQuery(undefined, {
-		onSuccess: ({ name }) => nameInput.length === 0 && setNameInput(name),
+		onSuccess: ({ email, name }) => {
+			event.finishGoogleOAuth({ email, name });
+
+			nameInput.length === 0 && setNameInput(name);
+		},
 	});
 
 	const updateProfile = api.profile.update.useMutation().mutateAsync;
@@ -24,6 +29,8 @@ const SignIn: NextPage = () => {
 		});
 
 		router.push("/home");
+
+		event.finishLanding({ name: nameInput });
 	};
 
 	return (

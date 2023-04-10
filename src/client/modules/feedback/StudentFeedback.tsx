@@ -8,9 +8,10 @@ import { type RouterOutputs } from "~/client/api";
 import Modal from "../shared/Modal";
 import Attachment from "../shared/Attachment";
 import { api } from "~/client/api";
-import fetchOpenaiStream from "~/client/modules/openai/fetchOpenAIStream";
+import fetchOpenaiStream from "~/client/modules/shared/fetchOpenAIStream";
 import { getFeedbackPrompt } from "~/client/modules/feedback/prompts";
 import authenticateWithGoogle from "~/client/modules/auth/authenticateWithGoogle";
+import { event } from "../analytics/mixpanel";
 
 interface Props {
 	priorFeedback: RouterOutputs["feedback"]["getPriorFeedback"];
@@ -18,6 +19,8 @@ interface Props {
 	instructions: string;
 	studentName: string;
 	courseName: string;
+	courseId: string;
+	assignmentId: string;
 }
 
 const StudentFeedback: React.FC<Props> = ({
@@ -25,6 +28,8 @@ const StudentFeedback: React.FC<Props> = ({
 	instructions,
 	studentName,
 	courseName,
+	courseId,
+	assignmentId,
 }) => {
 	const [assignmentInput, setAssignmentInput] = useState("");
 
@@ -98,7 +103,15 @@ const StudentFeedback: React.FC<Props> = ({
 					top: feedbackRef.current?.scrollHeight,
 				});
 			},
-			onFinish: () => setGeneratingFeedback(false),
+			onFinish: (rawFeedback) => {
+				setGeneratingFeedback(false);
+
+				event.feedbackDemo({
+					courseId,
+					assignmentId,
+					rawFeedback,
+				});
+			},
 		});
 	};
 

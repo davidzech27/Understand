@@ -18,7 +18,10 @@ const server = z.object({
  * Specify your client-side environment variables schema here. This way you can ensure the app isn't
  * built with invalid env vars. To expose them to the client, prefix them with `NEXT_PUBLIC_`.
  */
-const client = z.object({});
+const client = z.object({
+	NEXT_PUBLIC_MIXPANEL_TOKEN: z.string(),
+	NEXT_PUBLIC_LEARN_MORE_URL: z.string().url(),
+});
 
 /**
  * You can't destruct `process.env` as a regular object in the Next.js edge runtimes (e.g.
@@ -34,6 +37,8 @@ const processEnv = {
 	GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
 	GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
 	OPENAI_SECRET_KEY: process.env.OPENAI_SECRET_KEY,
+	NEXT_PUBLIC_MIXPANEL_TOKEN: process.env.NEXT_PUBLIC_MIXPANEL_TOKEN,
+	NEXT_PUBLIC_LEARN_MORE_URL: process.env.NEXT_PUBLIC_LEARN_MORE_URL,
 };
 
 // Don't touch the part below
