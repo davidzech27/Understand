@@ -8,8 +8,7 @@ import { type RouterOutputs } from "~/client/api";
 import Modal from "../shared/Modal";
 import Attachment from "../shared/Attachment";
 import { api } from "~/client/api";
-import fetchOpenaiStream from "~/client/modules/shared/fetchOpenAIStream";
-import { getFeedbackPrompt } from "~/client/modules/feedback/prompts";
+import getFeedback from "./getFeedback";
 import authenticateWithGoogle from "~/client/modules/auth/authenticateWithGoogle";
 import { event } from "../analytics/mixpanel";
 
@@ -40,19 +39,6 @@ const StudentFeedback: React.FC<Props> = ({
 	const [generatingFeedback, setGeneratingFeedback] = useState(false);
 
 	const [feedback, setFeedback] = useState("");
-
-	const processedFeedback = (() => {
-		const indexOfFeedbackBeginning = feedback.indexOf("Step 2");
-
-		if (indexOfFeedbackBeginning === -1) return "";
-
-		return feedback
-			.slice(indexOfFeedbackBeginning)
-			.split("\n")
-			.slice(1)
-			.join("\n")
-			.trim();
-	})();
 
 	const feedbackRef = useRef<HTMLDivElement>(null);
 
@@ -89,13 +75,11 @@ const StudentFeedback: React.FC<Props> = ({
 	const onGetFeedback = () => {
 		setGeneratingFeedback(true);
 
-		fetchOpenaiStream({
-			...getFeedbackPrompt({
-				assignment: assignmentInput,
-				instructions,
-				studentName,
-				courseName,
-			}),
+		getFeedback({
+			assignment: assignmentInput,
+			instructions,
+			studentName,
+			courseName,
 			onContent: (content) => {
 				setFeedback((prev) => prev + content);
 
@@ -103,7 +87,7 @@ const StudentFeedback: React.FC<Props> = ({
 					top: feedbackRef.current?.scrollHeight,
 				});
 			},
-			onFinish: (rawFeedback) => {
+			onFinish: ({ rawFeedback }) => {
 				setGeneratingFeedback(false);
 
 				event.feedbackDemo({
@@ -162,7 +146,7 @@ const StudentFeedback: React.FC<Props> = ({
 			)}
 
 			<div className="h-64">
-				{generatingFeedback || processedFeedback !== "" ? (
+				{generatingFeedback || feedback !== "" ? (
 					<div className="h-full select-text overflow-y-scroll whitespace-pre-wrap rounded-md border-[1px] border-border bg-surface-bright py-1.5 px-3 font-medium opacity-80">
 						{assignmentInput}
 					</div>
@@ -180,14 +164,14 @@ const StudentFeedback: React.FC<Props> = ({
 				ref={feedbackRef}
 				className={clsx(
 					"mt-2.5 h-64 select-text overflow-y-scroll whitespace-pre-wrap rounded-md border-[1px] border-border py-1.5 px-3 font-medium",
-					processedFeedback === ""
+					feedback === ""
 						? "opacity-30"
 						: "bg-surface-bright opacity-80"
 				)}
 			>
-				{processedFeedback === "" && generatingFeedback
+				{feedback === "" && generatingFeedback
 					? "Analyzing document, this may take a minute..."
-					: processedFeedback}
+					: feedback}
 			</div>
 
 			<div className="mt-2.5 flex space-x-2.5">
@@ -197,7 +181,7 @@ const StudentFeedback: React.FC<Props> = ({
 						disabled={
 							assignmentInput === "" ||
 							generatingFeedback ||
-							processedFeedback !== ""
+							feedback !== ""
 						}
 						fullWidth
 					>
@@ -205,7 +189,7 @@ const StudentFeedback: React.FC<Props> = ({
 					</Button>
 				</div>
 
-				{processedFeedback !== "" && !generatingFeedback && (
+				{feedback !== "" && !generatingFeedback && (
 					<div className="w-48">
 						<Button onClick={onTryAgain} fullWidth>
 							Try again

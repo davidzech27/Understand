@@ -1,41 +1,23 @@
-import { type OpenAIStreamRequest } from "~/server/modules/openai/edgeRoute";
+import fetchOpenAIStream from "../shared/fetchOpenAIStream";
 
-export const summarizeInstructionsPrompt = ({
-	text,
-}: {
-	text: string;
-}): OpenAIStreamRequest => ({
-	messages: [
-		{
-			role: "system",
-			content:
-				"You reply to instructions as clearly as possible, including no unnecessary information.",
-		},
-		{
-			role: "user",
-			content: `The following document was created by the teacher about an assignment that students are to complete. Based on this, write a detailed explanation of how the submitted assignment should look, ideally.
-
-${text}`,
-		},
-	],
-	model: "gpt-4",
-	temperature: 0,
-});
-
-// try to add additional information like grade level and page count later
-
-export const getFeedbackPrompt = ({
+const getFeedback = ({
 	instructions,
 	assignment,
 	studentName,
 	courseName,
+	onContent,
+	onFinish,
 }: {
 	instructions: string;
 	assignment: string;
 	studentName: string;
 	courseName: string;
-}): OpenAIStreamRequest => {
-	return {
+	onContent: (content: string) => void;
+	onFinish: ({ rawFeedback }: { rawFeedback: string }) => void;
+}) => {
+	let streamedContent = "";
+
+	fetchOpenAIStream({
 		messages: [
 			{
 				role: "system",
@@ -78,7 +60,15 @@ Now, begin the begin the described 2 step process of analyzing the students work
 		],
 		model: "gpt-4",
 		temperature: 0,
-	};
+		onContent: (content) => {
+			streamedContent += content;
+
+			const indexOfFeedbackBeginning = streamedContent.indexOf("Step 2");
+
+			if (indexOfFeedbackBeginning !== -1) onContent(content);
+		},
+		onFinish: () => onFinish({ rawFeedback: streamedContent }),
+	});
 };
 
-export const getFollowUpPrompt = () => {};
+export default getFeedback;

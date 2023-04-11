@@ -13,10 +13,8 @@ import TextArea from "~/client/modules/shared/TextArea";
 import ToggleButton from "~/client/modules/shared/ToggleButton";
 import Button from "~/client/modules/shared/Button";
 import fetchOpenaiStream from "~/client/modules/shared/fetchOpenAIStream";
-import {
-	getFeedbackPrompt,
-	summarizeInstructionsPrompt,
-} from "~/client/modules/feedback/prompts";
+import getFeedback from "~/client/modules/feedback/getFeedback";
+import summarizeInstructions from "~/client/modules/feedback/summarizeInstructions";
 import authenticateWithGoogle from "~/client/modules/auth/authenticateWithGoogle";
 import useStickyState from "~/client/modules/shared/useStickyState";
 import useSelectedCourse from "~/client/modules/courses/useSelectedCourse";
@@ -86,10 +84,8 @@ const Assignment: NextPage = () => {
 					id,
 				});
 
-			fetchOpenaiStream({
-				...summarizeInstructionsPrompt({
-					text: googleDocText,
-				}),
+			summarizeInstructions({
+				instructions: googleDocText,
 				onContent: (content) => {
 					setModal(undefined);
 
@@ -208,13 +204,11 @@ const Assignment: NextPage = () => {
 		assignment.feedbackConfig &&
 			profile &&
 			selectedCourse &&
-			fetchOpenaiStream({
-				...getFeedbackPrompt({
-					assignment: demoAssignmentInput,
-					instructions: assignment.feedbackConfig.instructions,
-					studentName: profile.name,
-					courseName: selectedCourse.name,
-				}),
+			getFeedback({
+				assignment: demoAssignmentInput,
+				instructions: assignment.feedbackConfig.instructions,
+				studentName: profile.name,
+				courseName: selectedCourse.name,
 				onContent: (content) => {
 					setDemoFeedback((prev) => prev + content);
 
@@ -222,7 +216,7 @@ const Assignment: NextPage = () => {
 						top: demoFeedbackRef.current?.scrollHeight,
 					});
 				},
-				onFinish: (rawFeedback) => {
+				onFinish: ({ rawFeedback }) => {
 					setGeneratingDemoFeedback(false);
 
 					event.feedbackDemo({
@@ -239,19 +233,6 @@ const Assignment: NextPage = () => {
 
 		process.nextTick(() => demoAssignmentInputRef.current?.select());
 	};
-
-	const processedDemoFeedback = (() => {
-		const indexOfFeedbackBeginning = demoFeedback.indexOf("Step 2");
-
-		if (indexOfFeedbackBeginning === -1) return "";
-
-		return demoFeedback
-			.slice(indexOfFeedbackBeginning)
-			.split("\n")
-			.slice(1)
-			.join("\n")
-			.trim();
-	})();
 
 	return (
 		<DefaultLayout
@@ -541,8 +522,7 @@ const Assignment: NextPage = () => {
 													<div className="flex-1">
 														{/*//! not sure if the extra button and not letting users type during generation is actually helpful */}
 														{generatingDemoFeedback ||
-														processedDemoFeedback !==
-															"" ? (
+														demoFeedback !== "" ? (
 															<div className="h-full select-text overflow-y-scroll whitespace-pre-wrap rounded-md border-[1px] border-border bg-surface-bright py-1.5 px-3 font-medium opacity-80">
 																{
 																	demoAssignmentInput
@@ -568,17 +548,15 @@ const Assignment: NextPage = () => {
 														ref={demoFeedbackRef}
 														className={clsx(
 															"h-full flex-1 select-text overflow-y-scroll whitespace-pre-wrap rounded-md border-[1px] border-border py-1.5 px-3 font-medium",
-															processedDemoFeedback ===
-																""
+															demoFeedback === ""
 																? "opacity-30"
 																: "bg-surface-bright opacity-80"
 														)}
 													>
-														{processedDemoFeedback ===
-															"" &&
+														{demoFeedback === "" &&
 														generatingDemoFeedback
 															? "Analyzing document, this may take a minute..."
-															: processedDemoFeedback}
+															: demoFeedback}
 													</div>
 												</div>
 
@@ -592,7 +570,7 @@ const Assignment: NextPage = () => {
 																demoAssignmentInput ===
 																	"" ||
 																generatingDemoFeedback ||
-																processedDemoFeedback !==
+																demoFeedback !==
 																	""
 															}
 															fullWidth
