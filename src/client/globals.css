@@ -5,6 +5,7 @@
 @layer base {
 	*::selection {
 		@apply bg-primary;
+		opacity: 1;
 		color: black;
 	}
 

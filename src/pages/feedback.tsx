@@ -527,9 +527,9 @@ const FeedbackContent: React.FC<{
 									className="fixed bottom-10 max-h-80 overflow-y-scroll overscroll-none rounded-md backdrop-blur-[6px]"
 								>
 									<div className="relative z-10 whitespace-pre-line rounded-md border border-border bg-surface px-4 py-2.5 opacity-80">
-										<div className="select-text font-medium opacity-80">
+										<p className="select-text font-medium opacity-80 [overflow-wrap:anywhere]">
 											{generalFeedback}
-										</div>
+										</p>
 									</div>
 								</motion.div>
 							</div>
@@ -1142,7 +1142,9 @@ const SpecificFeedbackItem: React.FC<{
 						key={index}
 						className="border-t border-border px-3 py-2 even:font-medium even:opacity-50"
 					>
-						<span className="select-text">{followUp}</span>
+						<p className="select-text [overflow-wrap:anywhere]">
+							{followUp}
+						</p>
 					</div>
 				))}
 			</div>

@@ -2,7 +2,7 @@ import fetchOpenAIStream from "../shared/fetchOpenAIStream";
 
 // currently feedback is too certain of itself and not varied. not very interesting feedback and doesn't go beyond the absolute surface level when providing reasoning.
 // needs to be more holistic. needs to understand that to improve one's writing, you must focus on elevating their strengths and reducing their weaknesses. don't suggest an improvement that has no bearing on the student's existing work.
-
+// perhaps being wrong isn't the worst thing, as it could train students to defend their essay. shouldn't be a feature though
 const getFeedback = ({
 	instructions,
 	submission,
