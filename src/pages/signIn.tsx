@@ -1,17 +1,31 @@
 import { type NextPage } from "next";
 import { useState } from "react";
+import { useRouter } from "next/router";
+import { Link } from "react-aria-components";
+import {
+	Item,
+	GridList,
+	Menu,
+	ListBox,
+	ToggleButton,
+} from "react-aria-components";
+import clsx from "clsx";
 import Head from "next/head";
 import authenticateWithGoogle from "~/client/modules/auth/authenticateWithGoogle";
-import WideButton from "~/client/modules/shared/WideButton";
 import FancyButton from "~/client/modules/shared/FancyButton";
 import { event } from "~/client/modules/analytics/mixpanel";
+import { api } from "~/client/api";
 
 // todo - add extra content to fill awkward whitespace. or perhaps make panel smaller, but this would make the gradient section too big
 
 const SignIn: NextPage = () => {
-	const onSignIn = () => {
-		selectedRole &&
-			authenticateWithGoogle({
+	const [loading, setLoading] = useState(false);
+
+	const onSignIn = async () => {
+		setLoading(true);
+
+		if (selectedRole) {
+			await authenticateWithGoogle({
 				permissions:
 					selectedRole === "student"
 						? [
@@ -37,7 +51,10 @@ const SignIn: NextPage = () => {
 				redirectTo: "/landing",
 			});
 
-		event.startGoogleOAuth();
+			event.startGoogleOAuth();
+
+			setTimeout(() => setLoading(false), 1000);
+		}
 	};
 
 	const [selectedRole, setSelectedRole] = useState<
@@ -76,43 +93,78 @@ const SignIn: NextPage = () => {
 							Which role describes you the best?
 						</div>
 
-						<div className="mt-6 mb-6 flex w-full flex-col space-y-4 px-16">
-							<div className="h-20">
-								<WideButton
-									onClick={() => setSelectedRole("student")}
-									disabled={selectedRole === "student"}
-								>
-									Student
-								</WideButton>
-							</div>
+						<ListBox
+							selectionMode="single"
+							disallowEmptySelection
+							onSelectionChange={(selectedIds) => {
+								for (const selectedId of selectedIds) {
+									setSelectedRole(
+										selectedId as
+											| "student"
+											| "teacher"
+											| "both"
+									);
+								}
+							}}
+							className="mt-6 mb-6 flex w-full flex-col space-y-4 px-16"
+						>
+							<Item id="student" className="group">
+								{({ isSelected }) => (
+									<div
+										className={clsx(
+											"flex h-20 w-full items-center justify-center rounded-md py-2.5 px-6 text-2xl font-medium transition-all duration-150",
+											isSelected
+												? "cursor-default bg-surface-selected-hover opacity-80"
+												: "cursor-pointer bg-surface-hover opacity-60 group-data-[hovered]:bg-surface-selected"
+										)}
+									>
+										Student
+									</div>
+								)}
+							</Item>
 
-							<div className="h-20">
-								<WideButton
-									onClick={() => setSelectedRole("teacher")}
-									disabled={selectedRole === "teacher"}
-								>
-									Teacher
-								</WideButton>
-							</div>
+							<Item id="teacher" className="group">
+								{({ isSelected }) => (
+									<div
+										className={clsx(
+											"flex h-20 w-full items-center justify-center rounded-md py-2.5 px-6 text-2xl font-medium transition-all duration-150",
+											isSelected
+												? "cursor-default bg-surface-selected-hover opacity-80"
+												: "cursor-pointer bg-surface-hover opacity-60 group-data-[hovered]:bg-surface-selected"
+										)}
+									>
+										Teacher
+									</div>
+								)}
+							</Item>
 
-							<div className="h-20">
-								<WideButton
-									onClick={() => setSelectedRole("both")}
-									disabled={selectedRole === "both"}
-								>
-									Both
-								</WideButton>
-							</div>
-						</div>
+							<Item id="both" className="group">
+								{({ isSelected }) => (
+									<div
+										className={clsx(
+											"flex h-20 w-full items-center justify-center rounded-md py-2.5 px-6 text-2xl font-medium transition-all duration-150",
+											isSelected
+												? "cursor-default bg-surface-selected-hover opacity-80"
+												: "cursor-pointer bg-surface-hover opacity-60 group-data-[hovered]:bg-surface-selected"
+										)}
+									>
+										Both
+									</div>
+								)}
+							</Item>
+						</ListBox>
 
 						<div className="relative h-20 w-96">
-							<FancyButton
-								onClick={onSignIn}
-								disabled={selectedRole === undefined}
-								bigText
-							>
-								Sign in with Google
-							</FancyButton>
+							<Link isDisabled={selectedRole === undefined}>
+								<FancyButton
+									onPress={onSignIn}
+									disabled={selectedRole === undefined}
+									loading={loading}
+									bigText
+								>
+									Sign in with Google
+								</FancyButton>
+							</Link>
 
 							<span className="absolute left-0 right-0 mt-4 text-center text-sm font-medium opacity-60">
 								Make sure that you check all the checkboxes

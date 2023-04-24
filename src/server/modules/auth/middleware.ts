@@ -25,6 +25,7 @@ const middleware = async (request: NextRequest) => {
 	if (
 		request.nextUrl.pathname === "/course" ||
 		request.nextUrl.pathname === "/assignment" ||
+		request.nextUrl.pathname === "/feedback" ||
 		request.nextUrl.pathname === "/student"
 	) {
 		return NextResponse.rewrite(

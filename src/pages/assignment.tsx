@@ -1,77 +1,85 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { type NextPage } from "next";
 import { TRPCClientError } from "@trpc/client";
 import { useRouter } from "next/router";
 import colors from "colors.cjs";
-import { api } from "~/client/api";
-import DefaultLayout from "~/client/modules/layout/DefaultLayout";
-import clsx from "clsx";
+import { RouterOutputs, api } from "~/client/api";
+import DefaultLayout, {
+	type DefaultLayoutRenderProps,
+} from "~/client/modules/layout/DefaultLayout";
 import formatDate from "~/client/modules/shared/formatDate";
 import Modal from "~/client/modules/shared/Modal";
 import TextArea from "~/client/modules/shared/TextArea";
 import ToggleButton from "~/client/modules/shared/ToggleButton";
 import Button from "~/client/modules/shared/Button";
-import fetchOpenaiStream from "~/client/modules/shared/fetchOpenAIStream";
-import getFeedback from "~/client/modules/feedback/getFeedback";
-import summarizeInstructions from "~/client/modules/feedback/summarizeInstructions";
 import authenticateWithGoogle from "~/client/modules/auth/authenticateWithGoogle";
 import useStickyState from "~/client/modules/shared/useStickyState";
-import useSelectedCourse from "~/client/modules/courses/useSelectedCourse";
-import StudentFeedback from "~/client/modules/feedback/StudentFeedback";
 import Attachment from "~/client/modules/shared/Attachment";
+import RowList from "~/client/modules/shared/RowList";
 import { event } from "~/client/modules/analytics/mixpanel";
 
 // put some more thought into how to bring external content into site. perhaps not always the best idea for input to show up on main screen, and maybe would be better for it to show up as an attachment that can be opened up with a modal
 // perhaps completely abstract away the creation of feedback instructions, and instead of showing actual instructions, just have user see list of things model is taking into account. not as transparent though, and users don't get to see summary being created
 // consider letting users delete feedback
 // todo - make loading indicators
-const Assignment: NextPage = () => {
+const AssignmentComponent: React.FC<DefaultLayoutRenderProps> = ({
+	courses,
+	currentCourseId,
+	currentRole,
+	onNotFound,
+}) => {
 	const router = useRouter();
 
 	const assignmentId = router.asPath.split("/").at(-1) as string;
 
-	const courseId = router.asPath.split("/").at(-3) as string;
+	const course =
+		currentRole !== "none" // never will be false
+			? courses[
+					({ teacher: "teaching", student: "enrolled" } as const)[
+						currentRole
+					] // checking in both places so that student knows if the assignment exists or not
+			  ].find((course) => course.id === currentCourseId)
+			: undefined;
 
-	const [notFoundMessage, setNotFoundMessage] = useState<string>();
+	const assignment = course?.assignments.find(
+		(assignment) => assignment.id === assignmentId
+	);
 
-	const { selectedCourse, role } = useSelectedCourse({
-		selectedCourseId: courseId,
-	});
-
-	if (role === "none")
-		notFoundMessage === undefined &&
-			setNotFoundMessage(
-				"You either do not have access to this course or it does not exist."
+	useEffect(() => {
+		if (currentRole === "student" && assignment !== undefined)
+			router.push(`/course/${currentCourseId}/feedback/${assignment.id}`);
+		else if (assignment === undefined)
+			onNotFound(
+				"You either do not have access to this assignment or it does not exist."
 			);
+	}, [assignment, currentCourseId, currentRole, onNotFound, router]);
 
+	return course && assignment ? (
+		<AssignmentContent course={course} assignment={assignment} />
+	) : null;
+};
+
+const AssignmentContent: React.FC<{
+	course: (
+		| RouterOutputs["courses"]["all"]["teaching"]
+		| RouterOutputs["courses"]["all"]["enrolled"]
+	)[0];
+	assignment: (
+		| RouterOutputs["courses"]["all"]["teaching"]
+		| RouterOutputs["courses"]["all"]["enrolled"]
+	)[0]["assignments"][0];
+}> = ({ course, assignment }) => {
 	const [subpage, setSubpage] = useStickyState<"feedback" | "insights">(
 		"feedback",
-		`course:${courseId}:${assignmentId}:subpage`
+		`course:${course.id}:${assignment.id}:subpage`
 	);
+
+	const [modal, setModal] = useState<"attachment" | "drive">();
 
 	const queryClient = api.useContext();
 
-	const { data: assignment } = api.assignments.get.useQuery(
-		{
-			id: assignmentId,
-			courseId,
-		},
-		{
-			initialData: () =>
-				queryClient.assignments.byCourse
-					.getData({ courseId })
-					?.find((assignment) => assignment.id === assignmentId), //! providing initialData, even if it returns undefined, makes data not undefined. be careful!!
-			onError: (error) =>
-				error.data?.code === "NOT_FOUND" &&
-				notFoundMessage === undefined &&
-				setNotFoundMessage("This assignment does not exist"),
-		}
-	);
-
-	const [modal, setModal] = useState<React.ReactNode>();
-
-	const driveFiles = assignment?.materials
+	const driveFiles = assignment.materials
 		.map((material) =>
 			material.type === "driveFile" ? material.driveFile : undefined
 		)
@@ -84,18 +92,13 @@ const Assignment: NextPage = () => {
 					id,
 				});
 
-			summarizeInstructions({
-				instructions: googleDocText,
-				onContent: (content) => {
-					setModal(undefined);
+			setModal(undefined);
 
-					setFeedbackInstructionsInput((prev) => prev + content);
+			setFeedbackInstructionsInput(googleDocText);
 
-					instructionsInputRef.current?.scroll({
-						top: instructionsInputRef.current?.scrollHeight,
-					});
-				},
-				onFinish: () => {},
+			instructionsInputRef.current?.scroll({
+				// not sure if still necessary
+				top: instructionsInputRef.current?.scrollHeight,
 			});
 		} catch (error) {
 			if (
@@ -121,7 +124,7 @@ const Assignment: NextPage = () => {
 		useState(false); // changing is different than editing, as changing implies that it already exists
 
 	const editingFeedbackInstructions =
-		changingFeedbackInstructions || !assignment?.feedbackConfig;
+		changingFeedbackInstructions || !assignment.feedbackConfig;
 
 	const onChange = () => {
 		assignment.feedbackConfig && // will always be satisfied because feedbackConfig has to exist for onChange to be visible
@@ -136,8 +139,8 @@ const Assignment: NextPage = () => {
 
 	const onDone = () => {
 		configureFeedback({
-			assignmentId,
-			courseId,
+			assignmentId: assignment.id,
+			courseId: course.id,
 			instructions: feedbackInstructionsInput,
 		});
 
@@ -150,24 +153,44 @@ const Assignment: NextPage = () => {
 			},
 		};
 
-		queryClient.assignments.get.setData(
-			{ courseId, id: assignmentId },
-			assignmentNew
-		);
+		queryClient.courses.all.setData(undefined, (prev) => {
+			// should always be true
+			if (prev) {
+				const { teaching, enrolled } = prev;
 
-		queryClient.assignments.byCourse.setData({ courseId }, (prev) => {
-			const assignmentIndex = prev?.findIndex(
-				(assignment) => assignment.id === assignmentId
-			);
+				const courseIndex = teaching.findIndex(
+					(c) => c.id === course.id
+				);
 
-			prev && assignmentIndex && (prev[assignmentIndex] = assignmentNew);
+				const assignmentIndex = course.assignments.findIndex(
+					(a) => a.id === assignment.id
+				);
 
-			return prev;
+				return {
+					teaching: [
+						...teaching.slice(0, courseIndex),
+						{
+							...course,
+							assignments: [
+								...course.assignments.slice(0, assignmentIndex),
+								assignmentNew,
+								...course.assignments.slice(
+									assignmentIndex + 1
+								),
+							],
+						},
+						...teaching.slice(courseIndex + 1),
+					],
+					enrolled,
+				};
+			} else {
+				return undefined;
+			}
 		});
 
 		event.feedbackConfig({
-			courseId,
-			assignmentId,
+			courseId: course.id,
+			assignmentId: assignment.id,
 			instructions: feedbackInstructionsInput,
 		});
 	};
@@ -176,461 +199,236 @@ const Assignment: NextPage = () => {
 
 	const [showLinkCopied, setShowLinkCopied] = useState(false);
 
-	const [demoAssignmentInput, setDemoAssignmentInput] = useState("");
-
-	const demoAssignmentInputRef = useRef<HTMLTextAreaElement>(null);
-
-	const [demoFeedback, setDemoFeedback] = useState("");
-
-	const demoFeedbackRef = useRef<HTMLDivElement>(null);
-
-	const [generatingDemoFeedback, setGeneratingDemoFeedback] = useState(false);
-
-	const { data: profile } = api.profile.me.useQuery();
-
-	const { data: priorFeedback } = api.feedback.getPriorFeedback.useQuery({
-		courseId,
-		assignmentId,
-	}); // will return all student submissions if user is teacher of course. design more elegant solution later
-
-	const { data: submissions } = api.feedback.getSubmissions.useQuery({
-		courseId,
-		assignmentId,
-	});
-
-	const onGetFeedback = () => {
-		setGeneratingDemoFeedback(true);
-
-		assignment.feedbackConfig &&
-			profile &&
-			selectedCourse &&
-			getFeedback({
-				assignment: demoAssignmentInput,
-				instructions: assignment.feedbackConfig.instructions,
-				studentName: profile.name,
-				courseName: selectedCourse.name,
-				onContent: (content) => {
-					setDemoFeedback((prev) => prev + content);
-
-					demoFeedbackRef.current?.scroll({
-						top: demoFeedbackRef.current?.scrollHeight,
-					});
-				},
-				onFinish: ({ rawFeedback }) => {
-					setGeneratingDemoFeedback(false);
-
-					event.feedbackDemo({
-						courseId,
-						assignmentId,
-						rawFeedback,
-					});
-				},
-			});
-	};
-
-	const onTryAgain = () => {
-		setDemoFeedback("");
-
-		process.nextTick(() => demoAssignmentInputRef.current?.select());
-	};
-
 	return (
-		<DefaultLayout
-			forceLoading={
-				!assignment ||
-				(role === "student" &&
-					(priorFeedback === undefined || submissions === undefined))
-			}
-			selectedCourseId={courseId}
-			notFoundMessage={notFoundMessage}
-		>
-			{assignment &&
-				(role !== "student" ||
-					(priorFeedback !== undefined &&
-						submissions !== undefined)) && (
-					<div className="flex min-h-screen flex-col space-y-2.5 py-2.5 pr-3">
-						<div className="flex flex-col rounded-md bg-surface py-5 px-6">
-							<div className="flex items-baseline justify-between">
-								<span
-									style={{
-										background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`,
-										WebkitBackgroundClip: "text",
-										backgroundClip: "text",
-										color: "transparent",
-									}}
-									className="pb-5 text-6xl font-semibold"
-								>
-									{assignment.title}
-								</span>
+		<div className="flex min-h-screen flex-col space-y-2.5 py-2.5 pr-3">
+			<div className="flex flex-col rounded-md border border-border bg-surface py-5 px-6">
+				<div className="flex items-baseline justify-between">
+					<span
+						style={{
+							background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`,
+							WebkitBackgroundClip: "text",
+							backgroundClip: "text",
+							color: "transparent",
+						}}
+						className="pb-5 text-6xl font-semibold"
+					>
+						{assignment.title}
+					</span>
 
-								{assignment.state === "PUBLISHED" ? (
-									<span className="relative bottom-[1px] mr-3 ml-6 flex-shrink-0 text-lg font-medium leading-none opacity-60">
-										{assignment.dueDate
-											? `Due ${formatDate(
-													assignment.dueDate
-											  )}`
-											: "No due date"}
-									</span>
-								) : (
-									<span className="relative bottom-[1px] mr-3 ml-6 flex-shrink-0 text-lg font-medium italic leading-none opacity-60">
-										Draft
-									</span>
+					{assignment.state === "PUBLISHED" ? (
+						<span className="relative bottom-[1px] mr-3 ml-6 flex-shrink-0 text-lg font-medium leading-none opacity-60">
+							{assignment.dueDate
+								? `Due ${formatDate(assignment.dueDate)}`
+								: "No due date"}
+						</span>
+					) : (
+						<span className="relative bottom-[1px] mr-3 ml-6 flex-shrink-0 text-lg font-medium italic leading-none opacity-60">
+							Draft
+						</span>
+					)}
+				</div>
+
+				<p className="select-text px-1 text-sm opacity-80">
+					{assignment.description}
+				</p>
+
+				<div className="mt-5 flex space-x-1.5">
+					<ToggleButton
+						onPress={() => setSubpage("feedback")}
+						toggled={subpage === "feedback"}
+					>
+						Feedback
+					</ToggleButton>
+
+					<ToggleButton
+						onPress={() => setSubpage("insights")}
+						toggled={subpage === "insights"}
+					>
+						Insights
+					</ToggleButton>
+				</div>
+			</div>
+
+			<div className="flex h-full flex-1 flex-col rounded-md border border-border bg-surface py-5 px-6 shadow-lg shadow-[#00000016]">
+				{subpage === "feedback" ? (
+					<div>
+						<label
+							htmlFor="feedbackInstructionsInput"
+							className="ml-1 mb-2 block text-lg font-medium opacity-60"
+						>
+							Instructions
+						</label>
+
+						<Modal
+							title="Pick an attachment"
+							open={modal === "attachment"}
+							setOpen={(open) =>
+								open
+									? setModal("attachment")
+									: setModal(undefined)
+							}
+						>
+							<RowList
+								items={driveFiles}
+								onAction={(id) => onPickAttachment({ id })}
+							>
+								{({ item: driveFile }) => (
+									<Attachment {...driveFile} />
 								)}
+							</RowList>
+						</Modal>
+
+						<Modal
+							title="Coming soon..."
+							open={modal === "drive"}
+							setOpen={(open) =>
+								open ? setModal("drive") : setModal(undefined)
+							}
+						>
+							<span className="font-medium italic opacity-60">
+								Ability to use summary of Drive document coming
+								soon...
+							</span>
+						</Modal>
+
+						{editingFeedbackInstructions && (
+							<div className="flex space-x-1.5">
+								{assignment.description && (
+									<Button
+										onPress={() =>
+											assignment.description &&
+											setFeedbackInstructionsInput(
+												assignment.description
+											)
+										}
+										disabled={
+											(feedbackInstructionsInput?.length ??
+												0) > 0
+										}
+									>
+										Use assignment description
+									</Button>
+								)}
+
+								{driveFiles.length > 0 && (
+									<Button
+										onPress={() => setModal("attachment")}
+										disabled={
+											(feedbackInstructionsInput?.length ??
+												0) > 0
+										}
+									>
+										Use assignment attachment
+									</Button>
+								)}
+
+								<Button
+									onPress={() => setModal("drive")}
+									disabled={
+										(feedbackInstructionsInput?.length ??
+											0) > 0
+									}
+								>
+									Use Drive file
+								</Button>
 							</div>
+						)}
 
-							<p className="select-text px-1 text-sm opacity-80">
-								{assignment.description}
-							</p>
-
-							{role === "teacher" && (
-								<div className="mt-5 flex space-x-1.5">
-									<ToggleButton
-										onClick={() => setSubpage("feedback")}
-										toggled={subpage === "feedback"}
-									>
-										Feedback
-									</ToggleButton>
-
-									<ToggleButton
-										onClick={() => setSubpage("insights")}
-										toggled={subpage === "insights"}
-									>
-										Insights
-									</ToggleButton>
+						<div className="mt-2.5">
+							{editingFeedbackInstructions ? (
+								<TextArea
+									value={feedbackInstructionsInput}
+									setValue={setFeedbackInstructionsInput}
+									placeholder="Instructions to set up feedback"
+									id="feedbackInstructionsInput"
+									ref={instructionsInputRef}
+								/>
+							) : (
+								<div className="select-text whitespace-pre-wrap rounded-md border-[1px] border-border bg-surface-bright py-1.5 px-3 font-medium opacity-80">
+									{
+										assignment.feedbackConfig?.instructions
+										// not sure why typescript can't narrow type here
+									}
 								</div>
 							)}
-						</div>
 
-						<div className="flex h-full flex-1 flex-col rounded-md bg-surface py-5 px-6">
-							{subpage === "feedback" ? (
-								role === "teacher" ? (
-									<div>
-										<div className="ml-1 mb-2 text-lg font-medium opacity-60">
-											Instructions
+							<div className="mt-2.5">
+								{editingFeedbackInstructions ? (
+									<div className="flex space-x-2.5">
+										<div className="w-48">
+											<Button
+												onPress={onDone}
+												disabled={
+													feedbackInstructionsInput.length ===
+													0
+												}
+												fullWidth
+											>
+												Done
+											</Button>
 										</div>
 
-										{modal &&
-											createPortal(modal, document.body)}
-
-										{editingFeedbackInstructions && (
-											<div className="flex space-x-1.5">
-												{assignment.description && (
-													<Button
-														onClick={() =>
-															assignment.description &&
-															setFeedbackInstructionsInput(
-																assignment.description
-															)
-														}
-														disabled={
-															(feedbackInstructionsInput?.length ??
-																0) > 0
-														}
-													>
-														Use assignment
-														description
-													</Button>
-												)}
-
-												{driveFiles.length > 0 && (
-													<Button
-														onClick={() =>
-															setModal(
-																<Modal
-																	title="Pick an attachment"
-																	onClose={() =>
-																		setModal(
-																			undefined
-																		)
-																	}
-																>
-																	<div className="flex flex-col space-y-2.5">
-																		{driveFiles.map(
-																			(
-																				driveFile
-																			) => (
-																				<Attachment
-																					title={
-																						driveFile.title
-																					}
-																					url={
-																						driveFile.url
-																					}
-																					thumbnailUrl={
-																						driveFile.thumbnailUrl
-																					}
-																					onClick={() =>
-																						onPickAttachment(
-																							{
-																								id: driveFile.id,
-																							}
-																						)
-																					}
-																					key={
-																						driveFile.id
-																					}
-																				/>
-																			)
-																		)}
-																	</div>
-																</Modal>
-															)
-														}
-														disabled={
-															(feedbackInstructionsInput?.length ??
-																0) > 0
-														}
-													>
-														Use summary of
-														assignment attachment
-													</Button>
-												)}
-
+										{changingFeedbackInstructions && (
+											<div className="w-48">
 												<Button
-													onClick={() =>
-														setModal(
-															<Modal
-																title="Coming soon..."
-																onClose={() =>
-																	setModal(
-																		undefined
-																	)
-																}
-															>
-																<span className="font-medium italic opacity-60">
-																	Ability to
-																	use summary
-																	of Drive
-																	document
-																	coming
-																	soon...
-																</span>
-															</Modal>
-														)
-													}
-													disabled={
-														(feedbackInstructionsInput?.length ??
-															0) > 0
-													}
+													onPress={onCancel}
+													fullWidth
 												>
-													Use summary from Drive
-													document
+													Cancel
 												</Button>
 											</div>
 										)}
-
-										<div className="mt-2.5">
-											{editingFeedbackInstructions ? (
-												<div className="h-48">
-													<TextArea
-														value={
-															feedbackInstructionsInput
-														}
-														setValue={
-															setFeedbackInstructionsInput
-														}
-														placeholder="Instructions to set up feedback"
-														ref={
-															instructionsInputRef
-														}
-													/>
-												</div>
-											) : (
-												<div className="select-text whitespace-pre-wrap rounded-md border-[1px] border-border bg-surface-bright py-1.5 px-3 font-medium opacity-80">
-													{
-														assignment
-															.feedbackConfig
-															?.instructions
-														// not sure why typescript can't narrow type here
-													}
-												</div>
-											)}
-
-											<div className="mt-2.5">
-												{editingFeedbackInstructions ? (
-													<div className="flex space-x-2.5">
-														<div className="w-48">
-															<Button
-																onClick={onDone}
-																disabled={
-																	feedbackInstructionsInput.length ===
-																	0
-																}
-																fullWidth
-															>
-																Done
-															</Button>
-														</div>
-
-														{changingFeedbackInstructions && (
-															<div className="w-48">
-																<Button
-																	onClick={
-																		onCancel
-																	}
-																	fullWidth
-																>
-																	Cancel
-																</Button>
-															</div>
-														)}
-													</div>
-												) : (
-													<div className="w-48">
-														<Button
-															onClick={onChange}
-															fullWidth
-														>
-															Change
-														</Button>
-													</div>
-												)}
-											</div>
-										</div>
-
-										{assignment.feedbackConfig && (
-											<>
-												<div className="ml-1 mb-2 mt-2.5 text-lg font-medium opacity-60">
-													Feedback link
-												</div>
-
-												<div className="w-48">
-													<Button
-														onClick={() => {
-															navigator.clipboard.writeText(
-																window.location
-																	.href
-															);
-
-															setShowLinkCopied(
-																true
-															);
-														}}
-														fullWidth
-													>
-														{showLinkCopied
-															? "Link copied"
-															: "Copy link"}
-													</Button>
-												</div>
-
-												<div className="ml-1 mb-2 mt-2.5 text-lg font-medium opacity-60">
-													Try out feedback
-												</div>
-
-												<div className="flex h-64 space-x-2.5">
-													<div className="flex-1">
-														{/*//! not sure if the extra button and not letting users type during generation is actually helpful */}
-														{generatingDemoFeedback ||
-														demoFeedback !== "" ? (
-															<div className="h-full select-text overflow-y-scroll whitespace-pre-wrap rounded-md border-[1px] border-border bg-surface-bright py-1.5 px-3 font-medium opacity-80">
-																{
-																	demoAssignmentInput
-																}
-															</div>
-														) : (
-															<TextArea
-																value={
-																	demoAssignmentInput
-																}
-																setValue={
-																	setDemoAssignmentInput
-																}
-																placeholder="Enter a test assignment to try out feedback"
-																ref={
-																	demoAssignmentInputRef
-																}
-															/>
-														)}
-													</div>
-
-													<div
-														ref={demoFeedbackRef}
-														className={clsx(
-															"h-full flex-1 select-text overflow-y-scroll whitespace-pre-wrap rounded-md border-[1px] border-border py-1.5 px-3 font-medium",
-															demoFeedback === ""
-																? "opacity-30"
-																: "bg-surface-bright opacity-80"
-														)}
-													>
-														{demoFeedback === "" &&
-														generatingDemoFeedback
-															? "Analyzing document, this may take a minute..."
-															: demoFeedback}
-													</div>
-												</div>
-
-												<div className="mt-2.5 flex space-x-2.5">
-													<div className="w-48">
-														<Button
-															onClick={
-																onGetFeedback
-															}
-															disabled={
-																demoAssignmentInput ===
-																	"" ||
-																generatingDemoFeedback ||
-																demoFeedback !==
-																	""
-															}
-															fullWidth
-														>
-															Get feedback
-														</Button>
-													</div>
-
-													{demoFeedback !== "" &&
-														!generatingDemoFeedback && (
-															<div className="w-48">
-																<Button
-																	onClick={
-																		onTryAgain
-																	}
-																	fullWidth
-																>
-																	Try again
-																</Button>
-															</div>
-														)}
-												</div>
-											</>
-										)}
 									</div>
 								) : (
-									priorFeedback &&
-									submissions && // again, typescript can't narrow away undefined here
-									selectedCourse &&
-									profile &&
-									(assignment.feedbackConfig !== undefined ? (
-										<StudentFeedback
-											priorFeedback={priorFeedback}
-											submissions={submissions}
-											instructions={
-												assignment.feedbackConfig
-													.instructions
-											}
-											courseName={selectedCourse.name}
-											studentName={profile.name}
-											courseId={courseId}
-											assignmentId={assignmentId}
-										/>
-									) : (
-										<span className="font-medium italic opacity-60">
-											Your teacher hasn&apos;t set up
-											feedback on this assignment yet
-										</span>
-									))
-								)
-							) : (
-								<span className="font-medium italic opacity-60">
-									Assignment insights coming soon...
-								</span>
-							)}
+									<div className="w-48">
+										<Button onPress={onChange} fullWidth>
+											Change
+										</Button>
+									</div>
+								)}
+							</div>
 						</div>
+
+						{assignment.feedbackConfig && (
+							<>
+								<div className="ml-1 mb-2 mt-2.5 text-lg font-medium opacity-60">
+									Feedback link
+								</div>
+
+								<div className="w-48">
+									<Button
+										onPress={() => {
+											navigator.clipboard.writeText(
+												window.location.href.replace(
+													"assignment",
+													"feedback"
+												)
+											);
+
+											setShowLinkCopied(true);
+										}}
+										fullWidth
+									>
+										{showLinkCopied
+											? "Link copied"
+											: "Copy link"}
+									</Button>
+								</div>
+							</>
+						)}
 					</div>
+				) : (
+					<span className="font-medium italic opacity-60">
+						Assignment insights coming soon...
+					</span>
 				)}
-		</DefaultLayout>
+			</div>
+		</div>
 	);
+};
+
+const Assignment: NextPage = () => {
+	return <DefaultLayout Component={AssignmentComponent} />;
 };
 
 export default Assignment;

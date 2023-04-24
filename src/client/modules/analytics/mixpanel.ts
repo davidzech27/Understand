@@ -22,7 +22,7 @@ export const event = {
 	feedback: (metadata: {
 		courseId: string;
 		assignmentId: string;
-		rawFeedback: string;
+		rawResponse: string;
 	}) => {
 		mixpanel.track("Feedback", metadata);
 	},

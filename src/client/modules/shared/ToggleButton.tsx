@@ -1,24 +1,26 @@
+import { ToggleButton as ReactAriaToggleButton } from "react-aria-components";
 import clsx from "clsx";
 
 interface Props {
 	children: React.ReactNode;
-	onClick: () => void;
+	onPress: () => void;
 	toggled: boolean;
 }
 
-const ToggleButton: React.FC<Props> = ({ children, onClick, toggled }) => {
+const ToggleButton: React.FC<Props> = ({ children, onPress, toggled }) => {
 	return (
-		<button
-			onClick={onClick}
+		<ReactAriaToggleButton
+			onPress={onPress}
+			isSelected={toggled}
 			className={clsx(
-				"select-none rounded-md py-2.5 px-6 text-lg font-medium transition-all duration-150",
+				"rounded-md py-2.5 px-6 text-lg font-medium transition-all duration-150",
 				toggled
-					? "bg-surface-selected opacity-80 hover:bg-surface-selected-hover"
-					: "opacity-60 hover:bg-surface-hover hover:opacity-80"
+					? "bg-surface-selected opacity-80 data-[hovered]:bg-surface-selected-hover"
+					: "opacity-60 data-[hovered]:bg-surface-hover data-[hovered]:opacity-80"
 			)}
 		>
 			{children}
-		</button>
+		</ReactAriaToggleButton>
 	);
 };
 

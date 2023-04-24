@@ -17,7 +17,9 @@ const requestSchema = z.object({
 		)
 		.min(1),
 	model: z.enum(["gpt-4", "gpt-3.5-turbo"]),
-	temperature: z.number().min(0).max(1),
+	temperature: z.number().min(0).max(2),
+	presencePenalty: z.number().min(-2).max(2),
+	frequencyPenalty: z.number().min(-2).max(2),
 });
 
 export type OpenAIStreamRequest = z.infer<typeof requestSchema>;
@@ -41,7 +43,8 @@ const openaiHandler = async (request: NextRequest) => {
 		return new Response("Bad Request", { status: 400 });
 	}
 
-	const { messages, model, temperature } = requestParsed.data;
+	const { messages, model, temperature, presencePenalty, frequencyPenalty } =
+		requestParsed.data;
 
 	const openaiResponse = await fetch(
 		"https://api.openai.com/v1/chat/completions",
@@ -55,6 +58,8 @@ const openaiHandler = async (request: NextRequest) => {
 				messages,
 				model,
 				temperature,
+				presence_penalty: presencePenalty,
+				frequency_penalty: frequencyPenalty,
 				stream: true,
 			}),
 		}

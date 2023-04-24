@@ -1,32 +1,33 @@
 import clsx from "clsx";
+import { Button as ReactAriaButton } from "react-aria-components";
 
 interface Props {
 	children: React.ReactNode;
-	onClick: () => void;
+	onPress: () => void;
 	disabled?: boolean;
 	fullWidth?: true;
 }
 
 const Button: React.FC<Props> = ({
 	children,
-	onClick,
+	onPress,
 	disabled,
 	fullWidth,
 }) => {
 	return (
-		<button
-			onClick={onClick}
-			disabled={disabled}
+		<ReactAriaButton
+			onPress={onPress}
+			isDisabled={disabled}
 			className={clsx(
-				"select-none rounded-md bg-surface-selected py-2.5 px-6 text-lg font-medium transition-all duration-150",
+				"rounded-md bg-surface-selected py-2.5 px-6 text-lg font-medium outline-none transition-all duration-150",
 				disabled
 					? "opacity-40"
-					: "opacity-60 hover:bg-surface-selected-hover hover:opacity-80",
+					: "opacity-60 data-[hovered]:bg-surface-selected-hover data-[hovered]:opacity-80",
 				fullWidth && "w-full"
 			)}
 		>
 			{children}
-		</button>
+		</ReactAriaButton>
 	);
 };
 

@@ -7,6 +7,8 @@ const fetchOpenAIStream = async ({
 	messages,
 	model,
 	temperature,
+	presencePenalty,
+	frequencyPenalty,
 	onContent,
 	onFinish,
 }: OpenAIStreamRequest & {
@@ -20,6 +22,8 @@ const fetchOpenAIStream = async ({
 				messages,
 				model,
 				temperature,
+				presencePenalty,
+				frequencyPenalty,
 			})
 		),
 	});
@@ -33,11 +37,9 @@ const fetchOpenAIStream = async ({
 			const result = await reader.read();
 
 			if (!result.done) {
-				const content = textDecoder.decode(result.value);
+				streamedContent += textDecoder.decode(result.value);
 
-				streamedContent += content;
-
-				onContent(content);
+				onContent(streamedContent);
 			} else {
 				onFinish && onFinish(streamedContent);
 

@@ -5,15 +5,17 @@ import { api } from "~/client/api";
 
 const Home: NextPage = () => {
 	return (
-		<DefaultLayout>
-			<div className="flex h-screen flex-col space-y-2.5 py-2.5 pr-3">
-				<div className="flex h-full flex-col justify-between rounded-md bg-surface py-5 px-6">
-					<span className="font-medium italic opacity-60">
-						Overview page coming soon...
-					</span>
+		<DefaultLayout
+			Component={() => (
+				<div className="flex h-screen flex-col space-y-2.5 py-2.5 pr-3">
+					<div className="flex h-full flex-col justify-between rounded-md border border-border bg-surface py-5 px-6 shadow-lg shadow-[#00000016]">
+						<span className="font-medium italic opacity-60">
+							Overview page coming soon...
+						</span>
+					</div>
 				</div>
-			</div>
-		</DefaultLayout>
+			)}
+		/>
 	);
 };
 

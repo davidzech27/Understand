@@ -5,10 +5,7 @@ import { createRouter, authedProcedure } from "~/server/trpc";
 import db from "~/server/modules/db/db";
 import { and, eq } from "drizzle-orm/expressions";
 import { feedback, feedbackConfig } from "~/server/modules/db/schema";
-import {
-	attachmentListSchema,
-	attachmentSchema,
-} from "~/server/modules/shared/validation";
+import { attachmentListSchema } from "~/server/modules/shared/validation";
 
 const feedbackRouter = createRouter({
 	getGoogleDocText: authedProcedure
@@ -23,6 +20,35 @@ const feedbackRouter = createRouter({
 					await drive.files.export({
 						fileId: id,
 						mimeType: "text/plain",
+					})
+				).data;
+
+				if (typeof instructions !== "string")
+					throw new TRPCError({ code: "NOT_FOUND" });
+
+				return instructions;
+			} catch (error) {
+				if (error instanceof googleapis.Common.GaxiosError) {
+					if ((error.code as unknown as number) === 403)
+						// annoying mistyping in library
+						throw new TRPCError({ code: "FORBIDDEN" });
+					else throw error;
+				} else throw error;
+			}
+		}),
+
+	getGoogleDocHTML: authedProcedure
+		.input(
+			z.object({
+				id: z.string(),
+			})
+		)
+		.query(async ({ input: { id }, ctx: { drive } }) => {
+			try {
+				const instructions = (
+					await drive.files.export({
+						fileId: id,
+						mimeType: "text/html",
 					})
 				).data;
 

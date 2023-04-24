@@ -1,35 +1,50 @@
+import {
+	Modal as ReactAriaModal,
+	ModalOverlay,
+	Dialog,
+	Heading,
+} from "react-aria-components";
+
 interface Props {
 	children: React.ReactNode;
 	title: string;
-	onClose: () => void;
+	open: boolean;
+	setOpen: (open: boolean) => void;
+	footer?: React.ReactNode;
 }
 
-const Modal: React.FC<Props> = ({ children, title, onClose }) => {
+const Modal: React.FC<Props> = ({ children, title, open, setOpen, footer }) => {
 	return (
-		<div
-			onClick={onClose}
+		<ModalOverlay
+			isDismissable
+			isOpen={open}
+			onOpenChange={setOpen}
 			className="fixed top-0 z-50 flex h-screen w-screen items-center justify-center bg-[#00000060]"
 		>
-			<div
-				onClick={(e) => e.stopPropagation()}
+			<ReactAriaModal
+				isDismissable
+				isOpen={open}
+				onOpenChange={setOpen}
 				className="flex h-3/5 w-2/3 flex-col rounded-md bg-white"
 			>
-				<div className="flex items-center justify-between pt-2 pr-3">
-					<span className="mb-0.5 pt-[5px] pl-5 text-lg font-medium opacity-60">
-						{title}
-					</span>
+				<Dialog className="flex h-full flex-col justify-between">
+					<div className="mx-6 mt-6 flex items-center justify-between">
+						<Heading className="mb-0.5 text-2xl font-medium leading-none opacity-80">
+							{title}
+						</Heading>
 
-					<div
-						onClick={onClose}
-						className="cursor-pointer rounded-lg p-1 transition-all duration-150 hover:bg-surface-hover"
-					>
-						<X />
+						<div
+							onClick={() => setOpen(false)}
+							className="relative bottom-[1px] -m-2 cursor-pointer rounded-lg p-1 transition-all duration-150 hover:bg-surface-hover"
+						>
+							<X />
+						</div>
 					</div>
-				</div>
-
-				<div className="h-full px-4 pt-1 pb-3">{children}</div>
-			</div>
-		</div>
+					<div className="m-6 h-full">{children}</div>
+					{footer}{" "}
+				</Dialog>
+			</ReactAriaModal>
+		</ModalOverlay>
 	);
 };
 

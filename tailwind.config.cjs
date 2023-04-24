@@ -8,7 +8,8 @@ const config = {
 			colors,
 		},
 	},
-	plugins: [],
+	// @ts-ignore
+	plugins: [require("tailwindcss-animate")],
 };
 
 module.exports = config;

@@ -1,13 +1,32 @@
 import { type NextPage } from "next";
 import Head from "next/head";
-import { useState } from "react";
+import Link from "next/link";
+import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import FancyButton from "~/client/modules/shared/FancyButton";
+import { type RouterOutputs, api } from "~/client/api";
 import colors from "colors.cjs";
 import { env } from "~/env.mjs";
 
 const Index: NextPage = () => {
 	const [scrollerHovered, setScrollerHovered] = useState(false); // in the future use this to slow down scrolling. https://stackoverflow.com/questions/70263043/change-animation-duration-without-reset-on-framer-motion
+
+	const [profile, setProfile] = useState<RouterOutputs["profile"]["me"]>();
+
+	const queryClient = api.useContext();
+
+	const profileFetched = useRef(false);
+
+	useEffect(() => {
+		if (!profileFetched.current) {
+			queryClient.profile.me
+				.fetch()
+				.then((profile) => setProfile(profile))
+				.catch(() => {});
+
+			profileFetched.current = true;
+		}
+	}, [queryClient]);
 
 	return (
 		<>
@@ -22,7 +41,7 @@ const Index: NextPage = () => {
 
 			<main className="flex flex-col">
 				<div className="flex h-screen w-full items-center justify-center">
-					<div className="flex h-screen flex-[2.5] flex-col items-center justify-center sm:items-end">
+					<div className="flex h-screen flex-[2.5] flex-col items-center justify-center md:items-end">
 						<div className="w-min flex-col space-y-8">
 							<h1
 								style={{
@@ -31,42 +50,48 @@ const Index: NextPage = () => {
 									backgroundClip: "text",
 									color: "transparent",
 								}}
-								className="-mb-[22px] select-none whitespace-pre py-2 text-5xl font-extrabold tracking-tight sm:text-[5.5rem]"
+								className="-mb-[22px] select-none whitespace-pre py-2 text-[1.5rem] font-extrabold leading-[1.1] tracking-tight sm:text-[2rem] md:text-[2.5rem] lg:text-[4rem] xl:text-[4.5rem] 2xl:text-[5.5rem]"
 							>
 								The future of education{"\n"}is personalized
 							</h1>
 
-							<p className="ml-1 select-text text-xl font-medium opacity-60">
+							<p className="ml-1 select-text text-lg font-medium opacity-60 sm:text-base lg:text-xl">
 								Provide your students with tailored learning
 								experiences and your teachers with in-depth
 								insights with our AI-powered education platform.
 							</p>
 
-							<div className="ml-1 flex">
+							<div className="ml-1 flex flex-col space-y-7 md:flex-row md:items-center md:space-y-0 md:space-x-9">
 								<div className="h-16 w-48">
-									<FancyButton href="/signIn">
-										Get started
-									</FancyButton>
+									<Link
+										href={profile ? "/home" : "/signIn"}
+										legacyBehavior
+									>
+										<a>
+											<FancyButton>
+												Get started
+											</FancyButton>
+										</a>
+									</Link>
 								</div>
 
-								<div className="ml-9 flex items-center">
-									<a
-										href={env.NEXT_PUBLIC_LEARN_MORE_URL}
-										style={{
-											background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`,
-											WebkitBackgroundClip: "text",
-											backgroundClip: "text",
-											color: "transparent",
-										}}
-										className="cursor-pointer select-none text-2xl font-semibold transition-opacity duration-150 hover:opacity-75"
-									>
-										Learn more
-									</a>
-								</div>
+								<a
+									href={env.NEXT_PUBLIC_LEARN_MORE_URL}
+									target="_blank"
+									style={{
+										background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`,
+										WebkitBackgroundClip: "text",
+										backgroundClip: "text",
+										color: "transparent",
+									}}
+									className="ml-1 cursor-pointer select-none text-2xl font-semibold transition-opacity duration-150 hover:opacity-75 md:ml-0"
+								>
+									Learn more
+								</a>
 							</div>
 						</div>
 					</div>
-					<div className="relative hidden h-screen flex-1 justify-center sm:flex">
+					<div className="relative hidden h-screen flex-1 justify-center md:flex">
 						<motion.div
 							animate={{
 								y: "100vh",

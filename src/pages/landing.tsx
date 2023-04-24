@@ -1,14 +1,18 @@
 import { type NextPage } from "next";
 import Head from "next/head";
+import { Link } from "react-aria-components";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import FancyButton from "~/client/modules/shared/FancyButton";
 import TextInput from "~/client/modules/shared/TextInput";
+import { Label, TextField } from "react-aria-components";
 import { api } from "~/client/api";
 import { event } from "~/client/modules/analytics/mixpanel";
 
 // perhaps add extra content to fill awkward whitespace
 const SignIn: NextPage = () => {
+	const [loading, setLoading] = useState(false);
+
 	api.profile.me.useQuery(undefined, {
 		onSuccess: ({ email, name }) => {
 			event.finishGoogleOAuth({ email, name });
@@ -24,9 +28,13 @@ const SignIn: NextPage = () => {
 	const router = useRouter();
 
 	const onGo = async () => {
+		setLoading(true);
+
 		await updateProfile({
 			name: nameInput,
 		});
+
+		setTimeout(() => setLoading(false), 1000);
 
 		router.push("/home");
 
@@ -56,12 +64,12 @@ const SignIn: NextPage = () => {
 				</div>
 
 				<div className="flex-1 py-5 pr-6">
-					<div className="flex h-full w-full flex-col items-center rounded-lg bg-white py-12 px-12 shadow-xl">
+					<TextField className="flex h-full w-full flex-col items-center rounded-lg bg-white py-12 px-12 shadow-xl">
 						<div className="flex-[0.875]" />
 
-						<div className="text-3xl font-medium leading-none opacity-60">
+						<Label className="text-3xl font-medium leading-none opacity-60">
 							What name would you like to go by?
-						</div>
+						</Label>
 
 						<div className="mt-6 mb-6 flex h-12 w-96 flex-col space-y-4">
 							<TextInput
@@ -73,18 +81,21 @@ const SignIn: NextPage = () => {
 							/>
 						</div>
 
-						<div className="h-20 w-96">
-							<FancyButton
-								onClick={onGo}
-								disabled={nameInput.length === 0}
-								bigText
-							>
-								Let&apos;s go
-							</FancyButton>
-						</div>
+						<Link isDisabled={nameInput.length === 0}>
+							<div className="h-20 w-96">
+								<FancyButton
+									onPress={onGo}
+									disabled={nameInput.length === 0}
+									loading={loading}
+									bigText
+								>
+									Let&apos;s go
+								</FancyButton>
+							</div>
+						</Link>
 
 						<div className="flex-1" />
-					</div>
+					</TextField>
 				</div>
 			</main>
 		</>

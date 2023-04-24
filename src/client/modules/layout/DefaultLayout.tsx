@@ -1,21 +1,22 @@
+import { useMemo, useState } from "react";
 import Head from "next/head";
 import SideBar from "./SideBar";
-import { api } from "~/client/api";
+import { api, type RouterOutputs } from "~/client/api";
 import { useRouter } from "next/router";
 
-type Props = {
-	children: React.ReactNode;
-	selectedCourseId?: string;
-	forceLoading?: boolean;
-	notFoundMessage?: string;
+export type DefaultLayoutRenderProps = {
+	profile: RouterOutputs["profile"]["me"];
+	courses: RouterOutputs["courses"]["all"];
+	currentCourseId: string | undefined;
+	currentRole: "teacher" | "student" | "none";
+	onNotFound: (message: string) => void;
 };
 
-const DefaultLayout: React.FC<Props> = ({
-	children,
-	selectedCourseId,
-	forceLoading,
-	notFoundMessage,
-}) => {
+type Props = {
+	Component: React.FC<DefaultLayoutRenderProps>;
+};
+
+const DefaultLayout: React.FC<Props> = ({ Component }) => {
 	const router = useRouter();
 
 	const { data: profile } = api.profile.me.useQuery(undefined, {
@@ -24,43 +25,37 @@ const DefaultLayout: React.FC<Props> = ({
 		},
 	});
 
-	const { data: coursesTeaching } = api.courses.teaching.useQuery(undefined, {
-		onSuccess: (courses) => {
-			for (const course of courses) {
-				queryClient.assignments.byCourse
-					.ensureData({
-						courseId: course.id,
-					})
-					.catch(console.error);
+	const currentCourseId = router.asPath.startsWith("/course/")
+		? router.asPath.split("/")[2]
+		: undefined;
 
-				queryClient.roster.get
-					.ensureData({
-						courseId: course.id,
-					})
-					.catch(console.error);
-			}
-		},
-	});
+	const { data: courses } = api.courses.all.useQuery();
 
-	const { data: coursesEnrolled } = api.courses.enrolled.useQuery(undefined, {
-		onSuccess: (courses) => {
-			for (const course of courses) {
-				queryClient.assignments.byCourse
-					.ensureData({
-						courseId: course.id,
-					})
-					.catch(console.error);
+	const currentRole = useMemo(() => {
+		if (courses === undefined) return undefined;
 
-				queryClient.roster.get
-					.ensureData({
-						courseId: course.id,
-					})
-					.catch(console.error);
-			}
-		},
-	});
+		if (currentCourseId === undefined) return "none";
 
-	const queryClient = api.useContext();
+		if (
+			courses.teaching.find((course) => course.id === currentCourseId) !==
+			undefined
+		)
+			return "teacher";
+
+		if (
+			courses.enrolled.find((course) => course.id === currentCourseId) !==
+			undefined
+		)
+			return "student";
+
+		setNotFoundMessage(
+			"You either do not have access to this course or it does not exist."
+		);
+
+		return undefined;
+	}, [courses, currentCourseId]);
+
+	const [notFoundMessage, setNotFoundMessage] = useState<string>();
 
 	return (
 		<>
@@ -77,31 +72,35 @@ const DefaultLayout: React.FC<Props> = ({
 				<div className="flex h-screen w-full flex-col items-center bg-gradient-to-tr from-primary to-secondary">
 					<div className="flex-[0.875]" />
 
-					<span className="px-48 text-[5rem] font-semibold leading-none text-white">
+					<span className="cursor-default px-48 text-[5rem] font-semibold leading-none text-white">
 						{notFoundMessage}
 					</span>
 
 					<div className="flex-1" />
 				</div>
-			) : !forceLoading &&
-			  profile &&
-			  coursesTeaching &&
-			  coursesEnrolled ? (
+			) : profile && courses && currentRole ? (
 				<div className="flex min-h-screen bg-background">
 					<SideBar
-						selectedCourseId={selectedCourseId}
+						currentCourseId={currentCourseId}
 						profile={profile}
-						coursesTeaching={coursesTeaching}
-						coursesEnrolled={coursesEnrolled}
+						courses={courses}
 					/>
 
-					<main className="flex-1">{children}</main>
+					<main className="flex-1">
+						<Component
+							profile={profile}
+							courses={courses}
+							currentCourseId={currentCourseId}
+							currentRole={currentRole}
+							onNotFound={setNotFoundMessage}
+						/>
+					</main>
 				</div>
 			) : (
 				<div className="flex h-screen w-full flex-col items-center bg-gradient-to-tr from-primary to-secondary">
 					<div className="flex-[0.875]" />
 
-					<span className="w-min text-[10rem] font-semibold leading-none text-white">
+					<span className="w-min cursor-default text-[10rem] font-semibold leading-none text-white">
 						Understand
 					</span>
 

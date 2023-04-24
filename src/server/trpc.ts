@@ -46,24 +46,26 @@ const isAuthed = t.middleware(async ({ ctx: { req, res }, next }) => {
 		refreshToken: googleRefreshToken,
 	});
 
-	oauth2Client.setCredentials({
-		...oauth2Client.credentials,
-		access_token: (await oauth2Client.getAccessToken()).token,
-	});
+	oauth2Client.forceRefreshOnFailure = true;
+
+	oauth2Client.on(
+		"tokens",
+		async ({ access_token, refresh_token }) =>
+			await setAuth({
+				req,
+				res,
+				auth: {
+					email,
+					googleAccessToken: access_token ?? googleAccessToken,
+					googleRefreshToken: refresh_token ?? googleRefreshToken,
+				},
+			})
+	);
 
 	if (
 		oauth2Client.credentials.access_token !== googleAccessToken &&
 		oauth2Client.credentials.access_token
 	) {
-		await setAuth({
-			req,
-			res,
-			auth: {
-				email,
-				googleAccessToken: oauth2Client.credentials.access_token,
-				googleRefreshToken,
-			},
-		});
 	}
 
 	const classroom = google.classroom({ version: "v1", auth: oauth2Client });

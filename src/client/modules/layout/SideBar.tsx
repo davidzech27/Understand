@@ -1,36 +1,23 @@
 import Link from "next/link";
 import PreviewDisplay from "../shared/PreviewDisplay";
+import { type RouterOutputs } from "~/client/api";
 import colors from "colors.cjs";
 
 interface Props {
-	selectedCourseId: string | undefined;
+	currentCourseId: string | undefined;
 	profile: {
 		email: string;
 		name: string;
 		photo?: string;
 	};
-	coursesTeaching: {
-		id: string;
-		name: string;
-		section?: string;
-	}[];
-	coursesEnrolled: {
-		id: string;
-		name: string;
-		section?: string;
-	}[];
+	courses: RouterOutputs["courses"]["all"];
 }
 
-const SideBar: React.FC<Props> = ({
-	selectedCourseId,
-	profile,
-	coursesTeaching,
-	coursesEnrolled,
-}) => {
+const SideBar: React.FC<Props> = ({ currentCourseId, profile, courses }) => {
 	return (
-		<nav className="h-screen w-80">
-			<div className="fixed h-screen w-80 px-3 py-2.5">
-				<div className="flex h-full select-none flex-col rounded-md bg-surface py-3 px-3">
+		<nav className="h-screen w-72">
+			<div className="fixed h-screen w-72 px-3 py-2.5">
+				<div className="flex h-full flex-col rounded-md border border-border bg-surface py-3 px-3 shadow-lg shadow-[#00000016]">
 					<Link
 						href="/" // possibly redirect to about page in future
 						className="flex justify-center rounded-md pt-1 pb-1.5 transition-opacity duration-150 hover:opacity-75"
@@ -63,19 +50,19 @@ const SideBar: React.FC<Props> = ({
 							)
 						}
 						href="/home" // change later once there is a separate home and account buttons
-						selected={selectedCourseId === undefined}
+						selected={currentCourseId === undefined}
 					/>
 
-					{coursesTeaching.length > 0 ||
-					coursesEnrolled.length > 0 ? (
+					{courses.teaching.length > 0 ||
+					courses.enrolled.length > 0 ? (
 						<>
-							{coursesTeaching.length > 0 && (
+							{courses.teaching.length > 0 && (
 								<>
 									<span className="my-1.5 ml-1.5 text-sm font-medium opacity-60">
 										Teaching
 									</span>
 									<div>
-										{coursesTeaching.map((course) => (
+										{courses.teaching.map((course) => (
 											<PreviewDisplay
 												text={course.name}
 												subtext={course.section}
@@ -86,7 +73,7 @@ const SideBar: React.FC<Props> = ({
 												}
 												href={`/course/${course.id}`}
 												selected={
-													selectedCourseId ===
+													currentCourseId ===
 													course.id
 												}
 												key={course.id}
@@ -96,13 +83,13 @@ const SideBar: React.FC<Props> = ({
 								</>
 							)}
 
-							{coursesEnrolled.length > 0 && (
+							{courses.enrolled.length > 0 && (
 								<>
 									<span className="my-1.5 ml-1.5 text-sm font-medium opacity-60">
 										Enrolled
 									</span>
 									<div>
-										{coursesEnrolled.map((course) => (
+										{courses.enrolled.map((course) => (
 											<PreviewDisplay
 												text={course.name}
 												subtext={course.section}
@@ -113,7 +100,7 @@ const SideBar: React.FC<Props> = ({
 												}
 												href={`/course/${course.id}`}
 												selected={
-													selectedCourseId ===
+													currentCourseId ===
 													course.id
 												}
 												key={course.id}
@@ -128,7 +115,6 @@ const SideBar: React.FC<Props> = ({
 							You&apos;re not teaching or enrolled in any classes
 						</span>
 					)}
-					{/* later only have message if not teaching or enrolled */}
 				</div>
 			</div>
 		</nav>

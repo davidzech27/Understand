@@ -1,13 +1,14 @@
+import { useEffect } from "react";
 import { type AppType } from "next/app";
 import Head from "next/head";
+import { SSRProvider } from "react-aria";
 import { Analytics } from "@vercel/analytics/react";
 import { api } from "~/client/api";
 import "~/client/globals.css";
-import useCallOnce from "~/client/modules/shared/useCallOnce";
 import { initMixpanel } from "~/client/modules/analytics/mixpanel";
 
 const App: AppType = ({ Component }) => {
-	useCallOnce(initMixpanel);
+	useEffect(initMixpanel, []);
 
 	return (
 		<>
@@ -15,7 +16,9 @@ const App: AppType = ({ Component }) => {
 				<meta name="referrer" content="no-referrer" />
 			</Head>
 
-			<Component />
+			<SSRProvider>
+				<Component />
+			</SSRProvider>
 
 			<Analytics />
 		</>

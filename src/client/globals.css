@@ -7,24 +7,39 @@
 		@apply bg-primary;
 		color: black;
 	}
-}
 
-* {
-	box-sizing: border-box;
-	overscroll-behavior: none;
-}
+	* {
+		box-sizing: border-box;
+	}
 
-/* Hide scrollbar for Chrome, Safari and Opera */
-*::-webkit-scrollbar {
-	display: none;
-}
+	* {
+		user-select: none;
+		outline: none;
+		@apply outline-border;
+	}
 
-/* Hide scrollbar for IE, Edge and Firefox */
-* {
-	-ms-overflow-style: none; /* IE and Edge */
-	scrollbar-width: none; /* Firefox */
-}
+	[data-focus-visible] {
+		outline: auto;
+	}
 
-* {
-	user-select: none;
+	html {
+		@apply bg-background;
+	}
+
+	*::-webkit-scrollbar-track {
+		background-color: transparent;
+		border-radius: 6px;
+	}
+	*::-webkit-scrollbar-thumb {
+		background-color: #bfbfbf;
+		border-radius: 6px;
+	}
+	*::-webkit-scrollbar {
+		width: 8px;
+		height: 8px;
+	}
+	* {
+		scrollbar-color: #bfbfbf #00000000;
+		scrollbar-width: thin;
+	}
 }
