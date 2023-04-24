@@ -39,7 +39,7 @@ const Index: NextPage = () => {
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
 
-			<main className="flex flex-col">
+			<main className="flex flex-col bg-white">
 				<div className="flex h-screen w-full items-center justify-center">
 					<div className="flex h-screen flex-[2.5] flex-col items-center justify-center md:items-end">
 						<div className="w-min flex-col space-y-8">
