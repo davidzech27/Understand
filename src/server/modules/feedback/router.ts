@@ -32,11 +32,11 @@ const feedbackRouter = createRouter({
 					if ((error.code as unknown as number) === 403)
 						// annoying mistyping in library
 						throw new TRPCError({ code: "FORBIDDEN" });
-					else throw error;
-				} else throw error;
+				}
+
+				throw error;
 			}
 		}),
-
 	getGoogleDocHTML: authedProcedure
 		.input(
 			z.object({
@@ -61,8 +61,9 @@ const feedbackRouter = createRouter({
 					if ((error.code as unknown as number) === 403)
 						// annoying mistyping in library
 						throw new TRPCError({ code: "FORBIDDEN" });
-					else throw error;
-				} else throw error;
+				}
+
+				throw error;
 			}
 		}),
 	configureFeedback: authedProcedure
@@ -125,63 +126,75 @@ const feedbackRouter = createRouter({
 				input: { courseId, assignmentId },
 				ctx: { classroom },
 			}) => {
-				const submissionsResponse =
-					await classroom.courses.courseWork.studentSubmissions.list({
-						courseId,
-						courseWorkId: assignmentId,
-					});
-
-				const submissionsTransformed =
-					submissionsResponse.data.studentSubmissions
-						?.at(-1)
-						?.assignmentSubmission?.attachments?.map(
-							({ driveFile, youTubeVideo, link, form }) => {
-								if (driveFile)
-									return {
-										type: "driveFile",
-										driveFile: {
-											id: driveFile.id,
-											title: driveFile.title,
-											url: driveFile.alternateLink,
-											thumbnailUrl:
-												driveFile.thumbnailUrl,
-										},
-									};
-								if (youTubeVideo)
-									return {
-										type: "youTubeVideo",
-										youtubeVideo: {
-											id: youTubeVideo.id,
-											title: youTubeVideo.title,
-											url: youTubeVideo.alternateLink,
-											thumbnailUrl:
-												youTubeVideo.thumbnailUrl,
-										},
-									};
-								if (link)
-									return {
-										type: "link",
-										link: {
-											title: link.title,
-											url: link.url,
-											thumbnailUrl: link.thumbnailUrl,
-										},
-									};
-								if (form)
-									return {
-										type: "form",
-										form: {
-											title: form.title,
-											formUrl: form.formUrl,
-											responseUrl: form.responseUrl,
-											thumbnailUrl: form.thumbnailUrl,
-										},
-									};
+				try {
+					const submissionsResponse =
+						await classroom.courses.courseWork.studentSubmissions.list(
+							{
+								courseId,
+								courseWorkId: assignmentId,
 							}
-						)
-						.filter(Boolean) ?? [];
+						);
 
-				return attachmentListSchema.parse(submissionsTransformed);
+					const submissionsTransformed =
+						submissionsResponse.data.studentSubmissions
+							?.at(-1)
+							?.assignmentSubmission?.attachments?.map(
+								({ driveFile, youTubeVideo, link, form }) => {
+									if (driveFile)
+										return {
+											type: "driveFile",
+											driveFile: {
+												id: driveFile.id,
+												title: driveFile.title,
+												url: driveFile.alternateLink,
+												thumbnailUrl:
+													driveFile.thumbnailUrl,
+											},
+										};
+									if (youTubeVideo)
+										return {
+											type: "youTubeVideo",
+											youtubeVideo: {
+												id: youTubeVideo.id,
+												title: youTubeVideo.title,
+												url: youTubeVideo.alternateLink,
+												thumbnailUrl:
+													youTubeVideo.thumbnailUrl,
+											},
+										};
+									if (link)
+										return {
+											type: "link",
+											link: {
+												title: link.title,
+												url: link.url,
+												thumbnailUrl: link.thumbnailUrl,
+											},
+										};
+									if (form)
+										return {
+											type: "form",
+											form: {
+												title: form.title,
+												formUrl: form.formUrl,
+												responseUrl: form.responseUrl,
+												thumbnailUrl: form.thumbnailUrl,
+											},
+										};
+								}
+							)
+							.filter(Boolean) ?? [];
+
+					return attachmentListSchema.parse(submissionsTransformed);
+				} catch (error) {
+					if (error instanceof googleapis.Common.GaxiosError) {
+						if ((error.code as unknown as number) === 403)
+							// annoying mistyping in library
+							throw new TRPCError({ code: "FORBIDDEN" });
+					}
+
+					throw error;
+				}
 			}
 		),
 });

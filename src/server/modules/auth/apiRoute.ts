@@ -39,7 +39,6 @@ const authHandler: NextApiHandler = async (req, res) => {
 
 		cookies.set(redirectToCookieKey, redirectTo, {
 			overwrite: true,
-			sameSite: "none",
 		});
 
 		const authUrl = oauth2Client.generateAuthUrl({
@@ -102,13 +101,18 @@ const authHandler: NextApiHandler = async (req, res) => {
 			},
 		});
 
-		const redirectTo = cookies.get(redirectToCookieKey);
+		let redirectTo = cookies.get(redirectToCookieKey);
 
-		if (!redirectTo) return res.status(400).end();
+		if (!redirectTo) {
+			console.warn(
+				"No redirectTo cookie found on OAuth callback handler"
+			);
+
+			redirectTo = "/landing";
+		}
 
 		cookies.set(redirectToCookieKey, undefined, {
 			overwrite: true,
-			sameSite: "none",
 		});
 
 		return res.redirect(redirectTo);

@@ -39,13 +39,17 @@ const profileRouter = createRouter({
 			};
 		} catch (error) {
 			if (error instanceof googleapis.Common.GaxiosError) {
+				if ((error.code as unknown as number) === 403)
+					// annoying mistyping in library
+					throw new TRPCError({ code: "FORBIDDEN" });
 				if (error.response?.data?.error === "invalid_grant")
 					throw new TRPCError({
 						code: "UNAUTHORIZED",
 						message: "Refresh token expired or revoked",
 					});
-				else throw error;
-			} else throw error;
+			}
+
+			throw error;
 		}
 	}),
 	get: authedProcedure
@@ -81,12 +85,16 @@ const profileRouter = createRouter({
 				});
 			} catch (error) {
 				if (error instanceof googleapis.Common.GaxiosError) {
+					if ((error.code as unknown as number) === 403)
+						// annoying mistyping in library
+						throw new TRPCError({ code: "FORBIDDEN" });
 					if (error.code === "404")
 						throw new TRPCError({
 							code: "NOT_FOUND",
 						});
-					else throw error;
-				} else throw error;
+				}
+
+				throw error;
 			}
 		}),
 	update: authedProcedure
