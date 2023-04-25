@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
 import { eq } from "drizzle-orm/expressions";
-import googleapis from "googleapis";
+import * as googleapis from "googleapis";
 import { TRPCError } from "@trpc/server";
 import { createRouter, authedProcedure } from "~/server/trpc";
 import {
