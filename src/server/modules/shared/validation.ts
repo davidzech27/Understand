@@ -63,7 +63,7 @@ export const materialSchema = z.discriminatedUnion("type", [
 		form: z.object({
 			formUrl: z.string().url(),
 			responseUrl: z.string().url().optional(),
-			title: z.string(),
+			title: z.string().optional(),
 			thumbnailUrl: z.string().url().optional(),
 		}),
 	}),
@@ -101,7 +101,7 @@ export const attachmentSchema = z.discriminatedUnion("type", [
 		form: z.object({
 			formUrl: z.string().url(),
 			responseUrl: z.string().url().optional(),
-			title: z.string(),
+			title: z.string().optional(),
 			thumbnailUrl: z.string().url().optional(),
 		}),
 	}),
