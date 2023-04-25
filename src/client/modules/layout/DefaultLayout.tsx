@@ -32,7 +32,11 @@ const DefaultLayout: React.FC<Props> = ({ Component }) => {
 			}
 		},
 		onError: (error) => {
-			if (error.data?.code === "UNAUTHORIZED") router.push("/signIn");
+			if (
+				error.data?.code === "UNAUTHORIZED" ||
+				error.data?.code === "FORBIDDEN"
+			)
+				router.push("/signIn");
 		},
 	});
 
@@ -40,7 +44,15 @@ const DefaultLayout: React.FC<Props> = ({ Component }) => {
 		? router.asPath.split("/")[2]
 		: undefined;
 
-	const { data: courses } = api.courses.all.useQuery();
+	const { data: courses } = api.courses.all.useQuery(undefined, {
+		onError: (error) => {
+			if (
+				error.data?.code === "UNAUTHORIZED" ||
+				error.data?.code === "FORBIDDEN"
+			)
+				router.push("/signIn");
+		},
+	});
 
 	const currentRole = useMemo(() => {
 		if (courses === undefined) return undefined;

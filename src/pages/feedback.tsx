@@ -66,18 +66,40 @@ const FeedbackComponent: React.FC<DefaultLayoutRenderProps> = ({
 	const priorFeedback =
 		course &&
 		assignment &&
-		api.feedback.getPriorFeedback.useQuery({
-			courseId: course.id,
-			assignmentId: assignment.id,
-		}).data; //! will return all student submissions if user is teacher of course. design more elegant solution later
+		api.feedback.getPriorFeedback.useQuery(
+			{
+				courseId: course.id,
+				assignmentId: assignment.id,
+			},
+			{
+				onError: (error) => {
+					if (
+						error.data?.code === "UNAUTHORIZED" ||
+						error.data?.code === "FORBIDDEN"
+					)
+						router.push("/signIn");
+				},
+			}
+		).data; //! will return all student submissions if user is teacher of course. design more elegant solution later
 
 	const submissions =
 		course &&
 		assignment &&
-		api.feedback.getSubmissions.useQuery({
-			courseId: course.id,
-			assignmentId: assignment.id,
-		}).data;
+		api.feedback.getSubmissions.useQuery(
+			{
+				courseId: course.id,
+				assignmentId: assignment.id,
+			},
+			{
+				onError: (error) => {
+					if (
+						error.data?.code === "UNAUTHORIZED" ||
+						error.data?.code === "FORBIDDEN"
+					)
+						router.push("/signIn");
+				},
+			}
+		).data;
 
 	return course && assignment && priorFeedback && submissions ? (
 		assignment.feedbackConfig !== undefined ? (
@@ -208,7 +230,7 @@ const FeedbackContent: React.FC<{
 				)
 					authenticateWithGoogle({
 						permissions: ["drive"],
-						redirectTo: window.location.href, //! not working
+						redirectTo: window.location.href, //! not sure if working
 					});
 			}
 	};
