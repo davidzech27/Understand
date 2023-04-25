@@ -161,12 +161,11 @@ const SignIn: NextPage = () => {
 								</FancyButton>
 							</Link>
 
-							<span className="absolute left-0 right-0 mt-4 text-center text-sm font-medium opacity-60">
-								Make sure that you check all the checkboxes
-								<br />
-								for Google account access or Understand
-								<br />
-								won&apos;t be able to work properly
+							<span className="absolute left-0 right-0 mt-5 select-text rounded-md border border-border bg-surface py-4 px-5 text-center font-medium opacity-80 shadow-lg shadow-[#0000000A]">
+								Make sure that you check all the boxes for
+								Google account access! Otherwise, Understand
+								won&apos;t be able to work properly. We promise
+								we won&apos;t steal your data!
 							</span>
 						</div>
 
