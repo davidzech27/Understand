@@ -1,8 +1,10 @@
 import { createNextApiHandler } from "@trpc/server/adapters/next";
-import { Handlers } from "@highlight-run/node";
+import { H, Handlers } from "@highlight-run/node";
 import { env } from "~/env.mjs";
 import { createContext } from "~/server/trpc";
 import { appRouter } from "~/server/root";
+
+H.init({ projectID: env.NEXT_PUBLIC_HIGHLIGHT_PRODUCT_ID });
 
 export default createNextApiHandler({
 	router: appRouter,
