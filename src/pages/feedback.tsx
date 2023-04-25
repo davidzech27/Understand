@@ -66,21 +66,10 @@ const FeedbackComponent: React.FC<DefaultLayoutRenderProps> = ({
 	const priorFeedback =
 		course &&
 		assignment &&
-		api.feedback.getPriorFeedback.useQuery(
-			{
-				courseId: course.id,
-				assignmentId: assignment.id,
-			},
-			{
-				onError: (error) => {
-					if (
-						error.data?.code === "UNAUTHORIZED" ||
-						error.data?.code === "FORBIDDEN"
-					)
-						router.push("/signIn");
-				},
-			}
-		).data; //! will return all student submissions if user is teacher of course. design more elegant solution later
+		api.feedback.getPriorFeedback.useQuery({
+			courseId: course.id,
+			assignmentId: assignment.id,
+		}).data; //! will return all student submissions if user is teacher of course. design more elegant solution later
 
 	const submissions =
 		course &&
@@ -92,10 +81,7 @@ const FeedbackComponent: React.FC<DefaultLayoutRenderProps> = ({
 			},
 			{
 				onError: (error) => {
-					if (
-						error.data?.code === "UNAUTHORIZED" ||
-						error.data?.code === "FORBIDDEN"
-					)
+					if (error.data?.code === "FORBIDDEN")
 						router.push("/signIn");
 				},
 			}

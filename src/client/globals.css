@@ -6,7 +6,7 @@
 	*::selection {
 		@apply bg-primary;
 		opacity: 1;
-		color: black;
+		color: white;
 	}
 
 	* {
