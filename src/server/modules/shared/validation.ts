@@ -36,7 +36,7 @@ export const materialSchema = z.discriminatedUnion("type", [
 		type: z.literal("driveFile"),
 		driveFile: z.object({
 			id: z.string(),
-			title: z.string(),
+			title: z.string().optional(),
 			url: z.string().url(),
 			thumbnailUrl: z.string().url().optional(),
 		}),
@@ -74,7 +74,7 @@ export const attachmentSchema = z.discriminatedUnion("type", [
 		type: z.literal("driveFile"),
 		driveFile: z.object({
 			id: z.string(),
-			title: z.string(),
+			title: z.string().optional(),
 			url: z.string().url(),
 			thumbnailUrl: z.string().url().optional(),
 		}),
