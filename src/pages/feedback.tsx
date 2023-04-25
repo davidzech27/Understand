@@ -299,7 +299,12 @@ const FeedbackContent: React.FC<{
 						temperature,
 						presencePenalty,
 						frequencyPenalty,
-						messages: messages.join("\n\n\n"),
+						messages: messages
+							.map(
+								(message) =>
+									`Role: ${message.role}\nContent: ${message.content}`
+							)
+							.join("\n\n\n"),
 						...(generatingStart
 							? {
 									secondsAnalyzing:
@@ -425,7 +430,12 @@ const FeedbackContent: React.FC<{
 					H.track("Follow up", {
 						assignmentId,
 						courseId: course.id,
-						messages: messages.join("\n\n\n"),
+						messages: messages
+							.map(
+								(message) =>
+									`Role: ${message.role}\nContent: ${message.content}`
+							)
+							.join("\n\n\n"),
 						model,
 						temperature,
 						presencePenalty,
