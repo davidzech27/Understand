@@ -47,6 +47,8 @@ const Index: NextPage = () => {
 								<div className="h-16 w-48">
 									<Link
 										href={
+											typeof localStorage !==
+												"undefined" &&
 											localStorage.getItem(
 												"hightlight-identified"
 											) === "true"
