@@ -1,32 +1,14 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import { useEffect, useState, useRef } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import FancyButton from "~/client/modules/shared/FancyButton";
-import { type RouterOutputs, api } from "~/client/api";
 import colors from "colors.cjs";
 import { env } from "~/env.mjs";
 
 const Index: NextPage = () => {
 	const [scrollerHovered, setScrollerHovered] = useState(false); // in the future use this to slow down scrolling. https://stackoverflow.com/questions/70263043/change-animation-duration-without-reset-on-framer-motion
-
-	const [profile, setProfile] = useState<RouterOutputs["profile"]["me"]>();
-
-	const queryClient = api.useContext();
-
-	const profileFetched = useRef(false);
-
-	useEffect(() => {
-		if (!profileFetched.current) {
-			queryClient.profile.me
-				.fetch()
-				.then((profile) => setProfile(profile))
-				.catch(() => {});
-
-			profileFetched.current = true;
-		}
-	}, [queryClient]);
 
 	return (
 		<>
@@ -64,7 +46,13 @@ const Index: NextPage = () => {
 							<div className="ml-1 flex flex-col space-y-7 md:flex-row md:items-center md:space-y-0 md:space-x-9">
 								<div className="h-16 w-48">
 									<Link
-										href={profile ? "/home" : "/signIn"}
+										href={
+											localStorage.getItem(
+												"hightlight-identified"
+											) === "true"
+												? "/home"
+												: "/signIn"
+										}
 										legacyBehavior
 									>
 										<a>
