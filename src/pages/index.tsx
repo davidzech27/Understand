@@ -91,7 +91,7 @@ const Index: NextPage = () => {
 							</div>
 						</div>
 					</div>
-					<div className="relative hidden h-screen flex-1 justify-center md:flex">
+					<div className="relative hidden h-screen flex-1 justify-center overflow-hidden md:flex">
 						<motion.div
 							animate={{
 								y: "100vh",
