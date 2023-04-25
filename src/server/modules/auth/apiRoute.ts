@@ -37,7 +37,10 @@ const authHandler: NextApiHandler = async (req, res) => {
 		)
 			return res.status(400).end();
 
-		cookies.set(redirectToCookieKey, redirectTo);
+		cookies.set(redirectToCookieKey, redirectTo, {
+			overwrite: true,
+			sameSite: "none",
+		});
 
 		const authUrl = oauth2Client.generateAuthUrl({
 			access_type: "offline",
@@ -103,7 +106,10 @@ const authHandler: NextApiHandler = async (req, res) => {
 
 		if (!redirectTo) return res.status(400).end();
 
-		cookies.set(redirectToCookieKey);
+		cookies.set(redirectToCookieKey, undefined, {
+			overwrite: true,
+			sameSite: "none",
+		});
 
 		return res.redirect(redirectTo);
 	}

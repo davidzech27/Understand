@@ -12,6 +12,7 @@ const server = z.object({
 	GOOGLE_CLIENT_ID: z.string(),
 	GOOGLE_CLIENT_SECRET: z.string(),
 	OPENAI_SECRET_KEY: z.string(),
+	NEXT_PUBLIC_HIGHLIGHT_PRODUCT_ID: z.string(),
 });
 
 /**
@@ -19,8 +20,9 @@ const server = z.object({
  * built with invalid env vars. To expose them to the client, prefix them with `NEXT_PUBLIC_`.
  */
 const client = z.object({
-	NEXT_PUBLIC_MIXPANEL_TOKEN: z.string(),
+	NEXT_PUBLIC_HIGHLIGHT_PRODUCT_ID: z.string(),
 	NEXT_PUBLIC_LEARN_MORE_URL: z.string().url(),
+	NEXT_PUBLIC_ENVIRONMENT: z.enum(["production", "development"]),
 });
 
 /**
@@ -37,8 +39,10 @@ const processEnv = {
 	GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
 	GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
 	OPENAI_SECRET_KEY: process.env.OPENAI_SECRET_KEY,
-	NEXT_PUBLIC_MIXPANEL_TOKEN: process.env.NEXT_PUBLIC_MIXPANEL_TOKEN,
+	NEXT_PUBLIC_HIGHLIGHT_PRODUCT_ID:
+		process.env.NEXT_PUBLIC_HIGHLIGHT_PRODUCT_ID,
 	NEXT_PUBLIC_LEARN_MORE_URL: process.env.NEXT_PUBLIC_LEARN_MORE_URL,
+	NEXT_PUBLIC_ENVIRONMENT: process.env.NEXT_PUBLIC_ENVIRONMENT,
 };
 
 // Don't touch the part below

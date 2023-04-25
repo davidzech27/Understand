@@ -1,6 +1,5 @@
 import { type NextPage } from "next";
 import { useState } from "react";
-import { useRouter } from "next/router";
 import { Link } from "react-aria-components";
 import {
 	Item,
@@ -13,8 +12,6 @@ import clsx from "clsx";
 import Head from "next/head";
 import authenticateWithGoogle from "~/client/modules/auth/authenticateWithGoogle";
 import FancyButton from "~/client/modules/shared/FancyButton";
-import { event } from "~/client/modules/analytics/mixpanel";
-import { api } from "~/client/api";
 
 // todo - add extra content to fill awkward whitespace. or perhaps make panel smaller, but this would make the gradient section too big
 
@@ -50,8 +47,6 @@ const SignIn: NextPage = () => {
 						  ],
 				redirectTo: "/landing",
 			});
-
-			event.startGoogleOAuth();
 
 			setTimeout(() => setLoading(false), 1000);
 		}

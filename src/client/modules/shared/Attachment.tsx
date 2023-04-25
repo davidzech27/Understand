@@ -49,7 +49,7 @@ const Attachment: React.FC<Props> = ({ id, title, url, thumbnailUrl }) => {
 						onClick={(e) => e.stopPropagation()}
 						target="_blank"
 						ref={linkRef}
-						className="overflow-hidden overflow-ellipsis whitespace-nowrap text-sm opacity-60 hover:underline" // ellipsis not working yet
+						className="w-min overflow-hidden overflow-ellipsis whitespace-nowrap text-sm opacity-60 hover:underline" // ellipsis not working yet
 					>
 						{url}
 					</Link>

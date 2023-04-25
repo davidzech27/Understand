@@ -23,6 +23,14 @@ const getFeedback = ({
 	}) => void;
 	onGeneralContent: (content: string) => void;
 	onFinish: ({}: {
+		model: string;
+		temperature: number;
+		presencePenalty: number;
+		frequencyPenalty: number;
+		messages: {
+			role: "user" | "system" | "assistant";
+			content: string;
+		}[];
 		rawResponse: string;
 		outline: string;
 		commentary: string;
@@ -33,17 +41,18 @@ const getFeedback = ({
 	let lastParagraphNumber = undefined as number | undefined;
 	let lastSentenceNumber = undefined as number | undefined;
 
-	fetchOpenAIStream({
-		messages: [
-			{
-				role: "system",
-				content:
-					"You are uncommonly engaging and insightful. You're incredibly skilled at going into great depth and cover more than just surface level details. You always elaborate on your reasoning in interesting ways in order to help students understand at a deeper level how to improve their work. You enjoy reading the work of students with an interesting writing style. You have an interesting and unique tone.",
-			},
-			{
-				role: "user",
+	const { messages, model, temperature, presencePenalty, frequencyPenalty } =
+		{
+			messages: [
+				{
+					role: "system" as "system" | "user" | "assistant",
+					content:
+						"You are uncommonly engaging and insightful. You're incredibly skilled at going into great depth and cover more than just surface level details. You always elaborate on your reasoning in interesting ways in order to help students understand at a deeper level how to improve their work. You enjoy reading the work of students with an interesting writing style. You have an interesting and unique tone.",
+				},
+				{
+					role: "user" as "system" | "user" | "assistant",
 
-				content: `You will be shown the prompt for an assignment and a high school student's progress on this assignment. Your role is to provide the student with thoughtful, engaging, and actionable feedback on their work, serving to guide the student to improve their ability to express their ideas effectively and to a deeper understanding of critical thinking. The process by which you will accomplish this will consist of four steps. First, you will provide an outline of the student's work with an assessment of each section embedded into it in order to ensure your understanding of the student's work. Second, you will provide commentary on the student's writing, serving as a basis for the feedback you provide the student to ensure that it is well thought-out. Third, you will provide the student with feedback pertaining to specific segments of their work. Fourth, you will provide the student with more general feedback on their work. This process should look exactly as follows:
+					content: `You will be shown the prompt for an assignment and a high school student's progress on this assignment. Your role is to provide the student with thoughtful, engaging, and actionable feedback on their work, serving to guide the student to improve their ability to express their ideas effectively and to a deeper understanding of critical thinking. The process by which you will accomplish this will consist of four steps. First, you will provide an outline of the student's work with an assessment of each section embedded into it in order to ensure your understanding of the student's work. Second, you will provide commentary on the student's writing, serving as a basis for the feedback you provide the student to ensure that it is well thought-out. Third, you will provide the student with feedback pertaining to specific segments of their work. Fourth, you will provide the student with more general feedback on their work. This process should look exactly as follows:
 
 Outline
 Provide a sentence-by-sentence outline of the student's work, with your thoughts on each paragraph embedded into it, critically assessing its its quality of communication and critical thinking demonstrated. This is to ensure your understanding of the student's work and the accuracy of your commentary and feedback on it.
@@ -74,22 +83,30 @@ ${submission}
 """""
 EXTRA INFORMATION:
 WORD COUNT: ${
-					submission
-						.split(/\s/)
-						.map((string) => string.trim())
-						.filter((string) => string !== "").length
-				}
+						submission
+							.split(/\s/)
+							.map((string) => string.trim())
+							.filter((string) => string !== "").length
+					}
 STUDENT'S NAME: ${studentName}
 YOUR NAME: Understand
 COURSE NAME: ${courseName}
 
 Now, begin the described four-step process.`,
-			},
-		],
-		model: "gpt-4",
-		temperature: 0,
-		presencePenalty: 0.35, // setting this and the one below made a huge difference. my theory is that it decreases the model's bias to take on a similar writing style to that of the prompt, increasing its likelihood to follow the instructions and not just attempt to match them in style. consider tweaking these further
-		frequencyPenalty: 0.5,
+				},
+			],
+			model: "gpt-4" as const,
+			temperature: 0,
+			presencePenalty: 0.35, // setting this and the one below made a huge difference. my theory is that it decreases the model's bias to take on a similar writing style to that of the prompt, increasing its likelihood to follow the instructions and not just attempt to match them in style. consider tweaking these further
+			frequencyPenalty: 0.5,
+		};
+
+	fetchOpenAIStream({
+		messages,
+		model,
+		temperature,
+		presencePenalty,
+		frequencyPenalty,
 		onContent: (content) => {
 			const generalFeedbackHeaderIndex = content.search(
 				/\nGeneral feedback:?\n.+/
@@ -182,6 +199,14 @@ Now, begin the described four-step process.`,
 			};
 
 			onFinish({
+				messages: messages.concat({
+					role: "user",
+					content,
+				}),
+				model,
+				temperature,
+				presencePenalty,
+				frequencyPenalty,
 				rawResponse: content,
 				outline: lines
 					.slice(1, headerLineIndex.commentary)

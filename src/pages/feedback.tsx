@@ -2,13 +2,13 @@ import { type NextPage } from "next";
 import { useRouter } from "next/router";
 import { produce } from "immer";
 import { renderToStaticMarkup } from "react-dom/server";
+import { H } from "highlight.run";
 import {
 	useEffect,
 	useState,
 	useRef,
 	forwardRef,
 	useImperativeHandle,
-	type RefObject,
 } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import RowList from "~/client/modules/shared/RowList";
@@ -17,7 +17,6 @@ import { api, type RouterOutputs } from "~/client/api";
 import DefaultLayout, {
 	type DefaultLayoutRenderProps,
 } from "~/client/modules/layout/DefaultLayout";
-import { event } from "~/client/modules/analytics/mixpanel";
 import Button from "~/client/modules/shared/Button";
 import Modal from "~/client/modules/shared/Modal";
 import Attachment from "~/client/modules/shared/Attachment";
@@ -215,11 +214,15 @@ const FeedbackContent: React.FC<{
 	};
 
 	const onGetFeedback = () => {
-		setGenerating(true);
-
 		const submissionInput = submissionRef.current?.getText();
 
-		if (submissionInput !== undefined)
+		if (submissionInput !== undefined) {
+			setGenerating(true);
+
+			const start = new Date();
+
+			let generatingStart: Date;
+
 			getFeedback({
 				submission: submissionInput,
 				instructions,
@@ -233,6 +236,9 @@ const FeedbackContent: React.FC<{
 					});
 				},
 				onSpecificContent: ({ content, paragraph, sentence }) => {
+					if (generatingStart === undefined)
+						generatingStart = new Date();
+
 					setSpecificFeedbackList(
 						produce((specificFeedbackList) => {
 							const specificFeedback = specificFeedbackList.find(
@@ -257,6 +263,11 @@ const FeedbackContent: React.FC<{
 					);
 				},
 				onFinish: ({
+					model,
+					temperature,
+					presencePenalty,
+					frequencyPenalty,
+					messages,
 					rawResponse,
 					outline,
 					commentary,
@@ -281,15 +292,31 @@ const FeedbackContent: React.FC<{
 						generalFeedback,
 					});
 
-					event.feedback({
+					H.track("Feedback", {
 						courseId: course.id,
 						assignmentId,
-						rawResponse,
+						model,
+						temperature,
+						presencePenalty,
+						frequencyPenalty,
+						messages: messages.join("\n\n\n"),
+						...(generatingStart
+							? {
+									secondsAnalyzing:
+										(generatingStart.valueOf() -
+											start.valueOf()) /
+										1000,
+							  }
+							: {}),
+						secondsGenerating:
+							(new Date().valueOf() - generatingStart.valueOf()) /
+							1000,
 					});
 
 					console.debug(rawResponse);
 				},
 			});
+		}
 	};
 
 	const onTryAgain = () => {
@@ -315,6 +342,8 @@ const FeedbackContent: React.FC<{
 		followUps: string[];
 	}) => {
 		if (feedbackResponse) {
+			const start = new Date();
+
 			setSpecificFeedbackList(
 				produce((specificFeedbackList) => {
 					const specificFeedback = specificFeedbackList.find(
@@ -371,7 +400,13 @@ const FeedbackContent: React.FC<{
 						})
 					);
 				},
-				onFinish: (content) => {
+				onFinish: ({
+					messages,
+					model,
+					temperature,
+					presencePenalty,
+					frequencyPenalty,
+				}) => {
 					// todo - add mixpanel event
 					setSpecificFeedbackList(
 						produce((specificFeedbackList) => {
@@ -386,6 +421,18 @@ const FeedbackContent: React.FC<{
 							}
 						})
 					);
+
+					H.track("Follow up", {
+						assignmentId,
+						courseId: course.id,
+						messages: messages.join("\n\n\n"),
+						model,
+						temperature,
+						presencePenalty,
+						frequencyPenalty,
+						secondsGenerating:
+							(new Date().valueOf() - start.valueOf()) / 1000,
+					});
 				},
 			});
 		}

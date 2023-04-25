@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 import { type NextPage } from "next";
 import { TRPCClientError } from "@trpc/client";
+import { H } from "highlight.run";
 import { useRouter } from "next/router";
 import colors from "colors.cjs";
 import { RouterOutputs, api } from "~/client/api";
@@ -17,7 +17,6 @@ import authenticateWithGoogle from "~/client/modules/auth/authenticateWithGoogle
 import useStickyState from "~/client/modules/shared/useStickyState";
 import Attachment from "~/client/modules/shared/Attachment";
 import RowList from "~/client/modules/shared/RowList";
-import { event } from "~/client/modules/analytics/mixpanel";
 
 // put some more thought into how to bring external content into site. perhaps not always the best idea for input to show up on main screen, and maybe would be better for it to show up as an attachment that can be opened up with a modal
 // perhaps completely abstract away the creation of feedback instructions, and instead of showing actual instructions, just have user see list of things model is taking into account. not as transparent though, and users don't get to see summary being created
@@ -104,11 +103,12 @@ const AssignmentContent: React.FC<{
 			if (
 				error instanceof TRPCClientError &&
 				error.message === "FORBIDDEN"
-			)
+			) {
 				authenticateWithGoogle({
 					permissions: ["drive"],
 					redirectTo: window.location.href,
 				});
+			}
 		}
 	};
 
@@ -188,7 +188,7 @@ const AssignmentContent: React.FC<{
 			}
 		});
 
-		event.feedbackConfig({
+		H.track("Configure feedback", {
 			courseId: course.id,
 			assignmentId: assignment.id,
 			instructions: feedbackInstructionsInput,

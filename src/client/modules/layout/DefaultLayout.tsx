@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import Head from "next/head";
+import { H } from "highlight.run";
 import SideBar from "./SideBar";
 import { api, type RouterOutputs } from "~/client/api";
 import { useRouter } from "next/router";
@@ -20,6 +21,16 @@ const DefaultLayout: React.FC<Props> = ({ Component }) => {
 	const router = useRouter();
 
 	const { data: profile } = api.profile.me.useQuery(undefined, {
+		onSuccess: ({ email, name, photo }) => {
+			if (localStorage.getItem("hightlight-identified") !== "true") {
+				H.identify(email, {
+					name,
+					...(photo ? { avatar: photo } : {}),
+				});
+
+				localStorage.setItem("hightlight-identified", "true");
+			}
+		},
 		onError: (error) => {
 			if (error.data?.code === "UNAUTHORIZED") router.push("/signIn");
 		},

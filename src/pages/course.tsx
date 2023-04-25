@@ -1,9 +1,7 @@
-import { useState } from "react";
 import { type NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import colors from "colors.cjs";
-import { api } from "~/client/api";
 import DefaultLayout, {
 	type DefaultLayoutRenderProps,
 } from "~/client/modules/layout/DefaultLayout";

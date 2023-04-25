@@ -3,25 +3,23 @@ import Head from "next/head";
 import { Link } from "react-aria-components";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { H } from "highlight.run";
 import FancyButton from "~/client/modules/shared/FancyButton";
 import TextInput from "~/client/modules/shared/TextInput";
 import { Label, TextField } from "react-aria-components";
 import { api } from "~/client/api";
-import { event } from "~/client/modules/analytics/mixpanel";
 
 // perhaps add extra content to fill awkward whitespace
 const SignIn: NextPage = () => {
 	const [loading, setLoading] = useState(false);
 
-	api.profile.me.useQuery(undefined, {
-		onSuccess: ({ email, name }) => {
-			event.finishGoogleOAuth({ email, name });
-
+	const { data: profile } = api.profile.me.useQuery(undefined, {
+		onSuccess: ({ name }) => {
 			nameInput.length === 0 && setNameInput(name);
 		},
 	});
 
-	const updateProfile = api.profile.update.useMutation().mutateAsync;
+	const updateProfile = api.profile.update.useMutation().mutate;
 
 	const [nameInput, setNameInput] = useState("");
 
@@ -30,15 +28,21 @@ const SignIn: NextPage = () => {
 	const onGo = async () => {
 		setLoading(true);
 
-		await updateProfile({
+		updateProfile({
 			name: nameInput,
 		});
+
+		profile &&
+			H.identify(profile.email, {
+				name: nameInput,
+				...(profile.photo ? { avatar: profile.photo } : {}),
+			});
+
+		localStorage.setItem("hightlight-identified", "true"); // weird system but probably just a temporary measure
 
 		setTimeout(() => setLoading(false), 1000);
 
 		router.push("/home");
-
-		event.finishLanding({ name: nameInput });
 	};
 
 	return (

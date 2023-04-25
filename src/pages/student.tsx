@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { type NextPage } from "next";
 import { useRouter } from "next/router";
 import colors from "colors.cjs";
-import { api } from "~/client/api";
 import DefaultLayout, {
 	type DefaultLayoutRenderProps,
 } from "~/client/modules/layout/DefaultLayout";
