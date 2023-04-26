@@ -45,7 +45,7 @@ export const materialSchema = z.discriminatedUnion("type", [
 		type: z.literal("youtubeVideo"),
 		youtubeVideo: z.object({
 			id: z.string(),
-			title: z.string(),
+			title: z.string().optional(),
 			url: z.string().url(),
 			thumbnailUrl: z.string().url().optional(),
 		}),
@@ -83,7 +83,7 @@ export const attachmentSchema = z.discriminatedUnion("type", [
 		type: z.literal("youTubeVideo"), // the capital t is the only difference between this is and materialSchema
 		youtubeVideo: z.object({
 			id: z.string(),
-			title: z.string(),
+			title: z.string().optional(),
 			url: z.string().url(),
 			thumbnailUrl: z.string().url().optional(),
 		}),
