@@ -67,7 +67,7 @@ const SideBar: React.FC<Props> = ({ currentCourseId, profile, courses }) => {
 												text={course.name}
 												subtext={course.section}
 												photo={
-													<div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-700 text-[1.16rem] text-white">
+													<div className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-[1.16rem] text-white">
 														{course.name[0]?.toUpperCase()}
 													</div>
 												}
@@ -94,7 +94,7 @@ const SideBar: React.FC<Props> = ({ currentCourseId, profile, courses }) => {
 												text={course.name}
 												subtext={course.section}
 												photo={
-													<div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-700 text-[1.16rem] text-white">
+													<div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-[1.16rem] text-white">
 														{course.name[0]?.toUpperCase()}
 													</div>
 												}
