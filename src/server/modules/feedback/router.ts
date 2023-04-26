@@ -5,7 +5,7 @@ import { createRouter, authedProcedure } from "~/server/trpc";
 import db from "~/server/modules/db/db";
 import { and, eq } from "drizzle-orm/expressions";
 import { feedback, feedbackConfig } from "~/server/modules/db/schema";
-import { attachmentListSchema } from "~/server/modules/shared/validation";
+import { submissionListSchema } from "~/server/modules/shared/validation";
 
 const feedbackRouter = createRouter({
 	getGoogleDocText: authedProcedure
@@ -154,7 +154,7 @@ const feedbackRouter = createRouter({
 									if (youTubeVideo)
 										return {
 											type: "youTubeVideo",
-											youtubeVideo: {
+											youTubeVideo: {
 												id: youTubeVideo.id,
 												title: youTubeVideo.title,
 												url: youTubeVideo.alternateLink,
@@ -185,7 +185,7 @@ const feedbackRouter = createRouter({
 							)
 							.filter(Boolean) ?? [];
 
-					return attachmentListSchema.parse(submissionsTransformed);
+					return submissionListSchema.parse(submissionsTransformed);
 				} catch (error) {
 					if (error instanceof googleapis.Common.GaxiosError) {
 						if ((error.code as unknown as number) === 403)
