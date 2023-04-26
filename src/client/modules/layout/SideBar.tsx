@@ -53,68 +53,71 @@ const SideBar: React.FC<Props> = ({ currentCourseId, profile, courses }) => {
 						selected={currentCourseId === undefined}
 					/>
 
-					{courses.teaching.length > 0 ||
-					courses.enrolled.length > 0 ? (
-						<>
-							{courses.teaching.length > 0 && (
-								<>
-									<span className="my-1.5 ml-1.5 text-sm font-medium opacity-60">
-										Teaching
-									</span>
-									<div>
-										{courses.teaching.map((course) => (
-											<PreviewDisplay
-												text={course.name}
-												subtext={course.section}
-												photo={
-													<div className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-[1.16rem] text-white">
-														{course.name[0]?.toUpperCase()}
-													</div>
-												}
-												href={`/course/${course.id}`}
-												selected={
-													currentCourseId ===
-													course.id
-												}
-												key={course.id}
-											/>
-										))}
-									</div>
-								</>
-							)}
+					<div className="mr-[-8px] overflow-y-scroll">
+						{courses.teaching.length > 0 ||
+						courses.enrolled.length > 0 ? (
+							<>
+								{courses.teaching.length > 0 && (
+									<>
+										<span className="my-1.5 ml-1.5 text-sm font-medium opacity-60">
+											Teaching
+										</span>
+										<div>
+											{courses.teaching.map((course) => (
+												<PreviewDisplay
+													text={course.name}
+													subtext={course.section}
+													photo={
+														<div className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-[1.16rem] text-white">
+															{course.name[0]?.toUpperCase()}
+														</div>
+													}
+													href={`/course/${course.id}`}
+													selected={
+														currentCourseId ===
+														course.id
+													}
+													key={course.id}
+												/>
+											))}
+										</div>
+									</>
+								)}
 
-							{courses.enrolled.length > 0 && (
-								<>
-									<span className="my-1.5 ml-1.5 text-sm font-medium opacity-60">
-										Enrolled
-									</span>
-									<div>
-										{courses.enrolled.map((course) => (
-											<PreviewDisplay
-												text={course.name}
-												subtext={course.section}
-												photo={
-													<div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-[1.16rem] text-white">
-														{course.name[0]?.toUpperCase()}
-													</div>
-												}
-												href={`/course/${course.id}`}
-												selected={
-													currentCourseId ===
-													course.id
-												}
-												key={course.id}
-											/>
-										))}
-									</div>
-								</>
-							)}
-						</>
-					) : (
-						<span className="my-1.5 ml-1.5 text-sm font-medium opacity-60">
-							You&apos;re not teaching or enrolled in any classes
-						</span>
-					)}
+								{courses.enrolled.length > 0 && (
+									<>
+										<span className="my-1.5 ml-1.5 text-sm font-medium opacity-60">
+											Enrolled
+										</span>
+										<div>
+											{courses.enrolled.map((course) => (
+												<PreviewDisplay
+													text={course.name}
+													subtext={course.section}
+													photo={
+														<div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-[1.16rem] text-white">
+															{course.name[0]?.toUpperCase()}
+														</div>
+													}
+													href={`/course/${course.id}`}
+													selected={
+														currentCourseId ===
+														course.id
+													}
+													key={course.id}
+												/>
+											))}
+										</div>
+									</>
+								)}
+							</>
+						) : (
+							<span className="my-1.5 ml-1.5 text-sm font-medium opacity-60">
+								You&apos;re not teaching or enrolled in any
+								classes
+							</span>
+						)}
+					</div>
 				</div>
 			</div>
 		</nav>

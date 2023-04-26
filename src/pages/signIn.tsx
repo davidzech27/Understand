@@ -21,25 +21,19 @@ const SignIn: NextPage = () => {
 	const onSignIn = async () => {
 		setLoading(true);
 
-		if (selectedRole) {
-			await authenticateWithGoogle({
-				permissions: [
-					"courses",
-					"rosters",
-					"studentAssignments",
-					"selfAssignments",
-					"assignmentAttachments",
-				],
-				redirectTo: "/landing",
-			});
+		await authenticateWithGoogle({
+			permissions: [
+				"courses",
+				"rosters",
+				"studentAssignments",
+				"selfAssignments",
+				"assignmentAttachments",
+			],
+			redirectTo: "/landing",
+		});
 
-			setTimeout(() => setLoading(false), 1000);
-		}
+		setTimeout(() => setLoading(false), 1000);
 	};
-
-	const [selectedRole, setSelectedRole] = useState<
-		"student" | "teacher" | "both"
-	>();
 
 	return (
 		<>
@@ -67,86 +61,20 @@ const SignIn: NextPage = () => {
 
 				<div className="flex-1 py-5 pr-6">
 					<div className="flex h-full w-full flex-col items-center rounded-lg bg-white py-12 px-12 shadow-xl">
-						<div className="flex-[0.875]" />
+						<div className="flex-[0.65]" />
 
-						<div className="text-3xl font-medium leading-none opacity-60">
-							Which role describes you the best?
-						</div>
-
-						<ListBox
-							selectionMode="single"
-							disallowEmptySelection
-							onSelectionChange={(selectedIds) => {
-								for (const selectedId of selectedIds) {
-									setSelectedRole(
-										selectedId as
-											| "student"
-											| "teacher"
-											| "both"
-									);
-								}
-							}}
-							className="mt-6 mb-6 flex w-full flex-col space-y-4 px-16"
-						>
-							<Item id="student" className="group">
-								{({ isSelected }) => (
-									<div
-										className={clsx(
-											"flex h-20 w-full items-center justify-center rounded-md py-2.5 px-6 text-2xl font-medium transition-all duration-150",
-											isSelected
-												? "cursor-default bg-surface-selected-hover opacity-80"
-												: "cursor-pointer bg-surface-hover opacity-60 group-data-[hovered]:bg-surface-selected"
-										)}
-									>
-										Student
-									</div>
-								)}
-							</Item>
-
-							<Item id="teacher" className="group">
-								{({ isSelected }) => (
-									<div
-										className={clsx(
-											"flex h-20 w-full items-center justify-center rounded-md py-2.5 px-6 text-2xl font-medium transition-all duration-150",
-											isSelected
-												? "cursor-default bg-surface-selected-hover opacity-80"
-												: "cursor-pointer bg-surface-hover opacity-60 group-data-[hovered]:bg-surface-selected"
-										)}
-									>
-										Teacher
-									</div>
-								)}
-							</Item>
-
-							<Item id="both" className="group">
-								{({ isSelected }) => (
-									<div
-										className={clsx(
-											"flex h-20 w-full items-center justify-center rounded-md py-2.5 px-6 text-2xl font-medium transition-all duration-150",
-											isSelected
-												? "cursor-default bg-surface-selected-hover opacity-80"
-												: "cursor-pointer bg-surface-hover opacity-60 group-data-[hovered]:bg-surface-selected"
-										)}
-									>
-										Both
-									</div>
-								)}
-							</Item>
-						</ListBox>
-
-						<div className="relative h-20 w-96">
-							<Link isDisabled={selectedRole === undefined}>
+						<div className="relative mx-8 h-24 w-full">
+							<Link>
 								<FancyButton
 									onPress={onSignIn}
-									disabled={selectedRole === undefined}
 									loading={loading}
 									bigText
 								>
-									Sign in with Google
+									Sign in with your school Google account
 								</FancyButton>
 							</Link>
 
-							<span className="absolute left-0 right-0 mt-5 select-text rounded-md border border-border bg-surface py-4 px-5 text-center font-medium opacity-80 shadow-lg shadow-[#0000000A]">
+							<span className="absolute left-0 right-0 mt-8 select-text rounded-md border border-border bg-surface py-4 px-5 text-center text-lg font-medium opacity-80 shadow-lg shadow-[#00000010]">
 								Make sure that you check all the boxes for
 								Google account access! Otherwise, Understand
 								won&apos;t be able to work properly. We promise

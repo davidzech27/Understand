@@ -524,7 +524,7 @@ const FeedbackContent: React.FC<{
 							{submissionEmpty &&
 							submissionDriveFiles.length > 0 ? (
 								<Button onPress={() => setModal("submission")}>
-									Use submission
+									Import submission
 								</Button>
 							) : editing || generating ? (
 								<Button
@@ -983,7 +983,7 @@ const Submission = forwardRef<
 
 				{empty && (
 					<span className="pointer-events-none absolute top-0 opacity-40">
-						Your assignment goes here
+						Your work goes here
 					</span>
 				)}
 			</div>
