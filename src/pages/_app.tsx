@@ -8,13 +8,16 @@ import { env } from "~/env.mjs";
 import { api } from "~/client/api";
 import "~/client/globals.css";
 
+const localhost =
+	typeof window !== "undefined" && window.location.href.includes("localhost");
+
 H.init(env.NEXT_PUBLIC_HIGHLIGHT_PRODUCT_ID, {
 	tracingOrigins: true,
 	networkRecording: {
 		enabled: true,
 		recordHeadersAndBody: true,
 	},
-	environment: env.NEXT_PUBLIC_ENVIRONMENT,
+	environment: localhost ? "development" : "production",
 });
 
 const App: AppType = ({ Component }) => {

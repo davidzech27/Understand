@@ -22,7 +22,6 @@ const server = z.object({
 const client = z.object({
 	NEXT_PUBLIC_HIGHLIGHT_PRODUCT_ID: z.string(),
 	NEXT_PUBLIC_LEARN_MORE_URL: z.string().url(),
-	NEXT_PUBLIC_ENVIRONMENT: z.enum(["production", "development"]),
 });
 
 /**
@@ -42,7 +41,6 @@ const processEnv = {
 	NEXT_PUBLIC_HIGHLIGHT_PRODUCT_ID:
 		process.env.NEXT_PUBLIC_HIGHLIGHT_PRODUCT_ID,
 	NEXT_PUBLIC_LEARN_MORE_URL: process.env.NEXT_PUBLIC_LEARN_MORE_URL,
-	NEXT_PUBLIC_ENVIRONMENT: process.env.NEXT_PUBLIC_ENVIRONMENT,
 };
 
 // Don't touch the part below
