@@ -930,6 +930,8 @@ const Submission = forwardRef<
 				return {
 					getText: () => ref.current?.textContent ?? undefined,
 					getTextOffset: ({ paragraph }) => {
+						let paragraphFound = false;
+
 						let offset = 0;
 
 						let currentParagraphNumber = 0;
@@ -944,6 +946,8 @@ const Submission = forwardRef<
 								}
 
 								if (currentParagraphNumber === paragraph) {
+									paragraphFound = true;
+
 									break;
 								}
 
@@ -951,7 +955,7 @@ const Submission = forwardRef<
 							}
 						}
 
-						return offset;
+						return paragraphFound ? offset : 0;
 					},
 					setHTML: (html) => {
 						if (ref.current) {
