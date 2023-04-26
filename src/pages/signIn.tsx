@@ -23,28 +23,13 @@ const SignIn: NextPage = () => {
 
 		if (selectedRole) {
 			await authenticateWithGoogle({
-				permissions:
-					selectedRole === "student"
-						? [
-								"courses",
-								"rosters",
-								"selfAssignments",
-								"assignmentAttachments", // perhaps later check if user has this permission on backend instead of requesting it on first signIn
-						  ]
-						: selectedRole === "teacher"
-						? [
-								"courses",
-								"rosters",
-								"studentAssignments",
-								"assignmentAttachments",
-						  ]
-						: [
-								"courses",
-								"rosters",
-								"studentAssignments",
-								"selfAssignments",
-								"assignmentAttachments",
-						  ],
+				permissions: [
+					"courses",
+					"rosters",
+					"studentAssignments",
+					"selfAssignments",
+					"assignmentAttachments",
+				],
 				redirectTo: "/landing",
 			});
 
