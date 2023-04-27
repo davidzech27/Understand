@@ -54,6 +54,8 @@ const DefaultLayout: React.FC<Props> = ({ Component }) => {
 		},
 	});
 
+	const [notFoundMessage, setNotFoundMessage] = useState<string>();
+
 	const currentRole = useMemo(() => {
 		if (courses === undefined) return undefined;
 
@@ -77,8 +79,6 @@ const DefaultLayout: React.FC<Props> = ({ Component }) => {
 
 		return undefined;
 	}, [courses, currentCourseId]);
-
-	const [notFoundMessage, setNotFoundMessage] = useState<string>();
 
 	return (
 		<>
