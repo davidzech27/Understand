@@ -4,8 +4,6 @@ import { env } from "~/env.mjs"
 import GetStartedLink from "./GetStartedLink"
 import FancyButton from "~/components/FancyButton"
 
-export const runtime = "edge"
-
 export const metadata = {
 	title: "Understand",
 	description:

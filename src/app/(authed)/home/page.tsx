@@ -4,6 +4,8 @@ import Card from "~/components/Card"
 import User from "~/data/User"
 import { getAuthOrThrow } from "~/auth/jwt"
 
+export const runtime = "edge"
+
 export const metadata = {
 	title: "Home",
 }

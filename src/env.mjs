@@ -24,8 +24,9 @@ const client = z.object({
 const processEnv = {
 	NODE_ENV: process.env.NODE_ENV,
 	JWT_SECRET: process.env.JWT_SECRET,
-	NEXT_PUBLIC_URL:
-		process.env.NEXT_PUBLIC_URL ?? `https://${process.env.VERCEL_URL}`,
+	NEXT_PUBLIC_URL: process.env.VERCEL_URL
+		? `https://${process.env.VERCEL_URL}`
+		: process.env.NEXT_PUBLIC_URL,
 	DATABASE_URL: process.env.DATABASE_URL,
 	NEXT_PUBLIC_GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
 	GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
