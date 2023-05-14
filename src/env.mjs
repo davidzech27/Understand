@@ -7,18 +7,12 @@ const server = z.object({
 	NEXT_PUBLIC_GOOGLE_CLIENT_ID: z.string(),
 	GOOGLE_CLIENT_SECRET: z.string(),
 	OPENAI_SECRET_KEY: z.string(),
-	NEXT_PUBLIC_URL: z.preprocess(
-		(str) => str ?? `https://${process.env.VERCEL_URL}`,
-		z.string().url()
-	),
+	NEXT_PUBLIC_URL: z.string().url(),
 	NEXT_PUBLIC_HIGHLIGHT_PRODUCT_ID: z.string(),
 })
 
 const client = z.object({
-	NEXT_PUBLIC_URL: z.preprocess(
-		(str) => str ?? `https://${process.env.VERCEL_URL}`,
-		z.string().url()
-	),
+	NEXT_PUBLIC_URL: z.string().url(),
 	NEXT_PUBLIC_GOOGLE_CLIENT_ID: z.string(),
 	NEXT_PUBLIC_HIGHLIGHT_PRODUCT_ID: z.string(),
 	NEXT_PUBLIC_LEARN_MORE_URL: z.string().url(),
