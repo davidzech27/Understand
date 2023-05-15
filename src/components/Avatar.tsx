@@ -1,6 +1,4 @@
 "use client"
-import * as AvatarRadix from "@radix-ui/react-avatar"
-import Image from "next/image"
 
 import cn from "../utils/cn"
 
@@ -44,23 +42,15 @@ const Avatar: React.FC<Props> = ({
 	)
 
 	return src ? (
-		<AvatarRadix.Root className={className}>
-			<AvatarRadix.Image asChild>
-				<Image
-					src={src}
-					alt={name ?? "No title"}
-					width={1000} // not sure if this is bad
-					className={cn(
-						"h-full w-full rounded-full",
-						border && "border-[0.75px] border-border"
-					)}
-				/>
-			</AvatarRadix.Image>
-
-			<AvatarRadix.Fallback delayMs={600} asChild>
-				{fallback}
-			</AvatarRadix.Fallback>
-		</AvatarRadix.Root>
+		<img
+			src={src}
+			alt={name ?? "No title"}
+			className={cn(
+				"h-full w-full rounded-full",
+				border && "border-[0.75px] border-border",
+				className
+			)}
+		/>
 	) : (
 		<div className={className}>{fallback}</div>
 	)

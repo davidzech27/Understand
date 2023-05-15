@@ -24,7 +24,7 @@ const ToggleButton: React.FC<Props> = ({
 				"rounded-md py-2.5 px-6 text-lg font-medium transition-all duration-150",
 				toggled
 					? "bg-surface-selected opacity-80 focus-within:bg-surface-selected-hover hover:bg-surface-selected-hover"
-					: "opacity-60 focus-within:bg-surface-hover focus-within:opacity-80 hover:bg-surface-hover hover:opacity-80",
+					: "opacity-60 hover:bg-surface-hover hover:opacity-80 focus-visible:bg-surface-hover focus-visible:opacity-80",
 				className
 			)}
 		>

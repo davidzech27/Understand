@@ -65,45 +65,53 @@ const SegmentTabs: React.FC<Props> = ({ course, role }) => {
 
 		router.push("/home")
 	}
-	// router.prefetch("", {kind: })
+
 	return (
 		<div className="flex items-center justify-between">
 			<div className="flex space-x-1.5">
-				<Link href={`/class/${course.id}`}>
-					<ToggleButton
-						toggled={segment === null}
-						onToggle={() => {}}
-					>
-						Home
-					</ToggleButton>
+				<Link href={`/class/${course.id}`} legacyBehavior>
+					<a>
+						<ToggleButton
+							toggled={segment === null}
+							onToggle={() => {}}
+						>
+							Home
+						</ToggleButton>
+					</a>
 				</Link>
 
-				<Link href={`/class/${course.id}/assignments`}>
-					<ToggleButton
-						toggled={segment === "assignments"}
-						onToggle={() => {}}
-					>
-						Assignments
-					</ToggleButton>
+				<Link href={`/class/${course.id}/assignments`} legacyBehavior>
+					<a>
+						<ToggleButton
+							toggled={segment === "assignments"}
+							onToggle={() => {}}
+						>
+							Assignments
+						</ToggleButton>
+					</a>
 				</Link>
 
-				<Link href={`/class/${course.id}/people`}>
-					<ToggleButton
-						toggled={segment === "people"}
-						onToggle={() => {}}
-					>
-						People
-					</ToggleButton>
+				<Link href={`/class/${course.id}/people`} legacyBehavior>
+					<a>
+						<ToggleButton
+							toggled={segment === "people"}
+							onToggle={() => {}}
+						>
+							People
+						</ToggleButton>
+					</a>
 				</Link>
 
 				{role === "teacher" && (
-					<Link href={`/class/${course.id}/insights`}>
-						<ToggleButton
-							toggled={segment === "insights"}
-							onToggle={() => {}}
-						>
-							Insights
-						</ToggleButton>
+					<Link href={`/class/${course.id}/insights`} legacyBehavior>
+						<a>
+							<ToggleButton
+								toggled={segment === "insights"}
+								onToggle={() => {}}
+							>
+								Insights
+							</ToggleButton>
+						</a>
 					</Link>
 				)}
 			</div>

@@ -7,12 +7,12 @@ export const metadata = {
 interface Params {
 	id: string
 }
-
+//! fix keyboard usability and outlines
 const InsightsPage = async ({ params: { id } }: { params: Params }) => {
 	return (
 		<Card className="flex flex-1 flex-col py-5 px-6">
 			<span className="font-medium italic opacity-60">
-				Class home coming soon...
+				Classroom insights coming soon...
 			</span>
 		</Card>
 	)
