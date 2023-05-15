@@ -4,7 +4,7 @@ import { getAuthOrThrow, setAuth } from "~/auth/jwt"
 import CreateClassForm from "./CreateClassForm"
 import GoogleAPI from "~/google/GoogleAPI"
 
-export const runtime = "edge"
+//! export const runtime = "edge" add back when server components error is fixed
 
 export const metadata = {
 	title: "Create class",

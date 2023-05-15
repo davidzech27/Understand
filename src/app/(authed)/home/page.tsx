@@ -31,7 +31,7 @@ const HomePage = async () => {
 					</>
 				) : (
 					<span className="font-medium italic opacity-60">
-						Class overview coming soon...
+						Home view coming soon...
 					</span>
 				)}
 			</div>

@@ -95,17 +95,23 @@ const User = ({ email }: { email: string }) => ({
 		role: "teacher" | "student"
 	}) => {
 		if (role === "teacher") {
-			await db.insert(teacherToCourse).values({
-				teacherEmail: email,
-				courseId: id,
-			})
+			await db
+				.insert(teacherToCourse)
+				.values({
+					teacherEmail: email,
+					courseId: id,
+				})
+				.onDuplicateKeyUpdate({ set: { teacherEmail: email } })
 		}
 
 		if (role === "student") {
-			await db.insert(studentToCourse).values({
-				studentEmail: email,
-				courseId: id,
-			})
+			await db
+				.insert(studentToCourse)
+				.values({
+					studentEmail: email,
+					courseId: id,
+				})
+				.onDuplicateKeyUpdate({ set: { studentEmail: email } })
 		}
 	},
 	removeFromCourse: async ({
@@ -136,6 +142,34 @@ const User = ({ email }: { email: string }) => ({
 					)
 				)
 		}
+	},
+	courseRole: async ({ id }: { id: string }) => {
+		const [teacherRow, studentRow] = await Promise.all([
+			db
+				.select({ id: teacherToCourse.courseId })
+				.from(teacherToCourse)
+				.where(
+					and(
+						eq(teacherToCourse.courseId, id),
+						eq(teacherToCourse.teacherEmail, email)
+					)
+				),
+			db
+				.select({ id: studentToCourse.courseId })
+				.from(studentToCourse)
+				.where(
+					and(
+						eq(studentToCourse.courseId, id),
+						eq(studentToCourse.studentEmail, email)
+					)
+				),
+		])
+
+		if (teacherRow !== undefined) return "teacher" as const
+
+		if (studentRow !== undefined) return "student" as const
+
+		return "none" as const
 	},
 })
 

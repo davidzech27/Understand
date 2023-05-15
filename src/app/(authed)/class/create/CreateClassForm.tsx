@@ -14,6 +14,7 @@ import Avatar from "~/components/Avatar"
 import authenticateWithGoogle from "~/google/authenticateWithGoogle"
 import Row from "~/components/Row"
 import createCourseAction from "./createCourseAction"
+import { useRouter } from "next/navigation"
 
 interface Props {
 	coursesPromise: Promise<
@@ -33,16 +34,27 @@ const CreateClassForm: React.FC<Props> = ({
 	coursesPromise,
 	courseRostersPromise,
 }) => {
+	const router = useRouter()
+
 	const { mutate: createCourse, isLoading: isCreatingCourse } =
 		useZact(createCourseAction)
 
-	const onCreate = () => {
-		createCourse({
-			name: classNameInput,
-			section: classSectionInput,
+	const onCreate = async () => {
+		const id =
+			new Date().valueOf().toString() +
+			Math.floor(Math.random() * 1_000_000).toString() // milliseconds after epoch appended by 6 random digits
+
+		await createCourse({
+			id,
+			name: classNameInput.trim(),
+			section: classSectionInput.trim(),
 			additionalTeacherEmails: additionalTeacherEmailListInputs,
 			studentEmails: studentEmailListInputs,
 		})
+
+		router.refresh()
+
+		router.push(`/class/${id}`)
 	}
 
 	const onImport = async () => {
@@ -127,7 +139,11 @@ const CreateClassForm: React.FC<Props> = ({
 	return (
 		<>
 			<Form.Root
-				onSubmit={onCreate}
+				onSubmit={(e) => {
+					e.preventDefault()
+
+					onCreate()
+				}}
 				className="flex h-full flex-col space-y-2.5"
 			>
 				<Card className="space-y-2 px-6 py-5 shadow-sm">
@@ -199,18 +215,15 @@ const CreateClassForm: React.FC<Props> = ({
 						Import class
 					</Button>
 
-					<FancyButton
-						onClick={(e) => {
-							e.preventDefault()
-
-							onCreate()
-						}}
-						loading={isCreatingCourse}
-						disabled={classNameInput.length === 0}
-						className="h-20 w-1/2 text-3xl"
-					>
-						Create
-					</FancyButton>
+					<Form.Submit asChild>
+						<FancyButton
+							loading={isCreatingCourse}
+							disabled={classNameInput.length === 0}
+							className="h-20 w-1/2 text-3xl"
+						>
+							Create
+						</FancyButton>
+					</Form.Submit>
 				</Card>
 			</Form.Root>
 

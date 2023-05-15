@@ -26,7 +26,7 @@ const Button: React.FC<Props> = ({
 			onClick={onClick}
 			disabled={disabled}
 			className={cn(
-				"rounded-md bg-surface-selected py-2.5 px-6 text-lg font-medium outline-none transition-all duration-150",
+				"rounded-md bg-surface-selected py-2.5 px-6 text-2xl font-medium outline-none transition-all duration-150",
 				disabled
 					? "opacity-40"
 					: "opacity-60 hover:bg-surface-selected-hover hover:opacity-80 focus-visible:bg-surface-selected-hover focus-visible:opacity-80",

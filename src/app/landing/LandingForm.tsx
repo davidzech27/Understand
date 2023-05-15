@@ -34,7 +34,7 @@ const LandingForm: React.FC<Props> = (props) => {
 	const onGo = () => {
 		if (!profile) return
 
-		updateName({ name: nameInput })
+		updateName({ name: nameInput.trim() })
 
 		H.identify(profile.email, {
 			name: nameInput,
