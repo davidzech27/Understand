@@ -39,9 +39,9 @@ const CreateAssignmentForm: React.FC<Props> = ({ coursesTeachingPromise }) => {
 		await createAssignment({
 			courseId,
 			assignmentId: id,
-			title: titleInput,
-			instructions: instructionsInput,
-			studentDescription: studentDescriptionInput,
+			title: titleInput.trim(),
+			instructions: instructionsInput.trim(),
+			studentDescription: studentDescriptionInput.trim() || undefined,
 		})
 
 		router.refresh()

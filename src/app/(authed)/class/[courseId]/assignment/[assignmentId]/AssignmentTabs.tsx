@@ -58,7 +58,7 @@ const AssignmentTabs: React.FC<Props> = ({ assignment }) => {
 			courseId: assignment.courseId,
 			assignmentId: assignment.assignmentId,
 			title: titleInput.trim(),
-			studentDescription: studentDescriptionInput.trim(),
+			studentDescription: studentDescriptionInput.trim() || undefined,
 			instructions: instructionsInput.trim(),
 		})
 

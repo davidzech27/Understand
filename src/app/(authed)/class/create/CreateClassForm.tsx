@@ -49,7 +49,7 @@ const CreateClassForm: React.FC<Props> = ({
 		await createCourse({
 			id,
 			name: nameInput.trim(),
-			section: sectionInput.trim(),
+			section: sectionInput.trim() || undefined,
 			additionalTeacherEmails: additionalTeacherEmailListInputs,
 			studentEmails: studentEmailListInputs,
 			googleClassroomId: importedCourse?.id,

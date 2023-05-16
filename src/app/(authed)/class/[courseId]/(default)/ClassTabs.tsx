@@ -44,7 +44,7 @@ const ClassTabs: React.FC<Props> = ({ course, role }) => {
 		await updateCourse({
 			id: course.id,
 			name: nameInput.trim(),
-			section: sectionInput.trim(),
+			section: sectionInput.trim() || undefined,
 		})
 
 		setSettingsModalOpen(false)
