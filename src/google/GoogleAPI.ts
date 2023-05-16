@@ -12,6 +12,7 @@ const courseSchema = z.object({
 	id: z.string(),
 	name: z.string(),
 	section: z.string().optional(),
+	url: z.string().url(),
 })
 
 const courseListSchema = courseSchema.array()
@@ -93,9 +94,14 @@ const GoogleAPI = async ({
 						},
 					}
 				)
-			).json()) as { courses: unknown }
+			).json()) as { courses: (unknown & { alternateLink: unknown })[] }
 
-			return courseListSchema.parse(courses)
+			return courseListSchema.parse(
+				courses.map((course) => ({
+					...course,
+					url: course.alternateLink,
+				}))
+			)
 		},
 		coursesEnrolled: async () => {
 			const { courses } = (await (
@@ -107,9 +113,14 @@ const GoogleAPI = async ({
 						},
 					}
 				)
-			).json()) as { courses: unknown }
+			).json()) as { courses: (unknown & { alternateLink: unknown })[] }
 
-			return courseListSchema.parse(courses)
+			return courseListSchema.parse(
+				courses.map((course) => ({
+					...course,
+					url: course.alternateLink,
+				}))
+			)
 		},
 		courseRoster: async ({ courseId }: { courseId: string }) => {
 			const [{ teachers }, { students }] = (await Promise.all([

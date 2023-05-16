@@ -1,4 +1,3 @@
-import { sql } from "drizzle-orm"
 import {
 	mysqlTable,
 	varchar,
@@ -6,7 +5,6 @@ import {
 	datetime,
 	text,
 	uniqueIndex,
-	json,
 } from "drizzle-orm/mysql-core"
 
 export const user = mysqlTable("user", {
@@ -49,6 +47,7 @@ export const course = mysqlTable("course", {
 	id: varchar("id", { length: 100 }).primaryKey(),
 	name: text("name").notNull(),
 	section: text("section"),
+	googleClassroomId: varchar("google_classroom_id", { length: 100 }),
 })
 
 export const assignment = mysqlTable(

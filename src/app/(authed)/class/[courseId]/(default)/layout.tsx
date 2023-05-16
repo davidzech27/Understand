@@ -2,22 +2,22 @@ import { notFound } from "next/navigation"
 import { cookies } from "next/headers"
 
 import colors from "~/colors.cjs"
-import SegmentTabs from "./SegmentTabs"
+import ClassTabs from "./ClassTabs"
 import Card from "~/components/Card"
 import User from "~/data/User"
 import Course from "~/data/Course"
 import { getAuthOrThrow } from "~/auth/jwt"
 
 interface Params {
-	id: string
+	courseId: string
 }
 
 export const generateMetadata = async ({
-	params: { id },
+	params: { courseId },
 }: {
 	params: Params
 }) => {
-	const name = (await Course({ id }).get())?.name
+	const name = (await Course({ id: courseId }).get())?.name
 
 	return {
 		template: `%s | ${name}`,
@@ -27,15 +27,15 @@ export const generateMetadata = async ({
 
 const ClassLayout = async ({
 	children,
-	params: { id },
+	params: { courseId },
 }: {
 	children: React.ReactNode
 	params: Params
 }) => {
 	const [course, role] = await Promise.all([
-		Course({ id }).get(),
+		Course({ id: courseId }).get(),
 		getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
-			User({ email }).courseRole({ id })
+			User({ email }).courseRole({ id: courseId })
 		),
 	])
 
@@ -64,7 +64,7 @@ const ClassLayout = async ({
 					)}
 				</div>
 
-				<SegmentTabs course={course} role={role} />
+				<ClassTabs course={course} role={role} />
 			</Card>
 
 			{children}

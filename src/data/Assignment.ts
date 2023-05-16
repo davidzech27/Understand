@@ -73,10 +73,12 @@ const Assignment = ({
 		await db
 			.update(assignment)
 			.set({
-				title,
-				instructions,
-				studentDescription,
-				dueAt,
+				...(title !== undefined ? { title } : {}),
+				...(instructions !== undefined ? { instructions } : {}),
+				...(studentDescription !== undefined
+					? { studentDescription }
+					: {}),
+				...(dueAt !== undefined ? { dueAt } : {}),
 			})
 			.where(
 				and(

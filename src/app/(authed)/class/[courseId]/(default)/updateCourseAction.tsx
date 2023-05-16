@@ -19,7 +19,7 @@ const updateCourseAction = zact(
 	const role = await User({ email }).courseRole({ id })
 
 	if (role !== "teacher") return
-	console.log({ id, name, section })
+
 	await Course({ id }).update({ name, section })
 })
 

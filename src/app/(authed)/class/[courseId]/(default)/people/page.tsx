@@ -11,20 +11,20 @@ export const metadata = {
 }
 
 interface Params {
-	id: string
+	courseId: string
 }
 
-const PeoplePage = async ({ params: { id } }: { params: Params }) => {
+const PeoplePage = async ({ params: { courseId } }: { params: Params }) => {
 	const [role, roster] = await Promise.all([
 		getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
-			User({ email }).courseRole({ id })
+			User({ email }).courseRole({ id: courseId })
 		),
-		Course({ id }).roster(),
+		Course({ id: courseId }).roster(),
 	])
 
 	if (role === "none") notFound()
 
-	return <Roster courseId={id} role={role} roster={roster} />
+	return <Roster courseId={courseId} role={role} roster={roster} />
 }
 
 export default PeoplePage

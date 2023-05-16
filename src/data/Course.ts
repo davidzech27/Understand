@@ -13,16 +13,22 @@ const Course = ({ id }: { id: string }) => ({
 	create: async ({
 		name,
 		section,
+		googleClassroomId,
 	}: {
 		name: string
 		section: string | undefined
+		googleClassroomId: string | undefined
 	}) => {
-		await db.insert(course).values({ id, name, section })
+		await db.insert(course).values({ id, name, section, googleClassroomId })
 	},
 	get: async () => {
 		const row = (
 			await db
-				.select({ name: course.name, section: course.section })
+				.select({
+					name: course.name,
+					section: course.section,
+					googleClassroomId: course.googleClassroomId,
+				})
 				.from(course)
 				.where(eq(course.id, id))
 		)[0]
@@ -33,10 +39,28 @@ const Course = ({ id }: { id: string }) => ({
 			id,
 			name: row.name,
 			section: row.section ?? undefined,
+			googleClassroomId: row.googleClassroomId ?? undefined,
 		}
 	},
-	update: async ({ name, section }: { name?: string; section?: string }) => {
-		await db.update(course).set({ name, section }).where(eq(course.id, id))
+	update: async ({
+		name,
+		section,
+		googleClassroomId,
+	}: {
+		name?: string
+		section?: string
+		googleClassroomId?: string
+	}) => {
+		await db
+			.update(course)
+			.set({
+				...(name !== undefined ? { name } : {}),
+				...(section !== undefined ? { section } : {}),
+				...(googleClassroomId !== undefined
+					? { googleClassroomId }
+					: {}),
+			})
+			.where(eq(course.id, id))
 	},
 	delete: async () => {
 		await Promise.all([

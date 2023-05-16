@@ -33,14 +33,14 @@ const TopActions = () => {
 						>
 							<Link
 								href="/assignment/create"
-								className="relative flex h-14 w-60 items-center rounded-md border-[0.75px] border-primary transition-all duration-150 hover:bg-primary/10 data-[active]:bg-primary/10"
+								className="relative flex h-14 w-60 items-center rounded-md border-[0.75px] border-primary bg-primary/5 transition-all duration-150 hover:bg-primary/10 data-[active]:bg-primary/10"
 							>
 								<FilePlus2
 									size={18}
-									className="ml-6 opacity-90"
+									className="ml-6 text-primary opacity-80"
 								/>
 
-								<div className="ml-5 opacity-80">
+								<div className="ml-5 font-medium opacity-70">
 									Create assignment
 								</div>
 							</Link>
@@ -52,14 +52,14 @@ const TopActions = () => {
 						>
 							<Link
 								href="/class/create"
-								className="relative flex h-14 w-60 items-center rounded-md border-[0.75px] border-secondary transition-all duration-150 hover:bg-secondary/10 data-[active]:bg-secondary/10"
+								className="relative flex h-14 w-60 items-center rounded-md border-[0.75px] border-secondary bg-secondary/5 transition-all duration-150 hover:bg-secondary/10 data-[active]:bg-secondary/10"
 							>
 								<UserPlus
 									size={18}
-									className="ml-6 opacity-90"
+									className="ml-6 text-secondary opacity-80"
 								/>
 
-								<div className="ml-5 opacity-80">
+								<div className="ml-5 font-medium opacity-70">
 									Create class
 								</div>
 							</Link>

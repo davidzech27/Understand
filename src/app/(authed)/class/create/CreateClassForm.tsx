@@ -2,6 +2,7 @@
 import * as Form from "@radix-ui/react-form"
 import { use, useState } from "react"
 import { useZact } from "zact/client"
+import { X } from "lucide-react"
 
 import TextInput from "~/components/TextInput"
 import Card from "~/components/Card"
@@ -21,7 +22,8 @@ interface Props {
 		| {
 				name: string
 				id: string
-				section?: string | undefined
+				section?: string
+				url: string
 		  }[]
 		| undefined
 	>
@@ -46,10 +48,11 @@ const CreateClassForm: React.FC<Props> = ({
 
 		await createCourse({
 			id,
-			name: classNameInput.trim(),
-			section: classSectionInput.trim(),
+			name: nameInput.trim(),
+			section: sectionInput.trim(),
 			additionalTeacherEmails: additionalTeacherEmailListInputs,
 			studentEmails: studentEmailListInputs,
+			googleClassroomId: importedCourse?.id,
 		})
 
 		router.refresh()
@@ -81,6 +84,13 @@ const CreateClassForm: React.FC<Props> = ({
 
 	const [courseLoading, setCourseLoading] = useState(false)
 
+	const [importedCourse, setImportedCourse] = useState<{
+		id: string
+		name: string
+		section?: string
+		url: string
+	}>()
+
 	const onChooseClass = async () => {
 		setCourseLoading(true)
 
@@ -99,19 +109,32 @@ const CreateClassForm: React.FC<Props> = ({
 
 		if (!course || !roster) return
 
-		setClassNameInput(course.name)
+		setNameInput(course.name)
 
-		course.section && setClassSectionInput(course.section)
+		course.section && setSectionInput(course.section)
 
 		setAdditionalTeacherEmailListInputs(roster.teachers)
 
 		setStudentEmailListInputs(roster.students)
 
+		setImportedCourse(course)
+
 		setImportClassModalOpen(false)
+
+		setSelectedCourseId(undefined)
 	}
 
-	const [classNameInput, setClassNameInput] = useState("")
-	const [classSectionInput, setClassSectionInput] = useState("")
+	const onUnimport = () => {
+		setNameInput("")
+		setSectionInput("")
+		setStudentEmailListInputs([""])
+		setAdditionalTeacherEmailListInputs([""])
+
+		setImportedCourse(undefined)
+	}
+
+	const [nameInput, setNameInput] = useState("")
+	const [sectionInput, setSectionInput] = useState("")
 	const [studentEmailListInputs, setStudentEmailListInputs] = useState<
 		string[]
 	>([""])
@@ -152,8 +175,8 @@ const CreateClassForm: React.FC<Props> = ({
 					<Form.Field asChild name="class-name">
 						<Form.Control asChild>
 							<TextInput
-								value={classNameInput}
-								setValue={setClassNameInput}
+								value={nameInput}
+								setValue={setNameInput}
 								placeholder="Class name"
 								autoFocus
 								className="h-min py-2.5 pl-4 text-base"
@@ -166,8 +189,8 @@ const CreateClassForm: React.FC<Props> = ({
 					<Form.Field asChild name="class-section">
 						<Form.Control asChild>
 							<TextInput
-								value={classSectionInput}
-								setValue={setClassSectionInput}
+								value={sectionInput}
+								setValue={setSectionInput}
 								placeholder="Section (optional)"
 								className="h-min py-2.5 pl-4 text-base"
 							/>
@@ -204,21 +227,62 @@ const CreateClassForm: React.FC<Props> = ({
 				</Card>
 
 				<Card className="flex space-x-3 py-5 px-6 shadow-sm">
-					<Button
-						onClick={(e) => {
-							e.preventDefault()
+					{importedCourse ? (
+						<div className="relative flex h-20 w-1/2 items-center space-x-3 rounded-md border-[0.75px] border-border px-6">
+							<Avatar
+								src={undefined}
+								name={importedCourse.name}
+								fallbackColor="secondary"
+								className="h-12 w-12"
+							/>
 
-							onImport()
-						}}
-						className="h-20 w-1/2 text-3xl"
-					>
-						Import class
-					</Button>
+							<div className="flex flex-1 flex-col space-y-0.5">
+								<div className="flex w-full justify-between">
+									<span className="text-sm opacity-80">
+										{importedCourse.name}
+									</span>
+
+									<span className="relative top-[2px] text-xs opacity-60">
+										{importedCourse.section}
+									</span>
+								</div>
+
+								<a
+									href={importedCourse.url}
+									className="text-xs opacity-60 hover:underline"
+								>
+									{importedCourse.url}
+								</a>
+							</div>
+
+							<button
+								type="button"
+								onClick={onUnimport}
+								className="group absolute -top-1.5 -right-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full border-[0.75px] border-border bg-surface-selected transition-all duration-150 hover:bg-surface-selected-hover"
+							>
+								<X
+									size={14}
+									className="text-black opacity-40 transition-all duration-150 group-hover:opacity-60"
+								/>
+							</button>
+						</div>
+					) : (
+						<Button
+							onClick={(e) => {
+								e.preventDefault()
+
+								onImport()
+							}}
+							className="h-20 w-1/2 text-3xl"
+						>
+							Import class
+						</Button>
+					)}
 
 					<Form.Submit asChild>
 						<FancyButton
 							loading={isCreatingCourse}
-							disabled={classNameInput.length === 0}
+							disabled={nameInput.length === 0}
 							className="h-20 w-1/2 text-3xl"
 						>
 							Create

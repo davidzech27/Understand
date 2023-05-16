@@ -19,22 +19,19 @@ interface Props {
 	role: "teacher" | "student"
 }
 
-const SegmentTabs: React.FC<Props> = ({ course, role }) => {
+const ClassTabs: React.FC<Props> = ({ course, role }) => {
 	const segment = useSelectedLayoutSegment()
 
 	const router = useRouter()
 
 	const [settingsModalOpen, setSettingsModalOpen] = useState(false)
 
-	const [classNameInput, setClassNameInput] = useState(course.name)
-	const [classSectionInput, setClassSectionInput] = useState(
-		course.section ?? ""
-	)
+	const [nameInput, setNameInput] = useState(course.name)
+	const [sectionInput, setSectionInput] = useState(course.section ?? "")
 
 	const updateDisabled =
-		(classNameInput === course.name &&
-			classSectionInput === course.section) ||
-		classNameInput.trim().length === 0
+		(nameInput === course.name && sectionInput === course.section) ||
+		nameInput.trim().length === 0
 
 	const [confirmingDeleteClass, setConfirmingDeleteClass] = useState(false)
 
@@ -46,8 +43,8 @@ const SegmentTabs: React.FC<Props> = ({ course, role }) => {
 
 		await updateCourse({
 			id: course.id,
-			name: classNameInput.trim(),
-			section: classSectionInput.trim(),
+			name: nameInput.trim(),
+			section: sectionInput.trim(),
 		})
 
 		setSettingsModalOpen(false)
@@ -145,8 +142,8 @@ const SegmentTabs: React.FC<Props> = ({ course, role }) => {
 						<div className="ml-1 font-medium opacity-80">Name</div>
 
 						<TextInput
-							value={classNameInput}
-							setValue={setClassNameInput}
+							value={nameInput}
+							setValue={setNameInput}
 							placeholder="Class name"
 							className="py-2.5 pl-4 text-base"
 						/>
@@ -156,8 +153,8 @@ const SegmentTabs: React.FC<Props> = ({ course, role }) => {
 						</div>
 
 						<TextInput
-							value={classSectionInput ?? ""}
-							setValue={setClassSectionInput}
+							value={sectionInput}
+							setValue={setSectionInput}
 							placeholder="Class section"
 							className="py-2.5 pl-4 text-base"
 						/>
@@ -184,15 +181,17 @@ const SegmentTabs: React.FC<Props> = ({ course, role }) => {
 										Do you really want to delete this class?
 									</Button>
 
-									<Button
-										onClick={() =>
-											setConfirmingDeleteClass(false)
-										}
-										type="button"
-										className="text-lg"
-									>
-										Actually, never mind
-									</Button>
+									{!isDeletingCourse && (
+										<Button
+											onClick={() =>
+												setConfirmingDeleteClass(false)
+											}
+											type="button"
+											className="text-lg"
+										>
+											Actually, never mind
+										</Button>
+									)}
 								</>
 							)}
 						</div>
@@ -223,4 +222,4 @@ const SegmentTabs: React.FC<Props> = ({ course, role }) => {
 	)
 }
 
-export default SegmentTabs
+export default ClassTabs

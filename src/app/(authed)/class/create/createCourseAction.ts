@@ -19,24 +19,34 @@ const createCourseAction = zact(
 		section: z.string().min(1).optional(),
 		additionalTeacherEmails: z.string().array(),
 		studentEmails: z.string().array(),
+		googleClassroomId: z.string().optional(),
 	})
-)(async ({ id, name, section, additionalTeacherEmails, studentEmails }) => {
-	const { email } = await getAuthOrThrow({ cookies: cookies() })
+)(
+	async ({
+		id,
+		name,
+		section,
+		additionalTeacherEmails,
+		studentEmails,
+		googleClassroomId,
+	}) => {
+		const { email } = await getAuthOrThrow({ cookies: cookies() })
 
-	additionalTeacherEmails = additionalTeacherEmails.filter(isEmailValid)
+		additionalTeacherEmails = additionalTeacherEmails.filter(isEmailValid)
 
-	studentEmails = studentEmails.filter(isEmailValid)
+		studentEmails = studentEmails.filter(isEmailValid)
 
-	await Promise.all([
-		Course({ id }).create({ name, section }),
-		User({ email }).addToCourse({ id, role: "teacher" }),
-		additionalTeacherEmails.map((email) =>
-			User({ email }).addToCourse({ id, role: "teacher" })
-		),
-		studentEmails.map((email) =>
-			User({ email }).addToCourse({ id, role: "student" })
-		),
-	])
-})
+		await Promise.all([
+			Course({ id }).create({ name, section, googleClassroomId }),
+			User({ email }).addToCourse({ id, role: "teacher" }),
+			additionalTeacherEmails.map((email) =>
+				User({ email }).addToCourse({ id, role: "teacher" })
+			),
+			studentEmails.map((email) =>
+				User({ email }).addToCourse({ id, role: "student" })
+			),
+		])
+	}
+)
 
 export default createCourseAction

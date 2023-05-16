@@ -8,7 +8,7 @@ import { getAuthOrThrow } from "~/auth/jwt"
 import Avatar from "~/components/Avatar"
 
 interface Params {
-	id: string
+	courseId: string
 	email: string
 }
 
@@ -27,7 +27,7 @@ export const generateMetadata = async ({
 
 const StudentLayout = async ({
 	children,
-	params: { id, email },
+	params: { courseId, email },
 }: {
 	children: React.ReactNode
 	params: Params
@@ -37,7 +37,7 @@ const StudentLayout = async ({
 	const [student, role] = await Promise.all([
 		User({ email }).get(),
 		getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
-			User({ email }).courseRole({ id })
+			User({ email }).courseRole({ id: courseId })
 		),
 	])
 

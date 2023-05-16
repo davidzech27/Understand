@@ -43,6 +43,8 @@ const LandingForm: React.FC<Props> = (props) => {
 
 		localStorage.setItem("hightlight-identified", "true") // weird system but probably just a temporary measure
 
+		router.refresh()
+
 		router.push("/home")
 	}
 

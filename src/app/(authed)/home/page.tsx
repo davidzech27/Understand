@@ -30,7 +30,7 @@ const HomePage = async () => {
 						</div>
 					</>
 				) : (
-					<span className="font-medium italic opacity-60">
+					<span className="italic opacity-60">
 						Home view coming soon...
 					</span>
 				)}
