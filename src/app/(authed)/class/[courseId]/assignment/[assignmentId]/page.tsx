@@ -41,7 +41,7 @@ const AssignmentPage = async ({
 	if (role !== "teacher" || assignment === undefined) notFound()
 
 	return (
-		<div className="flex flex-col space-y-2.5">
+		<div className="-mr-2 flex flex-col space-y-2.5 overflow-y-scroll">
 			<Card className="flex flex-col py-5 px-6">
 				<div className="flex items-baseline justify-between">
 					<span

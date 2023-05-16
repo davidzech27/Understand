@@ -16,7 +16,7 @@ const HomePage = async () => {
 	)
 
 	return (
-		<Card className="flex h-full flex-col justify-between border shadow-lg">
+		<Card className="-mr-2 flex h-full flex-col justify-between overflow-y-scroll border shadow-lg">
 			<div className="py-5 px-6">
 				{courses.teaching.length === 0 &&
 				courses.enrolled.length === 0 ? (

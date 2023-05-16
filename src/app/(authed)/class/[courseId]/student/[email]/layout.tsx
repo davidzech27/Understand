@@ -44,7 +44,7 @@ const StudentLayout = async ({
 	if (student === undefined || role !== "teacher") notFound()
 
 	return (
-		<div className="flex h-full flex-col space-y-2.5 overflow-y-scroll">
+		<div className="-mr-2 flex h-full flex-col space-y-2.5 overflow-y-scroll">
 			<Card className="flex items-center py-5 px-6">
 				<Avatar
 					src={student.photo}

@@ -42,7 +42,7 @@ const ClassLayout = async ({
 	if (course === undefined || role === "none") notFound()
 
 	return (
-		<div className="flex h-full flex-col space-y-2.5 overflow-y-scroll">
+		<div className="-mr-2 flex h-full flex-col space-y-2.5 overflow-y-scroll">
 			<Card className="flex flex-col justify-between py-5 px-6">
 				<div className="flex items-baseline justify-between">
 					<span
