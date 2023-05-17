@@ -18,7 +18,8 @@ interface Props {
 		assignmentId: string
 		title: string
 		studentDescription?: string
-		instructions: string
+		instructions?: string
+		context?: string
 		dueAt?: Date
 	}
 }
@@ -33,7 +34,7 @@ const AssignmentTabs: React.FC<Props> = ({ assignment }) => {
 		assignment.studentDescription ?? ""
 	)
 	const [instructionsInput, setInstructionsInput] = useState(
-		assignment.instructions
+		assignment.instructions ?? ""
 	)
 
 	const [feedbackLinkCopied, setFeedbackLinkCopied] = useState(false)

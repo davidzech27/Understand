@@ -13,21 +13,21 @@ const Course = ({ id }: { id: string }) => ({
 	create: async ({
 		name,
 		section,
-		googleClassroomId,
+		linkedUrl,
 	}: {
 		name: string
 		section: string | undefined
-		googleClassroomId: string | undefined
+		linkedUrl: string | undefined
 	}) => {
-		await db.insert(course).values({ id, name, section, googleClassroomId })
+		await db.insert(course).values({ id, name, section, linkedUrl })
 	},
 	get: async () => {
 		const row = (
 			await db
 				.select({
+					linkedUrl: course.linkedUrl, // I have no idea why but this query fails when linkedUrl is last column
 					name: course.name,
 					section: course.section,
-					googleClassroomId: course.googleClassroomId,
 				})
 				.from(course)
 				.where(eq(course.id, id))
@@ -39,14 +39,16 @@ const Course = ({ id }: { id: string }) => ({
 			id,
 			name: row.name,
 			section: row.section ?? undefined,
-			googleClassroomId: row.googleClassroomId ?? undefined,
+			linkedUrl: row.linkedUrl ?? undefined,
 		}
 	},
+
 	update: async ({
 		name,
 		section,
 		googleClassroomId,
-	}: {
+	}: // linkedUrl can't be changed yet, and I'm not sure if it ever will be able to be
+	{
 		name?: string
 		section?: string
 		googleClassroomId?: string
@@ -124,9 +126,11 @@ const Course = ({ id }: { id: string }) => ({
 			courseId: assignment.courseId,
 			assignmentId: assignment.assignmentId,
 			title: assignment.title,
-			instructions: assignment.instructions,
 			studentDescription: assignment.studentDescription ?? undefined,
+			instructions: assignment.instructions ?? undefined,
+			context: assignment.context ?? undefined,
 			dueAt: assignment.dueAt ?? undefined,
+			linkedUrl: assignment.linkedUrl ?? undefined,
 		}))
 	},
 })

@@ -160,7 +160,10 @@ const GoogleAPI = async ({
 					}[]
 				}
 			]
-
+			console.log({
+				teachers: teachers.map((teacher) => teacher.profile),
+				students: students.map((student) => student.profile),
+			})
 			return rosterSchema.parse({
 				teachers: teachers.map((teacher) => ({
 					email: teacher.profile.emailAddress,

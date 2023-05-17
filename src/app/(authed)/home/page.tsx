@@ -21,13 +21,9 @@ const HomePage = async () => {
 				{courses.teaching.length === 0 &&
 				courses.enrolled.length === 0 ? (
 					<>
-						<div className="text-5xl font-medium text-black opacity-80">
-							Welcome to Understand!
-						</div>
-
-						<div className="mt-2 ml-1 text-xl text-black opacity-60">
-							First, either create or join a class
-						</div>
+						<span className="italic opacity-60">
+							Home view coming soon...
+						</span>
 					</>
 				) : (
 					<span className="italic opacity-60">

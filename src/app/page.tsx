@@ -1,7 +1,8 @@
+import Link from "next/link"
+
 import ReviewScroller from "./ReviewScroller"
 import colors from "~/colors.cjs"
 import { env } from "~/env.mjs"
-import GetStartedLink from "./GetStartedLink"
 import FancyButton from "~/components/FancyButton"
 
 export const metadata = {
@@ -10,7 +11,7 @@ export const metadata = {
 		"The personalized educational content and student insight platform",
 }
 
-const IndexPage = () => {
+const IndexPage = async () => {
 	return (
 		<>
 			<main className="flex w-screen flex-col bg-white">
@@ -36,11 +37,24 @@ const IndexPage = () => {
 						</p>
 
 						<div className="flex flex-col space-x-0 space-y-4 text-center sm:flex-row sm:items-center sm:space-y-0 sm:space-x-9">
-							<GetStartedLink>
-								<FancyButton className="px-12 text-2xl">
-									Get started
-								</FancyButton>
-							</GetStartedLink>
+							<div className="h-16">
+								<Link
+									href={
+										typeof localStorage !== "undefined" &&
+										localStorage.getItem("landed") ===
+											"true"
+											? "/home"
+											: "/signIn"
+									}
+									legacyBehavior
+								>
+									<a>
+										<FancyButton className="px-12 text-2xl">
+											Get started
+										</FancyButton>
+									</a>
+								</Link>
+							</div>
 
 							<a
 								href={env.NEXT_PUBLIC_LEARN_MORE_URL}

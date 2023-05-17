@@ -25,10 +25,19 @@ const ClassCreatePage = async () => {
 				"https://www.googleapis.com/auth/classroom.rosters.readonly"
 			) ||
 			!googleScopes.includes(
-				"https://www.googleapis.com/auth/userinfo.email"
+				"https://www.googleapis.com/auth/classroom.profile.emails"
 			) ||
 			!googleScopes.includes(
-				"https://www.googleapis.com/auth/userinfo.profile"
+				"https://www.googleapis.com/auth/classroom.profile.photos"
+			) ||
+			!googleScopes.includes(
+				"https://www.googleapis.com/auth/classroom.student-submissions.students.readonly"
+			) ||
+			!googleScopes.includes(
+				"https://www.googleapis.com/auth/drive.readonly"
+			) ||
+			!googleScopes.includes(
+				"https://www.googleapis.com/auth/classroom.push-notifications"
 			)
 				? undefined
 				: GoogleAPI({

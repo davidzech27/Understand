@@ -8,6 +8,7 @@ import Card from "~/components/Card"
 import AssignmentTabs from "./AssignmentTabs"
 import colors from "~/colors.cjs"
 import formatDate from "~/utils/formatDate"
+import cn from "~/utils/cn"
 
 export const generateMetadata = async ({
 	params: { courseId, assignmentId },
@@ -43,7 +44,15 @@ const AssignmentPage = async ({
 	return (
 		<div className="-mr-2 flex flex-col space-y-2.5 overflow-y-scroll">
 			<Card className="flex flex-col py-5 px-6">
-				<div className="flex items-baseline justify-between">
+				<a
+					href={assignment.linkedUrl}
+					target="_blank"
+					className={cn(
+						"flex items-baseline justify-between",
+						assignment.linkedUrl !== undefined &&
+							"transition-all duration-150 hover:opacity-80"
+					)}
+				>
 					<span
 						style={{
 							background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`,
@@ -60,7 +69,7 @@ const AssignmentPage = async ({
 							? `Due ${formatDate(assignment.dueAt)}`
 							: "No due date"}
 					</span>
-				</div>
+				</a>
 
 				<p className="select-text px-1 text-sm opacity-80">
 					{assignment.studentDescription}

@@ -1,8 +1,8 @@
 "use client"
-import { useState, useTransition, use } from "react"
+import { useState, use } from "react"
 import { useRouter } from "next/navigation"
-import { H } from "highlight.run"
 import * as Form from "@radix-ui/react-form"
+import * as Sentry from "@sentry/nextjs"
 import { useZact } from "zact/client"
 
 import TextInput from "~/components/TextInput"
@@ -31,17 +31,20 @@ const LandingForm: React.FC<Props> = (props) => {
 
 	const router = useRouter()
 
-	const onGo = () => {
+	const onGo = async () => {
 		if (!profile) return
 
 		updateName({ name: nameInput.trim() })
 
-		H.identify(profile.email, {
-			name: nameInput,
-			...(profile.photo ? { avatar: profile.photo } : {}),
+		Sentry.setUser({
+			id: profile.email,
+			email: profile.email,
+			username: profile.name,
 		})
 
-		localStorage.setItem("hightlight-identified", "true") // weird system but probably just a temporary measure
+		await Sentry.flush()
+
+		localStorage.setItem("landed", "true")
 
 		router.refresh()
 

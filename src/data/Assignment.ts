@@ -1,4 +1,5 @@
 import { eq, and } from "drizzle-orm/expressions"
+import { LucideUnlink } from "lucide-react"
 
 import db from "~/db/db"
 import { assignment } from "~/db/schema"
@@ -12,22 +13,28 @@ const Assignment = ({
 }) => ({
 	create: async ({
 		title,
-		instructions,
 		studentDescription,
+		instructions,
+		context,
 		dueAt,
+		linkedUrl,
 	}: {
 		title: string
-		instructions: string
-		studentDescription?: string
-		dueAt?: Date
+		studentDescription: string | undefined
+		instructions: string | undefined
+		context: string | undefined
+		dueAt: Date | undefined
+		linkedUrl: string | undefined
 	}) => {
 		await db.insert(assignment).values({
 			courseId,
 			assignmentId,
 			title,
-			instructions,
 			studentDescription,
+			instructions,
+			context,
 			dueAt,
+			linkedUrl,
 		})
 	},
 	get: async () => {
@@ -35,9 +42,11 @@ const Assignment = ({
 			await db
 				.select({
 					title: assignment.title,
-					instructions: assignment.instructions,
 					studentDescription: assignment.studentDescription,
+					instructions: assignment.instructions,
+					context: assignment.context,
 					dueAt: assignment.dueAt,
+					linkedUrl: assignment.linkedUrl,
 				})
 				.from(assignment)
 				.where(
@@ -54,30 +63,35 @@ const Assignment = ({
 			courseId,
 			assignmentId,
 			title: row.title,
-			instructions: row.instructions,
 			studentDescription: row.studentDescription ?? undefined,
+			instructions: row.instructions ?? undefined,
+			context: row.context ?? undefined,
 			dueAt: row.dueAt ?? undefined,
 		}
 	},
 	update: async ({
 		title,
-		instructions,
 		studentDescription,
+		instructions,
+		context,
 		dueAt,
 	}: {
 		title?: string
-		instructions?: string
 		studentDescription?: string
+		instructions?: string
+		context?: string
 		dueAt?: Date
+		// linkedUrl can't be changed'
 	}) => {
 		await db
 			.update(assignment)
 			.set({
 				...(title !== undefined ? { title } : {}),
-				...(instructions !== undefined ? { instructions } : {}),
 				...(studentDescription !== undefined
 					? { studentDescription }
 					: {}),
+				...(instructions !== undefined ? { instructions } : {}),
+				...(context !== undefined ? { context } : {}),
 				...(dueAt !== undefined ? { dueAt } : {}),
 			})
 			.where(

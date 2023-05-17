@@ -7,7 +7,6 @@ import {
 	forwardRef,
 } from "react"
 import { renderToStaticMarkup } from "react-dom/server"
-import { H } from "highlight.run"
 import { produce } from "immer"
 import { motion, AnimatePresence } from "framer-motion"
 import { useFocusWithin, useHover } from "react-aria"
@@ -28,9 +27,11 @@ interface Props {
 		courseId: string
 		assignmentId: string
 		title: string
-		studentDescription?: string
-		instructions: string
-		dueAt?: Date
+		studentDescription: string | undefined
+		instructions: string | undefined
+		context: string | undefined
+		dueAt: Date | undefined
+		linkedUrl: string | undefined
 	}
 	profileName: string
 	courseName: string
@@ -203,31 +204,32 @@ const Feedback: React.FC<Props> = ({ assignment, profileName, courseName }) => {
 						generalFeedback,
 					})
 
-					H.track("Feedback", {
-						courseId: assignment.courseId,
-						assignmentId: assignment.assignmentId,
-						model,
-						temperature,
-						presencePenalty,
-						frequencyPenalty,
-						messages: messages
-							.map(
-								(message) =>
-									`Role: ${message.role}\nContent: ${message.content}`
-							)
-							.join("\n\n\n"),
-						...(generatingStart
-							? {
-									secondsAnalyzing:
-										(generatingStart.valueOf() -
-											start.valueOf()) /
-										1000,
-							  }
-							: {}),
-						secondsGenerating:
-							(new Date().valueOf() - generatingStart.valueOf()) /
-							1000,
-					})
+					// todo - replace with server action that uploads to database
+					// H.track("Feedback", {
+					// 	courseId: assignment.courseId,
+					// 	assignmentId: assignment.assignmentId,
+					// 	model,
+					// 	temperature,
+					// 	presencePenalty,
+					// 	frequencyPenalty,
+					// 	messages: messages
+					// 		.map(
+					// 			(message) =>
+					// 				`Role: ${message.role}\nContent: ${message.content}`
+					// 		)
+					// 		.join("\n\n\n"),
+					// 	...(generatingStart
+					// 		? {
+					// 				secondsAnalyzing:
+					// 					(generatingStart.valueOf() -
+					// 						start.valueOf()) /
+					// 					1000,
+					// 		  }
+					// 		: {}),
+					// 	secondsGenerating:
+					// 		(new Date().valueOf() - generatingStart.valueOf()) /
+					// 		1000,
+					// })
 
 					console.debug(rawResponse)
 				},
@@ -338,22 +340,23 @@ const Feedback: React.FC<Props> = ({ assignment, profileName, courseName }) => {
 						})
 					)
 
-					H.track("Follow up", {
-						assignmentId: assignment.assignmentId,
-						courseId: assignment.courseId,
-						messages: messages
-							.map(
-								(message) =>
-									`Role: ${message.role}\nContent: ${message.content}`
-							)
-							.join("\n\n\n"),
-						model,
-						temperature,
-						presencePenalty,
-						frequencyPenalty,
-						secondsGenerating:
-							(new Date().valueOf() - start.valueOf()) / 1000,
-					})
+					// todo - replace with server action that uploads to database
+					// H.track("Follow up", {
+					// 	assignmentId: assignment.assignmentId,
+					// 	courseId: assignment.courseId,
+					// 	messages: messages
+					// 		.map(
+					// 			(message) =>
+					// 				`Role: ${message.role}\nContent: ${message.content}`
+					// 		)
+					// 		.join("\n\n\n"),
+					// 	model,
+					// 	temperature,
+					// 	presencePenalty,
+					// 	frequencyPenalty,
+					// 	secondsGenerating:
+					// 		(new Date().valueOf() - start.valueOf()) / 1000,
+					// })
 				},
 			})
 		}

@@ -60,7 +60,7 @@ const User = ({ email }: { email: string }) => ({
 					id: course.id,
 					name: course.name,
 					section: course.section,
-					teach: teacherToCourse.courseId,
+					linkedUrl: course.linkedUrl,
 				})
 				.from(teacherToCourse)
 				.innerJoin(course, eq(course.id, teacherToCourse.courseId))
@@ -70,6 +70,7 @@ const User = ({ email }: { email: string }) => ({
 					id: course.id,
 					name: course.name,
 					section: course.section,
+					linkedUrl: course.linkedUrl,
 				})
 				.from(studentToCourse)
 				.innerJoin(course, eq(course.id, studentToCourse.courseId))
@@ -80,10 +81,12 @@ const User = ({ email }: { email: string }) => ({
 			teaching: teaching.map((course) => ({
 				...course,
 				section: course.section ?? undefined,
+				linkedUrl: course.linkedUrl ?? undefined,
 			})),
 			enrolled: enrolled.map((course) => ({
 				...course,
 				section: course.section ?? undefined,
+				linkedUrl: course.linkedUrl ?? undefined,
 			})),
 		}
 	},

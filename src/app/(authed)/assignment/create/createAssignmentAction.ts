@@ -33,9 +33,11 @@ const createAssignmentAction = zact(
 
 		await Assignment({ courseId, assignmentId }).create({
 			title,
-			instructions,
 			studentDescription,
+			instructions,
+			context: undefined,
 			dueAt,
+			linkedUrl: undefined,
 		})
 	}
 )

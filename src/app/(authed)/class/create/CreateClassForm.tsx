@@ -9,7 +9,6 @@ import Card from "~/components/Card"
 import ListInput from "~/components/ListInput"
 import Button from "~/components/Button"
 import FancyButton from "~/components/FancyButton"
-import useStickyState from "~/utils/useStickyState"
 import Modal from "~/components/Modal"
 import Avatar from "~/components/Avatar"
 import authenticateWithGoogle from "~/google/authenticateWithGoogle"
@@ -43,16 +42,17 @@ const CreateClassForm: React.FC<Props> = ({
 
 	const onCreate = async () => {
 		const id =
+			linkedCourse?.id ??
 			new Date().valueOf().toString() +
-			Math.floor(Math.random() * 1_000_000).toString() // milliseconds after epoch appended by 6 random digits
+				Math.floor(Math.random() * 1_000_000).toString() // milliseconds after epoch appended by 6 random digits
 
 		await createCourse({
 			id,
 			name: nameInput.trim(),
 			section: sectionInput.trim() || undefined,
+			linkedUrl: linkedCourse?.url,
 			additionalTeacherEmails: additionalTeacherEmailListInputs,
 			studentEmails: studentEmailListInputs,
-			googleClassroomId: importedCourse?.id,
 		})
 
 		router.refresh()
@@ -60,31 +60,41 @@ const CreateClassForm: React.FC<Props> = ({
 		router.push(`/class/${id}`)
 	}
 
-	const onImport = async () => {
+	const onLink = async () => {
 		const courses = await coursesPromise
 
 		if (courses === undefined) {
-			authenticateWithGoogle({
-				scopes: [
-					"https://www.googleapis.com/auth/classroom.courses.readonly",
-					"https://www.googleapis.com/auth/classroom.rosters.readonly",
-					"https://www.googleapis.com/auth/userinfo.email",
-					"https://www.googleapis.com/auth/userinfo.profile",
-				],
-				redirectTo: "/class/create",
-			})
+			setLinkClassExplanationModalOpen(true)
 		} else {
-			setImportClassModalOpen(true)
+			setLinkClassModalOpen(true)
 		}
 	}
 
-	const [importClassModalOpen, setImportClassModalOpen] = useState(false)
+	const onReauthenticate = () => {
+		authenticateWithGoogle({
+			scopes: [
+				"https://www.googleapis.com/auth/classroom.courses.readonly",
+				"https://www.googleapis.com/auth/classroom.rosters.readonly",
+				"https://www.googleapis.com/auth/classroom.profile.emails",
+				"https://www.googleapis.com/auth/classroom.profile.photos",
+				"https://www.googleapis.com/auth/classroom.student-submissions.students.readonly",
+				"https://www.googleapis.com/auth/drive.readonly",
+				"https://www.googleapis.com/auth/classroom.push-notifications",
+			],
+			redirectTo: "/class/create",
+		})
+	}
+
+	const [linkClassModalOpen, setLinkClassModalOpen] = useState(false)
+
+	const [linkClassExplanationModalOpen, setLinkClassExplanationModalOpen] =
+		useState(false)
 
 	const [selectedCourseId, setSelectedCourseId] = useState<string>() // perhaps extract behavior to separate component
 
 	const [courseLoading, setCourseLoading] = useState(false)
 
-	const [importedCourse, setImportedCourse] = useState<{
+	const [linkedCourse, setLinkedCourse] = useState<{
 		id: string
 		name: string
 		section?: string
@@ -117,20 +127,20 @@ const CreateClassForm: React.FC<Props> = ({
 
 		setStudentEmailListInputs(roster.students)
 
-		setImportedCourse(course)
+		setLinkedCourse(course)
 
-		setImportClassModalOpen(false)
+		setLinkClassModalOpen(false)
 
 		setSelectedCourseId(undefined)
 	}
 
-	const onUnimport = () => {
+	const onUnlink = () => {
 		setNameInput("")
 		setSectionInput("")
 		setStudentEmailListInputs([""])
 		setAdditionalTeacherEmailListInputs([""])
 
-		setImportedCourse(undefined)
+		setLinkedCourse(undefined)
 	}
 
 	const [nameInput, setNameInput] = useState("")
@@ -143,22 +153,6 @@ const CreateClassForm: React.FC<Props> = ({
 		setAdditionalTeacherEmailListInputs,
 	] = useState<string[]>([""])
 
-	//! not sure why not working but should attempt to fix soon
-	// const [classNameInput, setClassNameInput] = useStickyState(
-	// 	"",
-	// 	"class:create:classNameInput"
-	// )
-	// const [classSectionInput, setClassSectionInput] = useStickyState(
-	// 	"",
-	// 	"class:create:classSectionInput"
-	// )
-	// const [studentEmailListInputs, setStudentEmailListInputs] = useStickyState<
-	// 	string[]
-	// >([""], "class:create:studentEmailListInputs")
-	// const [teacherEmailListInputs, setTeacherEmailListInputs] = useStickyState<
-	// 	string[]
-	// >([""], "class:create:teacherEmailListInputs")
-
 	return (
 		<>
 			<Form.Root
@@ -169,6 +163,64 @@ const CreateClassForm: React.FC<Props> = ({
 				}}
 				className="flex h-full flex-col space-y-2.5"
 			>
+				<Card className="flex flex-col space-y-2 py-5 px-6 shadow-sm">
+					<div className="ml-1 font-medium opacity-80">
+						Link class
+					</div>
+
+					{linkedCourse ? (
+						<div className="relative flex h-20 w-full items-center space-x-3 rounded-md border-[0.75px] border-border px-6">
+							<Avatar
+								src={undefined}
+								name={linkedCourse.name}
+								fallbackColor="secondary"
+								className="h-12 w-12"
+							/>
+
+							<div className="flex flex-1 flex-col">
+								<div className="flex w-full justify-between">
+									<span className="font-medium opacity-80">
+										{linkedCourse.name}
+									</span>
+
+									<span className="relative top-[2px] text-sm opacity-60">
+										{linkedCourse.section}
+									</span>
+								</div>
+
+								<a
+									href={linkedCourse.url}
+									className="text-sm opacity-60 hover:underline"
+								>
+									{linkedCourse.url}
+								</a>
+							</div>
+
+							<button
+								type="button"
+								onClick={onUnlink}
+								className="group absolute -top-1.5 -right-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full border-[0.75px] border-border bg-surface-selected transition-all duration-150 hover:bg-surface-selected-hover"
+							>
+								<X
+									size={14}
+									className="text-black opacity-40 transition-all duration-150 group-hover:opacity-60"
+								/>
+							</button>
+						</div>
+					) : (
+						<Button
+							onClick={(e) => {
+								e.preventDefault()
+
+								onLink()
+							}}
+							className="h-20 w-full text-3xl"
+						>
+							Link with Google Classroom class
+						</Button>
+					)}
+				</Card>
+
 				<Card className="space-y-2 px-6 py-5 shadow-sm">
 					<div className="ml-1 font-medium opacity-80">Name</div>
 
@@ -227,63 +279,11 @@ const CreateClassForm: React.FC<Props> = ({
 				</Card>
 
 				<Card className="flex space-x-3 py-5 px-6 shadow-sm">
-					{importedCourse ? (
-						<div className="relative flex h-20 w-1/2 items-center space-x-3 rounded-md border-[0.75px] border-border px-6">
-							<Avatar
-								src={undefined}
-								name={importedCourse.name}
-								fallbackColor="secondary"
-								className="h-12 w-12"
-							/>
-
-							<div className="flex flex-1 flex-col space-y-0.5">
-								<div className="flex w-full justify-between">
-									<span className="text-sm opacity-80">
-										{importedCourse.name}
-									</span>
-
-									<span className="relative top-[2px] text-xs opacity-60">
-										{importedCourse.section}
-									</span>
-								</div>
-
-								<a
-									href={importedCourse.url}
-									className="text-xs opacity-60 hover:underline"
-								>
-									{importedCourse.url}
-								</a>
-							</div>
-
-							<button
-								type="button"
-								onClick={onUnimport}
-								className="group absolute -top-1.5 -right-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full border-[0.75px] border-border bg-surface-selected transition-all duration-150 hover:bg-surface-selected-hover"
-							>
-								<X
-									size={14}
-									className="text-black opacity-40 transition-all duration-150 group-hover:opacity-60"
-								/>
-							</button>
-						</div>
-					) : (
-						<Button
-							onClick={(e) => {
-								e.preventDefault()
-
-								onImport()
-							}}
-							className="h-20 w-1/2 text-3xl"
-						>
-							Import class
-						</Button>
-					)}
-
 					<Form.Submit asChild>
 						<FancyButton
 							loading={isCreatingCourse}
 							disabled={nameInput.length === 0}
-							className="h-20 w-1/2 text-3xl"
+							className="h-20 text-3xl"
 						>
 							Create
 						</FancyButton>
@@ -292,11 +292,35 @@ const CreateClassForm: React.FC<Props> = ({
 			</Form.Root>
 
 			<Modal
-				title="Choose a class to import"
-				open={importClassModalOpen}
-				setOpen={setImportClassModalOpen}
+				title="We need extra permission to access your Google account"
+				open={linkClassExplanationModalOpen}
+				setOpen={setLinkClassExplanationModalOpen}
 			>
-				{importClassModalOpen && (
+				<div className="flex h-full flex-col justify-between">
+					<div className="select-text text-lg leading-loose opacity-80">
+						By linking this class with a class in Google Classroom,
+						this class will reflect the roster and all the
+						assignments of that class. However, in order to access
+						your class in Google Classroom, we&apos;ll need to be
+						granted extra permission to access your Google Account,
+						and you&apos;ll need to reauthenticate with Google.
+					</div>
+
+					<FancyButton
+						onClick={onReauthenticate}
+						className="h-20 text-3xl"
+					>
+						Reauthenticate
+					</FancyButton>
+				</div>
+			</Modal>
+
+			<Modal
+				title="Choose a class to import"
+				open={linkClassModalOpen}
+				setOpen={setLinkClassModalOpen}
+			>
+				{linkClassModalOpen && (
 					<div className="flex h-full flex-col justify-between">
 						<Row.List items={use(coursesPromise) ?? []}>
 							{({ item: { id, name, section } }) => (

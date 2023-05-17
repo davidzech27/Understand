@@ -35,13 +35,13 @@ export const getCredentialsFromCode = async (code: string) => {
 	if (tokens === undefined) throw new Error("No Google tokens")
 
 	return tokensSchema.parse({
-		accessToken: tokens?.access_token,
-		refreshToken: tokens?.refresh_token,
+		accessToken: tokens.access_token,
+		refreshToken: tokens.refresh_token,
 		expiresMillis:
-			typeof tokens?.expires_in === "number" &&
+			typeof tokens.expires_in === "number" &&
 			new Date().valueOf() + (tokens.expires_in - 10) * 1000,
 		scopes:
-			typeof tokens?.scope === "string" &&
+			typeof tokens.scope === "string" &&
 			tokens.scope.split(" ").filter((scope) => scopes.includes(scope)),
 	})
 }

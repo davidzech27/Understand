@@ -17,9 +17,11 @@ const Feedback = ({
 	create: async ({
 		submission,
 		rawFeedback,
+		metadata,
 	}: {
 		submission: string
 		rawFeedback: string
+		metadata: Record<string, string>
 	}) => {
 		await db.insert(feedback).values({
 			courseId,
@@ -28,6 +30,7 @@ const Feedback = ({
 			givenAt,
 			submission,
 			rawFeedback,
+			metadata,
 		})
 	},
 	get: async () => {
@@ -36,6 +39,7 @@ const Feedback = ({
 				.select({
 					submission: feedback.submission,
 					rawFeedback: feedback.rawFeedback,
+					metadata: feedback.metadata,
 				})
 				.from(feedback)
 				.where(
@@ -57,6 +61,7 @@ const Feedback = ({
 			givenAt,
 			submission: row.submission,
 			rawFeedback: row.rawFeedback,
+			metadata: row.metadata,
 		}
 	},
 	delete: async () => {

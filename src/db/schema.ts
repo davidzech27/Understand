@@ -4,6 +4,7 @@ import {
 	primaryKey,
 	datetime,
 	text,
+	json,
 	uniqueIndex,
 } from "drizzle-orm/mysql-core"
 
@@ -47,7 +48,7 @@ export const course = mysqlTable("course", {
 	id: varchar("id", { length: 100 }).primaryKey(),
 	name: text("name").notNull(),
 	section: text("section"),
-	googleClassroomId: varchar("google_classroom_id", { length: 100 }),
+	linkedUrl: text("linked_url"),
 })
 
 export const assignment = mysqlTable(
@@ -56,9 +57,11 @@ export const assignment = mysqlTable(
 		courseId: varchar("course_id", { length: 100 }).notNull(),
 		assignmentId: varchar("assignment_id", { length: 100 }).notNull(),
 		title: text("title").notNull(),
-		instructions: text("instructions").notNull(),
 		studentDescription: text("student_description"),
+		instructions: text("instructions"),
+		context: text("context"),
 		dueAt: datetime("due_at"),
+		linkedUrl: text("linked_url"),
 	},
 	(table) => ({
 		cpk: primaryKey(table.courseId, table.assignmentId),
@@ -74,6 +77,7 @@ export const feedback = mysqlTable(
 		givenAt: datetime("given_at").notNull(),
 		submission: text("submission").notNull(),
 		rawFeedback: text("raw_feedback").notNull(),
+		metadata: json("metadata").notNull(),
 	},
 	(table) => ({
 		cpk: primaryKey(
@@ -85,15 +89,25 @@ export const feedback = mysqlTable(
 	})
 )
 
-// ! about to be dropped
-export const feedbackConfig = mysqlTable(
-	"feedback_config",
+export const followUp = mysqlTable(
+	"follow_up",
 	{
 		courseId: varchar("course_id", { length: 100 }).notNull(),
 		assignmentId: varchar("assignment_id", { length: 100 }).notNull(),
-		instructions: text("instructions").notNull(),
+		userEmail: varchar("user_email", { length: 100 }).notNull(),
+		feedbackGivenAt: datetime("feedback_given_at").notNull(),
+		givenAt: datetime("given_at").notNull(),
+		query: text("query").notNull(),
+		rawResponse: text("raw_response").notNull(),
+		metadata: json("metadata").notNull(),
 	},
 	(table) => ({
-		cpk: primaryKey(table.courseId, table.assignmentId),
+		cpk: primaryKey(
+			table.courseId,
+			table.assignmentId,
+			table.userEmail,
+			table.feedbackGivenAt,
+			table.givenAt
+		),
 	})
 )

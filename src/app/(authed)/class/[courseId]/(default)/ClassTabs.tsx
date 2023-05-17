@@ -160,40 +160,46 @@ const ClassTabs: React.FC<Props> = ({ course, role }) => {
 						/>
 
 						<div className="flex space-x-3 pt-3">
-							{!confirmingDeleteClass ? (
+							<>
 								<Button
 									onClick={() =>
 										setConfirmingDeleteClass(true)
 									}
+									disabled={confirmingDeleteClass}
 									type="button"
 									className="text-lg"
 								>
 									Delete class
 								</Button>
-							) : (
-								<>
-									<Button
-										onClick={onDeleteCourse}
-										type="button"
-										loading={isDeletingCourse}
-										className="text-lg"
-									>
-										Do you really want to delete this class?
-									</Button>
 
-									{!isDeletingCourse && (
+								{confirmingDeleteClass && (
+									<>
 										<Button
-											onClick={() =>
-												setConfirmingDeleteClass(false)
-											}
+											onClick={onDeleteCourse}
 											type="button"
+											loading={isDeletingCourse}
 											className="text-lg"
 										>
-											Actually, never mind
+											Do you really want to delete this
+											class?
 										</Button>
-									)}
-								</>
-							)}
+
+										{!isDeletingCourse && (
+											<Button
+												onClick={() =>
+													setConfirmingDeleteClass(
+														false
+													)
+												}
+												type="button"
+												className="text-lg"
+											>
+												Actually, never mind
+											</Button>
+										)}
+									</>
+								)}
+							</>
 						</div>
 					</div>
 

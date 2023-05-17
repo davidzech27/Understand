@@ -2,6 +2,7 @@ import { notFound } from "next/navigation"
 import { cookies } from "next/headers"
 
 import colors from "~/colors.cjs"
+import cn from "~/utils/cn"
 import ClassTabs from "./ClassTabs"
 import Card from "~/components/Card"
 import User from "~/data/User"
@@ -44,7 +45,15 @@ const ClassLayout = async ({
 	return (
 		<div className="-mr-2 flex h-full flex-col space-y-2.5 overflow-y-scroll">
 			<Card className="flex flex-col justify-between py-5 px-6">
-				<div className="flex items-baseline justify-between">
+				<a
+					href={course.linkedUrl}
+					target="_blank"
+					className={cn(
+						"flex items-baseline justify-between",
+						course.linkedUrl !== undefined &&
+							"transition-all duration-150 hover:opacity-80"
+					)}
+				>
 					<span
 						style={{
 							background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`,
@@ -52,7 +61,7 @@ const ClassLayout = async ({
 							backgroundClip: "text",
 							color: "transparent",
 						}}
-						className="pb-5 text-6xl font-semibold"
+						className="text-6xl font-semibold"
 					>
 						{course.name}
 					</span>
@@ -62,9 +71,11 @@ const ClassLayout = async ({
 							{course.section}
 						</span>
 					)}
-				</div>
+				</a>
 
-				<ClassTabs course={course} role={role} />
+				<div className="mt-5">
+					<ClassTabs course={course} role={role} />
+				</div>
 			</Card>
 
 			{children}

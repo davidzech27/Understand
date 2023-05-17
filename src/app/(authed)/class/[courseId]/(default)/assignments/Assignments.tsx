@@ -12,9 +12,11 @@ interface Props {
 		courseId: string
 		assignmentId: string
 		title: string
-		instructions: string
 		studentDescription: string | undefined
+		instructions: string | undefined
+		context: string | undefined
 		dueAt: Date | undefined
+		linkedUrl: string | undefined
 	}[]
 }
 

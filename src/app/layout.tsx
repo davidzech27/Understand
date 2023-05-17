@@ -1,7 +1,7 @@
 import { Analytics } from "@vercel/analytics/react"
+import { ErrorBoundary } from "./sentry"
 
 import "./global.css"
-import { HighlightErrorBoundary } from "./highlight"
 import { env } from "~/env.mjs"
 
 export const metadata = {
@@ -20,7 +20,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
 			<head />
 
 			<body>
-				<HighlightErrorBoundary>{children}</HighlightErrorBoundary>
+				<ErrorBoundary>{children}</ErrorBoundary>
 
 				{env.NODE_ENV === "production" && <Analytics />}
 			</body>
