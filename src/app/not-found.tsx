@@ -1,4 +1,4 @@
-import { NotFound } from "./sentry"
+import * as Sentry from "@sentry/nextjs"
 
 export const metadata = {
 	title: "Link not found | Understand",
@@ -7,6 +7,8 @@ export const metadata = {
 }
 
 const NotFoundPage = () => {
+	Sentry.captureEvent({ message: "Link not found" })
+
 	return (
 		<div className="flex h-screen w-full flex-col items-center bg-gradient-to-tr from-primary to-secondary">
 			<div className="flex-[0.875]" />
@@ -17,8 +19,6 @@ const NotFoundPage = () => {
 			</span>
 
 			<div className="flex-1" />
-
-			<NotFound />
 		</div>
 	)
 }

@@ -1,5 +1,4 @@
 import { Analytics } from "@vercel/analytics/react"
-import { ErrorBoundary } from "./sentry"
 
 import "./global.css"
 import { env } from "~/env.mjs"
@@ -20,7 +19,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
 			<head />
 
 			<body>
-				<ErrorBoundary>{children}</ErrorBoundary>
+				{children}
 
 				{env.NODE_ENV === "production" && <Analytics />}
 			</body>
