@@ -1,7 +1,4 @@
-import Link from "next/link"
-
-import getAuthenticationURL from "~/google/getAuthenticationURL"
-import FancyButton from "~/components/FancyButton"
+import SignInButton from "./SignInButton"
 import colors from "~/colors.cjs"
 
 export const runtime = "edge"
@@ -49,22 +46,7 @@ const SignInPage = () => {
 								Sign in with your school Google account
 							</h1>
 
-							<Link
-								href={getAuthenticationURL({
-									scopes: [
-										"https://www.googleapis.com/auth/userinfo.email",
-										"https://www.googleapis.com/auth/userinfo.profile",
-									],
-									redirectTo: "/landing",
-								})}
-								legacyBehavior
-							>
-								<a>
-									<FancyButton className="h-20 text-3xl">
-										Sign in
-									</FancyButton>
-								</a>
-							</Link>
+							<SignInButton />
 						</div>
 
 						<div className="flex-1" />

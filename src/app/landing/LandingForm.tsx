@@ -34,15 +34,16 @@ const LandingForm: React.FC<Props> = (props) => {
 	const onGo = async () => {
 		if (!profile) return
 
-		updateName({ name: nameInput.trim() })
-
 		Sentry.setUser({
 			id: profile.email,
 			email: profile.email,
 			username: profile.name,
 		})
-
-		await Sentry.flush()
+s
+		await Promise.all([
+			Sentry.flush(),
+			await updateName({ name: nameInput.trim() }),
+		])
 
 		localStorage.setItem("landed", "true")
 

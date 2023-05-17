@@ -11,7 +11,7 @@ const Error = ({ error }: { error: Error }) => {
 		<main className="flex h-screen w-screen flex-col bg-black">
 			<div className="flex-[0.875]" />
 
-			<div className="select-text px-[20vw] text-5xl font-medium text-white">
+			<div className="mx-[20vw] select-text text-5xl font-medium leading-relaxed text-white">
 				There has been an error! We&apos;ll probably fix this soon. In
 				the meantime, try refreshing the page, or perhaps signing in
 				again.

@@ -14,7 +14,8 @@ const getAuthenticationURL = ({
 	if (redirectTo[0] === "/")
 		redirectTo = `${env.NEXT_PUBLIC_URL}${redirectTo}`
 
-	document.cookie = `${redirectToCookieKey}=${redirectTo}`
+	typeof document !== "undefined" &&
+		(document.cookie = `${redirectToCookieKey}=${redirectTo}`)
 
 	return encodeURI(
 		`https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&scope=${scopes.join(
