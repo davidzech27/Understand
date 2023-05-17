@@ -39,7 +39,7 @@ const LandingForm: React.FC<Props> = (props) => {
 			email: profile.email,
 			username: profile.name,
 		})
-s
+
 		await Promise.all([
 			Sentry.flush(),
 			await updateName({ name: nameInput.trim() }),
