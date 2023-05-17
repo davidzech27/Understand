@@ -11,7 +11,7 @@ import Button from "~/components/Button"
 import FancyButton from "~/components/FancyButton"
 import Modal from "~/components/Modal"
 import Avatar from "~/components/Avatar"
-import authenticateWithGoogle from "~/google/authenticateWithGoogle"
+import getAuthenticationURL from "~/google/getAuthenticationURL"
 import Row from "~/components/Row"
 import createCourseAction from "./createCourseAction"
 import { useRouter } from "next/navigation"
@@ -71,7 +71,7 @@ const CreateClassForm: React.FC<Props> = ({
 	}
 
 	const onReauthenticate = () => {
-		authenticateWithGoogle({
+		window.location.href = getAuthenticationURL({
 			scopes: [
 				"https://www.googleapis.com/auth/classroom.courses.readonly",
 				"https://www.googleapis.com/auth/classroom.rosters.readonly",

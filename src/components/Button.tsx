@@ -34,7 +34,7 @@ const Button: React.FC<Props> = ({
 			)}
 		>
 			{loading ? (
-				<LoadingSpinner className="mx-auto fill-black opacity-90" />
+				<LoadingSpinner className="mx-auto h-6 w-6 fill-black opacity-90" />
 			) : (
 				children
 			)}

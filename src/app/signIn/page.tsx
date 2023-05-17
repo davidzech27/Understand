@@ -1,4 +1,6 @@
-import GoogleAuthLink from "~/google/GoogleAuthLink"
+import Link from "next/link"
+
+import getAuthenticationURL from "~/google/getAuthenticationURL"
 import FancyButton from "~/components/FancyButton"
 import colors from "~/colors.cjs"
 
@@ -47,20 +49,22 @@ const SignInPage = () => {
 								Sign in with your school Google account
 							</h1>
 
-							<GoogleAuthLink
-								scopes={[
-									"https://www.googleapis.com/auth/userinfo.email",
-									"https://www.googleapis.com/auth/userinfo.profile",
-								]}
-								redirectTo="/landing"
-								renderLoadingState={
-									<FancyButton loading className="h-20" />
-								}
+							<Link
+								href={getAuthenticationURL({
+									scopes: [
+										"https://www.googleapis.com/auth/userinfo.email",
+										"https://www.googleapis.com/auth/userinfo.profile",
+									],
+									redirectTo: "/landing",
+								})}
+								legacyBehavior
 							>
-								<FancyButton className="h-20 text-3xl">
-									Sign in
-								</FancyButton>
-							</GoogleAuthLink>
+								<a>
+									<FancyButton className="h-20 text-3xl">
+										Sign in
+									</FancyButton>
+								</a>
+							</Link>
 						</div>
 
 						<div className="flex-1" />

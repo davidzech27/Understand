@@ -1,9 +1,9 @@
-import redirectToCookieKey from "../auth/redirectToCookieKey"
-import redirectURL from "~/google/redirectURL"
-import { type Scope } from "~/google/scopes"
 import { env } from "~/env.mjs"
+import redirectToCookieKey from "~/auth/redirectToCookieKey"
+import redirectURL from "./redirectURL"
+import { type Scope } from "./scopes"
 
-const authenticateWithGoogle = async ({
+const getAuthenticationURL = ({
 	scopes,
 	redirectTo,
 }: {
@@ -15,7 +15,7 @@ const authenticateWithGoogle = async ({
 
 	document.cookie = `${redirectToCookieKey}=${redirectTo}`
 
-	window.location.href = encodeURI(
+	return encodeURI(
 		`https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&scope=${scopes.join(
 			" "
 		)}&prompt=consent&include_granted_scopes=true&response_type=code&client_id=${
@@ -24,4 +24,4 @@ const authenticateWithGoogle = async ({
 	)
 }
 
-export default authenticateWithGoogle
+export default getAuthenticationURL

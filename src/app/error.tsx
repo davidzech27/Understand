@@ -8,10 +8,10 @@ const Error = ({ error }: { error: Error }) => {
 	}, [error])
 
 	return (
-		<main className="flex h-screen w-screen flex-col">
+		<main className="flex h-screen w-screen flex-col bg-black">
 			<div className="flex-[0.875]" />
 
-			<div className="select-text bg-black text-5xl font-medium text-white">
+			<div className="select-text text-5xl font-medium text-white">
 				There has been an error! We&apos;ll probably fix this soon. In
 				the meantime, try refreshing the page, or perhaps signing in
 				again.
