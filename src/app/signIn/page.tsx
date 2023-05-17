@@ -1,8 +1,6 @@
 import SignInButton from "./SignInButton"
 import colors from "~/colors.cjs"
 
-export const runtime = "edge"
-
 export const metadata = {
 	title: "Sign in",
 }
