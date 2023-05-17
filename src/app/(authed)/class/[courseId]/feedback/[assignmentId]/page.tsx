@@ -44,11 +44,10 @@ const FeedbackPage = async ({
 		role === "none" ||
 		profile === undefined ||
 		assignment === undefined ||
-		course === undefined
+		course === undefined ||
+		assignment.instructions === undefined
 	)
 		notFound()
-
-	// overflow-y-scroll -mr-2
 
 	return (
 		<Feedback

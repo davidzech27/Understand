@@ -27,11 +27,11 @@ interface Props {
 		courseId: string
 		assignmentId: string
 		title: string
-		studentDescription: string | undefined
-		instructions: string | undefined
-		context: string | undefined
-		dueAt: Date | undefined
-		linkedUrl: string | undefined
+		studentDescription?: string
+		instructions: string
+		context?: string
+		dueAt?: Date
+		linkedUrl?: string
 	}
 	profileName: string
 	courseName: string
