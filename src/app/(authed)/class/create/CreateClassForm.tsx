@@ -51,8 +51,8 @@ const CreateClassForm: React.FC<Props> = ({
 			name: nameInput.trim(),
 			section: sectionInput.trim() || undefined,
 			linkedUrl: linkedCourse?.url,
-			additionalTeacherEmails: additionalTeacherEmailListInputs,
-			studentEmails: studentEmailListInputs,
+			additionalTeacherEmails: additionalTeacherEmailInputs,
+			studentEmails: studentEmailInputs,
 		})
 
 		router.refresh()
@@ -123,9 +123,9 @@ const CreateClassForm: React.FC<Props> = ({
 
 		course.section && setSectionInput(course.section)
 
-		setAdditionalTeacherEmailListInputs(roster.teachers)
+		setAdditionalTeacherEmailInputs(roster.teachers)
 
-		setStudentEmailListInputs(roster.students)
+		setStudentEmailInputs(roster.students)
 
 		setLinkedCourse(course)
 
@@ -137,21 +137,17 @@ const CreateClassForm: React.FC<Props> = ({
 	const onUnlink = () => {
 		setNameInput("")
 		setSectionInput("")
-		setStudentEmailListInputs([""])
-		setAdditionalTeacherEmailListInputs([""])
+		setStudentEmailInputs([""])
+		setAdditionalTeacherEmailInputs([""])
 
 		setLinkedCourse(undefined)
 	}
 
 	const [nameInput, setNameInput] = useState("")
 	const [sectionInput, setSectionInput] = useState("")
-	const [studentEmailListInputs, setStudentEmailListInputs] = useState<
-		string[]
-	>([""])
-	const [
-		additionalTeacherEmailListInputs,
-		setAdditionalTeacherEmailListInputs,
-	] = useState<string[]>([""])
+	const [studentEmailInputs, setStudentEmailInputs] = useState<string[]>([""])
+	const [additionalTeacherEmailInputs, setAdditionalTeacherEmailInputs] =
+		useState<string[]>([""])
 
 	return (
 		<>
@@ -254,8 +250,8 @@ const CreateClassForm: React.FC<Props> = ({
 					<div className="ml-1 font-medium opacity-80">Students</div>
 
 					<ListInput
-						values={studentEmailListInputs}
-						setValues={setStudentEmailListInputs}
+						values={studentEmailInputs}
+						setValues={setStudentEmailInputs}
 						singleWord
 						placeholder="Student email"
 						className="h-min"
@@ -268,8 +264,8 @@ const CreateClassForm: React.FC<Props> = ({
 					</div>
 
 					<ListInput
-						values={additionalTeacherEmailListInputs}
-						setValues={setAdditionalTeacherEmailListInputs}
+						values={additionalTeacherEmailInputs}
+						setValues={setAdditionalTeacherEmailInputs}
 						singleWord
 						placeholder="Teacher email"
 						className="h-min"

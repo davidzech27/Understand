@@ -67,6 +67,7 @@ const Assignment = ({
 			instructions: row.instructions ?? undefined,
 			context: row.context ?? undefined,
 			dueAt: row.dueAt ?? undefined,
+			linkedUrl: row.linkedUrl ?? undefined,
 		}
 	},
 	update: async ({

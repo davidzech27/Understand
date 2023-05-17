@@ -10,16 +10,24 @@ import ToggleButton from "~/components/ToggleButton"
 import Button from "~/components/Button"
 import FancyButton from "~/components/FancyButton"
 import TextInput from "~/components/TextInput"
+import ListInput from "~/components/ListInput"
 import Modal from "~/components/Modal"
 import updateCourseAction from "./updateCourseAction"
 import deleteCourseAction from "./deleteCourseAction"
 
 interface Props {
-	course: { id: string; name: string; section?: string }
+	course: { id: string; name: string; section?: string; linkedUrl?: string }
+	teacherEmails: string[]
+	studentEmails: string[]
 	role: "teacher" | "student"
 }
 
-const ClassTabs: React.FC<Props> = ({ course, role }) => {
+const ClassTabs: React.FC<Props> = ({
+	course,
+	teacherEmails,
+	studentEmails,
+	role,
+}) => {
 	const segment = useSelectedLayoutSegment()
 
 	const router = useRouter()
@@ -28,6 +36,8 @@ const ClassTabs: React.FC<Props> = ({ course, role }) => {
 
 	const [nameInput, setNameInput] = useState(course.name)
 	const [sectionInput, setSectionInput] = useState(course.section ?? "")
+	const [teacherEmailInputs, setTeacherEmailInputs] = useState(teacherEmails)
+	const [studentEmailInputs, setStudentEmailInputs] = useState(studentEmails)
 
 	const updateDisabled =
 		(nameInput === course.name && sectionInput === course.section) ||
@@ -45,6 +55,18 @@ const ClassTabs: React.FC<Props> = ({ course, role }) => {
 			id: course.id,
 			name: nameInput.trim(),
 			section: sectionInput.trim() || undefined,
+			addTeacherEmails: teacherEmailInputs.filter(
+				(email) => !teacherEmails.includes(email)
+			),
+			removeTeacherEmails: teacherEmails.filter(
+				(email) => !teacherEmailInputs.includes(email)
+			),
+			addStudentEmails: studentEmailInputs.filter(
+				(email) => !studentEmails.includes(email)
+			),
+			removeStudentEmails: studentEmails.filter(
+				(email) => !studentEmailInputs.includes(email)
+			),
 		})
 
 		setSettingsModalOpen(false)
@@ -136,16 +158,16 @@ const ClassTabs: React.FC<Props> = ({ course, role }) => {
 
 						onUpdateCourse()
 					}}
-					className="flex h-full flex-col justify-between"
+					className="flex h-full flex-col justify-between space-y-2"
 				>
-					<div className="flex flex-col space-y-2">
+					<div className="flex h-full flex-col space-y-2">
 						<div className="ml-1 font-medium opacity-80">Name</div>
 
 						<TextInput
 							value={nameInput}
 							setValue={setNameInput}
 							placeholder="Class name"
-							className="py-2.5 pl-4 text-base"
+							className="h-min py-2.5 pl-4 text-base"
 						/>
 
 						<div className="ml-1 font-medium opacity-80">
@@ -156,51 +178,78 @@ const ClassTabs: React.FC<Props> = ({ course, role }) => {
 							value={sectionInput}
 							setValue={setSectionInput}
 							placeholder="Class section"
-							className="py-2.5 pl-4 text-base"
+							className="h-min py-2.5 pl-4 text-base"
 						/>
 
-						<div className="flex space-x-3 pt-3">
-							<>
-								<Button
-									onClick={() =>
-										setConfirmingDeleteClass(true)
-									}
-									disabled={confirmingDeleteClass}
-									type="button"
-									className="text-lg"
-								>
-									Delete class
-								</Button>
+						<div className="h-[calc(60vh-6.5rem-19.5rem)] overflow-y-scroll">
+							<div className="flex-col space-y-2">
+								<div className="ml-1 font-medium opacity-80">
+									Students
+								</div>
 
-								{confirmingDeleteClass && (
-									<>
+								<ListInput
+									values={studentEmailInputs}
+									setValues={setStudentEmailInputs}
+									singleWord
+									placeholder="Student email"
+									className="h-min"
+									textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)] h-min"
+									buttonClassName="h-[46px] w-[46px]"
+								/>
+
+								<div className="ml-1 font-medium opacity-80">
+									Teachers
+								</div>
+
+								<ListInput
+									values={teacherEmailInputs}
+									setValues={setTeacherEmailInputs}
+									singleWord
+									placeholder="Teacher email"
+									className="h-min"
+									textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)] h-min"
+									buttonClassName="h-[46px] w-[46px]"
+								/>
+							</div>
+						</div>
+					</div>
+
+					<div className="flex space-x-3">
+						<>
+							<Button
+								onClick={() => setConfirmingDeleteClass(true)}
+								disabled={confirmingDeleteClass}
+								type="button"
+								className="text-lg"
+							>
+								Delete class
+							</Button>
+
+							{confirmingDeleteClass && (
+								<>
+									<Button
+										onClick={onDeleteCourse}
+										type="button"
+										loading={isDeletingCourse}
+										className="text-lg"
+									>
+										Do you really want to delete this class?
+									</Button>
+
+									{!isDeletingCourse && (
 										<Button
-											onClick={onDeleteCourse}
+											onClick={() =>
+												setConfirmingDeleteClass(false)
+											}
 											type="button"
-											loading={isDeletingCourse}
 											className="text-lg"
 										>
-											Do you really want to delete this
-											class?
+											Actually, never mind
 										</Button>
-
-										{!isDeletingCourse && (
-											<Button
-												onClick={() =>
-													setConfirmingDeleteClass(
-														false
-													)
-												}
-												type="button"
-												className="text-lg"
-											>
-												Actually, never mind
-											</Button>
-										)}
-									</>
-								)}
-							</>
-						</div>
+									)}
+								</>
+							)}
+						</>
 					</div>
 
 					<div className="flex space-x-3">

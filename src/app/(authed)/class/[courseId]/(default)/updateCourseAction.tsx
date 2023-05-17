@@ -12,15 +12,43 @@ const updateCourseAction = zact(
 		id: z.string(),
 		name: z.string().min(1).optional(),
 		section: z.string().min(1).optional(),
+		addTeacherEmails: z.string().array(),
+		removeTeacherEmails: z.string().array(),
+		addStudentEmails: z.string().array(),
+		removeStudentEmails: z.string().array(),
 	})
-)(async ({ id, name, section }) => {
-	const { email } = await getAuthOrThrow({ cookies: cookies() })
+)(
+	async ({
+		id,
+		name,
+		section,
+		addTeacherEmails,
+		removeTeacherEmails,
+		addStudentEmails,
+		removeStudentEmails,
+	}) => {
+		const { email } = await getAuthOrThrow({ cookies: cookies() })
 
-	const role = await User({ email }).courseRole({ id })
+		const role = await User({ email }).courseRole({ id })
 
-	if (role !== "teacher") return
+		if (role !== "teacher") return
 
-	await Course({ id }).update({ name, section })
-})
+		await Promise.all([
+			Course({ id }).update({ name, section }),
+			addTeacherEmails.map((email) =>
+				User({ email }).addToCourse({ id, role: "teacher" })
+			),
+			removeTeacherEmails.map((email) =>
+				User({ email }).removeFromCourse({ id, role: "teacher" })
+			),
+			addStudentEmails.map((email) =>
+				User({ email }).addToCourse({ id, role: "student" })
+			),
+			removeStudentEmails.map((email) =>
+				User({ email }).removeFromCourse({ id, role: "student" })
+			),
+		])
+	}
+)
 
 export default updateCourseAction

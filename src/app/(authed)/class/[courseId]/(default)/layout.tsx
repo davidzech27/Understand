@@ -33,8 +33,9 @@ const ClassLayout = async ({
 	children: React.ReactNode
 	params: Params
 }) => {
-	const [course, role] = await Promise.all([
+	const [course, roster, role] = await Promise.all([
 		Course({ id: courseId }).get(),
+		Course({ id: courseId }).roster(),
 		getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
 			User({ email }).courseRole({ id: courseId })
 		),
@@ -74,7 +75,16 @@ const ClassLayout = async ({
 				</a>
 
 				<div className="mt-5">
-					<ClassTabs course={course} role={role} />
+					<ClassTabs
+						course={course}
+						teacherEmails={roster.teachers.map(
+							(teacher) => teacher.email
+						)}
+						studentEmails={roster.students.map(
+							(student) => student.email
+						)}
+						role={role}
+					/>
 				</div>
 			</Card>
 
