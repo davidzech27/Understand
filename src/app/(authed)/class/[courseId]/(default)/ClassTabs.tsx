@@ -40,7 +40,16 @@ const ClassTabs: React.FC<Props> = ({
 	const [studentEmailInputs, setStudentEmailInputs] = useState(studentEmails)
 
 	const updateDisabled =
-		(nameInput === course.name && sectionInput === course.section) ||
+		(nameInput === course.name &&
+			sectionInput === course.section &&
+			teacherEmails.length === teacherEmailInputs.length &&
+			teacherEmails.every(
+				(email, index) => teacherEmailInputs[index] === email
+			) &&
+			studentEmails.length === studentEmailInputs.length &&
+			studentEmails.every(
+				(email, index) => studentEmailInputs[index] === email
+			)) ||
 		nameInput.trim().length === 0
 
 	const [confirmingDeleteClass, setConfirmingDeleteClass] = useState(false)
@@ -51,21 +60,24 @@ const ClassTabs: React.FC<Props> = ({
 	const onUpdateCourse = async () => {
 		if (updateDisabled) return
 
+		const teacherEmailInputsFiltered = teacherEmailInputs.filter(Boolean)
+		const studentEmailInputsFiltered = studentEmailInputs.filter(Boolean)
+
 		await updateCourse({
 			id: course.id,
 			name: nameInput.trim(),
 			section: sectionInput.trim() || undefined,
-			addTeacherEmails: teacherEmailInputs.filter(
+			addTeacherEmails: teacherEmailInputsFiltered.filter(
 				(email) => !teacherEmails.includes(email)
 			),
 			removeTeacherEmails: teacherEmails.filter(
-				(email) => !teacherEmailInputs.includes(email)
+				(email) => !teacherEmailInputsFiltered.includes(email)
 			),
-			addStudentEmails: studentEmailInputs.filter(
+			addStudentEmails: studentEmailInputsFiltered.filter(
 				(email) => !studentEmails.includes(email)
 			),
 			removeStudentEmails: studentEmails.filter(
-				(email) => !studentEmailInputs.includes(email)
+				(email) => !studentEmailInputsFiltered.includes(email)
 			),
 		})
 
