@@ -51,7 +51,10 @@ const FeedbackPage = async ({
 
 	return (
 		<Feedback
-			assignment={assignment}
+			assignment={{
+				...assignment,
+				instructions: assignment.instructions,
+			}}
 			profileName={profile.name}
 			courseName={course.name}
 		/>
