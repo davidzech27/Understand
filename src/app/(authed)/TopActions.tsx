@@ -33,7 +33,7 @@ const TopActions = () => {
 						>
 							<Link
 								href="/assignment/create"
-								className="relative flex h-14 w-60 items-center rounded-md border-[0.75px] border-primary bg-primary/5 transition-all duration-150 hover:bg-primary/10 data-[active]:bg-primary/10"
+								className="relative flex h-14 w-60 items-center rounded-md border-[0.75px] border-primary bg-primary/5 outline-none transition-all duration-150 focus-within:bg-primary/10 hover:bg-primary/10 data-[active]:bg-primary/10"
 							>
 								<FilePlus2
 									size={18}
@@ -52,7 +52,7 @@ const TopActions = () => {
 						>
 							<Link
 								href="/class/create"
-								className="relative flex h-14 w-60 items-center rounded-md border-[0.75px] border-secondary bg-secondary/5 transition-all duration-150 hover:bg-secondary/10 data-[active]:bg-secondary/10"
+								className="relative flex h-14 w-60 items-center rounded-md border-[0.75px] border-secondary bg-secondary/5 outline-none transition-all duration-150 hover:bg-secondary/10 focus-visible:bg-secondary/10 data-[active]:bg-secondary/10"
 							>
 								<UserPlus
 									size={18}
@@ -69,7 +69,8 @@ const TopActions = () => {
 			</NavigationMenu.List>
 
 			<div className="absolute top-[calc(100%+6px)] right-0 z-50">
-				<NavigationMenu.Viewport className="rounded-md border-[0.75px] border-border bg-surface shadow-lg shadow-[#00000016] transition-all duration-500 ease-out data-[state=hidden]:animate-[scale-out] data-[state=visible]:animate-[scale-in]" />
+				{/* can't get exit animation to work yet */}
+				<NavigationMenu.Viewport className="animate-[scale-in] rounded-md border-[0.75px] border-border bg-surface shadow-lg shadow-[#00000016] transition-all duration-150" />
 			</div>
 		</NavigationMenu.Root>
 	)

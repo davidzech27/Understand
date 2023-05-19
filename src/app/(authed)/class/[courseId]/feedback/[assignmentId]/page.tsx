@@ -6,6 +6,7 @@ import Assignment from "~/data/Assignment"
 import User from "~/data/User"
 import Course from "~/data/Course"
 import Feedback from "./Feedback"
+import GoogleAPI from "~/google/GoogleAPI"
 
 export const generateMetadata = async ({
 	params: { courseId, assignmentId },
@@ -30,11 +31,17 @@ const FeedbackPage = async ({
 	params: Params
 }) => {
 	const [[role, profile], assignment, course] = await Promise.all([
-		getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
-			Promise.all([
-				User({ email }).courseRole({ id: courseId }),
-				User({ email }).get(),
-			])
+		getAuthOrThrow({ cookies: cookies() }).then(
+			({
+				email,
+				googleAccessToken,
+				googleRefreshToken,
+				googleRefreshTokenExpiresMillis,
+			}) =>
+				Promise.all([
+					User({ email }).courseRole({ id: courseId }),
+					User({ email }).get(),
+				])
 		),
 		Assignment({ courseId, assignmentId }).get(),
 		Course({ id: courseId }).get(),

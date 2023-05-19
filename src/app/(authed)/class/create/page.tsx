@@ -34,6 +34,9 @@ const ClassCreatePage = async () => {
 				"https://www.googleapis.com/auth/classroom.student-submissions.students.readonly"
 			) ||
 			!googleScopes.includes(
+				"https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly"
+			) ||
+			!googleScopes.includes(
 				"https://www.googleapis.com/auth/drive.readonly"
 			) ||
 			!googleScopes.includes(
@@ -51,46 +54,16 @@ const ClassCreatePage = async () => {
 				  })
 	)
 
-	const coursesPromise = googleAPIPromise.then((googleAPI) =>
-		googleAPI?.coursesTeaching()
+	const coursesPromise = googleAPIPromise.then(
+		async (googleAPI) =>
+			googleAPI &&
+			(await googleAPI.coursesTeaching())?.map((course) => ({
+				...course,
+				roster: googleAPI.courseRoster({ courseId: course.id }),
+			}))
 	)
 
-	const courseRostersPromise = googleAPIPromise.then(async (googleAPI) => {
-		const courses = await coursesPromise
-
-		return googleAPI && courses
-			? (
-					await Promise.all(
-						courses.map((course) =>
-							googleAPI?.courseRoster({ courseId: course.id })
-						)
-					)
-			  ).reduce(
-					(previous, current, index) => ({
-						...previous,
-						[courses[index]!.id]: {
-							teachers: current.teachers
-								.map((teacher) => teacher.email)
-								.filter(Boolean),
-							students: current.students.map(
-								(student) => student.email
-							),
-						},
-					}),
-					{} as Record<
-						string,
-						{ teachers: string[]; students: string[] }
-					>
-			  )
-			: undefined
-	})
-
-	return (
-		<CreateClassForm
-			coursesPromise={coursesPromise}
-			courseRostersPromise={courseRostersPromise}
-		/>
-	)
+	return <CreateClassForm coursesPromise={coursesPromise} />
 }
 
 export default ClassCreatePage

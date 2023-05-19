@@ -20,6 +20,8 @@ const Button: React.FC<Props> = ({
 	className,
 	...props
 }) => {
+	if (loading) disabled = true
+
 	return (
 		<button
 			{...props}

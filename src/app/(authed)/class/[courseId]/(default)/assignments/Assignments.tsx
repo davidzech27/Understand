@@ -45,13 +45,13 @@ const Assignments: React.FC<Props> = ({ courseId, role, assignments }) => {
 				}
 			>
 				{({ item: assignment }) => (
-					<Row.Item key={assignment.assignmentId}>
-						<Link
-							href={`/class/${courseId}/${
-								role === "teacher" ? "assignment" : "feedback"
-							}/${assignment.assignmentId}`}
-							className="flex h-20 items-center justify-between"
-						>
+					<Link
+						href={`/class/${courseId}/${
+							role === "teacher" ? "assignment" : "feedback"
+						}/${assignment.assignmentId}`}
+						className="flex h-20 items-center justify-between"
+					>
+						<Row.Item key={assignment.assignmentId}>
 							<span className="text-lg font-medium opacity-90">
 								{assignment.title}
 							</span>
@@ -61,8 +61,8 @@ const Assignments: React.FC<Props> = ({ courseId, role, assignments }) => {
 									? `Due ${formatDate(assignment.dueAt)}`
 									: "No due date"}
 							</span>
-						</Link>
-					</Row.Item>
+						</Row.Item>
+					</Link>
 				)}
 			</Row.List>
 		</Card>

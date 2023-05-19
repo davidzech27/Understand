@@ -6,7 +6,7 @@ import { useZact } from "zact/client"
 import Link from "next/link"
 import * as Form from "@radix-ui/react-form"
 
-import ToggleButton from "~/components/ToggleButton"
+import LinkButton from "~/components/LinkButton"
 import Button from "~/components/Button"
 import FancyButton from "~/components/FancyButton"
 import TextInput from "~/components/TextInput"
@@ -100,50 +100,20 @@ const ClassTabs: React.FC<Props> = ({
 	return (
 		<div className="flex items-center justify-between">
 			<div className="flex space-x-1.5">
-				<Link href={`/class/${course.id}`} legacyBehavior>
-					<a>
-						<ToggleButton
-							toggled={segment === null}
-							onToggle={() => {}}
-						>
-							Home
-						</ToggleButton>
-					</a>
-				</Link>
+				<LinkButton href={`/class/${course.id}`}>Home</LinkButton>
 
-				<Link href={`/class/${course.id}/assignments`} legacyBehavior>
-					<a>
-						<ToggleButton
-							toggled={segment === "assignments"}
-							onToggle={() => {}}
-						>
-							Assignments
-						</ToggleButton>
-					</a>
-				</Link>
+				<LinkButton href={`/class/${course.id}/assignments`}>
+					Assignments
+				</LinkButton>
 
-				<Link href={`/class/${course.id}/people`} legacyBehavior>
-					<a>
-						<ToggleButton
-							toggled={segment === "people"}
-							onToggle={() => {}}
-						>
-							People
-						</ToggleButton>
-					</a>
-				</Link>
+				<LinkButton href={`/class/${course.id}/people`}>
+					People
+				</LinkButton>
 
 				{role === "teacher" && (
-					<Link href={`/class/${course.id}/insights`} legacyBehavior>
-						<a>
-							<ToggleButton
-								toggled={segment === "insights"}
-								onToggle={() => {}}
-							>
-								Insights
-							</ToggleButton>
-						</a>
-					</Link>
+					<LinkButton href={`/class/${course.id}/insights`}>
+						Insights
+					</LinkButton>
 				)}
 			</div>
 

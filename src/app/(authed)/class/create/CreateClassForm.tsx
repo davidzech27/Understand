@@ -23,18 +23,24 @@ interface Props {
 				id: string
 				section?: string
 				url: string
+				roster: Promise<{
+					teachers: {
+						name: string
+						email?: string | undefined
+						photo?: string | undefined
+					}[]
+					students: {
+						email: string
+						name: string
+						photo?: string | undefined
+					}[]
+				}>
 		  }[]
 		| undefined
 	>
-	courseRostersPromise: Promise<
-		Record<string, { teachers: string[]; students: string[] }> | undefined
-	>
 }
 
-const CreateClassForm: React.FC<Props> = ({
-	coursesPromise,
-	courseRostersPromise,
-}) => {
+const CreateClassForm: React.FC<Props> = ({ coursesPromise }) => {
 	const router = useRouter()
 
 	const { mutate: createCourse, isLoading: isCreatingCourse } =
@@ -78,6 +84,7 @@ const CreateClassForm: React.FC<Props> = ({
 				"https://www.googleapis.com/auth/classroom.profile.emails",
 				"https://www.googleapis.com/auth/classroom.profile.photos",
 				"https://www.googleapis.com/auth/classroom.student-submissions.students.readonly",
+				"https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly",
 				"https://www.googleapis.com/auth/drive.readonly",
 				"https://www.googleapis.com/auth/classroom.push-notifications",
 			],
@@ -104,18 +111,15 @@ const CreateClassForm: React.FC<Props> = ({
 	const onChooseClass = async () => {
 		setCourseLoading(true)
 
-		const [courses, courseRosters] = await Promise.all([
-			coursesPromise,
-			courseRostersPromise,
-		])
+		const courses = await coursesPromise
 
-		setCourseLoading(false)
-
-		if (!selectedCourseId || !courses || !courseRosters) return
+		if (!selectedCourseId || !courses) return
 
 		const course = courses.find((course) => course.id === selectedCourseId)
 
-		const roster = courseRosters[selectedCourseId]
+		const roster = await course?.roster
+
+		setCourseLoading(false)
 
 		if (!course || !roster) return
 
@@ -123,9 +127,11 @@ const CreateClassForm: React.FC<Props> = ({
 
 		course.section && setSectionInput(course.section)
 
-		setAdditionalTeacherEmailInputs(roster.teachers)
+		setAdditionalTeacherEmailInputs(
+			roster.teachers.map((teacher) => teacher.email).filter(Boolean)
+		)
 
-		setStudentEmailInputs(roster.students)
+		setStudentEmailInputs(roster.students.map((student) => student.email))
 
 		setLinkedCourse(course)
 
@@ -296,10 +302,21 @@ const CreateClassForm: React.FC<Props> = ({
 					<div className="select-text text-lg leading-loose opacity-80">
 						By linking this class with a class in Google Classroom,
 						this class will reflect the roster and all the
-						assignments of that class. However, in order to access
-						your class in Google Classroom, we&apos;ll need to be
-						granted extra permission to access your Google Account,
-						and you&apos;ll need to reauthenticate with Google.
+						assignments of that class. Additionally, we use the
+						instructions on the assignments you create to provide
+						your students with more tailored feedback on their work,
+						and we&apos;ll use your Google Classroom class to
+						automatically find instructions on assignments for you.
+						However, we are occasionally unable to find instructions
+						on assignments on Google Classroom, so there is a slight
+						chance that not all instructions on assignments will be
+						imported properly. But ultimately, this should not be
+						detrimental, and this feature should make using this
+						platform much more convenvient for you. However, in
+						order to access your class in Google Classroom,
+						we&apos;ll need to be granted extra permission to access
+						your Google Account, and you&apos;ll need to
+						reauthenticate with Google.
 					</div>
 
 					<FancyButton

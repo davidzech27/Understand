@@ -21,6 +21,8 @@ const FancyButton: React.FC<Props> = ({
 	className,
 	...props
 }) => {
+	if (loading) disabled = true
+
 	const buttonClassName = className
 		?.split(" ")
 		.filter((name) => !(name.includes("text") || name.includes("font")))

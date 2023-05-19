@@ -10,21 +10,21 @@ const config = {
 				"scale-in": {
 					"0%": {
 						opacity: "0",
-						transform: "rotateX(-30deg) scale(0.9)",
+						transform: "scale(0.95)",
 					},
 					"100%": {
 						opacity: "1",
-						transform: "rotateX(0deg) scale(1)",
+						transform: "scale(1)",
 					},
 				},
 				"scale-out": {
 					"0%": {
 						opacity: "1",
-						transform: "rotateX(0deg) scale(1)",
+						transform: "scale(1)",
 					},
 					"100%": {
 						opacity: "0",
-						transform: "rotateX(-30deg) scale(0.9)",
+						transform: "scale(0.95)",
 					},
 				},
 			},

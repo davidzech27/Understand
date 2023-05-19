@@ -1,36 +1,30 @@
 "use client"
-import * as Toggle from "@radix-ui/react-toggle"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 import cn from "../utils/cn"
 
-interface Props extends Toggle.ToggleProps {
-	onToggle: () => void
-	toggled: boolean
+interface Props {
+	children: React.ReactNode
+	href: string
+	className?: string
 }
 
-const ToggleButton: React.FC<Props> = ({
-	children,
-	onToggle,
-	toggled,
-	className,
-	...props
-}) => {
+const LinkButton: React.FC<Props> = ({ children, href, className }) => {
 	return (
-		<Toggle.Root
-			{...props}
-			onPressedChange={onToggle}
-			pressed={toggled}
+		<Link
+			href={href}
 			className={cn(
 				"rounded-md py-2.5 px-6 text-lg font-medium transition-all duration-150",
-				toggled
+				usePathname() === href
 					? "bg-surface-selected opacity-80 focus-within:bg-surface-selected-hover hover:bg-surface-selected-hover"
 					: "opacity-60 hover:bg-surface-hover hover:opacity-80 focus-visible:bg-surface-hover focus-visible:opacity-80",
 				className
 			)}
 		>
 			{children}
-		</Toggle.Root>
+		</Link>
 	)
 }
 
-export default ToggleButton
+export default LinkButton

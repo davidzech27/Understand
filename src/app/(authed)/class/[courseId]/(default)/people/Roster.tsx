@@ -128,14 +128,14 @@ const Roster: React.FC<Props> = ({ courseId, role, roster }) => {
 
 								if (role === "teacher" && student.signedUp) {
 									return (
-										<Row.Item key={student.email}>
-											<Link
-												href={`/class/${courseId}/student/${student.email}`}
-												className="flex h-20 items-center justify-between"
-											>
+										<Link
+											href={`/class/${courseId}/student/${student.email}`}
+											className="flex h-20 items-center justify-between"
+										>
+											<Row.Item key={student.email}>
 												{inner}
-											</Link>
-										</Row.Item>
+											</Row.Item>
+										</Link>
 									)
 								} else {
 									return (
