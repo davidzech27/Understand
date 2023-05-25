@@ -395,7 +395,14 @@ const Feedback: React.FC<Props> = ({ assignment, profileName, courseName }) => {
 					frequencyPenalty,
 				}) => {
 					if (paragraph === undefined && sentence === undefined) {
-						generalFeedback && (generalFeedback.generating = false)
+						generalFeedback &&
+							setGeneralFeedback(
+								(generalFeedback) =>
+									generalFeedback && {
+										...generalFeedback,
+										generating: false,
+									}
+							)
 					} else {
 						setSpecificFeedbackList(
 							produce((specificFeedbackList) => {
