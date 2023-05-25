@@ -42,6 +42,7 @@ const User = ({ email }: { email: string }) => ({
 			.where(eq(user.email, email))
 	},
 	delete: async () => {
+		// consider deleting user's feedback
 		await Promise.all([
 			db.delete(user).where(eq(user.email, email)),
 			db

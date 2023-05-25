@@ -7,6 +7,8 @@ import {
 	studentToCourse,
 	teacherToCourse,
 	assignment,
+	feedback,
+	followUp,
 } from "~/db/schema"
 import Resource from "./Resource"
 
@@ -69,6 +71,9 @@ const Course = ({ id }: { id: string }) => ({
 			db.delete(course).where(eq(course.id, id)),
 			db.delete(teacherToCourse).where(eq(teacherToCourse.courseId, id)),
 			db.delete(studentToCourse).where(eq(studentToCourse.courseId, id)),
+			db.delete(assignment).where(eq(assignment.courseId, id)),
+			db.delete(feedback).where(eq(feedback.courseId, id)),
+			db.delete(followUp).where(eq(followUp.courseId, id)),
 			Resource({ courseId: id }).delete({ where: {} }),
 		])
 	},

@@ -1,7 +1,7 @@
 import { eq, and } from "drizzle-orm/expressions"
 
 import db from "~/db/db"
-import { assignment } from "~/db/schema"
+import { assignment, feedback, followUp } from "~/db/schema"
 
 const Assignment = ({
 	courseId,
@@ -99,14 +99,33 @@ const Assignment = ({
 			)
 	},
 	delete: async () => {
-		await db
-			.delete(assignment)
-			.where(
-				and(
-					eq(assignment.courseId, courseId),
-					eq(assignment.assignmentId, assignmentId)
-				)
-			)
+		// consider deleting resources
+		await Promise.all([
+			db
+				.delete(assignment)
+				.where(
+					and(
+						eq(assignment.courseId, courseId),
+						eq(assignment.assignmentId, assignmentId)
+					)
+				),
+			db
+				.delete(feedback)
+				.where(
+					and(
+						eq(feedback.courseId, courseId),
+						eq(feedback.assignmentId, assignmentId)
+					)
+				),
+			db
+				.delete(followUp)
+				.where(
+					and(
+						eq(feedback.courseId, courseId),
+						eq(feedback.assignmentId, assignmentId)
+					)
+				),
+		])
 	},
 })
 

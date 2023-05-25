@@ -36,7 +36,7 @@
 		scrollbar-width: thin;
 	}
 
-	*{
+	* {
 		overflow-wrap: anywhere;
 	}
 }

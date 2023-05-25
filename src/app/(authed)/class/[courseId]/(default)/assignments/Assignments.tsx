@@ -45,25 +45,24 @@ const Assignments: React.FC<Props> = ({ courseId, role, assignments }) => {
 				}
 			>
 				{({ item: assignment }) => (
-					<Link
-						href={`/class/${courseId}/${
-							role === "teacher" ? "assignment" : "feedback"
-						}/${assignment.assignmentId}`}
-					>
-						<Row.Item key={assignment.assignmentId}>
-							<div className="flex h-20 items-center justify-between">
-								<span className="text-lg font-medium opacity-90">
-									{assignment.title}
-								</span>
+					<Row.Item key={assignment.assignmentId}>
+						<Link
+							href={`/class/${courseId}/${
+								role === "teacher" ? "assignment" : "feedback"
+							}/${assignment.assignmentId}`}
+							className="flex h-20 items-center justify-between"
+						>
+							<span className="text-lg font-medium opacity-90">
+								{assignment.title}
+							</span>
 
-								<span className="opacity-60">
-									{assignment.dueAt
-										? `Due ${formatDate(assignment.dueAt)}`
-										: "No due date"}
-								</span>
-							</div>
-						</Row.Item>
-					</Link>
+							<span className="opacity-60">
+								{assignment.dueAt
+									? `Due ${formatDate(assignment.dueAt)}`
+									: "No due date"}
+							</span>
+						</Link>
+					</Row.Item>
 				)}
 			</Row.List>
 		</Card>

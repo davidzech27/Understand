@@ -62,7 +62,7 @@ const Row = {
 					}
 				}}
 				className={cn(
-					"h-full w-full rounded-md border-[0.75px] border-border pl-6 pr-8 outline-none transition-all duration-150",
+					"rounded-md border-[0.75px] border-border pl-6 pr-8 outline-none transition-all duration-150",
 					!disabled &&
 						cn(
 							"focus-visible:outline-border",
