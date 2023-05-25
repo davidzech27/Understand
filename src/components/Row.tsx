@@ -20,7 +20,6 @@ interface ItemProps {
 	onKeyboardFocus?: () => void
 	selected?: boolean
 	disabled?: boolean
-	className?: string
 }
 
 const Row = {
@@ -44,7 +43,6 @@ const Row = {
 		onKeyboardFocus,
 		selected,
 		disabled,
-		className,
 	}: ItemProps) => {
 		return (
 			<li
@@ -71,8 +69,7 @@ const Row = {
 							selected
 								? "bg-surface-selected hover:bg-surface-selected-hover"
 								: "bg-surface hover:bg-surface-hover"
-						),
-					className
+						)
 				)}
 			>
 				{children}

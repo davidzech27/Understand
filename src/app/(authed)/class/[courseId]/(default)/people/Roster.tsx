@@ -131,11 +131,10 @@ const Roster: React.FC<Props> = ({ courseId, role, roster }) => {
 										<Link
 											href={`/class/${courseId}/student/${student.email}`}
 										>
-											<Row.Item
-												key={student.email}
-												className="flex h-20 items-center justify-between"
-											>
-												{inner}
+											<Row.Item key={student.email}>
+												<div className="flex h-20 items-center justify-between">
+													{inner}
+												</div>
 											</Row.Item>
 										</Link>
 									)
