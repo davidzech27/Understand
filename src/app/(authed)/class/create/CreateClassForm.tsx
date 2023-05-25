@@ -344,23 +344,24 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise }) => {
 									onKeyboardFocus={() =>
 										setSelectedCourseId(id)
 									}
-									className="flex h-20 cursor-pointer items-center"
 								>
-									<Avatar
-										src={undefined}
-										name={name}
-										fallbackColor="secondary"
-										className="h-12 w-12"
-									/>
+									<div className="flex h-20 cursor-pointer items-center">
+										<Avatar
+											src={undefined}
+											name={name}
+											fallbackColor="secondary"
+											className="h-12 w-12"
+										/>
 
-									<div className="ml-3 flex flex-shrink flex-col">
-										<span className="mb-[1px] font-medium leading-none opacity-90">
-											{name}
-										</span>
+										<div className="ml-3 flex flex-shrink flex-col">
+											<span className="mb-[1px] font-medium leading-none opacity-90">
+												{name}
+											</span>
 
-										<span className="text-sm opacity-60">
-											{section}
-										</span>
+											<span className="text-sm opacity-60">
+												{section}
+											</span>
+										</div>
 									</div>
 								</Row.Item>
 							)}

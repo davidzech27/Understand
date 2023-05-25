@@ -142,7 +142,7 @@ const ClassTabs: React.FC<Props> = ({
 					}}
 					className="flex h-full flex-col justify-between"
 				>
-					<div className="h-[calc(60vh-6.5rem-5.5rem)] space-y-2 overflow-y-scroll">
+					<div className="h-[calc(60vh-6.5rem-5.75rem)] space-y-2 overflow-y-scroll">
 						<div className="flex flex-col space-y-2">
 							<div className="ml-1 font-medium opacity-80">
 								Name

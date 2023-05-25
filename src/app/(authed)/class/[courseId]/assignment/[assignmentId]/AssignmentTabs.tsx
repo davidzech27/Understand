@@ -11,6 +11,7 @@ import TextInput from "~/components/TextInput"
 import Modal from "~/components/Modal"
 import updateAssignmentAction from "./updateAssignmentAction"
 import deleteAssignmentAction from "./deleteAssignmentAction"
+import TextArea from "~/components/TextArea"
 
 interface Props {
 	assignment: {
@@ -127,14 +128,14 @@ const AssignmentTabs: React.FC<Props> = ({ assignment }) => {
 					}}
 					className="flex h-full flex-col justify-between"
 				>
-					<div className="flex flex-col space-y-2">
+					<div className="flex h-[calc(60vh-6.5rem-5.75rem)] flex-col space-y-2 overflow-y-scroll">
 						<div className="ml-1 font-medium opacity-80">Title</div>
 
 						<TextInput
 							value={titleInput}
 							setValue={setTitleInput}
 							placeholder="Assignment title"
-							className="py-2.5 pl-4 text-base"
+							className="h-min py-2.5 pl-4 text-base"
 						/>
 
 						<div className="ml-1 font-medium opacity-80">
@@ -145,14 +146,14 @@ const AssignmentTabs: React.FC<Props> = ({ assignment }) => {
 							value={descriptionInput}
 							setValue={setDescriptionInput}
 							placeholder="Description"
-							className="py-2.5 pl-4 text-base"
+							className="h-min py-2.5 pl-4 text-base"
 						/>
 
 						<div className="ml-1 font-medium opacity-80">
 							Instructions
 						</div>
 
-						<TextInput
+						<TextArea
 							value={instructionsInput}
 							setValue={setInstructionsInput}
 							placeholder="Instructions"
