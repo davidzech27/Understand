@@ -8,6 +8,7 @@ import {
 	teacherToCourse,
 	assignment,
 } from "~/db/schema"
+import Resource from "./Resource"
 
 const Course = ({ id }: { id: string }) => ({
 	create: async ({
@@ -47,8 +48,7 @@ const Course = ({ id }: { id: string }) => ({
 		name,
 		section,
 		googleClassroomId,
-	}: // linkedUrl can't be changed yet, and I'm not sure if it ever will be able to be
-	{
+	}: {
 		name?: string
 		section?: string
 		googleClassroomId?: string
@@ -69,6 +69,7 @@ const Course = ({ id }: { id: string }) => ({
 			db.delete(course).where(eq(course.id, id)),
 			db.delete(teacherToCourse).where(eq(teacherToCourse.courseId, id)),
 			db.delete(studentToCourse).where(eq(studentToCourse.courseId, id)),
+			Resource({ courseId: id }).delete({ where: {} }),
 		])
 	},
 	roster: async () => {
@@ -126,7 +127,7 @@ const Course = ({ id }: { id: string }) => ({
 			courseId: assignment.courseId,
 			assignmentId: assignment.assignmentId,
 			title: assignment.title,
-			studentDescription: assignment.studentDescription ?? undefined,
+			description: assignment.description ?? undefined,
 			instructions: assignment.instructions ?? undefined,
 			context: assignment.context ?? undefined,
 			dueAt: assignment.dueAt ?? undefined,

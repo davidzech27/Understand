@@ -1,12 +1,6 @@
 "use client"
-import { useEffect } from "react"
-import * as Sentry from "@sentry/nextjs"
 
 const Error = ({ error }: { error: Error }) => {
-	useEffect(() => {
-		Sentry.captureException(error)
-	}, [error])
-
 	return (
 		<main className="flex h-screen w-screen flex-col bg-black">
 			<div className="flex-[0.875]" />

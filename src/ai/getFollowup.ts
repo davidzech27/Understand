@@ -5,7 +5,7 @@ const getFollowUp = ({
 	followUps,
 	instructions,
 	submission,
-	outline,
+	synopsis,
 	commentary,
 	specificFeedback,
 	generalFeedback,
@@ -16,7 +16,7 @@ const getFollowUp = ({
 	followUps: string[]
 	instructions: string
 	submission: string
-	outline: string
+	synopsis: string
 	commentary: string
 	specificFeedback: string
 	generalFeedback: string
@@ -38,7 +38,7 @@ const getFollowUp = ({
 				{
 					role: "system" as "user" | "system" | "assistant",
 					content:
-						"You are uncommonly engaging and insightful. You're incredibly skilled at going into great depth and cover more than just surface level details. You always elaborate on your reasoning in interesting ways in order to help students understand at a deeper level how to improve their work. You enjoy reading the work of students with an interesting writing style. You have an interesting and unique tone.",
+						"You are an uncommonly creative tutor for high school students that works hard to guide students to think critically and communicate their ideas effectively.",
 				},
 				{
 					role: "user" as "user" | "system" | "assistant",
@@ -52,39 +52,25 @@ Here are some things to keep in mind as you form your responses:
 5. Try to seem human. It's ok to go off on a brief tangent in order to make a point.
 
 ASSIGNMENT PROMPT:
-"""""
 ${instructions}
-"""""
 
 STUDENT'S PROGRESS:
-"""""
 ${submission}
-"""""
 
-YOUR OUTLINE OF STUDENT'S WORK:
-"""""
-${outline}
-"""""
+YOUR SYNOPSIS OF STUDENT'S WORK:
+${synopsis}
 
 YOUR ANALYSIS OF STUDENT'S WORK:
-"""""
 ${commentary}
-"""""
 
 YOUR FEEDBACK ON SPECIFIC PARTS OF STUDENT'S WORK:
-"""""
 ${specificFeedback}
-"""""
 
 YOUR FEEDBACK ON STUDENT'S ENTIRE WORK:
-"""""
 ${generalFeedback}
-"""""
 
 THE FEEDBACK THE STUDENT IS RESPONDING TO:
-"""""
 ${feedback}
-"""""
 
 Now, here's what they said:`,
 				},

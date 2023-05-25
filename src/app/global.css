@@ -35,4 +35,8 @@
 		scrollbar-color: #bfbfbf #00000000;
 		scrollbar-width: thin;
 	}
+
+	*{
+		overflow-wrap: anywhere;
+	}
 }

@@ -12,7 +12,7 @@ interface Props {
 		courseId: string
 		assignmentId: string
 		title: string
-		studentDescription: string | undefined
+		description: string | undefined
 		instructions: string | undefined
 		context: string | undefined
 		dueAt: Date | undefined
@@ -49,9 +49,11 @@ const Assignments: React.FC<Props> = ({ courseId, role, assignments }) => {
 						href={`/class/${courseId}/${
 							role === "teacher" ? "assignment" : "feedback"
 						}/${assignment.assignmentId}`}
-						className="flex h-20 items-center justify-between"
 					>
-						<Row.Item key={assignment.assignmentId}>
+						<Row.Item
+							key={assignment.assignmentId}
+							className="flex h-20 items-center justify-between"
+						>
 							<span className="text-lg font-medium opacity-90">
 								{assignment.title}
 							</span>

@@ -15,8 +15,6 @@ const courseSchema = z.object({
 	url: z.string().url(),
 })
 
-const courseListSchema = courseSchema.array()
-
 const teacherSchema = z.object({
 	email: z.string().optional(),
 	name: z.string(),
@@ -34,7 +32,7 @@ const rosterSchema = z.object({
 	students: studentSchema.array(),
 })
 
-const materialSchema = z.discriminatedUnion("type", [
+const attachmentSchema = z.discriminatedUnion("type", [
 	z.object({
 		type: z.literal("driveFile"),
 		driveFile: z.object({
@@ -72,15 +70,23 @@ const materialSchema = z.discriminatedUnion("type", [
 	}),
 ])
 
-const courseWorkSchema = z.object({
+const assignmentSchema = z.object({
 	id: z.string(),
 	title: z.string(),
 	description: z.string().optional(),
-	materials: materialSchema.array(),
+	attachments: attachmentSchema.array(),
 	dueAt: z.date().optional(),
+	url: z.string().url(),
 })
 
-const courseWorkListSchema = courseWorkSchema.array()
+const materialSchema = z.object({
+	id: z.string(),
+	title: z.string(),
+	description: z.string().optional(),
+	attachments: attachmentSchema.array(),
+	dueAt: z.date().optional(),
+	url: z.string().url(),
+})
 
 const studentSubmissionAttachmentSchema = z.discriminatedUnion("type", [
 	z.object({
@@ -93,7 +99,7 @@ const studentSubmissionAttachmentSchema = z.discriminatedUnion("type", [
 		}),
 	}),
 	z.object({
-		type: z.literal("youTubeVideo"), // the capital t is the only difference between this is and materialSchema
+		type: z.literal("youTubeVideo"), // the capital t is the only difference between this is and attachmentSchema
 		youTubeVideo: z.object({
 			id: z.string(),
 			title: z.string().optional(),
@@ -119,9 +125,6 @@ const studentSubmissionAttachmentSchema = z.discriminatedUnion("type", [
 		}),
 	}),
 ])
-
-const studentSubmissionAttachmentListSchema =
-	studentSubmissionAttachmentSchema.array()
 
 const GoogleAPI = async ({
 	accessToken,
@@ -207,7 +210,7 @@ const GoogleAPI = async ({
 				nextPageToken = response.nextPageToken
 			}
 
-			return courseListSchema.parse(
+			return courseSchema.array().parse(
 				courses.map((course) => ({
 					...course,
 					url: course.alternateLink,
@@ -250,7 +253,7 @@ const GoogleAPI = async ({
 				nextPageToken = response.nextPageToken
 			}
 
-			return courseListSchema.parse(
+			return courseSchema.array().parse(
 				courses.map((course) => ({
 					...course,
 					url: course.alternateLink,
@@ -358,7 +361,7 @@ const GoogleAPI = async ({
 				})),
 			})
 		},
-		courseWork: async ({ courseId }: { courseId: string }) => {
+		courseAssignments: async ({ courseId }: { courseId: string }) => {
 			type Response = {
 				courseWork: {
 					id: unknown
@@ -439,7 +442,7 @@ const GoogleAPI = async ({
 				nextPageToken = response.nextPageToken
 			}
 
-			const courseWorkTransformed = courseWork
+			const assignments = courseWork
 				.map(
 					({
 						id,
@@ -457,7 +460,7 @@ const GoogleAPI = async ({
 									title,
 									description,
 									url: alternateLink,
-									materials: (materials ?? []).map(
+									attachments: (materials ?? []).map(
 										({
 											driveFile,
 											youtubeVideo,
@@ -538,7 +541,7 @@ const GoogleAPI = async ({
 				)
 				.filter(Boolean)
 
-			return courseWorkListSchema.parse(courseWorkTransformed)
+			return assignmentSchema.array().parse(assignments)
 		},
 		courseMaterials: async ({ courseId }: { courseId: string }) => {
 			type Response = {
@@ -638,7 +641,7 @@ const GoogleAPI = async ({
 					title,
 					description,
 					url: alternateLink,
-					materials: (materials ?? []).map(
+					attachments: (materials ?? []).map(
 						({ driveFile, youtubeVideo, link, form }) => {
 							if (driveFile)
 								return {
@@ -704,7 +707,7 @@ const GoogleAPI = async ({
 				})
 			)
 
-			return courseWorkListSchema.parse(courseWorkMaterialTransformed)
+			return materialSchema.array().parse(courseWorkMaterialTransformed)
 		},
 		studentSubmissions: async ({
 			courseId,
@@ -849,9 +852,9 @@ const GoogleAPI = async ({
 				)
 				.filter(Boolean)
 
-			return studentSubmissionAttachmentListSchema.parse(
-				studentSubmissionsTransformed
-			)
+			return studentSubmissionAttachmentSchema
+				.array()
+				.parse(studentSubmissionsTransformed)
 		},
 		getDriveFileText: async ({ id }: { id: string }) => {
 			return await (

@@ -17,7 +17,7 @@ interface Props {
 		courseId: string
 		assignmentId: string
 		title: string
-		studentDescription?: string
+		description?: string
 		instructions?: string
 		context?: string
 		dueAt?: Date
@@ -30,8 +30,8 @@ const AssignmentTabs: React.FC<Props> = ({ assignment }) => {
 	const [settingsModalOpen, setSettingsModalOpen] = useState(false)
 
 	const [titleInput, setTitleInput] = useState(assignment.title)
-	const [studentDescriptionInput, setStudentDescriptionInput] = useState(
-		assignment.studentDescription ?? ""
+	const [descriptionInput, setDescriptionInput] = useState(
+		assignment.description ?? ""
 	)
 	const [instructionsInput, setInstructionsInput] = useState(
 		assignment.instructions ?? ""
@@ -41,7 +41,7 @@ const AssignmentTabs: React.FC<Props> = ({ assignment }) => {
 
 	const updateDisabled =
 		(titleInput === assignment.title &&
-			studentDescriptionInput === assignment.studentDescription &&
+			descriptionInput === assignment.description &&
 			instructionsInput === assignment.instructions) ||
 		titleInput.trim().length === 0 ||
 		instructionsInput.trim().length === 0
@@ -59,7 +59,7 @@ const AssignmentTabs: React.FC<Props> = ({ assignment }) => {
 			courseId: assignment.courseId,
 			assignmentId: assignment.assignmentId,
 			title: titleInput.trim(),
-			studentDescription: studentDescriptionInput.trim() || undefined,
+			description: descriptionInput.trim() || undefined,
 			instructions: instructionsInput.trim(),
 		})
 
@@ -142,8 +142,8 @@ const AssignmentTabs: React.FC<Props> = ({ assignment }) => {
 						</div>
 
 						<TextInput
-							value={studentDescriptionInput}
-							setValue={setStudentDescriptionInput}
+							value={descriptionInput}
+							setValue={setDescriptionInput}
 							placeholder="Description"
 							className="py-2.5 pl-4 text-base"
 						/>
@@ -160,17 +160,18 @@ const AssignmentTabs: React.FC<Props> = ({ assignment }) => {
 						/>
 
 						<div className="flex space-x-3 pt-3">
-							{!confirmingDeleteAssignment ? (
-								<Button
-									onClick={() =>
-										setConfirmingDeleteAssignment(true)
-									}
-									type="button"
-									className="text-lg"
-								>
-									Delete assignment
-								</Button>
-							) : (
+							<Button
+								onClick={() =>
+									setConfirmingDeleteAssignment(true)
+								}
+								type="button"
+								disabled={confirmingDeleteAssignment}
+								className="text-lg"
+							>
+								Delete assignment
+							</Button>
+
+							{confirmingDeleteAssignment && (
 								<>
 									<Button
 										onClick={onDeleteAssignment}

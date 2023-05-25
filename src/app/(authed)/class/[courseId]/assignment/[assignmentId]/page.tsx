@@ -26,7 +26,7 @@ interface Params {
 	courseId: string
 	assignmentId: string
 }
-
+// todo - make multi-tab and make instructions be on main page and when clicked it should open up editing modal with instructions focused
 const AssignmentPage = async ({
 	params: { courseId, assignmentId },
 }: {
@@ -64,6 +64,7 @@ const AssignmentPage = async ({
 					>
 						{assignment.title}
 					</span>
+
 					<span className="relative bottom-[1px] mr-3 ml-6 flex-shrink-0 text-lg font-medium leading-none opacity-60">
 						{assignment.dueAt
 							? `Due ${formatDate(assignment.dueAt)}`
@@ -71,13 +72,13 @@ const AssignmentPage = async ({
 					</span>
 				</a>
 
-				<p className="select-text px-1 text-sm opacity-80">
-					{assignment.studentDescription}
-				</p>
+				{assignment.description !== undefined && (
+					<p className="select-text px-1 pb-4 text-sm opacity-80">
+						{assignment.description}
+					</p>
+				)}
 
-				<div className="mt-5">
-					<AssignmentTabs assignment={assignment} />
-				</div>
+				<AssignmentTabs assignment={assignment} />
 			</Card>
 
 			<Card className="flex h-full flex-col py-5 px-6">

@@ -1,5 +1,4 @@
 import { eq, and } from "drizzle-orm/expressions"
-import { LucideUnlink } from "lucide-react"
 
 import db from "~/db/db"
 import { assignment } from "~/db/schema"
@@ -13,14 +12,14 @@ const Assignment = ({
 }) => ({
 	create: async ({
 		title,
-		studentDescription,
+		description,
 		instructions,
 		context,
 		dueAt,
 		linkedUrl,
 	}: {
 		title: string
-		studentDescription: string | undefined
+		description: string | undefined
 		instructions: string | undefined
 		context: string | undefined
 		dueAt: Date | undefined
@@ -30,7 +29,7 @@ const Assignment = ({
 			courseId,
 			assignmentId,
 			title,
-			studentDescription,
+			description,
 			instructions,
 			context,
 			dueAt,
@@ -42,7 +41,7 @@ const Assignment = ({
 			await db
 				.select({
 					title: assignment.title,
-					studentDescription: assignment.studentDescription,
+					description: assignment.description,
 					instructions: assignment.instructions,
 					context: assignment.context,
 					dueAt: assignment.dueAt,
@@ -63,7 +62,7 @@ const Assignment = ({
 			courseId,
 			assignmentId,
 			title: row.title,
-			studentDescription: row.studentDescription ?? undefined,
+			description: row.description ?? undefined,
 			instructions: row.instructions ?? undefined,
 			context: row.context ?? undefined,
 			dueAt: row.dueAt ?? undefined,
@@ -72,25 +71,22 @@ const Assignment = ({
 	},
 	update: async ({
 		title,
-		studentDescription,
+		description,
 		instructions,
 		context,
 		dueAt,
 	}: {
 		title?: string
-		studentDescription?: string
+		description?: string
 		instructions?: string
 		context?: string
 		dueAt?: Date
-		// linkedUrl can't be changed'
 	}) => {
 		await db
 			.update(assignment)
 			.set({
 				...(title !== undefined ? { title } : {}),
-				...(studentDescription !== undefined
-					? { studentDescription }
-					: {}),
+				...(description !== undefined ? { description } : {}),
 				...(instructions !== undefined ? { instructions } : {}),
 				...(context !== undefined ? { context } : {}),
 				...(dueAt !== undefined ? { dueAt } : {}),

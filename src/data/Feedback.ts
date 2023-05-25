@@ -1,7 +1,7 @@
 import { eq, and } from "drizzle-orm/expressions"
 
 import db from "~/db/db"
-import { feedback } from "~/db/schema"
+import { feedback, followUp } from "~/db/schema"
 
 const Feedback = ({
 	courseId,
@@ -16,12 +16,12 @@ const Feedback = ({
 }) => ({
 	create: async ({
 		submission,
-		rawFeedback,
+		rawResponse,
 		metadata,
 	}: {
 		submission: string
-		rawFeedback: string
-		metadata: Record<string, string>
+		rawResponse: string
+		metadata: Record<string, unknown>
 	}) => {
 		await db.insert(feedback).values({
 			courseId,
@@ -29,7 +29,7 @@ const Feedback = ({
 			userEmail,
 			givenAt,
 			submission,
-			rawFeedback,
+			rawResponse,
 			metadata,
 		})
 	},
@@ -38,7 +38,7 @@ const Feedback = ({
 			await db
 				.select({
 					submission: feedback.submission,
-					rawFeedback: feedback.rawFeedback,
+					rawResponse: feedback.rawResponse,
 					metadata: feedback.metadata,
 				})
 				.from(feedback)
@@ -60,21 +60,59 @@ const Feedback = ({
 			userEmail,
 			givenAt,
 			submission: row.submission,
-			rawFeedback: row.rawFeedback,
+			rawResponse: row.rawResponse,
 			metadata: row.metadata,
 		}
 	},
 	delete: async () => {
-		await db
-			.delete(feedback)
-			.where(
-				and(
-					eq(feedback.courseId, courseId),
-					eq(feedback.assignmentId, assignmentId),
-					eq(feedback.userEmail, userEmail),
-					eq(feedback.givenAt, givenAt)
-				)
-			)
+		await Promise.all([
+			db
+				.delete(feedback)
+				.where(
+					and(
+						eq(feedback.courseId, courseId),
+						eq(feedback.assignmentId, assignmentId),
+						eq(feedback.userEmail, userEmail),
+						eq(feedback.givenAt, givenAt)
+					)
+				),
+			db
+				.delete(followUp)
+				.where(
+					and(
+						eq(followUp.courseId, courseId),
+						eq(followUp.assignmentId, assignmentId),
+						eq(followUp.userEmail, userEmail),
+						eq(followUp.feedbackGivenAt, givenAt)
+					)
+				),
+		])
+	},
+	addFollowUp: async ({
+		paragraphNumber,
+		sentenceNumber,
+		query,
+		rawResponse,
+		metadata,
+	}: {
+		paragraphNumber: number | undefined
+		sentenceNumber: number | undefined
+		query: string
+		rawResponse: string
+		metadata: Record<string, unknown>
+	}) => {
+		db.insert(followUp).values({
+			courseId,
+			assignmentId,
+			userEmail,
+			feedbackGivenAt: givenAt,
+			givenAt: new Date(),
+			paragraphNumber,
+			sentenceNumber,
+			query,
+			rawResponse,
+			metadata,
+		})
 	},
 })
 

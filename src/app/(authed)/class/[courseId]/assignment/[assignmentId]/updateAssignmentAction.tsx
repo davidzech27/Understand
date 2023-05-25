@@ -12,7 +12,7 @@ const updateAssignmentAction = zact(
 		courseId: z.string(),
 		assignmentId: z.string(),
 		title: z.string().min(1),
-		studentDescription: z.string().min(1).optional(),
+		description: z.string().min(1).optional(),
 		instructions: z.string().min(1),
 		dueAt: z.date().optional(),
 	})
@@ -21,7 +21,7 @@ const updateAssignmentAction = zact(
 		courseId,
 		assignmentId,
 		title,
-		studentDescription,
+		description,
 		instructions,
 		dueAt,
 	}) => {
@@ -33,7 +33,7 @@ const updateAssignmentAction = zact(
 
 		await Assignment({ courseId, assignmentId }).update({
 			title,
-			studentDescription,
+			description,
 			instructions,
 			dueAt,
 		})

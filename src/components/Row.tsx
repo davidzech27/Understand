@@ -20,6 +20,7 @@ interface ItemProps {
 	onKeyboardFocus?: () => void
 	selected?: boolean
 	disabled?: boolean
+	className?: string
 }
 
 const Row = {
@@ -43,6 +44,7 @@ const Row = {
 		onKeyboardFocus,
 		selected,
 		disabled,
+		className,
 	}: ItemProps) => {
 		return (
 			<li
@@ -62,14 +64,15 @@ const Row = {
 					}
 				}}
 				className={cn(
-					"rounded-md border-[0.75px] border-border pl-6 pr-8 outline-none transition-all duration-150",
+					"h-full w-full rounded-md border-[0.75px] border-border pl-6 pr-8 outline-none transition-all duration-150",
 					!disabled &&
 						cn(
 							"focus-visible:outline-border",
 							selected
 								? "bg-surface-selected hover:bg-surface-selected-hover"
 								: "bg-surface hover:bg-surface-hover"
-						)
+						),
+					className
 				)}
 			>
 				{children}

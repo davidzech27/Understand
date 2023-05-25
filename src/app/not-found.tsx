@@ -1,5 +1,7 @@
 import * as Sentry from "@sentry/nextjs"
 
+import { env } from "~/env.mjs"
+
 export const metadata = {
 	title: "Link not found | Understand",
 	description:
@@ -7,7 +9,8 @@ export const metadata = {
 }
 
 const NotFoundPage = () => {
-	Sentry.captureEvent({ message: "Link not found" })
+	if (env.NODE_ENV === "production")
+		Sentry.captureEvent({ message: "Link not found" })
 
 	return (
 		<div className="flex h-screen w-full flex-col items-center bg-gradient-to-tr from-primary to-secondary">

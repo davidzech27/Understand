@@ -62,7 +62,7 @@ const ClassLayout = async ({
 							backgroundClip: "text",
 							color: "transparent",
 						}}
-						className="text-6xl font-semibold"
+						className="pb-5 text-6xl font-semibold"
 					>
 						{course.name}
 					</span>
@@ -74,18 +74,16 @@ const ClassLayout = async ({
 					)}
 				</a>
 
-				<div className="mt-5">
-					<ClassTabs
-						course={course}
-						teacherEmails={roster.teachers.map(
-							(teacher) => teacher.email
-						)}
-						studentEmails={roster.students.map(
-							(student) => student.email
-						)}
-						role={role}
-					/>
-				</div>
+				<ClassTabs
+					course={course}
+					teacherEmails={roster.teachers.map(
+						(teacher) => teacher.email
+					)}
+					studentEmails={roster.students.map(
+						(student) => student.email
+					)}
+					role={role}
+				/>
 			</Card>
 
 			{children}

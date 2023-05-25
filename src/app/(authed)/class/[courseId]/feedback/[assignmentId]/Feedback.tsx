@@ -5,10 +5,12 @@ import {
 	useEffect,
 	useImperativeHandle,
 	forwardRef,
+	CSSProperties,
 } from "react"
 import { renderToStaticMarkup } from "react-dom/server"
 import { produce } from "immer"
 import { motion, AnimatePresence } from "framer-motion"
+import { useZact } from "zact/client"
 import { useFocusWithin, useHover } from "react-aria"
 
 import getFeedback from "~/ai/getFeedback"
@@ -19,6 +21,8 @@ import Button from "~/components/Button"
 import TextArea from "~/components/TextArea"
 import breakIntoSentences from "~/utils/breakIntoSentences"
 import cn from "~/utils/cn"
+import registerFeedbackAction from "./registerFeedbackAction"
+import registerFollowUpAction from "./registerFollowUpAction"
 
 // todo - re-add feature that allows students to import work from google classroom
 
@@ -27,7 +31,7 @@ interface Props {
 		courseId: string
 		assignmentId: string
 		title: string
-		studentDescription?: string
+		description?: string
 		instructions: string
 		context?: string
 		dueAt?: Date
@@ -61,7 +65,15 @@ const Feedback: React.FC<Props> = ({ assignment, profileName, courseName }) => {
 
 	const [generating, setGenerating] = useState(false)
 
-	const [generalFeedback, setGeneralFeedback] = useState("")
+	const [generalFeedback, setGeneralFeedback] = useState<
+		| {
+				content: string
+				generating: boolean
+				followUps: string[]
+				state: "focus" | "hover" | undefined
+		  }
+		| undefined
+	>(undefined)
 
 	const [specificFeedbackList, setSpecificFeedbackList] = useState<
 		{
@@ -74,8 +86,6 @@ const Feedback: React.FC<Props> = ({ assignment, profileName, courseName }) => {
 		}[]
 	>([])
 
-	const generalFeedbackScroller = useRef<HTMLDivElement>(null)
-
 	const [submissionWidth, setSubmissionWidth] = useState<number>()
 
 	const headerRef = useRef<HTMLDivElement>(null)
@@ -83,19 +93,28 @@ const Feedback: React.FC<Props> = ({ assignment, profileName, courseName }) => {
 	const [headerHeight, setHeaderHeight] = useState<number>()
 
 	useEffect(() => {
-		// todo - make run on window resize
-		if (submissionRef.current) {
-			setSubmissionWidth(submissionRef.current.getWidth())
+		const positionContent = () => {
+			if (submissionRef.current) {
+				setSubmissionWidth(submissionRef.current.getWidth())
+			}
+
+			if (headerRef.current) {
+				setHeaderHeight(headerRef.current.offsetHeight + 20)
+			}
 		}
 
-		if (headerRef.current) {
-			setHeaderHeight(headerRef.current.offsetHeight + 20)
+		positionContent()
+
+		window.addEventListener("resize", positionContent)
+
+		return () => {
+			window.removeEventListener("resize", positionContent)
 		}
 	}, [])
 
 	const editing =
 		!generating &&
-		generalFeedback.length === 0 &&
+		generalFeedback === undefined &&
 		specificFeedbackList.length === 0
 
 	// const submissionDriveFiles = submissions
@@ -125,6 +144,10 @@ const Feedback: React.FC<Props> = ({ assignment, profileName, courseName }) => {
 		// 	}
 	}
 
+	const { mutate: registerFeedback, data: feedbackData } = useZact(
+		registerFeedbackAction
+	)
+
 	const onGetFeedback = () => {
 		const submissionInput = submissionRef.current?.getText()
 
@@ -133,7 +156,7 @@ const Feedback: React.FC<Props> = ({ assignment, profileName, courseName }) => {
 
 			const start = new Date()
 
-			let generatingStart: Date
+			let producingStart: Date
 
 			getFeedback({
 				submission: submissionInput,
@@ -141,15 +164,16 @@ const Feedback: React.FC<Props> = ({ assignment, profileName, courseName }) => {
 				studentName: profileName,
 				courseName,
 				onGeneralContent: (content) => {
-					setGeneralFeedback(content)
-
-					generalFeedbackScroller.current?.scroll({
-						top: generalFeedbackScroller.current.scrollHeight,
-					})
+					setGeneralFeedback((generalFeedback) => ({
+						content,
+						followUps: [],
+						generating: true,
+						state: generalFeedback?.state ?? undefined,
+					}))
 				},
 				onSpecificContent: ({ content, paragraph, sentence }) => {
-					if (generatingStart === undefined)
-						generatingStart = new Date()
+					if (producingStart === undefined)
+						producingStart = new Date()
 
 					setSpecificFeedbackList(
 						produce((specificFeedbackList) => {
@@ -181,12 +205,20 @@ const Feedback: React.FC<Props> = ({ assignment, profileName, courseName }) => {
 					frequencyPenalty,
 					messages,
 					rawResponse,
-					outline,
+					synopsis,
 					commentary,
 					specificFeedback,
 					generalFeedback,
 				}) => {
 					setGenerating(false)
+
+					setGeneralFeedback(
+						(generalFeedback) =>
+							generalFeedback && {
+								...generalFeedback,
+								generating: false,
+							}
+					)
 
 					setSpecificFeedbackList(
 						produce((specificFeedbackList) => {
@@ -198,38 +230,37 @@ const Feedback: React.FC<Props> = ({ assignment, profileName, courseName }) => {
 
 					setFeedbackResponse({
 						rawResponse,
-						outline,
+						synopsis,
 						commentary,
 						specificFeedback,
 						generalFeedback,
 					})
 
-					// todo - replace with server action that uploads to database
-					// H.track("Feedback", {
-					// 	courseId: assignment.courseId,
-					// 	assignmentId: assignment.assignmentId,
-					// 	model,
-					// 	temperature,
-					// 	presencePenalty,
-					// 	frequencyPenalty,
-					// 	messages: messages
-					// 		.map(
-					// 			(message) =>
-					// 				`Role: ${message.role}\nContent: ${message.content}`
-					// 		)
-					// 		.join("\n\n\n"),
-					// 	...(generatingStart
-					// 		? {
-					// 				secondsAnalyzing:
-					// 					(generatingStart.valueOf() -
-					// 						start.valueOf()) /
-					// 					1000,
-					// 		  }
-					// 		: {}),
-					// 	secondsGenerating:
-					// 		(new Date().valueOf() - generatingStart.valueOf()) /
-					// 		1000,
-					// })
+					registerFeedback({
+						courseId: assignment.courseId,
+						assignmentId: assignment.assignmentId,
+						submission: submissionInput,
+						rawResponse,
+						metadata: {
+							model,
+							temperature,
+							presencePenalty,
+							frequencyPenalty,
+							messages,
+							...(producingStart
+								? {
+										secondsAnalyzing:
+											(producingStart.valueOf() -
+												start.valueOf()) /
+											1000,
+								  }
+								: {}),
+							secondsProducing:
+								(new Date().valueOf() -
+									producingStart.valueOf()) /
+								1000,
+						},
+					})
 
 					console.debug(rawResponse)
 				},
@@ -239,85 +270,123 @@ const Feedback: React.FC<Props> = ({ assignment, profileName, courseName }) => {
 
 	const onTryAgain = () => {
 		setSpecificFeedbackList([])
-		setGeneralFeedback("")
+		setGeneralFeedback(undefined)
 	}
 
 	const [feedbackResponse, setFeedbackResponse] = useState<{
 		rawResponse: string
-		outline: string
+		synopsis: string
 		commentary: string
 		specificFeedback: string
 		generalFeedback: string
 	}>()
+
+	const { mutate: registerFollowUp } = useZact(registerFollowUpAction)
 
 	const onGetFollowUp = ({
 		paragraph,
 		sentence,
 		followUps,
 	}: {
-		paragraph: number
-		sentence: number
+		paragraph?: number
+		sentence?: number
 		followUps: string[]
 	}) => {
-		if (feedbackResponse) {
+		if (feedbackResponse && feedbackData !== null) {
 			const start = new Date()
 
-			setSpecificFeedbackList(
-				produce((specificFeedbackList) => {
-					const specificFeedback = specificFeedbackList.find(
-						(specificFeedback) =>
-							specificFeedback.paragraph === paragraph &&
-							specificFeedback.sentence === sentence
-					)
+			if (paragraph === undefined && sentence === undefined) {
+				setGeneralFeedback(
+					(generalFeedback) =>
+						generalFeedback && {
+							...generalFeedback,
+							followUps,
+							generating: true,
+						}
+				)
+			} else {
+				setSpecificFeedbackList(
+					produce((specificFeedbackList) => {
+						const specificFeedback = specificFeedbackList.find(
+							(specificFeedback) =>
+								specificFeedback.paragraph === paragraph &&
+								specificFeedback.sentence === sentence
+						)
 
-					if (specificFeedback) {
-						specificFeedback.followUps = followUps
+						if (specificFeedback) {
+							specificFeedback.followUps = followUps
 
-						specificFeedback.generating = true
-					}
-				})
-			)
+							specificFeedback.generating = true
+						}
+					})
+				)
+			}
 
 			getFollowup({
 				feedback:
-					specificFeedbackList.find(
-						(specificFeedback) =>
-							specificFeedback.paragraph === paragraph &&
-							specificFeedback.sentence === sentence
-					)?.content ?? "",
+					paragraph === undefined && sentence === undefined
+						? generalFeedback?.content ?? ""
+						: specificFeedbackList.find(
+								(specificFeedback) =>
+									specificFeedback.paragraph === paragraph &&
+									specificFeedback.sentence === sentence
+						  )?.content ?? "",
 				followUps,
 				instructions: assignment.instructions,
 				submission: submissionRef.current?.getText() ?? "",
 				...feedbackResponse,
-				onContent: (content) => {
-					setSpecificFeedbackList(
-						produce((specificFeedbackList) => {
-							const specificFeedback = specificFeedbackList.find(
-								(specificFeedback) =>
-									specificFeedback.paragraph === paragraph &&
-									specificFeedback.sentence === sentence
-							)
+				onContent: (content) =>
+					paragraph === undefined && sentence === undefined
+						? setGeneralFeedback(
+								produce((generalFeedback) => {
+									if (!generalFeedback) return undefined
 
-							if (specificFeedback) {
-								// relies on that user's followUps will be odd and gpt's will be even
-								if (
-									specificFeedback.followUps.length % 2 ===
-									1
-								) {
-									specificFeedback.followUps.push(content)
-								} else {
-									specificFeedback.followUps[
-										specificFeedback.followUps.length - 1
-									] = content
-								}
-							} else {
-								console.error(
-									"This shouldn't happen. followUp requested for specific feedback that doesn't exist"
-								)
-							}
-						})
-					)
-				},
+									if (
+										generalFeedback.followUps.length % 2 ===
+										1
+									) {
+										generalFeedback.followUps.push(content)
+									} else {
+										generalFeedback.followUps[
+											generalFeedback.followUps.length - 1
+										] = content
+									}
+								})
+						  )
+						: setSpecificFeedbackList(
+								produce((specificFeedbackList) => {
+									const specificFeedback =
+										specificFeedbackList.find(
+											(specificFeedback) =>
+												specificFeedback.paragraph ===
+													paragraph &&
+												specificFeedback.sentence ===
+													sentence
+										)
+
+									if (specificFeedback) {
+										// relies on that user's followUps will be odd and gpt's will be even
+										if (
+											specificFeedback.followUps.length %
+												2 ===
+											1
+										) {
+											specificFeedback.followUps.push(
+												content
+											)
+										} else {
+											specificFeedback.followUps[
+												specificFeedback.followUps
+													.length - 1
+											] = content
+										}
+									} else {
+										console.error(
+											"This shouldn't happen. followUp requested for specific feedback that doesn't exist"
+										)
+									}
+								})
+						  ),
 				onFinish: ({
 					messages,
 					model,
@@ -325,38 +394,45 @@ const Feedback: React.FC<Props> = ({ assignment, profileName, courseName }) => {
 					presencePenalty,
 					frequencyPenalty,
 				}) => {
-					// todo - add mixpanel event
-					setSpecificFeedbackList(
-						produce((specificFeedbackList) => {
-							const specificFeedback = specificFeedbackList.find(
-								(specificFeedback) =>
-									specificFeedback.paragraph === paragraph &&
-									specificFeedback.sentence === sentence
-							)
+					if (paragraph === undefined && sentence === undefined) {
+						generalFeedback && (generalFeedback.generating = false)
+					} else {
+						setSpecificFeedbackList(
+							produce((specificFeedbackList) => {
+								const specificFeedback =
+									specificFeedbackList.find(
+										(specificFeedback) =>
+											specificFeedback.paragraph ===
+												paragraph &&
+											specificFeedback.sentence ===
+												sentence
+									)
 
-							if (specificFeedback) {
-								specificFeedback.generating = false
-							}
-						})
-					)
+								if (specificFeedback) {
+									specificFeedback.generating = false
+								}
+							})
+						)
+					}
 
-					// todo - replace with server action that uploads to database
-					// H.track("Follow up", {
-					// 	assignmentId: assignment.assignmentId,
-					// 	courseId: assignment.courseId,
-					// 	messages: messages
-					// 		.map(
-					// 			(message) =>
-					// 				`Role: ${message.role}\nContent: ${message.content}`
-					// 		)
-					// 		.join("\n\n\n"),
-					// 	model,
-					// 	temperature,
-					// 	presencePenalty,
-					// 	frequencyPenalty,
-					// 	secondsGenerating:
-					// 		(new Date().valueOf() - start.valueOf()) / 1000,
-					// })
+					registerFollowUp({
+						courseId: assignment.courseId,
+						assignmentId: assignment.assignmentId,
+						feedbackGivenAt: feedbackData.givenAt,
+						paragraphNumber: paragraph,
+						sentenceNumber: sentence,
+						query: followUps.at(-1) ?? "",
+						rawResponse: messages.at(-1)?.content ?? "",
+						metadata: {
+							model,
+							temperature,
+							presencePenalty,
+							frequencyPenalty,
+							messages,
+							seconds:
+								(new Date().valueOf() - start.valueOf()) / 1000,
+						},
+					})
 				},
 			})
 		}
@@ -441,7 +517,7 @@ const Feedback: React.FC<Props> = ({ assignment, profileName, courseName }) => {
 								>
 									{generating
 										? specificFeedbackList.length > 0 ||
-										  generalFeedback.length > 0
+										  generalFeedback !== undefined
 											? "Generating feedback..."
 											: "Analyzing document..."
 										: "Get feedback"}
@@ -486,31 +562,25 @@ const Feedback: React.FC<Props> = ({ assignment, profileName, courseName }) => {
 					/>
 
 					<AnimatePresence>
-						{generalFeedback.length > 0 && (
-							<div className="absolute">
-								<motion.div
-									initial={{ opacity: 0, y: 25 }}
-									animate={{ opacity: 1, y: 0 }}
-									exit={{ opacity: 0, y: 25 }}
-									transition={{
-										duration: 0.35,
-										ease: "easeOut",
-									}}
-									ref={generalFeedbackScroller}
-									style={{
-										width:
-											submissionWidth &&
-											submissionWidth + 8,
-									}}
-									className="fixed bottom-10 max-h-80 overflow-y-scroll overscroll-none rounded-md backdrop-blur-[6px]"
-								>
-									<div className="relative z-10 whitespace-pre-line rounded-md border border-border bg-surface px-4 py-2.5 opacity-80">
-										<p className="select-text font-medium opacity-80 [overflow-wrap:anywhere]">
-											{generalFeedback}
-										</p>
-									</div>
-								</motion.div>
-							</div>
+						{generalFeedback !== undefined && (
+							<GeneralFeedback
+								{...generalFeedback}
+								onGetFollowUp={(followUps) =>
+									onGetFollowUp({ followUps })
+								}
+								onStateChange={(update) =>
+									setGeneralFeedback(
+										(generalFeedback) =>
+											generalFeedback && {
+												...generalFeedback,
+												state: update(
+													generalFeedback.state
+												),
+											}
+									)
+								}
+								submissionWidth={submissionWidth ?? 0}
+							/>
 						)}
 					</AnimatePresence>
 				</div>
@@ -610,7 +680,7 @@ const Submission = forwardRef<
 
 				let currentParagraphNumber = 0
 
-				for (const child of ref.current.children) {
+				for (const child of ref.current.querySelectorAll("p")) {
 					if (
 						child.textContent !== null &&
 						child.textContent.indexOf(".") !== -1 &&
@@ -653,6 +723,7 @@ const Submission = forwardRef<
 							<span
 								dangerouslySetInnerHTML={{ __html: segment }}
 								id={highlightId}
+								style={child.style as unknown as CSSProperties}
 								className="-my-1.5 -mx-1 select-text rounded-md bg-surface py-1.5 px-1 transition"
 							/>
 						)
@@ -840,7 +911,9 @@ const Submission = forwardRef<
 						let currentParagraphNumber = 0
 
 						if (ref.current !== null) {
-							for (const child of ref.current.children) {
+							for (const child of ref.current.querySelectorAll(
+								"p"
+							)) {
 								if (
 									child.textContent?.indexOf(".") !==
 									child.textContent?.lastIndexOf(".")
@@ -858,7 +931,9 @@ const Submission = forwardRef<
 							}
 						}
 
-						return paragraphFound ? offset : 0
+						const textOffset = paragraphFound ? offset : 0
+
+						return textOffset
 					},
 					setHTML: (html) => {
 						if (ref.current) {
@@ -899,6 +974,185 @@ const Submission = forwardRef<
 )
 
 Submission.displayName = "Submission"
+
+const GeneralFeedback = ({
+	content,
+	generating,
+	followUps,
+	onGetFollowUp: onGetFollowUpProp,
+	state,
+	onStateChange,
+	submissionWidth,
+}: {
+	content: string
+	generating: boolean
+	followUps: string[]
+	onGetFollowUp: (followUps: string[]) => void
+	state: "focus" | "hover" | undefined
+	onStateChange: (
+		update: (
+			prevState: "focus" | "hover" | undefined
+		) => "focus" | "hover" | undefined
+	) => void
+	submissionWidth: number
+}) => {
+	const [followUpInput, setFollowUpInput] = useState("")
+
+	const inputRef = useRef<HTMLTextAreaElement>(null)
+
+	const scrollerRef = useRef<HTMLDivElement>(null)
+
+	const { focusWithinProps } = useFocusWithin({
+		onFocusWithinChange: (isFocusWithin) =>
+			onStateChange((prevState) =>
+				isFocusWithin
+					? "focus"
+					: isHovered || prevState === "hover"
+					? "hover"
+					: undefined
+			),
+	})
+
+	const { hoverProps, isHovered } = useHover({
+		onHoverChange: (isHovering) =>
+			onStateChange((prevState) =>
+				prevState === "focus"
+					? "focus"
+					: isHovering
+					? "hover"
+					: undefined
+			),
+	})
+
+	useEffect(() => {
+		if (
+			scrollerRef.current !== null &&
+			Math.abs(
+				scrollerRef.current.scrollHeight -
+					scrollerRef.current.scrollTop -
+					scrollerRef.current.clientHeight
+			) < 50
+		) {
+			scrollerRef.current?.scroll({
+				top: scrollerRef.current.scrollHeight,
+			})
+		}
+	}, [followUps])
+
+	const [previousContent, setPreviousContent] = useState(content)
+
+	useEffect(() => {
+		if (
+			scrollerRef.current !== null &&
+			state !== undefined &&
+			content !== previousContent &&
+			Math.abs(
+				scrollerRef.current.scrollHeight -
+					scrollerRef.current.scrollTop -
+					scrollerRef.current.clientHeight
+			) < 50
+		) {
+			scrollerRef.current?.scroll({
+				top: scrollerRef.current.scrollHeight,
+			})
+
+			setPreviousContent(content)
+		}
+	}, [content, state, previousContent])
+
+	const onGetFollowUp = () => {
+		if (generating) return
+
+		onGetFollowUpProp([...followUps, followUpInput])
+
+		setFollowUpInput("")
+
+		scrollerRef.current?.scroll({
+			top: scrollerRef.current.scrollHeight,
+		})
+	}
+
+	useEffect(() => {
+		if (state === "focus") inputRef.current?.focus()
+	}, [state])
+
+	return (
+		content.length > 0 && (
+			<div className="absolute">
+				<motion.div
+					onClick={() => {
+						onStateChange(() => "focus")
+
+						scrollerRef.current?.scroll({
+							top: scrollerRef.current.scrollHeight,
+							behavior: "smooth"
+						})
+					}}
+					initial={{ opacity: 0, y: 25 }}
+					animate={{ opacity: 1, y: 0 }}
+					exit={{ opacity: 0, y: 25 }}
+					transition={{
+						duration: 0.35,
+						ease: "easeOut",
+					}}
+					ref={scrollerRef}
+					style={{
+						width: submissionWidth + 8,
+					}}
+					className="fixed bottom-10 max-h-80 overflow-y-scroll overscroll-none rounded-md backdrop-blur-[6px]"
+				>
+					<div
+						{...focusWithinProps}
+						{...hoverProps}
+						className="relative z-10 whitespace-pre-line rounded-md border border-border bg-surface opacity-80"
+					>
+						<p className="select-text px-4 py-2.5 font-medium opacity-80 [overflow-wrap:anywhere]">
+							{content}
+						</p>
+
+						{followUps.map((followUp, index) => (
+							<div
+								key={index}
+								className="border-t border-border px-4 py-2.5 even:font-medium even:opacity-50"
+							>
+								<p className="select-text [overflow-wrap:anywhere]">
+									{followUp}
+								</p>
+							</div>
+						))}
+
+						<div
+							style={{
+								height:
+									state === "focus" || state === "hover"
+										? (inputRef.current?.offsetHeight ??
+												0) + 9
+										: 0,
+							}}
+							className={cn(
+								"overflow-hidden rounded-b-md bg-surface-hover transition-all"
+							)}
+						>
+							<div className="border-t border-border p-1">
+								<TextArea
+									value={followUpInput}
+									setValue={setFollowUpInput}
+									placeholder={
+										generating
+											? "Generating..."
+											: "Say something"
+									}
+									onEnter={onGetFollowUp}
+									ref={inputRef}
+								/>
+							</div>
+						</div>
+					</div>
+				</motion.div>
+			</div>
+		)
+	)
+}
 
 const SpecificFeedbackColumn: React.FC<{
 	feedbackList: {
@@ -965,8 +1219,8 @@ const SpecificFeedbackColumn: React.FC<{
 	}
 
 	return (
-		<div ref={ref} className="relative min-w-[192px]">
-			<AnimatePresence>
+		<AnimatePresence>
+			<div ref={ref} className="relative min-w-[192px]">
 				{feedbackList.map((feedback, index) => (
 					<motion.div
 						initial={{ opacity: 0, y: 10 }}
@@ -1002,8 +1256,8 @@ const SpecificFeedbackColumn: React.FC<{
 						/>
 					</motion.div>
 				))}
-			</AnimatePresence>
-		</div>
+			</div>
+		</AnimatePresence>
 	)
 }
 
@@ -1066,7 +1320,28 @@ const SpecificFeedbackItem: React.FC<{
 				top: scrollerRef.current.scrollHeight,
 			})
 		}
-	}, [followUps]) // consider doing something similar for content
+	}, [followUps])
+
+	const [previousContent, setPreviousContent] = useState(content)
+
+	useEffect(() => {
+		if (
+			scrollerRef.current !== null &&
+			state !== undefined &&
+			content !== previousContent &&
+			Math.abs(
+				scrollerRef.current.scrollHeight -
+					scrollerRef.current.scrollTop -
+					scrollerRef.current.clientHeight
+			) < 50
+		) {
+			scrollerRef.current?.scroll({
+				top: scrollerRef.current.scrollHeight,
+			})
+
+			setPreviousContent(content)
+		}
+	}, [content, state, previousContent])
 
 	const onGetFollowUp = () => {
 		if (generating) return
@@ -1100,7 +1375,14 @@ const SpecificFeedbackItem: React.FC<{
 		>
 			<div
 				ref={scrollerRef}
-				onClick={() => onStateChange(() => "focus")}
+				onClick={() => {
+					onStateChange(() => "focus")
+
+					scrollerRef.current?.scroll({
+						top: scrollerRef.current.scrollHeight,
+						behavior: "smooth"
+					})
+				}}
 				className="max-h-[384px] overflow-y-scroll overscroll-none"
 			>
 				<div className="px-3 py-2">

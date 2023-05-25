@@ -3,7 +3,6 @@ import { and, eq } from "drizzle-orm/expressions"
 import db from "~/db/db"
 import { user, course, studentToCourse, teacherToCourse } from "~/db/schema"
 
-// never seen this multi cache pattern before so it's risky
 const User = ({ email }: { email: string }) => ({
 	create: async ({
 		name,

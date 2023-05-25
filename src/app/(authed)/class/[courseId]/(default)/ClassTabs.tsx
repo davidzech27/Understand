@@ -140,30 +140,32 @@ const ClassTabs: React.FC<Props> = ({
 
 						onUpdateCourse()
 					}}
-					className="flex h-full flex-col justify-between space-y-2"
+					className="flex h-full flex-col justify-between"
 				>
-					<div className="flex h-full flex-col space-y-2">
-						<div className="ml-1 font-medium opacity-80">Name</div>
+					<div className="h-[calc(60vh-6.5rem-5.5rem)] space-y-2 overflow-y-scroll">
+						<div className="flex flex-col space-y-2">
+							<div className="ml-1 font-medium opacity-80">
+								Name
+							</div>
 
-						<TextInput
-							value={nameInput}
-							setValue={setNameInput}
-							placeholder="Class name"
-							className="h-min py-2.5 pl-4 text-base"
-						/>
+							<TextInput
+								value={nameInput}
+								setValue={setNameInput}
+								placeholder="Class name"
+								className="h-min py-2.5 pl-4 text-base"
+							/>
 
-						<div className="ml-1 font-medium opacity-80">
-							Section
-						</div>
+							<div className="ml-1 font-medium opacity-80">
+								Section
+							</div>
 
-						<TextInput
-							value={sectionInput}
-							setValue={setSectionInput}
-							placeholder="Class section"
-							className="h-min py-2.5 pl-4 text-base"
-						/>
+							<TextInput
+								value={sectionInput}
+								setValue={setSectionInput}
+								placeholder="Class section"
+								className="h-min py-2.5 pl-4 text-base"
+							/>
 
-						<div className="h-[calc(60vh-6.5rem-19.5rem)] overflow-y-scroll">
 							<div className="flex-col space-y-2">
 								<div className="ml-1 font-medium opacity-80">
 									Students
@@ -194,44 +196,49 @@ const ClassTabs: React.FC<Props> = ({
 								/>
 							</div>
 						</div>
-					</div>
 
-					<div className="flex space-x-3">
-						<>
-							<Button
-								onClick={() => setConfirmingDeleteClass(true)}
-								disabled={confirmingDeleteClass}
-								type="button"
-								className="text-lg"
-							>
-								Delete class
-							</Button>
+						<div className="flex space-x-3 pt-3">
+							<>
+								<Button
+									onClick={() =>
+										setConfirmingDeleteClass(true)
+									}
+									disabled={confirmingDeleteClass}
+									type="button"
+									className="text-lg"
+								>
+									Delete class
+								</Button>
 
-							{confirmingDeleteClass && (
-								<>
-									<Button
-										onClick={onDeleteCourse}
-										type="button"
-										loading={isDeletingCourse}
-										className="text-lg"
-									>
-										Do you really want to delete this class?
-									</Button>
-
-									{!isDeletingCourse && (
+								{confirmingDeleteClass && (
+									<>
 										<Button
-											onClick={() =>
-												setConfirmingDeleteClass(false)
-											}
+											onClick={onDeleteCourse}
 											type="button"
+											loading={isDeletingCourse}
 											className="text-lg"
 										>
-											Actually, never mind
+											Do you really want to delete this
+											class?
 										</Button>
-									)}
-								</>
-							)}
-						</>
+
+										{!isDeletingCourse && (
+											<Button
+												onClick={() =>
+													setConfirmingDeleteClass(
+														false
+													)
+												}
+												type="button"
+												className="text-lg"
+											>
+												Actually, never mind
+											</Button>
+										)}
+									</>
+								)}
+							</>
+						</div>
 					</div>
 
 					<div className="flex space-x-3">

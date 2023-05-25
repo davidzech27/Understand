@@ -13,7 +13,7 @@ const createAssignmentAction = zact(
 		assignmentId: z.string(),
 		title: z.string().min(1),
 		instructions: z.string().min(1),
-		studentDescription: z.string().min(1).optional(),
+		description: z.string().min(1).optional(),
 		dueAt: z.date().optional(),
 	})
 )(
@@ -22,7 +22,7 @@ const createAssignmentAction = zact(
 		assignmentId,
 		title,
 		instructions,
-		studentDescription,
+		description,
 		dueAt,
 	}) => {
 		const { email } = await getAuthOrThrow({ cookies: cookies() })
@@ -33,7 +33,7 @@ const createAssignmentAction = zact(
 
 		await Assignment({ courseId, assignmentId }).create({
 			title,
-			studentDescription,
+			description,
 			instructions,
 			context: undefined,
 			dueAt,

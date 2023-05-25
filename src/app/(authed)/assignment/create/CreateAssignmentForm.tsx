@@ -41,7 +41,7 @@ const CreateAssignmentForm: React.FC<Props> = ({ coursesTeachingPromise }) => {
 			assignmentId: id,
 			title: titleInput.trim(),
 			instructions: instructionsInput.trim(),
-			studentDescription: studentDescriptionInput.trim() || undefined,
+			description: descriptionInput.trim() || undefined,
 		})
 
 		router.refresh()
@@ -50,7 +50,7 @@ const CreateAssignmentForm: React.FC<Props> = ({ coursesTeachingPromise }) => {
 	}
 
 	const [titleInput, setTitleInput] = useState("")
-	const [studentDescriptionInput, setStudentDescriptionInput] = useState("")
+	const [descriptionInput, setDescriptionInput] = useState("")
 	const [courseId, setCourseId] = useState<string>()
 	const [instructionsInput, setInstructionsInput] = useState("")
 
@@ -86,8 +86,8 @@ const CreateAssignmentForm: React.FC<Props> = ({ coursesTeachingPromise }) => {
 					<Form.Field asChild name="assignment-student-description">
 						<Form.Control asChild>
 							<TextInput
-								value={studentDescriptionInput}
-								setValue={setStudentDescriptionInput}
+								value={descriptionInput}
+								setValue={setDescriptionInput}
 								placeholder="Assignment description (optional)"
 								className="h-min py-2.5 pl-4 text-base"
 							/>

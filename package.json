@@ -10,6 +10,7 @@
 		"dbpush": "drizzle-kit push:mysql --config=./src/db/drizzle.config.ts"
 	},
 	"dependencies": {
+		"@pinecone-database/pinecone": "^0.1.6",
 		"@planetscale/database": "^1.6.0",
 		"@radix-ui/react-dialog": "^1.0.3",
 		"@radix-ui/react-form": "^0.0.2",
@@ -24,6 +25,7 @@
 		"drizzle-orm": "^0.23.2-e17a5ba",
 		"framer-motion": "^10.11.2",
 		"immer": "^10.0.1",
+		"inngest": "^1.9.0",
 		"jose": "^4.13.1",
 		"lucide-react": "^0.214.0",
 		"next": "^13.4.2",
@@ -48,6 +50,7 @@
 		"autoprefixer": "^10.4.7",
 		"dotenv": "^16.0.3",
 		"drizzle-kit": "^0.17.1-609a4f0",
+		"encoding": "^0.1.13",
 		"eslint": "^8.34.0",
 		"eslint-config-next": "^13.4.1",
 		"postcss": "^8.4.14",

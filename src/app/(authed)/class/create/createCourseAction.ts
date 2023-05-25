@@ -6,6 +6,7 @@ import { z } from "zod"
 import Course from "~/data/Course"
 import User from "~/data/User"
 import { getAuthOrThrow } from "~/auth/jwt"
+import inngest from "~/background/inngest"
 
 const isEmailValid = (email: string) =>
 	email.search(
@@ -30,7 +31,9 @@ const createCourseAction = zact(
 		additionalTeacherEmails,
 		studentEmails,
 	}) => {
-		const { email } = await getAuthOrThrow({ cookies: cookies() })
+		const { email, ...creatorAuth } = await getAuthOrThrow({
+			cookies: cookies(),
+		})
 
 		additionalTeacherEmails = additionalTeacherEmails.filter(isEmailValid)
 
@@ -46,6 +49,12 @@ const createCourseAction = zact(
 				User({ email }).addToCourse({ id, role: "student" })
 			),
 		])
+
+		if (linkedUrl !== undefined) {
+			inngest.send("app/linkedCourse.created", {
+				data: { id, name, creatorAuth },
+			})
+		}
 	}
 )
 

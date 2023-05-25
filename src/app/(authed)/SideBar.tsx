@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation"
+import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
 
 import PreviewDisplay from "~/components/PreviewDisplay"
@@ -14,7 +14,7 @@ const SideBar = async () => {
 
 	const [profile, courses] = await Promise.all([user.get(), user.courses()])
 
-	if (!profile) notFound()
+	if (!profile) redirect("/signIn")
 
 	return (
 		<Card className="flex h-full w-72 flex-col py-3 px-3">
