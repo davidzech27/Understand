@@ -262,7 +262,7 @@ const Feedback: React.FC<Props> = ({ assignment, profileName, courseName }) => {
 						},
 					})
 
-					console.debug(rawResponse)
+					console.log(rawResponse)
 				},
 			})
 		}
@@ -1085,7 +1085,7 @@ const GeneralFeedback = ({
 
 						scrollerRef.current?.scroll({
 							top: scrollerRef.current.scrollHeight,
-							behavior: "smooth"
+							behavior: "smooth",
 						})
 					}}
 					initial={{ opacity: 0, y: 25 }}
@@ -1380,7 +1380,7 @@ const SpecificFeedbackItem: React.FC<{
 
 					scrollerRef.current?.scroll({
 						top: scrollerRef.current.scrollHeight,
-						behavior: "smooth"
+						behavior: "smooth",
 					})
 				}}
 				className="max-h-[384px] overflow-y-scroll overscroll-none"
