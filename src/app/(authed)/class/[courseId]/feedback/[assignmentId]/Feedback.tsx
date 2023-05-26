@@ -494,50 +494,58 @@ const Feedback: React.FC<Props> = ({ assignment, profileName, courseName }) => {
 						}
 					/>
 				</div>
+				{/* <p className="select-text px-1 pb-4 text-sm opacity-80">
+					{assignment.description}
+				</p> */}
 
 				<div className="relative flex basis-[704px] flex-col">
-					<div
-						ref={headerRef}
-						className="min-h-12 flex items-end justify-between"
-					>
-						<div className="select-text text-2xl font-bold">
-							{assignment.title}
+					<div ref={headerRef} className="min-h-12 flex flex-col">
+						<div className="flex items-end justify-between">
+							<div className="select-text text-2xl font-bold">
+								{assignment.title}
+							</div>
+
+							{/* not sure why this is even necessary with justify-between */}
+							<div className="flex-1" />
+
+							<div className="flex-shrink-0">
+								{/* submissionDriveFiles.length > 0 */}
+								{submissionEmpty && false ? (
+									<Button
+										onClick={() => setModal("submission")}
+										className="text-lg"
+									>
+										Import submission
+									</Button>
+								) : editing || generating ? (
+									<Button
+										onClick={onGetFeedback}
+										disabled={submissionEmpty || generating}
+										className="text-lg"
+									>
+										{generating
+											? specificFeedbackList.length > 0 ||
+											  generalFeedback !== undefined
+												? "Generating feedback..."
+												: "Analyzing document..."
+											: "Get feedback"}
+									</Button>
+								) : (
+									<Button
+										onClick={onTryAgain}
+										className="text-lg"
+									>
+										Try again
+									</Button>
+								)}
+							</div>
 						</div>
 
-						{/* not sure why this is even necessary with justify-between */}
-						<div className="flex-1" />
-
-						<div className="flex-shrink-0">
-							{/* submissionDriveFiles.length > 0 */}
-							{submissionEmpty && false ? (
-								<Button
-									onClick={() => setModal("submission")}
-									className="text-lg"
-								>
-									Import submission
-								</Button>
-							) : editing || generating ? (
-								<Button
-									onClick={onGetFeedback}
-									disabled={submissionEmpty || generating}
-									className="text-lg"
-								>
-									{generating
-										? specificFeedbackList.length > 0 ||
-										  generalFeedback !== undefined
-											? "Generating feedback..."
-											: "Analyzing document..."
-										: "Get feedback"}
-								</Button>
-							) : (
-								<Button
-									onClick={onTryAgain}
-									className="text-lg"
-								>
-									Try again
-								</Button>
-							)}
-						</div>
+						{assignment.description !== undefined && (
+							<p className="mt-4 select-text text-sm opacity-60">
+								{assignment.description}
+							</p>
+						)}
 					</div>
 
 					<hr className="mt-2 mb-3" />
