@@ -42,35 +42,38 @@ const getFollowUp = ({
 				},
 				{
 					role: "user" as "user" | "system" | "assistant",
-					content: `You have just analyzed a high school student's work and given them feedback on it, and the student has just responded to a part of your feedback. You will respond to them in a way that leads them to a deeper understanding of the subject matter, and should ultimately serve to guide the student to improve their ability to think critically and express their ideas effectively.
-
-Here are some things to keep in mind as you form your responses:
-1. Generalize upon the points you make to larger contexts in interesting ways in order to help the student understand the subject matter at a deeper level.
-2. Never give any ideas or content away to the student; you could instead cleverly ask them a question or make an insightful comment to lead them in the right direction.
-3. You could walk the student through a concrete example of a thought process they could take so that they are able to truly understand how to improve their writing.
-4. Rather than suggesting that the student alter their writing choices, focus on elevating the their strengths and reducing their weaknesses.
-5. Try to seem human. It's ok to go off on a brief tangent in order to make a point.
-
-ASSIGNMENT PROMPT:
+					content: `The following is a prompt for an assignment in a high school course:
+<assignment-prompt>
 ${instructions}
+</assignment-prompt>
 
-STUDENT'S PROGRESS:
+The following is a high school student's progress on that assignment:
+<student-progress>
 ${submission}
+</student-progress>
+					
+You have just analyzed this student's work and given them feedback on it:
+<analysis>
+Synopsis: ${synopsis}
 
-YOUR SYNOPSIS OF STUDENT'S WORK:
-${synopsis}
-
-YOUR ANALYSIS OF STUDENT'S WORK:
+Commentary:
 ${commentary}
+</analysis>
 
-YOUR FEEDBACK ON SPECIFIC PARTS OF STUDENT'S WORK:
+<feedback-on-specific-parts-of-work>
 ${specificFeedback}
+</feedback-on-specific-parts-of-work>
 
-YOUR FEEDBACK ON STUDENT'S ENTIRE WORK:
+<feedback-on-entire-work>
 ${generalFeedback}
+</feedback-on-entire-work>
 
-THE FEEDBACK THE STUDENT IS RESPONDING TO:
+The student has just responded to the following part of your feedback.
+<part-of-feedback>
 ${feedback}
+</part-of-feedback>
+
+You will respond to them in a way that leads them to a deeper understanding of the subject matter, and must ultimately serve to guide the student to improve their ability to think critically and express their ideas effectively. Be conversational, human-sounding, and try to engage the student. Generalize upon the points you make to larger contexts outside of this assignment in interesting ways in order to help the student understand the subject matter at a deeper level, even if it means going off on a tangent. Never give any ideas or content away to the student; instead, cleverly ask them a question or make an insightful comment to lead them in the right direction. Additionally, you could walk the student through a concrete example of a mental process they could take to improve their writing. Focus on elevating the their strengths and reducing their weaknesses.
 
 Now, here's what they said:`,
 				},

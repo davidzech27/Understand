@@ -15,25 +15,31 @@ const getCompletion = async ({
 	frequencyPenalty: number
 	maxTokens?: number
 }) => {
-	return (
-		(await (
-			await fetch("https://api.openai.com/v1/chat/completions", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${env.OPENAI_SECRET_KEY}`,
-				},
-				body: JSON.stringify({
-					messages,
-					model,
-					temperature,
-					presence_penalty: presencePenalty,
-					frequency_penalty: frequencyPenalty,
-					max_tokens: maxTokens,
-				}),
-			})
-		).json()) as { choices: [{ message: { content: string } }] }
-	).choices[0].message.content
+	const response = (await (
+		await fetch("https://api.openai.com/v1/chat/completions", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${env.OPENAI_SECRET_KEY}`,
+			},
+			body: JSON.stringify({
+				messages,
+				model,
+				temperature,
+				presence_penalty: presencePenalty,
+				frequency_penalty: frequencyPenalty,
+				max_tokens: maxTokens,
+			}),
+		})
+	).json()) as
+		| { choices: [{ message: { content: string } }] }
+		| { error: { message: string } }
+
+	if ("error" in response) {
+		throw new Error(`OpenAI error: ${response.error.message}`)
+	}
+
+	return response.choices[0].message.content
 }
 
 export default getCompletion
