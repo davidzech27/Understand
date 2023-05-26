@@ -138,7 +138,7 @@ const CreateAssignmentForm: React.FC<Props> = ({ coursesTeachingPromise }) => {
 												<Select.Item
 													value={course.id}
 													key={course.id}
-													className="flex cursor-pointer items-center space-x-2 bg-surface px-4 py-3 font-medium opacity-80 outline-none transition-all duration-150 hover:bg-surface-hover data-[state=checked]:bg-surface-selected data-[state=checked]:hover:bg-surface-selected-hover"
+													className="flex cursor-pointer items-center space-x-2 border-t-[0.75px] border-border bg-surface px-4 py-3 font-medium opacity-80 outline-none transition-all duration-150 hover:bg-surface-hover data-[state=checked]:bg-surface-selected data-[state=checked]:hover:bg-surface-selected-hover"
 												>
 													<Avatar
 														src={undefined}

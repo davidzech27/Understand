@@ -242,7 +242,7 @@ const ClassTabs: React.FC<Props> = ({
 					</div>
 
 					<div className="flex space-x-3">
-						<Form.Submit className="w-1/2">
+						<Form.Submit asChild className="w-1/2">
 							<FancyButton
 								loading={isUpdatingCourse}
 								disabled={updateDisabled}

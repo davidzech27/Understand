@@ -4,6 +4,7 @@ import fetchOpenAIStream from "./fetchOpenAIStream"
 // specific feedback needs to ask a question or make an insightful comment to guide the student to a deeper understanding of the subject matter.
 // it also needs to reference other parts of the student's work so that no part of it is ignored
 // general feedback isn't comprehensive enough
+// sometimes doesn't see the big picture. big problem with GPTs in general
 
 // should give student options for how to revise their work, and not prescribe its own
 
