@@ -1111,7 +1111,11 @@ const GeneralFeedback = ({
 					<div
 						{...focusWithinProps}
 						{...hoverProps}
-						className="relative z-10 whitespace-pre-line rounded-md border border-border bg-surface opacity-80"
+						className={cn(
+							"relative z-10 whitespace-pre-line rounded-md border border-border bg-surface opacity-80 shadow-sm",
+							state === "focus" && "shadow-lg",
+							state === "hover" && "shadow-lg"
+						)}
 					>
 						<p className="select-text px-4 py-2.5 font-medium opacity-80 [overflow-wrap:anywhere]">
 							{content}
@@ -1375,7 +1379,7 @@ const SpecificFeedbackItem: React.FC<{
 			{...focusWithinProps}
 			{...hoverProps}
 			className={cn(
-				"group absolute flex flex-col rounded-md border border-border bg-surface opacity-80 shadow-[#E5E5E5] backdrop-blur-sm transition-shadow duration-500",
+				"group absolute flex flex-col rounded-md border border-border bg-surface opacity-80 shadow-sm shadow-[#E5E5E5] backdrop-blur-sm transition-shadow duration-500",
 				state === "focus" && "shadow-lg",
 				state === "hover" && "shadow-lg"
 			)}
