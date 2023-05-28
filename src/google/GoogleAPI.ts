@@ -863,7 +863,7 @@ const GoogleAPI = async ({
 				.array()
 				.parse(studentSubmissionsTransformed)
 		},
-		getDriveFileText: async ({ id }: { id: string }) => {
+		driveFileText: async ({ id }: { id: string }) => {
 			return await (
 				await fetch(
 					`https://www.googleapis.com/drive/v3/files/${id}/export?mimeType=text%2Fplain`,
@@ -875,7 +875,7 @@ const GoogleAPI = async ({
 				)
 			).text()
 		},
-		getDriveFileHTML: async ({ id }: { id: string }) => {
+		driveFileHTML: async ({ id }: { id: string }) => {
 			return await (
 				await fetch(
 					`https://www.googleapis.com/drive/v3/files/${id}/export?mimeType=text%2Fhtml`,
@@ -886,6 +886,49 @@ const GoogleAPI = async ({
 					}
 				)
 			).text()
+		},
+		subscribeToPushNotifications: async ({
+			courseId,
+		}: {
+			courseId: string
+		}) => {
+			await Promise.all([
+				fetch("https://classroom.googleapis.com/v1/registrations", {
+					method: "POST",
+					body: JSON.stringify({
+						feed: {
+							feedType: "COURSE_ROSTER_CHANGES",
+							courseRosterChangesInfo: {
+								courseId,
+							},
+						},
+						cloudPubsubTopic: {
+							topicName: "classroom-push-notification",
+						},
+					}),
+					headers: {
+						Authorization: `Bearer ${accessToken}`,
+					},
+				}),
+				fetch("https://classroom.googleapis.com/v1/registrations", {
+					method: "POST",
+					body: JSON.stringify({
+						feed: {
+							feedType: "COURSE_WORK_CHANGES",
+							courseWorkChangesInfo: {
+								courseId,
+							},
+						},
+						cloudPubsubTopic: {
+							topicName: "classroom-push-notification",
+						},
+					}),
+					headers: {
+						Authorization: `Bearer ${accessToken}`,
+					},
+				}),
+			])
+			//! not implementing unsubscribe yet because it's hard and not that important
 		},
 	}
 }

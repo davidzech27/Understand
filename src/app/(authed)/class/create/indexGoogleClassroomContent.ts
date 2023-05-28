@@ -27,7 +27,19 @@ const indexGoogleClassroomContent = inngest.createFunction(
 		},
 		step,
 	}) => {
-		// return
+		await step.run(
+			"Subscribe to classroom push notifications",
+			async () => {
+				const googleAPI = await GoogleAPI({
+					accessToken: googleAccessToken,
+					refreshToken: googleRefreshToken,
+					expiresMillis: googleRefreshTokenExpiresMillis,
+					onRefreshAccessToken: () => {},
+				})
+
+				await googleAPI.subscribeToPushNotifications({ courseId: id })
+			}
+		)
 
 		const [assignmentsWithoutText, materialsWithoutText] = await step.run(
 			"Get assignments and materials",
@@ -69,7 +81,7 @@ const indexGoogleClassroomContent = inngest.createFunction(
 									.filter(Boolean)
 									.map(async (attachment) => {
 										const text =
-											await googleAPI.getDriveFileText({
+											await googleAPI.driveFileText({
 												id: attachment.id,
 											})
 
@@ -107,7 +119,7 @@ const indexGoogleClassroomContent = inngest.createFunction(
 									.filter(Boolean)
 									.map(async (attachment) => {
 										const text =
-											await googleAPI.getDriveFileText({
+											await googleAPI.driveFileText({
 												id: attachment.id,
 											})
 

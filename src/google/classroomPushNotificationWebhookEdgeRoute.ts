@@ -11,10 +11,42 @@ const requestSchema = z
 		JSON.parse(Buffer.from(message.data, "base64").toString("utf8"))
 	)
 
-const dataSchema = z.object({})
+const dataSchema = z.intersection(
+	z.discriminatedUnion("collection", [
+		z.object({
+			collection: z.enum(["courses.teachers", "courses.students"]),
+			resourceId: z.object({
+				courseId: z.string(),
+				userId: z.string(),
+			}),
+		}),
+		z.object({
+			collection: z.literal("courses.courseWork"),
+			resourceId: z.object({
+				courseId: z.string(),
+				id: z.string(),
+			}),
+		}),
+		z.object({
+			collection: z.literal("courses.courseWork.studentSubmissions"),
+			resourceId: z.object({
+				courseId: z.string(),
+				courseWorkId: z.string(),
+				id: z.string(),
+			}),
+		}),
+	]),
+	z.object({
+		registrationId: z.string(),
+	})
+)
 
 const webhookHandler = async (request: NextRequest) => {
-	const parsed = requestSchema.safeParse(await request.json())
+	const json = await request.json()
+
+	console.info("JSON: ", json)
+
+	const parsed = requestSchema.safeParse(json)
 
 	if (!parsed.success) return new Response(null, { status: 400 })
 
