@@ -1,4 +1,4 @@
-import openaiHandler from "~/ai/edgeRoute"
+import openaiHandler from "~/ai/openAIEdgeRoute"
 
 export const runtime = "edge"
 

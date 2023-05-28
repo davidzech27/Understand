@@ -1,4 +1,4 @@
-import { type OpenAIStreamRequest } from "./edgeRoute"
+import { type OpenAIStreamRequest } from "./openAIEdgeRoute"
 
 const textEncoder = new TextEncoder()
 const textDecoder = new TextDecoder()
