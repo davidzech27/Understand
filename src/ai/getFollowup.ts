@@ -88,7 +88,7 @@ Now, here's what they said:`, // consider removing "Focus on elevating their str
 			model: "gpt-4" as const,
 			temperature: 0.25,
 			presencePenalty: 0.5,
-			frequencyPenalty: 0.35,
+			frequencyPenalty: 0.5,
 		}
 
 	fetchOpenAIStream({
