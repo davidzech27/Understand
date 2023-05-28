@@ -5,6 +5,7 @@ import GoogleAPI from "~/google/GoogleAPI"
 import getCompletion from "~/ai/getCompletion"
 // prompts are same regardless of whether there is just single attachment
 // account for the fact that some teachers may include instructions in a student submission document
+// potentially do topic by topic for greater reliability
 // todo - think about ways order assignments in interface, and also how to support chatbot that would access recent assignments
 // todo - support more attachment types. consider breaking attachments up if we don't end up using Anthropic's 100k token limit
 const indexGoogleClassroomContent = inngest.createFunction(
@@ -26,131 +27,129 @@ const indexGoogleClassroomContent = inngest.createFunction(
 		},
 		step,
 	}) => {
-		return
+		// return
 
-		const googleAPI = await GoogleAPI({
-			accessToken: googleAccessToken,
-			refreshToken: googleRefreshToken,
-			expiresMillis: googleRefreshTokenExpiresMillis,
-			onRefreshAccessToken: () => {},
-		})
+		const [assignmentsWithoutText, materialsWithoutText] = await step.run(
+			"Get assignments and materials",
+			async () => {
+				const googleAPI = await GoogleAPI({
+					accessToken: googleAccessToken,
+					refreshToken: googleRefreshToken,
+					expiresMillis: googleRefreshTokenExpiresMillis,
+					onRefreshAccessToken: () => {},
+				})
 
-		const [assignments, materials] = await Promise.all([
-			googleAPI.courseAssignments({ courseId: id }).then((assignments) =>
-				Promise.all(
-					assignments.map(async (assignment) => {
-						const attachments = await Promise.all(
-							assignment.attachments
-								.map((attachment) =>
-									attachment.type === "driveFile"
-										? attachment.driveFile
-										: undefined
-								)
-								.filter(Boolean)
-								.map(async (attachment) => {
-									const text = await step.run(
-										"Index assignment attachment",
-										async () => {
-											const text =
-												await googleAPI.getDriveFileText(
-													{
-														id: attachment.id,
-													}
-												)
+				return await Promise.all([
+					googleAPI.courseAssignments({ courseId: id }),
+					googleAPI.courseMaterials({ courseId: id }),
+				])
+			}
+		)
 
-											await Resource({
-												courseId: id,
-											}).create({
-												text,
-												driveId: attachment.id,
-												driveTitle: attachment.title,
-												attachmentOnAssignmentId:
-													assignment.id,
-												attachmentOnAssignmentTitle:
-													assignment.title,
+		const [assignments, materials] = await step.run(
+			"Index assignments and materials",
+			async () => {
+				const googleAPI = await GoogleAPI({
+					accessToken: googleAccessToken,
+					refreshToken: googleRefreshToken,
+					expiresMillis: googleRefreshTokenExpiresMillis,
+					onRefreshAccessToken: () => {},
+				})
+
+				return await Promise.all([
+					Promise.all(
+						assignmentsWithoutText.map(async (assignment) => {
+							const attachments = await Promise.all(
+								assignment.attachments
+									.map((attachment) =>
+										attachment.type === "driveFile"
+											? attachment.driveFile
+											: undefined
+									)
+									.filter(Boolean)
+									.map(async (attachment) => {
+										const text =
+											await googleAPI.getDriveFileText({
+												id: attachment.id,
 											})
 
-											return text
-										}
+										await Resource({
+											courseId: id,
+										}).create({
+											text,
+											driveId: attachment.id,
+											driveTitle: attachment.title,
+											attachmentOnAssignmentId:
+												assignment.id,
+											attachmentOnAssignmentTitle:
+												assignment.title,
+										})
+
+										return { ...attachment, text }
+									})
+							)
+
+							return {
+								...assignment,
+								attachments,
+							}
+						})
+					),
+					Promise.all(
+						materialsWithoutText.map(async (material) => {
+							const attachments = await Promise.all(
+								material.attachments
+									.map((attachment) =>
+										attachment.type === "driveFile"
+											? attachment.driveFile
+											: undefined
 									)
-
-									return { ...attachment, text }
-								})
-						)
-
-						return {
-							...assignment,
-							attachments,
-						}
-					})
-				)
-			),
-			googleAPI.courseMaterials({ courseId: id }).then((materials) =>
-				Promise.all(
-					materials.map(async (material) => {
-						const attachments = await Promise.all(
-							material.attachments
-								.map((attachment) =>
-									attachment.type === "driveFile"
-										? attachment.driveFile
-										: undefined
-								)
-								.filter(Boolean)
-								.map(async (attachment) => {
-									const text = await step.run(
-										"Index material attachment",
-										async () => {
-											const text =
-												await googleAPI.getDriveFileText(
-													{
-														id: attachment.id,
-													}
-												)
-
-											await Resource({
-												courseId: id,
-											}).create({
-												text,
-												driveId: attachment.id,
-												driveTitle: attachment.title,
-												attachmentOnMaterialId:
-													material.id,
-												attachmentOnMaterialTitle:
-													material.title,
+									.filter(Boolean)
+									.map(async (attachment) => {
+										const text =
+											await googleAPI.getDriveFileText({
+												id: attachment.id,
 											})
 
-											return text
+										await Resource({
+											courseId: id,
+										}).create({
+											text,
+											driveId: attachment.id,
+											driveTitle: attachment.title,
+											attachmentOnMaterialId: material.id,
+											attachmentOnMaterialTitle:
+												material.title,
+										})
+
+										return {
+											...attachment,
+											text,
 										}
-									)
+									})
+							)
 
-									return {
-										...attachment,
-										text,
-									}
-								})
-						)
-
-						return {
-							...material,
-							attachments,
-						}
-					})
-				)
-			),
-		])
-
-		console.log(JSON.stringify([assignments, materials], null, 4))
-
-		return
+							return {
+								...material,
+								attachments,
+							}
+						})
+					),
+				])
+			}
+		)
 
 		await Promise.all(
 			assignments.map(
 				async (assignment) =>
 					await step.run(
-						"Find and update instructions and context on assignment",
+						`Find and update instructions and context on assignment with id ${assignment.id}`,
 						async () => {
-							const usedAttachments: typeof assignment.attachments =
-								[]
+							const usedAttachments: {
+								id: string
+								title: string | undefined
+								text: string
+							}[] = []
 
 							let useDescription = false
 
@@ -205,8 +204,8 @@ ${
 											}${
 												assignment.attachments
 													.length !== 0
-													? `Given that the title of the assignment in Google Classroom is ${assignment.title}, identify the numbers corresponding to the content that is likely to be instructions on that assignment. If there are multiple answers, use a comma-separated list. Respond with "None" if none of the provided content is likely to be instructions on the assignment.`
-													: `Given that the title of the assignment in Google Classroom is ${assignment.title}, is this description likely to be the instructions on the assignment? Respond with yes or no.`
+													? `Given that the title of the assignment in Google Classroom is ${assignment.title}, identify the numbers corresponding to the content that is likely to be a part of the instructions on that assignment. If there are multiple answers, use a comma-separated list. Respond with "None" if none of the provided content is likely to be instructions on the assignment.`
+													: `Given that the title of the assignment in Google Classroom is ${assignment.title}, is this description likely to be a part of the instructions on the assignment? Respond with yes or no.`
 											}`,
 										},
 									],
@@ -225,18 +224,24 @@ ${
 										.map((number) => number - 1)
 
 									usedAttachments.push(
-										...assignment.attachments.filter(
-											(_, index) =>
+										...assignment.attachments
+											.map((attachment) => ({
+												id: attachment.id,
+												title: attachment.title,
+												text: attachment.text,
+											}))
+											.filter((_, index) =>
 												indexes.includes(index)
-										)
+											)
 									)
 
 									useDescription = indexes.includes(
 										assignment.attachments.length
 									)
 								} else {
-									useDescription =
-										response.toLowerCase() === "yes"
+									useDescription = response
+										.toLowerCase()
+										.includes("yes")
 								}
 							}
 
@@ -255,7 +260,14 @@ ${
 											},
 											{
 												role: "user",
-												content: `Respond with something that sounds like it could be the instructions on an assignment titled "${assignment.title}" in a course named ${name} in Google Classroom.`,
+												content: `Respond with something that sounds like it could be the instructions on an assignment titled "${
+													assignment.title
+												}"${
+													assignment.description !==
+													undefined
+														? ` and with a description of ${assignment.description}`
+														: ""
+												} in a course named ${name} in Google Classroom.`,
 											},
 										],
 										model: "gpt-3.5-turbo",
@@ -335,7 +347,7 @@ ${driveFiles
 
 Given that the title of the assignment in Google Classroom is ${
 												assignment.title
-											}, identify the numbers corresponding to the content that is likely to be instructions on that assignment. If there are multiple answers, use a comma-separated list. Respond with "None" if none of the provided content is likely to be instructions on the assignment.`,
+											}, identify the numbers corresponding to the content that is likely to be a part of the instructions on that assignment. If there are multiple answers, use a comma-separated list. Respond with "None" if none of the provided content is likely to be instructions on the assignment.`,
 										},
 									],
 									model: "gpt-3.5-turbo",
@@ -352,9 +364,15 @@ Given that the title of the assignment in Google Classroom is ${
 									.map((number) => number - 1)
 
 								usedAttachments.push(
-									...assignment.attachments.filter(
-										(_, index) => indexes.includes(index)
-									)
+									...driveFiles
+										.map((driveFile) => ({
+											id: driveFile.driveId,
+											title: driveFile.driveTitle,
+											text: driveFile.text,
+										}))
+										.filter((_, index) =>
+											indexes.includes(index)
+										)
 								)
 							}
 
@@ -534,7 +552,19 @@ Identify the numbers corresponding to the resources that are likely to provide h
 									description: assignment.description,
 									instructions,
 									context,
-									dueAt: assignment.dueAt,
+									dueAt:
+										assignment.dueAt === undefined
+											? undefined
+											: new Date(
+													new Date(
+														assignment.dueAt
+													).getTime() +
+														new Date(
+															assignment.dueAt
+														).getTimezoneOffset() *
+															60 *
+															1000
+											  ),
 									linkedUrl: assignment.url,
 								}),
 							])

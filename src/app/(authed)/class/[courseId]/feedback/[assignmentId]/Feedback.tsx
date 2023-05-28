@@ -542,7 +542,7 @@ const Feedback: React.FC<Props> = ({ assignment, profileName, courseName }) => {
 						</div>
 
 						{assignment.description !== undefined && (
-							<p className="mt-4 select-text text-sm opacity-60">
+							<p className="mt-3.5 mb-0.5 select-text text-sm opacity-60">
 								{assignment.description}
 							</p>
 						)}
@@ -695,7 +695,10 @@ const Submission = forwardRef<
 
 				let currentParagraphNumber = 0
 
-				for (const child of ref.current.querySelectorAll("p")) {
+				for (const child of [
+					...ref.current.querySelectorAll("p"),
+					...ref.current.querySelectorAll("div"),
+				]) {
 					if (
 						child.textContent !== null &&
 						child.textContent.indexOf(".") !== -1 &&
@@ -927,7 +930,7 @@ const Submission = forwardRef<
 
 						if (ref.current !== null) {
 							for (const child of ref.current.querySelectorAll(
-								"p"
+								"p, div"
 							)) {
 								if (
 									child.textContent?.indexOf(".") !==
@@ -1238,8 +1241,8 @@ const SpecificFeedbackColumn: React.FC<{
 	}
 
 	return (
-		<AnimatePresence>
-			<div ref={ref} className="relative min-w-[192px]">
+		<div ref={ref} className="relative min-w-[192px]">
+			<AnimatePresence>
 				{feedbackList.map((feedback, index) => (
 					<motion.div
 						initial={{ opacity: 0, y: 10 }}
@@ -1250,7 +1253,10 @@ const SpecificFeedbackColumn: React.FC<{
 							ease: "easeOut",
 						}}
 						key={`${feedback.paragraph},${feedback.sentence}`}
-						style={{ top: tops[index] }}
+						style={{
+							top: tops[index],
+							zIndex: feedback.paragraph * 10 + feedback.sentence,
+						}}
 						className="absolute left-4 right-4"
 					>
 						<SpecificFeedbackItem
@@ -1275,8 +1281,8 @@ const SpecificFeedbackColumn: React.FC<{
 						/>
 					</motion.div>
 				))}
-			</div>
-		</AnimatePresence>
+			</AnimatePresence>
+		</div>
 	)
 }
 

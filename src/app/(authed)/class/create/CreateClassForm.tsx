@@ -38,9 +38,10 @@ interface Props {
 		  }[]
 		| undefined
 	>
+	emailPromise: Promise<string>
 }
 
-const CreateClassForm: React.FC<Props> = ({ coursesPromise }) => {
+const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 	const router = useRouter()
 
 	const { mutate: createCourse, isLoading: isCreatingCourse } =
@@ -127,8 +128,13 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise }) => {
 
 		course.section && setSectionInput(course.section)
 
+		const profileEmail = await emailPromise
+
 		setAdditionalTeacherEmailInputs(
-			roster.teachers.map((teacher) => teacher.email).filter(Boolean)
+			roster.teachers
+				.map((teacher) => teacher.email)
+				.filter(Boolean)
+				.filter((email) => email !== profileEmail)
 		)
 
 		setStudentEmailInputs(roster.students.map((student) => student.email))

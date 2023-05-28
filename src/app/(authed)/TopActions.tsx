@@ -4,10 +4,6 @@ import { Plus, ChevronDown, FilePlus2, UserPlus } from "lucide-react"
 import * as NavigationMenu from "@radix-ui/react-navigation-menu"
 import { usePathname } from "next/navigation"
 
-interface Props {
-	isTeacher: boolean
-}
-
 const TopActions = () => {
 	const pathname = usePathname()
 

@@ -150,9 +150,9 @@ const Roster: React.FC<Props> = ({ courseId, role, roster }) => {
 						</Row.List>
 					</>
 				) : (
-					<span className="font-medium italic opacity-60">
+					<div className="mt-4 ml-1 font-medium italic opacity-60">
 						This class doesn&apos;t have any students yet
-					</span>
+					</div>
 				)}
 			</div>
 		</Card>

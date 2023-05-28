@@ -2,6 +2,7 @@ import { eq, and } from "drizzle-orm/expressions"
 
 import db from "~/db/db"
 import { assignment, feedback, followUp } from "~/db/schema"
+import Resource from "./Resource"
 
 const Assignment = ({
 	courseId,
@@ -125,6 +126,16 @@ const Assignment = ({
 						eq(feedback.assignmentId, assignmentId)
 					)
 				),
+			Resource({ courseId }).delete({
+				where: {
+					attachmentOnAssignmentId: assignmentId,
+				},
+			}),
+			Resource({ courseId }).delete({
+				where: {
+					instructionsForAssignmentId: assignmentId,
+				},
+			}),
 		])
 	},
 })

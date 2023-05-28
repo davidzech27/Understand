@@ -262,24 +262,28 @@ const GoogleAPI = async ({
 		},
 		courseRoster: async ({ courseId }: { courseId: string }) => {
 			type TeachersResponse = {
-				teachers: {
-					profile: {
-						emailAddress?: string
-						name: { fullName: string }
-						photoUrl: string
-					}
-				}[]
+				teachers:
+					| {
+							profile: {
+								emailAddress?: string
+								name: { fullName: string }
+								photoUrl: string
+							}
+					  }[]
+					| undefined
 				nextPageToken: string | undefined
 			}
 
 			type StudentsResponse = {
-				students: {
-					profile: {
-						emailAddress: string
-						name: { fullName: string }
-						photoUrl: string
-					}
-				}[]
+				students:
+					| {
+							profile: {
+								emailAddress: string
+								name: { fullName: string }
+								photoUrl: string
+							}
+					  }[]
+					| undefined
 				nextPageToken: string | undefined
 			}
 
@@ -319,7 +323,7 @@ const GoogleAPI = async ({
 							response.json()
 						)) as TeachersResponse
 
-						teachers.push(...response.teachers)
+						teachers?.push(...(response.teachers ?? []))
 
 						nextPageTokenTeachers = response.nextPageToken
 					}
@@ -339,7 +343,7 @@ const GoogleAPI = async ({
 							response.json()
 						)) as StudentsResponse
 
-						students.push(...response.students)
+						students?.push(...(response.students ?? []))
 
 						nextPageTokenStudents = response.nextPageToken
 					}
@@ -349,12 +353,12 @@ const GoogleAPI = async ({
 			])
 
 			return rosterSchema.parse({
-				teachers: teachers.map((teacher) => ({
+				teachers: (teachers ?? []).map((teacher) => ({
 					email: teacher.profile.emailAddress,
 					name: teacher.profile.name.fullName,
 					photo: teacher.profile.photoUrl,
 				})),
-				students: students.map((student) => ({
+				students: (students ?? []).map((student) => ({
 					email: student.profile.emailAddress,
 					name: student.profile.name.fullName,
 					photo: student.profile.photoUrl,
@@ -518,23 +522,26 @@ const GoogleAPI = async ({
 										}
 									),
 									dueAt: (() => {
-										return dueDate &&
+										const date =
+											dueDate &&
 											dueDate.year &&
 											dueDate.month &&
 											dueDate.day &&
 											dueTime &&
 											dueTime.hours &&
 											dueTime.minutes
-											? new Date(
-													Date.UTC(
-														dueDate.year,
-														dueDate.month - 1,
-														dueDate.day,
-														dueTime.hours,
-														dueTime.minutes
-													)
-											  )
-											: undefined
+												? new Date(
+														Date.UTC(
+															dueDate.year,
+															dueDate.month - 1,
+															dueDate.day,
+															dueTime.hours,
+															dueTime.minutes
+														)
+												  )
+												: undefined
+
+										return date
 									})(),
 							  }
 							: undefined

@@ -11,7 +11,9 @@ export const metadata = {
 }
 
 const ClassCreatePage = async () => {
-	const googleAPIPromise = getAuthOrThrow({ cookies: cookies() }).then(
+	const authPromise = getAuthOrThrow({ cookies: cookies() })
+
+	const googleAPIPromise = authPromise.then(
 		({
 			googleAccessToken,
 			googleRefreshToken,
@@ -54,6 +56,8 @@ const ClassCreatePage = async () => {
 				  })
 	)
 
+	const emailPromise = authPromise.then(({ email }) => email)
+
 	const coursesPromise = googleAPIPromise.then(
 		async (googleAPI) =>
 			googleAPI &&
@@ -63,7 +67,12 @@ const ClassCreatePage = async () => {
 			}))
 	)
 
-	return <CreateClassForm coursesPromise={coursesPromise} />
+	return (
+		<CreateClassForm
+			coursesPromise={coursesPromise}
+			emailPromise={emailPromise}
+		/>
+	)
 }
 
 export default ClassCreatePage
