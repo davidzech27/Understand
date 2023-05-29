@@ -8,7 +8,7 @@ const requestSchema = z
 	.object({
 		message: z.object({
 			data: z.string(),
-			attributes: z.object({ registrationId: z.string() }).optional(),
+			attributes: z.object({ registrationId: z.string() }),
 		}),
 	})
 	.transform(({ message }, ctx) => {
@@ -22,7 +22,10 @@ const requestSchema = z
 				registrationId: message.attributes?.registrationId,
 			}
 		} catch (e) {
-			ctx.addIssue({ code: "custom", message: "Data not valid JSON" })
+			ctx.addIssue({
+				code: "custom",
+				message: e instanceof Error ? e.message : "Unknown error",
+			})
 		}
 	})
 
@@ -55,7 +58,7 @@ const dataSchema = z.intersection(
 		}),
 	]),
 	z.object({
-		registrationId: z.string().optional(),
+		registrationId: z.string(),
 	})
 )
 
