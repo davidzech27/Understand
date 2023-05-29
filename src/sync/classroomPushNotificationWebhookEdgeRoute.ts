@@ -8,13 +8,19 @@ const requestSchema = z
 	.object({
 		message: z.object({
 			data: z.string(),
+			attributes: z.object({ registrationId: z.string() }),
 		}),
 	})
 	.transform(({ message }, ctx) => {
 		try {
-			return JSON.parse(
+			const data = JSON.parse(
 				Buffer.from(message.data, "base64").toString("utf8")
 			)
+
+			return {
+				...(typeof data === "object" ? data : {}),
+				registrationId: message.attributes.registrationId,
+			}
 		} catch (e) {
 			ctx.addIssue({ code: "custom", message: "Data not valid JSON" })
 		}
@@ -55,7 +61,7 @@ const dataSchema = z.intersection(
 
 const webhookHandler = async (request: NextRequest) => {
 	const json = await request.json()
-	console.info(json)
+
 	const requestParsed = requestSchema.safeParse(json)
 
 	if (!requestParsed.success) {
@@ -68,6 +74,8 @@ const webhookHandler = async (request: NextRequest) => {
 	}
 
 	const { data } = requestParsed
+
+	console.info("Data: ", JSON.stringify(data))
 
 	const dataParsed = dataSchema.safeParse(data)
 
