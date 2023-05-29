@@ -156,7 +156,8 @@ const User = ({ email }: { email: string }) => ({
 						eq(teacherToCourse.courseId, id),
 						eq(teacherToCourse.teacherEmail, email)
 					)
-				),
+				)
+				.then((rows) => rows[0]),
 			db
 				.select({ id: studentToCourse.courseId })
 				.from(studentToCourse)
@@ -165,7 +166,8 @@ const User = ({ email }: { email: string }) => ({
 						eq(studentToCourse.courseId, id),
 						eq(studentToCourse.studentEmail, email)
 					)
-				),
+				)
+				.then((rows) => rows[0]),
 		])
 
 		if (teacherRow !== undefined) return "teacher" as const
