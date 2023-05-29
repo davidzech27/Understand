@@ -49,7 +49,7 @@ const dataSchema = z.intersection(
 		}),
 	]),
 	z.object({
-		registrationId: z.string(),
+		registrationId: z.string().optional(),
 	})
 )
 
