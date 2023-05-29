@@ -27,6 +27,7 @@ const indexGoogleClassroomContent = inngest.createFunction(
 		},
 		step,
 	}) => {
+		//! currently expires after 7 days. also isn't being undone when course is deleted. make solution where this runs every 7 days until course is deleted. or potentially code that runs every 7 days updating subscriptions. would require that refresh token is stored in database
 		await step.run(
 			"Subscribe to classroom push notifications",
 			async () => {
@@ -190,7 +191,7 @@ ${assignment.attachments
 		(attachment, index) =>
 			`${index + 1}. ${
 				attachment.title !== undefined
-					? `Title: ${attachment.title}\n\n`
+					? `Document title: ${attachment.title}\n\n`
 					: ""
 			}Content: ${attachment.text}\n\n`
 	)
@@ -351,7 +352,7 @@ ${driveFiles
 		(driveFile, index) =>
 			`${index + 1}. ${
 				driveFile.driveTitle !== undefined
-					? `Title: ${driveFile.driveTitle}\n\n`
+					? `Document title: ${driveFile.driveTitle}\n\n`
 					: ""
 			}Content: ${driveFile.text}`
 	)
@@ -403,7 +404,7 @@ Given that the title of the assignment in Google Classroom is ${
 																	`${
 																		attachment.title !==
 																		undefined
-																			? `Title: ${attachment.title}\n\n`
+																			? `Instructions document title: ${attachment.title}\n\n`
 																			: ""
 																	}Content: ${
 																		attachment.text
@@ -494,7 +495,7 @@ ${driveFiles
 		(driveFile, index) =>
 			`${index + 1}. ${
 				driveFile.driveTitle !== undefined
-					? `Title: ${driveFile.driveTitle}\n\n`
+					? `Document title: ${driveFile.driveTitle}\n\n`
 					: ""
 			}Content: ${driveFile.text}`
 	)
@@ -524,7 +525,7 @@ Identify the numbers corresponding to the resources that are likely to provide h
 
 										context += `${
 											driveFile.driveTitle !== undefined
-												? `Title: ${driveFile.driveTitle}\n\n`
+												? `Document title: ${driveFile.driveTitle}\n\n`
 												: ""
 										}Content: ${driveFile.text}\n\n`
 									}

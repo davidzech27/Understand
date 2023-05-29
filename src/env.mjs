@@ -10,8 +10,7 @@ const server = z.object({
 	PINECONE_ENVIRONMENT: z.string(),
 	PINECONE_API_KEY: z.string(),
 	INNGEST_EVENT_KEY: z.string(),
-	INNGEST_SIGNING_KEY:
-		process.env.NODE_ENV === "production" ? z.string() : z.undefined(),
+	INNGEST_SIGNING_KEY: z.string(),
 	NEXT_PUBLIC_URL: z.string().url(),
 })
 

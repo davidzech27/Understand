@@ -903,13 +903,14 @@ const GoogleAPI = async ({
 							},
 						},
 						cloudPubsubTopic: {
-							topicName: "classroom-push-notification",
+							topicName:
+								"projects/understand-381816/topics/classroom-push-notifications",
 						},
 					}),
 					headers: {
 						Authorization: `Bearer ${accessToken}`,
 					},
-				}),
+				}).then((response) => response.json()),
 				fetch("https://classroom.googleapis.com/v1/registrations", {
 					method: "POST",
 					body: JSON.stringify({
@@ -920,13 +921,14 @@ const GoogleAPI = async ({
 							},
 						},
 						cloudPubsubTopic: {
-							topicName: "classroom-push-notification",
+							topicName:
+								"projects/understand-381816/topics/classroom-push-notifications",
 						},
 					}),
 					headers: {
 						Authorization: `Bearer ${accessToken}`,
 					},
-				}),
+				}).then((response) => response.json()),
 			])
 			//! not implementing unsubscribe yet because it's hard and not that important
 		},
