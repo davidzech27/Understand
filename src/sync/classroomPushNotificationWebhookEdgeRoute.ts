@@ -10,9 +10,15 @@ const requestSchema = z
 			data: z.string(),
 		}),
 	})
-	.transform(({ message }) =>
-		JSON.parse(Buffer.from(message.data, "base64").toString("utf8"))
-	)
+	.transform(({ message }, ctx) => {
+		try {
+			return JSON.parse(
+				Buffer.from(message.data, "base64").toString("utf8")
+			)
+		} catch (e) {
+			ctx.addIssue({ code: "custom", message: "Data not valid JSON" })
+		}
+	})
 
 const dataSchema = z.intersection(
 	z.discriminatedUnion("collection", [
@@ -52,21 +58,26 @@ const webhookHandler = async (request: NextRequest) => {
 
 	const requestParsed = requestSchema.safeParse(json)
 
-	if (!requestParsed.success)
+	if (!requestParsed.success) {
+		console.error(requestParsed.error)
+
 		return new Response(
 			`Incorrect request body format: ${JSON.stringify(json)}`,
 			{ status: 400 }
 		)
+	}
 
 	const { data } = requestParsed
 
 	const dataParsed = dataSchema.safeParse(data)
 
-	if (!dataParsed.success)
+	if (!dataParsed.success) {
+		console.error(dataParsed.error)
+
 		return new Response(`Incorrect data format: ${JSON.stringify(data)}`, {
 			status: 400,
 		})
-
+	}
 	const idToken = request.headers.get("Authorization")?.split(" ")[1]
 
 	if (idToken === undefined)
