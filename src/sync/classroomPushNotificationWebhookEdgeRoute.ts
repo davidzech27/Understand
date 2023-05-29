@@ -55,12 +55,14 @@ const dataSchema = z.intersection(
 		}),
 	]),
 	z.object({
-		registrationId: z.string().optional(),
+		registrationId: z.string(),
 	})
 )
 
 const webhookHandler = async (request: NextRequest) => {
 	const json = await request.json()
+
+	console.info("JSON: ", JSON.stringify(json))
 
 	const requestParsed = requestSchema.safeParse(json)
 
