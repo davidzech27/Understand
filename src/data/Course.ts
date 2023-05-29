@@ -17,12 +17,23 @@ const Course = ({ id }: { id: string }) => ({
 		name,
 		section,
 		linkedUrl,
+		linkedAccessToken,
+		linkedRefreshToken,
 	}: {
 		name: string
 		section: string | undefined
 		linkedUrl: string | undefined
+		linkedAccessToken: string | undefined
+		linkedRefreshToken: string | undefined
 	}) => {
-		await db.insert(course).values({ id, name, section, linkedUrl })
+		await db.insert(course).values({
+			id,
+			name,
+			section,
+			linkedUrl,
+			linkedAccessToken,
+			linkedRefreshToken,
+		})
 	},
 	get: async () => {
 		const row = (
@@ -50,10 +61,14 @@ const Course = ({ id }: { id: string }) => ({
 		name,
 		section,
 		googleClassroomId,
+		linkedAccessToken,
+		linkedRefreshToken,
 	}: {
 		name?: string
 		section?: string
 		googleClassroomId?: string
+		linkedAccessToken?: string
+		linkedRefreshToken?: string
 	}) => {
 		await db
 			.update(course)
@@ -62,6 +77,12 @@ const Course = ({ id }: { id: string }) => ({
 				...(section !== undefined ? { section } : {}),
 				...(googleClassroomId !== undefined
 					? { googleClassroomId }
+					: {}),
+				...(linkedAccessToken !== undefined
+					? { linkedAccessToken }
+					: {}),
+				...(linkedRefreshToken !== undefined
+					? { linkedRefreshToken }
 					: {}),
 			})
 			.where(eq(course.id, id))
@@ -76,6 +97,24 @@ const Course = ({ id }: { id: string }) => ({
 			db.delete(followUp).where(eq(followUp.courseId, id)),
 			Resource({ courseId: id }).delete({ where: {} }),
 		])
+	},
+	linkedCredentials: async () => {
+		const credentials = (
+			await db
+				.select({
+					linkedAccessToken: course.linkedAccessToken,
+					linkedRefreshToken: course.linkedRefreshToken,
+				})
+				.from(course)
+				.where(eq(course.id, id))
+		)[0]
+
+		return (
+			credentials && {
+				accessToken: credentials.linkedAccessToken ?? undefined,
+				refreshToken: credentials.linkedRefreshToken ?? undefined,
+			}
+		)
 	},
 	roster: async () => {
 		const [teachers, students] = await Promise.all([

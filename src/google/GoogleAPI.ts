@@ -550,6 +550,154 @@ const GoogleAPI = async ({
 
 			return assignmentSchema.array().parse(assignments)
 		},
+		assignment: async ({
+			courseId,
+			assignmentId,
+		}: {
+			courseId: string
+			assignmentId: string
+		}) => {
+			type Response = {
+				id: unknown
+				title: unknown
+				description: unknown
+				materials:
+					| {
+							driveFile:
+								| {
+										driveFile: {
+											id: unknown
+											title: unknown
+											alternateLink: unknown
+											thumbnailUrl: unknown
+										}
+								  }
+								| undefined
+							youtubeVideo:
+								| {
+										id: unknown
+										title: unknown
+										alternateLink: unknown
+										thumbnailUrl: unknown
+								  }
+								| undefined
+							link:
+								| {
+										title: unknown
+										url: unknown
+										thumbnailUrl: unknown
+								  }
+								| undefined
+							form:
+								| {
+										title: unknown
+										formUrl: unknown
+										responseUrl: unknown
+										thumbnailUrl: unknown
+								  }
+								| undefined
+					  }[]
+					| undefined
+				dueDate:
+					| { year: number; month: number; day: number }
+					| undefined
+				dueTime: { hours: number; minutes: number } | undefined
+				workType: unknown
+				alternateLink: unknown
+			}
+
+			const {
+				id,
+				title,
+				description,
+				alternateLink,
+				materials,
+				dueDate,
+				dueTime,
+			} = (await (
+				await fetch(
+					`https://classroom.googleapis.com/v1/courses/${courseId}/courseWork/${assignmentId}`,
+					{
+						headers: {
+							Authorization: `Bearer ${accessToken}`,
+						},
+					}
+				)
+			).json()) as Response
+
+			return assignmentSchema.parse({
+				id,
+				title,
+				description,
+				url: alternateLink,
+				attachments: (materials ?? []).map(
+					({ driveFile, youtubeVideo, link, form }) => {
+						if (driveFile)
+							return {
+								type: "driveFile",
+								driveFile: {
+									id: driveFile.driveFile?.id,
+									title: driveFile.driveFile?.title,
+									url: driveFile.driveFile?.alternateLink,
+									thumbnailUrl:
+										driveFile.driveFile?.thumbnailUrl,
+								},
+							}
+						if (youtubeVideo)
+							return {
+								type: "youtubeVideo",
+								youtubeVideo: {
+									id: youtubeVideo.id,
+									title: youtubeVideo.title,
+									url: youtubeVideo.alternateLink,
+									thumbnailUrl: youtubeVideo.thumbnailUrl,
+								},
+							}
+						if (link)
+							return {
+								type: "link",
+								link: {
+									title: link.title,
+									url: link.url,
+									thumbnailUrl: link.thumbnailUrl,
+								},
+							}
+						if (form)
+							return {
+								type: "form",
+								form: {
+									title: form.title,
+									formUrl: form.formUrl,
+									responseUrl: form.responseUrl,
+									thumbnailUrl: form.thumbnailUrl,
+								},
+							}
+					}
+				),
+				dueAt: (() => {
+					const date =
+						dueDate &&
+						dueDate.year &&
+						dueDate.month &&
+						dueDate.day &&
+						dueTime &&
+						dueTime.hours &&
+						dueTime.minutes
+							? new Date(
+									Date.UTC(
+										dueDate.year,
+										dueDate.month - 1,
+										dueDate.day,
+										dueTime.hours,
+										dueTime.minutes
+									)
+							  )
+							: undefined
+
+					return date
+				})(),
+			})
+		},
 		courseMaterials: async ({ courseId }: { courseId: string }) => {
 			type Response = {
 				courseWorkMaterial: {

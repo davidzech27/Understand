@@ -57,9 +57,9 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 			id,
 			name: nameInput.trim(),
 			section: sectionInput.trim() || undefined,
-			linkedUrl: linkedCourse?.url,
 			additionalTeacherEmails: additionalTeacherEmailInputs,
 			studentEmails: studentEmailInputs,
+			linkedUrl: linkedCourse?.url,
 		})
 
 		router.refresh()

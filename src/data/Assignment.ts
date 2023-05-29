@@ -100,7 +100,6 @@ const Assignment = ({
 			)
 	},
 	delete: async () => {
-		// consider deleting resources
 		await Promise.all([
 			db
 				.delete(assignment)

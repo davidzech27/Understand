@@ -18,18 +18,18 @@ const createCourseAction = zact(
 		id: z.string(),
 		name: z.string().min(1),
 		section: z.string().min(1).optional(),
-		linkedUrl: z.string().url().optional(),
 		additionalTeacherEmails: z.string().array(),
 		studentEmails: z.string().array(),
+		linkedUrl: z.string().url().optional(),
 	})
 )(
 	async ({
 		id,
 		name,
 		section,
-		linkedUrl,
 		additionalTeacherEmails,
 		studentEmails,
+		linkedUrl,
 	}) => {
 		const { email, ...creatorAuth } = await getAuthOrThrow({
 			cookies: cookies(),
@@ -40,7 +40,21 @@ const createCourseAction = zact(
 		studentEmails = studentEmails.filter(isEmailValid)
 
 		await Promise.all([
-			Course({ id }).create({ name, section, linkedUrl }),
+			Course({ id }).create({
+				name,
+				section,
+				...(linkedUrl !== undefined
+					? {
+							linkedUrl,
+							linkedAccessToken: creatorAuth.googleAccessToken,
+							linkedRefreshToken: creatorAuth.googleRefreshToken,
+					  }
+					: {
+							linkedUrl: undefined,
+							linkedAccessToken: undefined,
+							linkedRefreshToken: undefined,
+					  }),
+			}),
 			User({ email }).addToCourse({ id, role: "teacher" }),
 			additionalTeacherEmails.map((email) =>
 				User({ email }).addToCourse({ id, role: "teacher" })

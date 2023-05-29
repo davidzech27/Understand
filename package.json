@@ -24,6 +24,7 @@
 		"date-fns": "^2.30.0",
 		"drizzle-orm": "^0.23.2-e17a5ba",
 		"framer-motion": "^10.11.2",
+		"google-auth-library": "^8.8.0",
 		"immer": "^10.0.1",
 		"inngest": "^1.9.0",
 		"jose": "^4.13.1",

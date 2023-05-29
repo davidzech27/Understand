@@ -1,4 +1,4 @@
-import webhookHandler from "~/google/classroomPushNotificationWebhookEdgeRoute"
+import webhookHandler from "~/sync/classroomPushNotificationWebhookEdgeRoute"
 
 export const runtime = "edge"
 

@@ -60,42 +60,54 @@ const Resource = ({ courseId }: { courseId: string }) => {
 
 	return {
 		create: async (resource: Resource) => {
-			try {
-				const vdb = await vdbPromise
+			const vdb = await vdbPromise
 
-				vdb.upsert({
-					upsertRequest: {
-						vectors: [
-							{
-								id: `resource:${courseId}:${
-									"driveId" in resource
-										? "drive"
-										: "instructionsForAssignmentId" in
-										  resource
-										? "description"
-										: ""
-								}:${
-									"driveId" in resource
-										? resource.driveId
-										: "instructionsForAssignmentId" in
-										  resource
-										? resource.instructionsForAssignmentId
-										: ""
-								}`,
-								values: await getEmbedding(
-									getFormattedText(resource)
-								),
-								metadata: resource,
-							},
-						],
-						namespace,
-					},
-				})
-			} catch (e) {
-				console.log("create", resource)
+			vdb.upsert({
+				upsertRequest: {
+					vectors: [
+						{
+							id: `resource:${courseId}:${
+								"driveId" in resource
+									? "drive"
+									: "instructionsForAssignmentId" in resource
+									? "description"
+									: ""
+							}:${
+								"driveId" in resource
+									? resource.driveId
+									: "instructionsForAssignmentId" in resource
+									? resource.instructionsForAssignmentId
+									: ""
+							}`,
+							values: await getEmbedding(
+								getFormattedText(resource)
+							),
+							metadata: resource,
+						},
+					],
+					namespace,
+				},
+			})
+		},
+		getMany: async ({ where }: { where: Partial<Resource> }) => {
+			const vdb = await vdbPromise
 
-				throw e
-			}
+			return (
+				(
+					await vdb.query({
+						queryRequest: {
+							vector: Array(1536).fill(0),
+							filter:
+								Object.keys(where).length === 0
+									? undefined
+									: where,
+							topK: 10_000,
+							includeMetadata: true,
+							namespace,
+						},
+					})
+				).matches ?? []
+			).map((match) => resourceMetadataSchema.parse(match.metadata))
 		},
 		search: async ({
 			similarText,
@@ -106,30 +118,24 @@ const Resource = ({ courseId }: { courseId: string }) => {
 			where: Partial<Resource> // Pick and Omit weren't working well with union types
 			topK: number
 		}) => {
-			try {
-				const vdb = await vdbPromise
+			const vdb = await vdbPromise
 
-				return (
-					(
-						await vdb.query({
-							queryRequest: {
-								vector: await getEmbedding(similarText),
-								filter:
-									Object.keys(where).length === 0
-										? undefined
-										: where,
-								topK,
-								includeMetadata: true,
-								namespace,
-							},
-						})
-					).matches ?? []
-				).map((match) => resourceMetadataSchema.parse(match.metadata))
-			} catch (e) {
-				console.log("search", { where })
-
-				throw e
-			}
+			return (
+				(
+					await vdb.query({
+						queryRequest: {
+							vector: await getEmbedding(similarText),
+							filter:
+								Object.keys(where).length === 0
+									? undefined
+									: where,
+							topK,
+							includeMetadata: true,
+							namespace,
+						},
+					})
+				).matches ?? []
+			).map((match) => resourceMetadataSchema.parse(match.metadata))
 		},
 		update: async ({
 			set,
@@ -138,78 +144,66 @@ const Resource = ({ courseId }: { courseId: string }) => {
 			set: Partial<Resource>
 			where: Partial<Resource>
 		}) => {
-			try {
-				const [vdb, values] = await Promise.all([
-					vdbPromise,
-					set.text !== undefined
-						? await getEmbedding(set.text)
-						: undefined,
-				])
+			const [vdb, values] = await Promise.all([
+				vdbPromise,
+				set.text !== undefined
+					? await getEmbedding(set.text)
+					: undefined,
+			])
 
-				await Promise.all(
+			await Promise.all(
+				(
 					(
-						(
-							await vdb.query({
-								queryRequest: {
-									vector: Array(1536).fill(0),
-									filter:
-										Object.keys(where).length === 0
-											? undefined
-											: where,
-									topK: 10_000,
-									namespace,
-								},
-							})
-						).matches ?? []
-					).map(({ id }) =>
-						vdb.update({
-							updateRequest: {
-								id,
-								...(values !== undefined ? { values } : {}),
-								setMetadata: set,
-								namespace,
-							},
-						})
-					)
-				)
-			} catch (e) {
-				console.log("update", { where })
-
-				throw e
-			}
-		},
-		delete: async ({ where }: { where: Partial<Resource> }) => {
-			try {
-				const vdb = await vdbPromise
-
-				if (Object.keys(where).length === 0) {
-					await vdb.delete1({
-						deleteAll: true,
-						namespace: `resource:${courseId}`,
-					})
-				} else {
-					const ids = (
 						await vdb.query({
 							queryRequest: {
 								vector: Array(1536).fill(0),
-								filter: where,
-								namespace,
+								filter:
+									Object.keys(where).length === 0
+										? undefined
+										: where,
 								topK: 10_000,
+								namespace,
 							},
 						})
-					).matches?.map(({ id }) => id)
-
-					if (ids === undefined) return
-
-					await vdb.delete1({
-						ids, //! currently throwing an error. investigate later
-						namespace,
+					).matches ?? []
+				).map(({ id }) =>
+					vdb.update({
+						updateRequest: {
+							id,
+							...(values !== undefined ? { values } : {}),
+							setMetadata: set,
+							namespace,
+						},
 					})
-				}
-			} catch (e) {
-				console.log("search", { where })
+				)
+			)
+		},
+		delete: async ({ where }: { where: Partial<Resource> }) => {
+			const vdb = await vdbPromise
 
-				throw e
+			if (Object.keys(where).length === 0) {
+				await vdb.delete1({
+					deleteAll: true,
+					namespace: `resource:${courseId}`,
+				})
+			} else {
+				const ids = (
+					await vdb.query({
+						queryRequest: {
+							vector: Array(1536).fill(0),
+							filter: where,
+							namespace,
+							topK: 10_000,
+						},
+					})
+				).matches?.map(({ id }) => id)
+
+				if (ids === undefined) return
+
+				await vdb.delete1({
+					ids, //! currently throwing an error. investigate later
+					namespace,
+				})
 			}
 		},
 	}

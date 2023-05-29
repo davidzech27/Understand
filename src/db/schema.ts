@@ -50,6 +50,8 @@ export const course = mysqlTable("course", {
 	name: text("name").notNull(),
 	section: text("section"),
 	linkedUrl: text("linked_url"),
+	linkedAccessToken: text("linked_access_token"),
+	linkedRefreshToken: text("linked_refresh_token"),
 })
 
 export const assignment = mysqlTable(

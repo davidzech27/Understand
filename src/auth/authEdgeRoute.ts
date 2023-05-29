@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { eq } from "drizzle-orm/expressions"
 
 import { env } from "~/env.mjs"
 import { setAuth } from "~/auth/jwt"
@@ -7,6 +8,7 @@ import db from "~/db/db"
 import { getCredentialsFromCode } from "~/google/credentials"
 import GoogleAPI from "~/google/GoogleAPI"
 import User from "~/data/User"
+import Course from "~/data/Course"
 
 export const oauthCallbackHandler = async (request: NextRequest) => {
 	const { searchParams } = new URL(request.url)
@@ -35,16 +37,30 @@ export const oauthCallbackHandler = async (request: NextRequest) => {
 
 	const response = NextResponse.redirect(new URL(redirectTo))
 
-	await setAuth({
-		cookies: response.cookies,
-		auth: {
-			email,
-			googleAccessToken: accessToken,
-			googleRefreshToken: refreshToken,
-			googleRefreshTokenExpiresMillis: expiresMillis,
-			googleScopes: scopes,
-		},
-	})
+	await Promise.all([
+		setAuth({
+			cookies: response.cookies,
+			auth: {
+				email,
+				googleAccessToken: accessToken,
+				googleRefreshToken: refreshToken,
+				googleRefreshTokenExpiresMillis: expiresMillis,
+				googleScopes: scopes,
+			},
+		}),
+		User({ email })
+			.courses()
+			.then(({ teaching }) =>
+				Promise.all(
+					teaching.map(({ id }) =>
+						Course({ id }).update({
+							linkedAccessToken: accessToken,
+							linkedRefreshToken: refreshToken,
+						})
+					)
+				)
+			),
+	])
 
 	return response
 }
