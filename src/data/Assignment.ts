@@ -26,16 +26,28 @@ const Assignment = ({
 		dueAt: Date | undefined
 		linkedUrl: string | undefined
 	}) => {
-		await db.insert(assignment).values({
-			courseId,
-			assignmentId,
-			title,
-			description,
-			instructions,
-			context,
-			dueAt,
-			linkedUrl,
-		})
+		await db
+			.insert(assignment)
+			.values({
+				courseId,
+				assignmentId,
+				title,
+				description,
+				instructions,
+				context,
+				dueAt,
+				linkedUrl,
+			})
+			.onDuplicateKeyUpdate({
+				set: {
+					title,
+					description,
+					instructions,
+					context,
+					dueAt,
+					linkedUrl,
+				},
+			})
 	},
 	get: async () => {
 		const row = (

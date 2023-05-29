@@ -6,7 +6,7 @@ import Course from "~/data/Course"
 import Resource from "~/data/Resource"
 import GoogleAPI from "~/google/GoogleAPI"
 import createAssignmentWithInstructionsAndContext from "./createAssignmentWithInstructionsAndContext"
-//! currently just deleting then recreating assignment. honestly not even sure if works
+//! currently just recreating assignment. I should really be doing more cleanup
 const updateAssignment = inngest.createFunction(
 	{ name: "Update assignment from Classroom" },
 	{ event: "classroom/assignment.updated" },
