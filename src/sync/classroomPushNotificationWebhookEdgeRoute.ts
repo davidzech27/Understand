@@ -53,14 +53,19 @@ const webhookHandler = async (request: NextRequest) => {
 	const requestParsed = requestSchema.safeParse(json)
 
 	if (!requestParsed.success)
-		return new Response("Incorrect request body format", { status: 400 })
+		return new Response(
+			`Incorrect request body format: ${JSON.stringify(json)}`,
+			{ status: 400 }
+		)
 
 	const { data } = requestParsed
 
 	const dataParsed = dataSchema.safeParse(data)
 
 	if (!dataParsed.success)
-		return new Response("Incorrect data format", { status: 400 })
+		return new Response(`Incorrect data format: ${JSON.stringify(data)}`, {
+			status: 400,
+		})
 
 	const idToken = request.headers.get("Authorization")?.split(" ")[1]
 
