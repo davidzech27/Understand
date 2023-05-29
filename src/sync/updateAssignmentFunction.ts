@@ -15,8 +15,6 @@ const updateAssignment = inngest.createFunction(
 			data: { courseId, assignmentId },
 		},
 	}) => {
-		await Assignment({ courseId, assignmentId }).delete()
-
 		const credentials = await Course({ id: courseId }).linkedCredentials()
 
 		if (
