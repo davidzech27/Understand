@@ -55,7 +55,7 @@ const dataSchema = z.intersection(
 
 const webhookHandler = async (request: NextRequest) => {
 	const json = await request.json()
-
+	console.info(json)
 	const requestParsed = requestSchema.safeParse(json)
 
 	if (!requestParsed.success) {
