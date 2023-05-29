@@ -7,9 +7,9 @@ import createAssignmentWithInstructionsAndContext from "./createAssignmentWithIn
 // potentially do topic by topic for greater reliability
 // todo - think about ways order assignments in interface, and also how to support chatbot that would access recent assignments
 // todo - support more attachment types. consider breaking attachments up if we don't end up using Anthropic's 100k token limit
-const indexClassroomContent = inngest.createFunction(
+const importClassroom = inngest.createFunction(
 	{
-		name: "Index Google Classroom content of linked course",
+		name: "Import Classroom content from linked course",
 	},
 	{ event: "app/linkedCourse.created" },
 	async ({
@@ -184,4 +184,4 @@ const indexClassroomContent = inngest.createFunction(
 	}
 )
 
-export default indexClassroomContent
+export default importClassroom

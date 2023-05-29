@@ -1,7 +1,7 @@
 import { serve } from "inngest/next"
 
 import inngest from "~/background/inngest"
-import indexClassroomContent from "~/sync/indexClassroomContentFunction"
+import importClassroom from "~/sync/importClassroomFunction"
 import createAssignment from "~/sync/createAssignmentFunction"
 import updateAssignment from "~/sync/updateAssignmentFunction"
 import deleteAssignment from "~/sync/deleteAssignmentFunction"
@@ -14,7 +14,7 @@ export const runtime = "edge"
 export const { GET, POST, PUT } = serve(
 	inngest,
 	[
-		indexClassroomContent,
+		importClassroom,
 		createAssignment,
 		updateAssignment,
 		deleteAssignment,
