@@ -4,7 +4,9 @@ import type { NextRequest } from "next/server"
 import { getAuth } from "~/auth/jwt"
 
 export const config = {
-	matcher: ["/((?!api|_|favicon.ico|landing|signIn|monitoring).+)"],
+	matcher: [
+		"/((?!api|_|favicon.ico|opengraph-image.jpg|landing|signIn|monitoring).+)",
+	],
 }
 
 const middleware = async (request: NextRequest) => {
