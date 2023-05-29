@@ -7,7 +7,10 @@ import GoogleAPI from "~/google/GoogleAPI"
 import createAssignmentWithInstructionsAndContext from "./createAssignmentWithInstructionsAndContext"
 //! should I also manage deleting deleted materials?
 const createAssignment = inngest.createFunction(
-	{ name: "Create assignment from classroom course" },
+	{
+		name: "Create assignment from classroom course",
+		cancelOn: [{ event: "classroom/assignment.updated", match: "data" }], //! change this if this event ever relies on assignment already existing
+	},
 	{ event: "classroom/assignment.created" },
 	async ({
 		event: {

@@ -8,7 +8,10 @@ import GoogleAPI from "~/google/GoogleAPI"
 import createAssignmentWithInstructionsAndContext from "./createAssignmentWithInstructionsAndContext"
 //! currently just recreating assignment. I should really be doing more cleanup
 const updateAssignment = inngest.createFunction(
-	{ name: "Update assignment from Classroom" },
+	{
+		name: "Update assignment from Classroom",
+		cancelOn: [{ event: "classroom/assignment.updated", match: "data" }],
+	},
 	{ event: "classroom/assignment.updated" },
 	async ({
 		event: {
