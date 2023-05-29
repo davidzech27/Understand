@@ -52,17 +52,20 @@ const webhookHandler = async (request: NextRequest) => {
 
 	const requestParsed = requestSchema.safeParse(json)
 
-	if (!requestParsed.success) return new Response(null, { status: 400 })
+	if (!requestParsed.success)
+		return new Response("Incorrect request body format", { status: 400 })
 
 	const { data } = requestParsed
 
 	const dataParsed = dataSchema.safeParse(data)
 
-	if (!dataParsed.success) return new Response(null, { status: 400 })
+	if (!dataParsed.success)
+		return new Response("Incorrect data format", { status: 400 })
 
 	const idToken = request.headers.get("Authorization")?.split(" ")[1]
 
-	if (idToken === undefined) return new Response(null, { status: 400 })
+	if (idToken === undefined)
+		return new Response("Missing ID token", { status: 401 })
 
 	let ticket: LoginTicket
 
@@ -73,7 +76,7 @@ const webhookHandler = async (request: NextRequest) => {
 				"https://understand.school/api/classroomPushNotificationWebhook",
 		})
 	} catch (_) {
-		return new Response(null, { status: 401 })
+		return new Response("Invalid ID token", { status: 401 })
 	}
 
 	const claim = ticket.getPayload()
@@ -84,7 +87,7 @@ const webhookHandler = async (request: NextRequest) => {
 		claim.email !== "461408025253-compute@developer.gserviceaccount.com" ||
 		!claim.email_verified
 	)
-		return new Response(null, { status: 403 })
+		return new Response("Invalid service account", { status: 403 })
 
 	const event = dataParsed.data
 

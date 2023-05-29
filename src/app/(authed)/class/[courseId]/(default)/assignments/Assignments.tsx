@@ -56,11 +56,11 @@ const Assignments: React.FC<Props> = ({ courseId, role, assignments }) => {
 								{assignment.title}
 							</span>
 
-							<span className="opacity-60">
+							{typeof window !== undefined && <span className="opacity-60">
 								{assignment.dueAt
 									? `Due ${formatDate(assignment.dueAt)}`
 									: "No due date"}
-							</span>
+							</span>}
 						</Link>
 					</Row.Item>
 				)}

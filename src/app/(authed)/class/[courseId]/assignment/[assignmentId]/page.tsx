@@ -65,11 +65,13 @@ const AssignmentPage = async ({
 						{assignment.title}
 					</span>
 
-					<span className="relative bottom-[1px] mr-3 ml-6 flex-shrink-0 text-lg font-medium leading-none opacity-60">
-						{assignment.dueAt
-							? `Due ${formatDate(assignment.dueAt)}`
-							: "No due date"}
-					</span>
+					{typeof window !== undefined && (
+						<span className="relative bottom-[1px] mr-3 ml-6 flex-shrink-0 text-lg font-medium leading-none opacity-60">
+							{assignment.dueAt
+								? `Due ${formatDate(assignment.dueAt)}`
+								: "No due date"}
+						</span>
+					)}
 				</a>
 
 				{assignment.description !== undefined && (
