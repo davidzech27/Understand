@@ -40,12 +40,11 @@ const Assignment = ({
 			})
 			.onDuplicateKeyUpdate({
 				set: {
-					title,
-					description,
-					instructions,
-					context,
-					dueAt,
-					linkedUrl,
+					...(title !== undefined ? { title } : {}),
+					...(description !== undefined ? { description } : {}),
+					...(instructions !== undefined ? { instructions } : {}),
+					...(context !== undefined ? { context } : {}),
+					...(dueAt !== undefined ? { dueAt } : {}),
 				},
 			})
 	},
