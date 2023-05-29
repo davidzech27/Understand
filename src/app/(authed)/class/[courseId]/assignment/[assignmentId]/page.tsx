@@ -7,7 +7,7 @@ import { getAuthOrThrow } from "~/auth/jwt"
 import Card from "~/components/Card"
 import AssignmentTabs from "./AssignmentTabs"
 import colors from "~/colors.cjs"
-import formatDate from "~/utils/formatDate"
+import FormattedDate from "~/utils/FormattedDate"
 import cn from "~/utils/cn"
 
 export const generateMetadata = async ({
@@ -65,13 +65,16 @@ const AssignmentPage = async ({
 						{assignment.title}
 					</span>
 
-					{typeof window !== undefined && (
-						<span className="relative bottom-[1px] mr-3 ml-6 flex-shrink-0 text-lg font-medium leading-none opacity-60">
-							{assignment.dueAt
-								? `Due ${formatDate(assignment.dueAt)}`
-								: "No due date"}
-						</span>
-					)}
+					<span className="relative bottom-[1px] mr-3 ml-6 flex-shrink-0 text-lg font-medium leading-none opacity-60">
+						{assignment.dueAt ? (
+							<FormattedDate
+								prefix="Due "
+								date={assignment.dueAt}
+							/>
+						) : (
+							"No due date"
+						)}
+					</span>
 				</a>
 
 				{assignment.description !== undefined && (

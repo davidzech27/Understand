@@ -1,7 +1,7 @@
 "use client"
 import Link from "next/link"
 
-import formatDate from "~/utils/formatDate"
+import FormattedDate from "~/utils/FormattedDate"
 import Card from "~/components/Card"
 import Row from "~/components/Row"
 
@@ -56,11 +56,16 @@ const Assignments: React.FC<Props> = ({ courseId, role, assignments }) => {
 								{assignment.title}
 							</span>
 
-							{typeof window !== undefined && <span className="opacity-60">
-								{assignment.dueAt
-									? `Due ${formatDate(assignment.dueAt)}`
-									: "No due date"}
-							</span>}
+							<span className="opacity-60">
+								{assignment.dueAt ? (
+									<FormattedDate
+										prefix="Due "
+										date={assignment.dueAt}
+									/>
+								) : (
+									"No due date"
+								)}
+							</span>
 						</Link>
 					</Row.Item>
 				)}
