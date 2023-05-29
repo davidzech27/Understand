@@ -46,33 +46,39 @@ const ClassLayout = async ({
 	return (
 		<div className="-mr-2 flex h-full flex-col space-y-2.5 overflow-y-scroll">
 			<Card className="flex flex-col justify-between py-5 px-6">
-				<a
-					href={course.linkedUrl}
-					target="_blank"
-					className={cn(
-						"flex items-baseline justify-between",
-						course.linkedUrl !== undefined &&
-							"transition-all duration-150 hover:opacity-80"
-					)}
-				>
-					<span
+				<div className="group flex items-baseline justify-between">
+					<a
+						href={course.linkedUrl}
+						target="_blank"
 						style={{
 							background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`,
 							WebkitBackgroundClip: "text",
 							backgroundClip: "text",
 							color: "transparent",
 						}}
-						className="pb-5 text-6xl font-semibold"
+						className={cn(
+							"pb-5 text-6xl font-semibold",
+							course.linkedUrl !== undefined &&
+								"peer transition-all duration-150 hover:opacity-80 peer-hover:opacity-80"
+						)}
 					>
 						{course.name}
-					</span>
+					</a>
 
 					{course.section && (
-						<span className="relative bottom-[1px] mr-1 ml-3 flex-shrink-0 text-base font-medium leading-none opacity-60">
+						<a
+							href={course.linkedUrl}
+							target="_blank"
+							className={cn(
+								"relative bottom-[1px] mr-1 ml-3 flex-shrink-0 text-base font-medium leading-none opacity-60",
+								course.linkedUrl !== undefined &&
+									"peer transition-all duration-150 hover:opacity-50 peer-hover:opacity-50"
+							)}
+						>
 							{course.section}
-						</span>
+						</a>
 					)}
-				</a>
+				</div>
 
 				<ClassTabs
 					course={course}

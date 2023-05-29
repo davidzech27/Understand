@@ -42,28 +42,26 @@ const AssignmentPage = async ({
 	if (role !== "teacher" || assignment === undefined) notFound()
 
 	return (
-		<div className="-mr-2 flex flex-col space-y-2.5 overflow-y-scroll">
+		<div className="-mr-2 flex h-full flex-col space-y-2.5 overflow-y-scroll">
 			<Card className="flex flex-col py-5 px-6">
-				<a
-					href={assignment.linkedUrl}
-					target="_blank"
-					className={cn(
-						"flex items-baseline justify-between",
-						assignment.linkedUrl !== undefined &&
-							"transition-all duration-150 hover:opacity-80"
-					)}
-				>
-					<span
+				<div className="flex items-baseline justify-between">
+					<a
+						href={assignment.linkedUrl}
+						target="_blank"
 						style={{
 							background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`,
 							WebkitBackgroundClip: "text",
 							backgroundClip: "text",
 							color: "transparent",
 						}}
-						className="pb-5 text-6xl font-semibold"
+						className={cn(
+							"pb-5 text-6xl font-semibold",
+							assignment.linkedUrl !== undefined &&
+								"transition-all duration-150 hover:opacity-80"
+						)}
 					>
 						{assignment.title}
-					</span>
+					</a>
 
 					<span className="relative bottom-[1px] mr-3 ml-6 flex-shrink-0 text-lg font-medium leading-none opacity-60">
 						{assignment.dueAt ? (
@@ -75,7 +73,7 @@ const AssignmentPage = async ({
 							"No due date"
 						)}
 					</span>
-				</a>
+				</div>
 
 				{assignment.description !== undefined && (
 					<p className="select-text px-1 pb-4 text-sm opacity-80">
@@ -87,9 +85,23 @@ const AssignmentPage = async ({
 			</Card>
 
 			<Card className="flex h-full flex-col py-5 px-6">
-				<span className="italic opacity-60">
-					Assignment insights coming soon...
-				</span>
+				{assignment.instructions !== undefined ? (
+					<>
+						<div className="ml-1 mb-2 text-lg font-medium opacity-60">
+							Instructions
+						</div>
+
+						<div className="select-text rounded-md border-[0.75px] border-border bg-surface-hover px-3 py-2 font-medium opacity-80">
+							{assignment.instructions}
+						</div>
+					</>
+				) : (
+					<div className="text-lg font-medium opacity-60">
+						Instructions for this assignment couldn&apos;t be found
+						on Google Classroom. Use the settings button above and
+						to the right to set them manually.
+					</div>
+				)}
 			</Card>
 		</div>
 	)

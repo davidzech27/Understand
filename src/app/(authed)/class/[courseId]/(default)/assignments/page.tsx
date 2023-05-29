@@ -2,6 +2,7 @@ import { cookies } from "next/headers"
 import { notFound } from "next/navigation"
 
 import { getAuthOrThrow } from "~/auth/jwt"
+import Card from "~/components/Card"
 import Course from "~/data/Course"
 import User from "~/data/User"
 import Assignments from "./Assignments"
@@ -28,12 +29,40 @@ const AssignmentsPage = async ({
 
 	if (role === "none") notFound()
 
+	const assignmentsWithInstructions = assignments.filter(
+		(assignment) => assignment.instructions !== undefined
+	)
+
+	const assignmentsWithoutInstructions = assignments.filter(
+		(assignment) => assignment.instructions === undefined
+	)
+
 	return (
-		<Assignments
-			courseId={courseId}
-			role={role}
-			assignments={assignments}
-		/>
+		<Card className="flex flex-1 flex-col space-y-2 py-5 px-6">
+			{assignmentsWithInstructions.length !== 0 && role === "teacher" && (
+				<>
+					<div className="ml-1 text-lg font-medium opacity-60">
+						Assignments missing instructions
+					</div>
+
+					<Assignments
+						courseId={courseId}
+						role={role}
+						assignments={assignmentsWithoutInstructions}
+					/>
+
+					<div className="ml-1 text-lg font-medium opacity-60">
+						Assignments
+					</div>
+				</>
+			)}
+
+			<Assignments
+				courseId={courseId}
+				role={role}
+				assignments={assignmentsWithInstructions}
+			/>
+		</Card>
 	)
 }
 

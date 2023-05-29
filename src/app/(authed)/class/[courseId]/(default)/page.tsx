@@ -14,7 +14,7 @@ const ClassPage = async ({ params: { courseId } }: { params: Params }) => {
 
 	return (
 		<Card className="flex flex-1 flex-col py-5 px-6">
-			<span className="italic opacity-60">Class home coming soon...</span>
+			<span className="opacity-60">Class home coming soon...</span>
 		</Card>
 	)
 }

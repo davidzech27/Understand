@@ -171,6 +171,63 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 				}}
 				className="flex h-full flex-col space-y-2.5"
 			>
+				<Card className="space-y-2 px-6 py-5 shadow-sm">
+					<div className="ml-1 font-medium opacity-80">Name</div>
+
+					<Form.Field asChild name="class-name">
+						<Form.Control asChild>
+							<TextInput
+								value={nameInput}
+								setValue={setNameInput}
+								placeholder="Class name"
+								autoFocus
+								className="h-min py-2.5 pl-4 text-base"
+							/>
+						</Form.Control>
+					</Form.Field>
+
+					<div className="ml-1 font-medium opacity-80">Section</div>
+
+					<Form.Field asChild name="class-section">
+						<Form.Control asChild>
+							<TextInput
+								value={sectionInput}
+								setValue={setSectionInput}
+								placeholder="Section (optional)"
+								className="h-min py-2.5 pl-4 text-base"
+							/>
+						</Form.Control>
+					</Form.Field>
+				</Card>
+
+				<Card className="flex-1 space-y-2 overflow-y-scroll px-6 py-5 shadow-sm">
+					<div className="ml-1 font-medium opacity-80">Students</div>
+
+					<ListInput
+						values={studentEmailInputs}
+						setValues={setStudentEmailInputs}
+						singleWord
+						placeholder="Student email"
+						className="h-min"
+						textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)] h-min"
+						buttonClassName="h-[46px] w-[46px]"
+					/>
+
+					<div className="ml-1 font-medium opacity-80">
+						Additional teachers
+					</div>
+
+					<ListInput
+						values={additionalTeacherEmailInputs}
+						setValues={setAdditionalTeacherEmailInputs}
+						singleWord
+						placeholder="Teacher email"
+						className="h-min"
+						textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)] h-min"
+						buttonClassName="h-[46px] w-[46px]"
+					/>
+				</Card>
+
 				<Card className="flex flex-col space-y-2 py-5 px-6 shadow-sm">
 					<div className="ml-1 font-medium opacity-80">
 						Link class
@@ -227,63 +284,6 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 							Link with Google Classroom class
 						</Button>
 					)}
-				</Card>
-
-				<Card className="space-y-2 px-6 py-5 shadow-sm">
-					<div className="ml-1 font-medium opacity-80">Name</div>
-
-					<Form.Field asChild name="class-name">
-						<Form.Control asChild>
-							<TextInput
-								value={nameInput}
-								setValue={setNameInput}
-								placeholder="Class name"
-								autoFocus
-								className="h-min py-2.5 pl-4 text-base"
-							/>
-						</Form.Control>
-					</Form.Field>
-
-					<div className="ml-1 font-medium opacity-80">Section</div>
-
-					<Form.Field asChild name="class-section">
-						<Form.Control asChild>
-							<TextInput
-								value={sectionInput}
-								setValue={setSectionInput}
-								placeholder="Section (optional)"
-								className="h-min py-2.5 pl-4 text-base"
-							/>
-						</Form.Control>
-					</Form.Field>
-				</Card>
-
-				<Card className="flex-1 space-y-2 overflow-y-scroll px-6 py-5 shadow-sm">
-					<div className="ml-1 font-medium opacity-80">Students</div>
-
-					<ListInput
-						values={studentEmailInputs}
-						setValues={setStudentEmailInputs}
-						singleWord
-						placeholder="Student email"
-						className="h-min"
-						textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)] h-min"
-						buttonClassName="h-[46px] w-[46px]"
-					/>
-
-					<div className="ml-1 font-medium opacity-80">
-						Additional teachers
-					</div>
-
-					<ListInput
-						values={additionalTeacherEmailInputs}
-						setValues={setAdditionalTeacherEmailInputs}
-						singleWord
-						placeholder="Teacher email"
-						className="h-min"
-						textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)] h-min"
-						buttonClassName="h-[46px] w-[46px]"
-					/>
 				</Card>
 
 				<Card className="flex space-x-3 py-5 px-6 shadow-sm">

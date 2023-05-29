@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm/expressions"
+import { desc, eq } from "drizzle-orm/expressions"
 
 import db from "~/db/db"
 import {
@@ -166,6 +166,7 @@ const Course = ({ id }: { id: string }) => ({
 			.select()
 			.from(assignment)
 			.where(eq(assignment.courseId, id))
+			.orderBy(desc(assignment.dueAt))
 
 		return assignments.map((assignment) => ({
 			courseId: assignment.courseId,

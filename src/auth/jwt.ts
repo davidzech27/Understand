@@ -1,4 +1,3 @@
-import { type ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies"
 import { type ResponseCookies } from "next/dist/compiled/@edge-runtime/cookies"
 import * as jose from "jose"
 import { z } from "zod"
@@ -37,7 +36,7 @@ const decodeAccessToken = async ({ accessToken }: { accessToken: string }) =>
 export const getAuth = async ({
 	cookies,
 }: {
-	cookies: ReadonlyRequestCookies
+	cookies: { get: (key: string) => { value: string } | undefined }
 }) => {
 	const authorization = cookies.get(authorizationCookieKey)?.value
 
@@ -59,7 +58,7 @@ export const getAuth = async ({
 export const getAuthOrThrow = async ({
 	cookies,
 }: {
-	cookies: ReadonlyRequestCookies
+	cookies: { get: (key: string) => { value: string } | undefined }
 }) => {
 	const auth = await getAuth({ cookies })
 

@@ -8,10 +8,10 @@ interface Props {
 
 const FormattedDate: React.FC<Props> = ({ date, prefix }) => {
 	const [formattedDate, setFormattedDate] = useState<string | null>(null)
-	console.log(date.getHours())
+
 	useEffect(() => {
 		const timeString = `${
-			((date.getHours() + 1) % 12) - 1 + (date.getHours() >= 12 ? 12 : 0)
+			((date.getHours() + 1) % 12) - 1
 		}:${date.getMinutes()} ${
 			date.getHours() >= 12 && date.getHours() !== 24 ? "PM" : "AM"
 		}`

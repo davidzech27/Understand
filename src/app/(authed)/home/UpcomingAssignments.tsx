@@ -1,51 +1,41 @@
 "use client"
 import Link from "next/link"
 
-import FormattedDate from "~/utils/FormattedDate"
 import Row from "~/components/Row"
+import FormattedDate from "~/utils/FormattedDate"
 
 interface Props {
-	courseId: string
-	role: "teacher" | "student"
 	assignments: {
 		courseId: string
 		assignmentId: string
 		title: string
-		description: string | undefined
-		instructions: string | undefined
-		context: string | undefined
-		dueAt: Date | undefined
-		linkedUrl: string | undefined
+		dueAt: Date
 	}[]
+	role: "teacher" | "student"
 }
 
-const Assignments: React.FC<Props> = ({ courseId, role, assignments }) => {
+const UpcomingAssignments: React.FC<Props> = ({ assignments, role }) => {
 	return (
 		<Row.List
 			items={assignments}
 			renderEmptyState={
-				<>
-					<span className="font-medium leading-relaxed opacity-60">
-						{`This is where you'll see ${
-							role === "teacher"
-								? "your created assignments"
-								: "assigned assignments"
-						}`}
+				role === "teacher" ? (
+					<span className="opacity-60">
+						This is where you&apos;ll see the upcoming assignments
+						for all the classes you&apos;re teaching
 					</span>
-
-					{role === "teacher" && (
-						<span className="mt-1 leading-relaxed opacity-60">
-							Use the plus button in the upper right corner to
-							create some
-						</span>
-					)}
-				</>
+				) : (
+					<span className="opacity-60">
+						This is where you&apos;ll see the upcoming assignments
+						for all the classes you&apos;re in
+					</span>
+				)
 			}
 		>
 			{({ item: assignment }) => (
 				<Row.Item key={assignment.assignmentId}>
 					<Link
-						href={`/class/${courseId}/${
+						href={`/class/${assignment.courseId}/${
 							role === "teacher" ? "assignment" : "feedback"
 						}/${assignment.assignmentId}`}
 						className="flex h-20 items-center justify-between"
@@ -71,4 +61,4 @@ const Assignments: React.FC<Props> = ({ courseId, role, assignments }) => {
 	)
 }
 
-export default Assignments
+export default UpcomingAssignments

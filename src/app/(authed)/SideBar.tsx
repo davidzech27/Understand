@@ -98,11 +98,9 @@ const SideBar = async () => {
 						</div>
 
 						<div className="mx-3 mt-1 text-xs leading-relaxed opacity-60">
-							Ask your teachers for an invite or use the plus
+							Either ask a teacher for an invite or use the plus
 							button in the upper right corner to create one
 						</div>
-
-						<div></div>
 					</>
 				)}
 			</div>
