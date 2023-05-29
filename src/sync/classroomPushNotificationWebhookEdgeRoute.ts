@@ -8,7 +8,7 @@ const requestSchema = z
 	.object({
 		message: z.object({
 			data: z.string(),
-			attributes: z.object({ registrationId: z.string() }),
+			attributes: z.object({ registrationId: z.string() }).optional(),
 		}),
 	})
 	.transform(({ message }, ctx) => {
@@ -19,7 +19,7 @@ const requestSchema = z
 
 			return {
 				...(typeof data === "object" ? data : {}),
-				registrationId: message.attributes.registrationId,
+				registrationId: message.attributes?.registrationId,
 			}
 		} catch (e) {
 			ctx.addIssue({ code: "custom", message: "Data not valid JSON" })
@@ -55,7 +55,7 @@ const dataSchema = z.intersection(
 		}),
 	]),
 	z.object({
-		registrationId: z.string(),
+		registrationId: z.string().optional(),
 	})
 )
 
@@ -117,10 +117,8 @@ const webhookHandler = async (request: NextRequest) => {
 
 	const event = dataParsed.data
 
-	console.info("Event: ", event)
-
 	if (event.collection === "courses.teachers")
-		inngest.send("classroom/roster.updated", {
+		await inngest.send("classroom/roster.updated", {
 			data: {
 				courseId: event.resourceId.courseId,
 				email: event.resourceId.userId,
@@ -128,7 +126,7 @@ const webhookHandler = async (request: NextRequest) => {
 			},
 		})
 	else if (event.collection === "courses.students")
-		inngest.send("classroom/roster.updated", {
+		await inngest.send("classroom/roster.updated", {
 			data: {
 				courseId: event.resourceId.courseId,
 				email: event.resourceId.userId,
@@ -136,7 +134,7 @@ const webhookHandler = async (request: NextRequest) => {
 			},
 		})
 	else if (event.collection === "courses.courseWork")
-		inngest.send(
+		await inngest.send(
 			event.eventType === "CREATED"
 				? "classroom/assignment.created"
 				: event.eventType === "MODIFIED"
@@ -150,7 +148,7 @@ const webhookHandler = async (request: NextRequest) => {
 			}
 		)
 	else if (event.collection === "courses.courseWork.studentSubmissions")
-		inngest.send("classroom/studentSubmission.updated", {
+		await inngest.send("classroom/studentSubmission.updated", {
 			data: {
 				courseId: event.resourceId.courseId,
 				assignmentId: event.resourceId.courseWorkId,
