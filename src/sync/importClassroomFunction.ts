@@ -162,16 +162,7 @@ const importClassroom = inngest.createFunction(
 									...assignment,
 									dueAt:
 										assignment.dueAt !== undefined
-											? new Date(
-													new Date(
-														assignment.dueAt
-													).getTime() +
-														new Date(
-															assignment.dueAt
-														).getTimezoneOffset() *
-															60 *
-															1000
-											  )
+											? new Date(assignment.dueAt)
 											: undefined,
 								},
 								courseId: id,

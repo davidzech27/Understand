@@ -12,7 +12,7 @@ const TopActions = () => {
 			<NavigationMenu.List>
 				<NavigationMenu.Item>
 					<NavigationMenu.Trigger asChild>
-						<button className="flex h-8 items-center space-x-[1px] rounded-md border-border bg-background-raised  px-2 transition-all duration-150 hover:bg-background-raised-hover">
+						<button className="flex h-8 items-center space-x-[1px] rounded-md bg-background-raised  px-2 transition-all duration-150 hover:bg-background-raised-hover">
 							<Plus size={20} className="opacity-80" />
 
 							<ChevronDown

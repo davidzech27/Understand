@@ -531,13 +531,11 @@ const GoogleAPI = async ({
 											dueTime.hours &&
 											dueTime.minutes
 												? new Date(
-														Date.UTC(
-															dueDate.year,
-															dueDate.month - 1,
-															dueDate.day,
-															dueTime.hours,
-															dueTime.minutes
-														)
+														dueDate.year,
+														dueDate.month - 1,
+														dueDate.day,
+														dueTime.hours,
+														dueTime.minutes
 												  )
 												: undefined
 
@@ -684,13 +682,11 @@ const GoogleAPI = async ({
 						dueTime.hours &&
 						dueTime.minutes
 							? new Date(
-									Date.UTC(
-										dueDate.year,
-										dueDate.month - 1,
-										dueDate.day,
-										dueTime.hours,
-										dueTime.minutes
-									)
+									dueDate.year,
+									dueDate.month - 1,
+									dueDate.day,
+									dueTime.hours,
+									dueTime.minutes
 							  )
 							: undefined
 
@@ -849,13 +845,11 @@ const GoogleAPI = async ({
 							dueTime.hours &&
 							dueTime.minutes
 							? new Date(
-									Date.UTC(
-										dueDate.year,
-										dueDate.month - 1,
-										dueDate.day,
-										dueTime.hours,
-										dueTime.minutes
-									)
+									dueDate.year,
+									dueDate.month - 1,
+									dueDate.day,
+									dueTime.hours,
+									dueTime.minutes
 							  )
 							: undefined
 					})(),

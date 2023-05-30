@@ -6,28 +6,37 @@ interface Props {
 	prefix?: string
 }
 
-const FormattedDate: React.FC<Props> = ({ date, prefix }) => {
+const FormattedDate: React.FC<Props> = ({ date: dateUTC, prefix }) => {
 	const [formattedDate, setFormattedDate] = useState<string | null>(null)
 
 	useEffect(() => {
+		const dateLocale = new Date(
+			dateUTC.getTime() + dateUTC.getTimezoneOffset() * 60 * 1000
+		)
+
 		const timeString = `${
-			((date.getHours() + 1) % 12) - 1
-		}:${date.getMinutes()} ${
-			date.getHours() >= 12 && date.getHours() !== 24 ? "PM" : "AM"
+			(dateLocale.getHours() % 12) +
+			(dateLocale.getHours() % 12 === 0 ? 12 : 0)
+		}:${dateLocale.getMinutes()} ${
+			dateLocale.getHours() >= 12 && dateLocale.getHours() !== 24
+				? "PM"
+				: "AM"
 		}`
 
-		if (date.getFullYear() === new Date().getFullYear()) {
+		if (dateLocale.getFullYear() === new Date().getFullYear()) {
 			setFormattedDate(
-				`${date
+				`${dateLocale
 					.toDateString()
 					.split(" ")
 					.slice(0, 3)
 					.join(" ")}, ${timeString}`
 			)
 		} else {
-			setFormattedDate(`${date.toDateString() + 1}, ${timeString}`)
+			setFormattedDate(
+				`${dateLocale.toLocaleDateString() + 1}, ${timeString}`
+			)
 		}
-	}, [date])
+	}, [dateUTC])
 
 	return formattedDate !== null ? (
 		<>
