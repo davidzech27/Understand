@@ -155,7 +155,7 @@ const importClassroom = inngest.createFunction(
 			assignments.map(
 				async (assignment) =>
 					await step.run(
-						`Find and update instructions and context for and create assignment with id ${assignment.id}`,
+						`Find instructions and context for and create assignment with id ${assignment.id}`,
 						async () => {
 							await createAssignmentWithInstructionsAndContext({
 								assignment: {

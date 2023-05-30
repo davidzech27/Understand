@@ -875,12 +875,10 @@ const GoogleAPI = async ({
 									| {
 											driveFile:
 												| {
-														driveFile: {
-															id: unknown
-															title: unknown
-															alternateLink: unknown
-															thumbnailUrl: unknown
-														}
+														id: unknown
+														title: unknown
+														alternateLink: unknown
+														thumbnailUrl: unknown
 												  }
 												| undefined
 											youTubeVideo:
@@ -955,20 +953,17 @@ const GoogleAPI = async ({
 										return {
 											type: "driveFile",
 											driveFile: {
-												id: driveFile.driveFile?.id,
-												title: driveFile.driveFile
-													?.title,
-												url: driveFile.driveFile
-													?.alternateLink,
+												id: driveFile.id,
+												title: driveFile.title,
+												url: driveFile.alternateLink,
 												thumbnailUrl:
-													driveFile.driveFile
-														?.thumbnailUrl,
+													driveFile.thumbnailUrl,
 											},
 										}
 									if (youTubeVideo)
 										return {
 											type: "youTubeVideo",
-											youtubeVideo: {
+											youTubeVideo: {
 												id: youTubeVideo.id,
 												title: youTubeVideo.title,
 												url: youTubeVideo.alternateLink,
@@ -999,6 +994,7 @@ const GoogleAPI = async ({
 						  )
 						: undefined
 				)
+				.flat()
 				.filter(Boolean)
 
 			return studentSubmissionAttachmentSchema

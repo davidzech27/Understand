@@ -31,6 +31,7 @@ const ClassPage = async ({ params: { courseId } }: { params: Params }) => {
 					role={role}
 				/>
 			) : (
+				//! will show up even if no assignments in Classroom
 				<div className="text-lg font-medium opacity-60">
 					Assignments are being imported from Google Classroom.
 					They&apos;ll be found in the &quot;assignments&quot; tab

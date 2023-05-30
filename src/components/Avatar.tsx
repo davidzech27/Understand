@@ -1,4 +1,5 @@
 "use client"
+import { useState } from "react"
 
 import cn from "../utils/cn"
 
@@ -17,6 +18,8 @@ const Avatar: React.FC<Props> = ({
 	border,
 	className,
 }) => {
+	const [isError, setIsError] = useState(false)
+
 	const fallback = name?.[0] ? (
 		<div
 			ref={(div) => {
@@ -41,10 +44,11 @@ const Avatar: React.FC<Props> = ({
 		/>
 	)
 
-	return src ? (
+	return src && !isError ? (
 		<img
 			src={src}
 			alt={name ?? "No title"}
+			onError={() => setIsError(true)}
 			className={cn(
 				"h-full w-full rounded-full",
 				border && "border-[0.75px] border-border",

@@ -30,22 +30,58 @@ const FeedbackPage = async ({
 }: {
 	params: Params
 }) => {
-	const [[role, profile], assignment, course] = await Promise.all([
-		getAuthOrThrow({ cookies: cookies() }).then(
-			({
-				email,
-				googleAccessToken,
-				googleRefreshToken,
-				googleRefreshTokenExpiresMillis,
-			}) =>
+	const [[role, profile, submissions], assignment, course] =
+		await Promise.all([
+			getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
 				Promise.all([
-					User({ email }).courseRole({ id: courseId }),
+					User({ email }).courseRole({
+						id: courseId,
+					}),
 					User({ email }).get(),
+					Course({
+						id: courseId,
+					})
+						.linkedCredentials()
+						.then(async (credentials) => {
+							if (credentials === undefined) return []
+
+							const googleAPI = await GoogleAPI({
+								accessToken: credentials.accessToken,
+								refreshToken: credentials.refreshToken,
+								expiresMillis: 0,
+								onRefreshAccessToken: async ({ accessToken }) =>
+									await Course({
+										id: courseId,
+									}).update({
+										linkedAccessToken: accessToken,
+									}),
+							})
+
+							return (
+								await googleAPI.studentSubmissions({
+									courseId,
+									assignmentId,
+									email,
+								})
+							)
+								.map((submission) =>
+									submission.type === "driveFile"
+										? submission.driveFile
+										: undefined
+								)
+								.filter(Boolean)
+								.map((submission) => ({
+									...submission,
+									html: googleAPI.driveFileHTML({
+										id: submission.id,
+									}),
+								}))
+						}),
 				])
-		),
-		Assignment({ courseId, assignmentId }).get(),
-		Course({ id: courseId }).get(),
-	])
+			),
+			Assignment({ courseId, assignmentId }).get(),
+			Course({ id: courseId }).get(),
+		])
 
 	if (
 		role === "none" ||
@@ -64,6 +100,7 @@ const FeedbackPage = async ({
 			}}
 			profileName={profile.name}
 			courseName={course.name}
+			submissions={submissions}
 		/>
 	)
 }

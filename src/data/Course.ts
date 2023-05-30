@@ -109,12 +109,14 @@ const Course = ({ id }: { id: string }) => ({
 				.where(eq(course.id, id))
 		)[0]
 
-		return (
-			credentials && {
-				accessToken: credentials.linkedAccessToken ?? undefined,
-				refreshToken: credentials.linkedRefreshToken ?? undefined,
-			}
-		)
+		return credentials &&
+			credentials.linkedAccessToken !== null &&
+			credentials.linkedRefreshToken !== null
+			? {
+					accessToken: credentials.linkedAccessToken,
+					refreshToken: credentials.linkedRefreshToken,
+			  }
+			: undefined
 	},
 	roster: async () => {
 		const [teachers, students] = await Promise.all([

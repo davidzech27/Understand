@@ -144,7 +144,7 @@ ${newMessages[0]}`,
 		<div className="relative h-full">
 			<div
 				ref={scrollerRef}
-				className="absolute top-0 left-0 right-0 bottom-0 flex flex-col space-y-1 overflow-y-scroll rounded-md border-[0.75px] border-border bg-surface-hover pl-3 pr-1 pt-3 pb-11"
+				className="absolute top-0 left-0 right-0 bottom-0 flex flex-col space-y-1 overflow-y-scroll rounded-md border-[0.75px] border-border bg-surface-hover pl-3 pr-1 pt-3 pb-14"
 			>
 				{messages.map((message, index) => (
 					<div
@@ -169,7 +169,7 @@ ${newMessages[0]}`,
 							? "Generating..."
 							: "Ask a question that could be answered by the content in the Google Classroom for this class"
 					}
-					className="h-min py-2 px-3"
+					className="back h-min py-2 px-3"
 				/>
 
 				<Send
@@ -177,7 +177,7 @@ ${newMessages[0]}`,
 					size={20}
 					aria-disabled={disabled}
 					className={cn(
-						"absolute bottom-2.5 right-3 transition-all duration-150",
+						"absolute bottom-2.5 right-3 backdrop-blur-lg transition-all duration-150",
 						!disabled
 							? "cursor-pointer opacity-60 hover:opacity-80"
 							: "opacity-40"

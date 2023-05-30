@@ -137,7 +137,7 @@ ${
 			temperature: 0,
 			presencePenalty: 0,
 			frequencyPenalty: 0,
-			maxTokens: 200,
+			maxTokens: 150,
 		})
 
 		const attachmentCandidates = await Resource({

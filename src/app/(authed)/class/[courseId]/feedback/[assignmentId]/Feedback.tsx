@@ -39,6 +39,13 @@ interface Props {
 	}
 	profileName: string
 	courseName: string
+	submissions: {
+		id: string
+		title?: string
+		url: string
+		thumbnailUrl?: string
+		html: Promise<string>
+	}[]
 }
 
 const specificFeedbackHighlightDomIdPrefix = "specific-feedback"
@@ -51,7 +58,12 @@ const getDomIdOfSpecificFeedbackHighlight = ({
 	sentence: number
 }) => `${specificFeedbackHighlightDomIdPrefix}-${paragraph}-${sentence}`
 
-const Feedback: React.FC<Props> = ({ assignment, profileName, courseName }) => {
+const Feedback: React.FC<Props> = ({
+	assignment,
+	profileName,
+	courseName,
+	submissions,
+}) => {
 	const submissionRef = useRef<{
 		getText: () => string | undefined
 		getTextOffset: ({}: { paragraph: number }) => number
@@ -117,31 +129,18 @@ const Feedback: React.FC<Props> = ({ assignment, profileName, courseName }) => {
 		generalFeedback === undefined &&
 		specificFeedbackList.length === 0
 
-	// const submissionDriveFiles = submissions
-	// 	.map((submission) =>
-	// 		submission.type === "driveFile" ? submission.driveFile : undefined
-	// 	)
-	// 	.filter(Boolean)
+	const [selectedAttachmentId, setSelectedAttachmentId] = useState<string>()
 
-	const onPickAttachment = async ({ id }: { id: string }) => {
-		// if (submissionRef.current)
-		// 	try {
-		// 		const googleDocHTML =
-		// 			await queryClient.feedback.getGoogleDocHTML.fetch({
-		// 				id,
-		// 			})
-		// 		submissionRef.current.setHTML(googleDocHTML)
-		// 		setModal(undefined)
-		// 	} catch (error) {
-		// 		if (
-		// 			error instanceof TRPCClientError &&
-		// 			error.message === "FORBIDDEN"
-		// 		)
-		// 			authenticateWithGoogle({
-		// 				permissions: ["drive"],
-		// 				redirectTo: window.location.href,
-		// 			})
-		// 	}
+	const onPickAttachment = async () => {
+		if (submissionRef.current) {
+			const html = await submissions.find(
+				(submission) => submission.id === selectedAttachmentId
+			)?.html
+
+			submissionRef.current.setHTML(html ?? "")
+
+			setModal(undefined)
+		}
 	}
 
 	const { mutate: registerFeedback, data: feedbackData } = useZact(
@@ -448,20 +447,56 @@ const Feedback: React.FC<Props> = ({ assignment, profileName, courseName }) => {
 	return (
 		<div className="flex h-full space-y-2.5">
 			<div className="relative flex h-full w-full overflow-y-scroll overscroll-y-contain rounded-md border border-border bg-white pt-16 shadow-lg shadow-[#00000016]">
-				<Modal
-					title="Pick a submission"
-					open={modal === "submission"}
-					setOpen={(open) =>
-						open ? setModal("submission") : setModal(undefined)
-					}
-				>
-					{/* <AttachmentList
-						items={submissionDriveFiles}
-						selectionType="single"
-					/> */}
+				{submissions.length > 0 && (
+					<Modal
+						title="Pick a submission"
+						open={modal === "submission"}
+						setOpen={(open) =>
+							open ? setModal("submission") : setModal(undefined)
+						}
+					>
+						<div className="flex h-full flex-col justify-between">
+							<AttachmentList
+								items={submissions}
+								selectionType="single"
+								selectionSet={
+									new Set(
+										selectedAttachmentId
+											? [selectedAttachmentId]
+											: []
+									)
+								}
+								setSelectionSet={(updater) => {
+									if (typeof updater === "object") {
+										setSelectedAttachmentId(
+											updater.values().next().value
+										)
+									} else {
+										setSelectedAttachmentId(
+											updater(
+												new Set(
+													selectedAttachmentId
+														? [selectedAttachmentId]
+														: []
+												)
+											)
+												.values()
+												.next().value
+										)
+									}
+								}}
+							/>
 
-					{/* (id) => onPickAttachment({ id }) */}
-				</Modal>
+							<Button
+								onClick={onPickAttachment}
+								disabled={selectedAttachmentId === undefined}
+								className="h-20 text-3xl"
+							>
+								Pick attachment
+							</Button>
+						</div>
+					</Modal>
+				)}
 
 				<div
 					style={{ marginTop: headerHeight ?? 0 }}
@@ -494,9 +529,6 @@ const Feedback: React.FC<Props> = ({ assignment, profileName, courseName }) => {
 						}
 					/>
 				</div>
-				{/* <p className="select-text px-1 pb-4 text-sm opacity-80">
-					{assignment.description}
-				</p> */}
 
 				<div className="relative flex basis-[704px] flex-col">
 					<div ref={headerRef} className="min-h-12 flex flex-col">
@@ -509,26 +541,26 @@ const Feedback: React.FC<Props> = ({ assignment, profileName, courseName }) => {
 							<div className="flex-1" />
 
 							<div className="flex-shrink-0">
-								{/* submissionDriveFiles.length > 0 */}
-								{submissionEmpty && false ? (
+								{submissionEmpty && submissions.length > 0 ? (
 									<Button
 										onClick={() => setModal("submission")}
 										className="text-lg"
 									>
 										Import submission
 									</Button>
-								) : editing || generating ? (
+								) : editing ? (
 									<Button
 										onClick={onGetFeedback}
-										disabled={submissionEmpty || generating}
+										disabled={submissionEmpty}
 										className="text-lg"
 									>
-										{generating
-											? specificFeedbackList.length > 0 ||
-											  generalFeedback !== undefined
-												? "Generating feedback..."
-												: "Analyzing document..."
-											: "Get feedback"}
+										Get feedback
+									</Button>
+								) : generating ? (
+									<Button disabled className="text-lg">
+										{specificFeedbackList.length > 0
+											? "Generating feedback..."
+											: "Analyzing document..."}
 									</Button>
 								) : (
 									<Button
