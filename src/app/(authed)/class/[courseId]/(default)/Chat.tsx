@@ -60,12 +60,14 @@ Respond with something that sounds like it could hypothetically be found in the 
 			temperature: 0,
 			onContent: () => {},
 			onFinish: async (content) => {
+				console.log("Predicted similar resources: ", content)
+
 				const similarResources = await getSimilarResourcesAction({
 					courseId,
 					similarText: content,
 				})
 
-				console.log(similarResources)
+				console.log("Similar resources: ", similarResources)
 
 				fetchOpenAIStream({
 					messages: [

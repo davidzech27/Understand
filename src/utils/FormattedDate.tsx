@@ -11,7 +11,7 @@ const FormattedDate: React.FC<Props> = ({ date: dateUTC, prefix }) => {
 
 	useEffect(() => {
 		const dateLocale = new Date(
-			dateUTC.getTime() + dateUTC.getTimezoneOffset() * 60 * 1000
+			dateUTC.getTime() + new Date().getTimezoneOffset() * 60 * 1000
 		)
 
 		const timeString = `${
