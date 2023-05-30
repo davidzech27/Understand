@@ -141,7 +141,7 @@ ${newMessages[0]}`,
 		<div className="relative h-full">
 			<div
 				ref={scrollerRef}
-				className="absolute top-0 left-0 right-0 bottom-0 flex flex-col space-y-1 overflow-y-scroll rounded-md border-[0.75px] border-border bg-surface-hover p-3 pb-11"
+				className="absolute top-0 left-0 right-0 bottom-0 flex flex-col space-y-1 overflow-y-scroll rounded-md border-[0.75px] border-border bg-surface-hover pl-3 pr-1 pt-3 pb-11"
 			>
 				{messages.map((message, index) => (
 					<div
