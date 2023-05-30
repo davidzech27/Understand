@@ -12,18 +12,19 @@ interface Params {
 }
 
 const ClassPage = async ({ params: { courseId } }: { params: Params }) => {
-	const [course, role] = await Promise.all([
+	const [course, role, assignments] = await Promise.all([
 		Course({ id: courseId }).get(),
 		getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
 			User({ email }).courseRole({ id: courseId })
 		),
+		Course({ id: courseId }).assignments(),
 	])
 
 	if (course === undefined || role === "none") notFound()
 
 	return (
 		<Card className="flex flex-1 flex-col py-5 px-6">
-			{course.linkedUrl !== undefined && (
+			{course.linkedUrl !== undefined && assignments.length !== 0 && (
 				<Chat
 					courseId={courseId}
 					courseName={course.name}
