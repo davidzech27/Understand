@@ -29,7 +29,7 @@ const TopActions = () => {
 						>
 							<Link
 								href="/assignment/create"
-								className="relative flex h-14 w-60 items-center rounded-md border-[0.75px] border-primary bg-primary/5 outline-none transition-all duration-150 focus-within:bg-primary/10 hover:bg-primary/10 data-[active]:bg-primary/10"
+								className="relative flex h-14 w-60 cursor-pointer items-center rounded-md border-[0.75px] border-primary bg-primary/5 outline-none transition-all duration-150 focus-within:bg-primary/10 hover:bg-primary/10 data-[active]:bg-primary/10"
 							>
 								<FilePlus2
 									size={18}
@@ -48,7 +48,7 @@ const TopActions = () => {
 						>
 							<Link
 								href="/class/create"
-								className="relative flex h-14 w-60 items-center rounded-md border-[0.75px] border-secondary bg-secondary/5 outline-none transition-all duration-150 hover:bg-secondary/10 focus-visible:bg-secondary/10 data-[active]:bg-secondary/10"
+								className="relative flex h-14 w-60 cursor-pointer items-center rounded-md border-[0.75px] border-secondary bg-secondary/5 outline-none transition-all duration-150 hover:bg-secondary/10 focus-visible:bg-secondary/10 data-[active]:bg-secondary/10"
 							>
 								<UserPlus
 									size={18}
