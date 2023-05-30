@@ -62,7 +62,7 @@ export const getAuthOrThrow = async ({
 }) => {
 	const auth = await getAuth({ cookies })
 
-	if (auth === undefined) throw new Error("No auth")
+	if (auth === undefined) throw new Error("Unauthenticated")
 
 	return auth
 }

@@ -39,23 +39,24 @@ const AssignmentsPage = async ({
 
 	return (
 		<Card className="flex flex-1 flex-col space-y-2 py-5 px-6">
-			{assignmentsWithInstructions.length !== 0 && role === "teacher" && (
-				<>
-					<div className="ml-1 text-lg font-medium opacity-60">
-						Assignments missing instructions
-					</div>
+			{assignmentsWithoutInstructions.length !== 0 &&
+				role === "teacher" && (
+					<>
+						<div className="ml-1 text-lg font-medium opacity-60">
+							Assignments missing instructions
+						</div>
 
-					<Assignments
-						courseId={courseId}
-						role={role}
-						assignments={assignmentsWithoutInstructions}
-					/>
+						<Assignments
+							courseId={courseId}
+							role={role}
+							assignments={assignmentsWithoutInstructions}
+						/>
 
-					<div className="ml-1 text-lg font-medium opacity-60">
-						Assignments
-					</div>
-				</>
-			)}
+						<div className="ml-1 text-lg font-medium opacity-60">
+							Assignments
+						</div>
+					</>
+				)}
 
 			<Assignments
 				courseId={courseId}

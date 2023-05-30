@@ -91,9 +91,9 @@ const AssignmentPage = async ({
 							Instructions
 						</div>
 
-						<div className="select-text rounded-md border-[0.75px] border-border bg-surface-hover px-3 py-2 font-medium opacity-80">
+						<p className="select-text whitespace-pre-line rounded-md border-[0.75px] border-border bg-surface-hover px-3 py-2 font-medium opacity-80">
 							{assignment.instructions}
-						</div>
+						</p>
 					</>
 				) : (
 					<div className="text-lg font-medium opacity-60">

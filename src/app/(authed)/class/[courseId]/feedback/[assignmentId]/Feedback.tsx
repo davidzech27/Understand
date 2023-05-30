@@ -1128,7 +1128,7 @@ const GeneralFeedback = ({
 							state === "hover" && "shadow-lg"
 						)}
 					>
-						<p className="select-text px-4 py-2.5 font-medium opacity-80 [overflow-wrap:anywhere]">
+						<p className="select-text whitespace-pre-line px-4 py-2.5 font-medium opacity-80 [overflow-wrap:anywhere]">
 							{content}
 						</p>
 
@@ -1137,7 +1137,7 @@ const GeneralFeedback = ({
 								key={index}
 								className="border-t border-border px-4 py-2.5 even:font-medium even:opacity-50"
 							>
-								<p className="select-text [overflow-wrap:anywhere]">
+								<p className="select-text whitespace-pre-line">
 									{followUp}
 								</p>
 							</div>
@@ -1411,7 +1411,7 @@ const SpecificFeedbackItem: React.FC<{
 				className="max-h-[384px] overflow-y-scroll overscroll-none"
 			>
 				<div className="px-3 py-2">
-					<span className="select-text">{content}</span>
+					<p className="select-text whitespace-pre-line">{content}</p>
 				</div>
 
 				{followUps.map((followUp, index) => (
@@ -1421,7 +1421,7 @@ const SpecificFeedbackItem: React.FC<{
 						key={index}
 						className="border-t border-border px-3 py-2 even:font-medium even:opacity-50"
 					>
-						<p className="select-text [overflow-wrap:anywhere]">
+						<p className="select-text whitespace-pre-line">
 							{followUp}
 						</p>
 					</div>
