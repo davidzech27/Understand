@@ -20,6 +20,7 @@ const requestSchema = z.object({
 	temperature: z.number().min(0).max(2),
 	presencePenalty: z.number().min(-2).max(2),
 	frequencyPenalty: z.number().min(-2).max(2),
+	maxTokens: z.number().optional(),
 })
 
 export type OpenAIStreamRequest = z.infer<typeof requestSchema>
@@ -34,8 +35,14 @@ const openaiHandler = async (request: NextRequest) => {
 		return new Response("Bad Request", { status: 400 })
 	}
 
-	const { messages, model, temperature, presencePenalty, frequencyPenalty } =
-		requestParsed.data
+	const {
+		messages,
+		model,
+		temperature,
+		presencePenalty,
+		frequencyPenalty,
+		maxTokens,
+	} = requestParsed.data
 
 	const openaiResponse = await fetch(
 		"https://api.openai.com/v1/chat/completions",
@@ -51,6 +58,7 @@ const openaiHandler = async (request: NextRequest) => {
 				temperature,
 				presence_penalty: presencePenalty,
 				frequency_penalty: frequencyPenalty,
+				max_tokens: maxTokens,
 				stream: true,
 			}),
 		}

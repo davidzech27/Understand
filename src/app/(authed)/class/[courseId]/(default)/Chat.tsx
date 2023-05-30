@@ -58,6 +58,7 @@ Respond with something that sounds like it could hypothetically be found in the 
 			frequencyPenalty: 0,
 			presencePenalty: 0,
 			temperature: 0,
+			maxTokens: 100,
 			onContent: () => {},
 			onFinish: async (content) => {
 				console.log("Predicted similar resources: ", content)

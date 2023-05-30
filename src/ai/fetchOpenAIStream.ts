@@ -9,6 +9,7 @@ const fetchOpenAIStream = async ({
 	temperature,
 	presencePenalty,
 	frequencyPenalty,
+	maxTokens,
 	onContent,
 	onFinish,
 }: OpenAIStreamRequest & {
@@ -24,6 +25,7 @@ const fetchOpenAIStream = async ({
 				temperature,
 				presencePenalty,
 				frequencyPenalty,
+				maxTokens,
 			})
 		),
 	})
