@@ -27,6 +27,8 @@ const Chat: React.FC<Props> = ({ courseId, courseName, role }) => {
 
 		setMessages((messages) => [...messages, messageInput])
 
+		const newMessages = [...messages, messageInput]
+
 		setMessageInput("")
 
 		setGenerating(true)
@@ -58,18 +60,15 @@ ${similarResources
 
 Using this information, respond to the ${role} in that class in the conversation that follows. Reference details about specific assignments and documents. If you can't find information on a particular topic, be transparent about it and ask for more context to aid you in your search for relevant information. It is absolutely imperative that you do not assist in plagiarism, so refuse to partake in anything resembling plagiarism. Here's the ${role}'s first message:
 
-${messages[0]}`,
+${newMessages[0]}`,
 				},
-				...messages
-					.concat(messageInput)
-					.map((message, index) => ({
-						role:
-							index % 2 === 0
-								? ("user" as const)
-								: ("assistant" as const),
-						content: message,
-					}))
-					.slice(1),
+				...newMessages.slice(1).map((message, index) => ({
+					role:
+						index % 2 === 0
+							? ("assistant" as const)
+							: ("user" as const),
+					content: message,
+				})),
 			],
 			model: "gpt-3.5-turbo",
 			temperature: 0,
