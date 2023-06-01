@@ -11,6 +11,10 @@ const syncAssignment = async ({
 	courseId: string
 	assignmentId: string
 }) => {
+	console.info(
+		`Syncing assignment with course id ${courseId} and assignment id ${assignmentId}`
+	)
+
 	const [assignment, courseName] = await Promise.all([
 		(async () => {
 			const refreshToken = await Course({
@@ -148,6 +152,10 @@ ${
 		} else {
 			useDescription = response.toLowerCase().includes("yes")
 		}
+
+		console.info(
+			`Checked attachments and/or description for instructions for assignment with course id ${courseId} and assignment id ${assignmentId}`
+		)
 	}
 
 	if (
@@ -265,6 +273,10 @@ Given that the title of the assignment in Google Classroom is ${
 					text: driveFile.text,
 				}))
 				.filter((_, index) => indexes.includes(index))
+		)
+
+		console.info(
+			`Checked external attachments for instructions for assignment with course id ${courseId} and assignment id ${assignmentId}`
 		)
 	}
 
@@ -399,6 +411,10 @@ Identify the numbers corresponding to the resources that are likely to provide h
 		}
 
 		context = context?.trimEnd()
+
+		console.info(
+			`Checked external attachments for context for assignment with course id ${courseId} and assignment id ${assignmentId}`
+		)
 	}
 
 	await Promise.all([
