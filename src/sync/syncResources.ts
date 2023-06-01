@@ -113,9 +113,19 @@ const syncResources = async ({ courseId }: { courseId: string }) => {
 									driveTitle: driveFile.title,
 									attachmentOnAssignmentId:
 										classroomAssignment.id,
-									text: await (
-										await googleAPIPromise
-									).driveFileText({ id: driveFile.id }),
+									text: await new Promise<string>((res) =>
+										setTimeout(
+											async () =>
+												res(
+													await (
+														await googleAPIPromise
+													).driveFileText({
+														id: driveFile.id,
+													})
+												),
+											Math.random() * 1000 * 5 // funky way to prevent too many fetch calls in too short a time
+										)
+									),
 								})
 						),
 				])
