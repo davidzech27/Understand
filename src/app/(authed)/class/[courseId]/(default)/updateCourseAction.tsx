@@ -36,13 +36,21 @@ const updateCourseAction = zact(
 		await Promise.all([
 			Course({ id }).update({ name, section }),
 			addTeacherEmails.map((email) =>
-				User({ email }).addToCourse({ id, role: "teacher" })
+				User({ email }).addToCourse({
+					id,
+					role: "teacher",
+					linked: false,
+				})
 			),
 			removeTeacherEmails.map((email) =>
 				User({ email }).removeFromCourse({ id, role: "teacher" })
 			),
 			addStudentEmails.map((email) =>
-				User({ email }).addToCourse({ id, role: "student" })
+				User({ email }).addToCourse({
+					id,
+					role: "student",
+					linked: false,
+				})
 			),
 			removeStudentEmails.map((email) =>
 				User({ email }).removeFromCourse({ id, role: "student" })
