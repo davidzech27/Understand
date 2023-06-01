@@ -8,7 +8,7 @@ const TopActions = () => {
 	const pathname = usePathname()
 
 	return (
-		<NavigationMenu.Root className="relative">
+		<NavigationMenu.Root delayDuration={0} className="relative">
 			<NavigationMenu.List>
 				<NavigationMenu.Item>
 					<NavigationMenu.Trigger asChild>
