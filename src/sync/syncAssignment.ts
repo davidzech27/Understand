@@ -14,7 +14,7 @@ const syncAssignment = async ({
 	console.info(
 		`Syncing assignment with course id ${courseId} and assignment id ${assignmentId}`
 	)
-
+	console.time(`${courseId}-${assignmentId}`)
 	const [assignment, courseName] = await Promise.all([
 		(async () => {
 			const refreshToken = await Course({
@@ -170,7 +170,7 @@ ${
 				},
 				{
 					role: "user",
-					content: `Respond with something that sounds like it could be the instructions on an assignment titled "${
+					content: `Briefly respond with something that sounds like it would be the instructions on an assignment titled "${
 						assignment.title
 					}"${
 						assignment.description !== undefined
@@ -183,11 +183,14 @@ ${
 			temperature: 0,
 			presencePenalty: 0,
 			frequencyPenalty: 0,
-			maxTokens: 150,
+			maxTokens: 100,
 		})
 
 		console.info(
-			`Predicted instructions for assignment with course id ${courseId} and assignment id ${assignmentId}`
+			`Predicted instructions for assignment with course id ${courseId} and assignment id ${assignmentId}`,
+			{
+				predictedInstructions,
+			}
 		)
 
 		const attachmentCandidates = await Resource({
@@ -333,12 +336,13 @@ Given that the title of the assignment in Google Classroom is ${
 				text: assignment.description,
 				instructionsForAssignmentId: assignment.id,
 			}),
-		Assignment({
-			courseId,
-			assignmentId: assignment.id,
-		}).update({
-			instructions,
-		}),
+		instructions !== undefined &&
+			Assignment({
+				courseId,
+				assignmentId: assignment.id,
+			}).update({
+				instructions,
+			}),
 	])
 
 	let context: string | undefined = undefined
@@ -446,12 +450,15 @@ Identify the numbers corresponding to the resources that are likely to provide h
 		)
 	}
 
-	await Assignment({
-		courseId,
-		assignmentId: assignment.id,
-	}).update({
-		context,
-	})
+	if (context !== undefined)
+		await Assignment({
+			courseId,
+			assignmentId: assignment.id,
+		}).update({
+			context,
+		})
+
+	console.timeEnd(`${courseId}-${assignmentId}`)
 }
 
 export default syncAssignment

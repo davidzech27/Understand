@@ -12,9 +12,9 @@ const syncCourse = async ({ id }: { id: string }) => {
 		callSync({
 			name: "resources",
 			courseId: id,
-			deduplicationId: `resources-${Math.floor(
-				new Date().valueOf() / (1000 * 60 * 5)
-			)}`,
+			// deduplicationId: `resources-${Math.floor(
+			// 	new Date().valueOf() / (1000 * 60 * 5)
+			// )}`,
 		}),
 	])
 }
