@@ -25,7 +25,7 @@ const FormattedDate: React.FC<Props> = ({ date, prefix }) => {
 		return (
 			<>
 				{prefix}
-				{date.toLocaleDateString() + 1}, {timeString}
+				{date.toLocaleDateString()}, {timeString}
 			</>
 		)
 	}
