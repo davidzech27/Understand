@@ -186,6 +186,10 @@ ${
 			maxTokens: 150,
 		})
 
+		console.info(
+			`Predicted instructions for assignment with course id ${courseId} and assignment id ${assignmentId}`
+		)
+
 		const attachmentCandidates = await Resource({
 			courseId,
 		}).search({
@@ -312,6 +316,31 @@ Given that the title of the assignment in Google Classroom is ${
 			  }`
 			: undefined
 
+	await Promise.all([
+		...usedAttachments.map((attachment) =>
+			Resource({ courseId }).update({
+				set: {
+					instructionsForAssignmentId: assignment.id,
+				},
+				filter: {
+					driveId: attachment.id,
+				},
+			})
+		),
+		useDescription &&
+			assignment.description &&
+			Resource({ courseId }).create({
+				text: assignment.description,
+				instructionsForAssignmentId: assignment.id,
+			}),
+		Assignment({
+			courseId,
+			assignmentId: assignment.id,
+		}).update({
+			instructions,
+		}),
+	])
+
 	let context: string | undefined = undefined
 
 	if (instructions !== undefined) {
@@ -417,31 +446,12 @@ Identify the numbers corresponding to the resources that are likely to provide h
 		)
 	}
 
-	await Promise.all([
-		...usedAttachments.map((attachment) =>
-			Resource({ courseId }).update({
-				set: {
-					instructionsForAssignmentId: assignment.id,
-				},
-				filter: {
-					driveId: attachment.id,
-				},
-			})
-		),
-		useDescription &&
-			assignment.description &&
-			Resource({ courseId }).create({
-				text: assignment.description,
-				instructionsForAssignmentId: assignment.id,
-			}),
-		Assignment({
-			courseId,
-			assignmentId: assignment.id,
-		}).update({
-			instructions,
-			context,
-		}),
-	])
+	await Assignment({
+		courseId,
+		assignmentId: assignment.id,
+	}).update({
+		context,
+	})
 }
 
 export default syncAssignment
