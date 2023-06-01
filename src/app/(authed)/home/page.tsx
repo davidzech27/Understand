@@ -38,12 +38,7 @@ const HomePage = async () => {
 				assignment,
 				eq(assignment.courseId, teacherToCourse.courseId)
 			)
-			.where(
-				and(
-					eq(teacherToCourse.teacherEmail, email),
-					isNotNull(assignment.dueAt)
-				)
-			)
+			.where(eq(teacherToCourse.teacherEmail, email))
 			.then((rows) => ({
 				isTeaching: rows.length !== 0,
 				assignmentsTeaching: rows
@@ -73,12 +68,7 @@ const HomePage = async () => {
 				assignment,
 				eq(assignment.courseId, studentToCourse.courseId)
 			)
-			.where(
-				and(
-					eq(studentToCourse.studentEmail, email),
-					isNotNull(assignment.dueAt)
-				)
-			)
+			.where(eq(studentToCourse.studentEmail, email))
 			.then((rows) => ({
 				isEnrolled: rows.length !== 0,
 				assignmentsEnrolled: rows

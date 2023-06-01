@@ -1,29 +1,67 @@
-import Resource from "~/data/Resource"
-import Assignment from "~/data/Assignment"
 import getCompletion from "~/ai/getCompletion"
+import Resource from "~/data/Resource"
+import GoogleAPI from "~/google/GoogleAPI"
+import Course from "~/data/Course"
+import Assignment from "~/data/Assignment"
 
-const createAssignmentWithInstructionsAndContext = async ({
-	assignment,
+const syncAssignment = async ({
 	courseId,
-	courseName,
+	assignmentId,
 }: {
-	assignment: {
-		id: string
-		title: string
-		url: string
-		attachments: {
-			text: string
-			id: string
-			title?: string | undefined
-			url: string
-			thumbnailUrl?: string | undefined
-		}[]
-		description?: string | undefined
-		dueAt?: Date | undefined
-	}
 	courseId: string
-	courseName: string
+	assignmentId: string
 }) => {
+	const [assignment, courseName] = await Promise.all([
+		(async () => {
+			const refreshToken = await Course({
+				id: courseId,
+			}).linkedRefreshToken()
+
+			if (refreshToken === undefined)
+				throw new Error(
+					"Linked refresh token could not be found for course"
+				)
+
+			const googleAPI = await GoogleAPI({
+				refreshToken,
+			})
+
+			const assignmentWithAllAttachments = await googleAPI.assignment({
+				courseId,
+				assignmentId,
+			})
+
+			return {
+				...assignmentWithAllAttachments,
+				attachments: (
+					await Promise.all(
+						assignmentWithAllAttachments.attachments.map(
+							async (attachment) =>
+								attachment.type === "driveFile"
+									? {
+											...attachment.driveFile,
+											text: await googleAPI.driveFileText(
+												{
+													id: attachment.driveFile.id,
+												}
+											),
+									  }
+									: undefined
+						)
+					)
+				).filter(Boolean),
+			}
+		})(),
+		Course({ id: courseId })
+			.get()
+			.then((course) => {
+				if (course === undefined)
+					throw new Error("Course could not be found in database")
+
+				return course.name
+			}),
+	])
+
 	const usedAttachments: {
 		id: string
 		title: string | undefined
@@ -144,7 +182,7 @@ ${
 			courseId,
 		}).search({
 			similarText: predictedInstructions,
-			where: {},
+			filter: {},
 			topK: 15,
 		})
 
@@ -269,7 +307,7 @@ Given that the title of the assignment in Google Classroom is ${
 			courseId,
 		}).search({
 			similarText: instructions,
-			where: {},
+			filter: {},
 			topK: 15,
 		})
 
@@ -368,9 +406,8 @@ Identify the numbers corresponding to the resources that are likely to provide h
 			Resource({ courseId }).update({
 				set: {
 					instructionsForAssignmentId: assignment.id,
-					instructionsForAssignmentTitle: assignment.title,
 				},
-				where: {
+				filter: {
 					driveId: attachment.id,
 				},
 			})
@@ -380,20 +417,15 @@ Identify the numbers corresponding to the resources that are likely to provide h
 			Resource({ courseId }).create({
 				text: assignment.description,
 				instructionsForAssignmentId: assignment.id,
-				instructionsForAssignmentTitle: assignment.title,
 			}),
 		Assignment({
 			courseId,
 			assignmentId: assignment.id,
-		}).create({
-			title: assignment.title,
-			description: assignment.description,
+		}).update({
 			instructions,
 			context,
-			dueAt: assignment.dueAt,
-			linkedUrl: assignment.url,
 		}),
 	])
 }
 
-export default createAssignmentWithInstructionsAndContext
+export default syncAssignment

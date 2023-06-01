@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm/expressions"
+import { and, desc, eq } from "drizzle-orm/expressions"
 
 import db from "~/db/db"
 import {
@@ -11,19 +11,18 @@ import {
 	followUp,
 } from "~/db/schema"
 import Resource from "./Resource"
+import User from "./User"
 
 const Course = ({ id }: { id: string }) => ({
 	create: async ({
 		name,
 		section,
 		linkedUrl,
-		linkedAccessToken,
 		linkedRefreshToken,
 	}: {
 		name: string
 		section: string | undefined
 		linkedUrl: string | undefined
-		linkedAccessToken: string | undefined
 		linkedRefreshToken: string | undefined
 	}) => {
 		await db.insert(course).values({
@@ -31,7 +30,6 @@ const Course = ({ id }: { id: string }) => ({
 			name,
 			section,
 			linkedUrl,
-			linkedAccessToken,
 			linkedRefreshToken,
 		})
 	},
@@ -61,13 +59,11 @@ const Course = ({ id }: { id: string }) => ({
 		name,
 		section,
 		googleClassroomId,
-		linkedAccessToken,
 		linkedRefreshToken,
 	}: {
 		name?: string
 		section?: string
 		googleClassroomId?: string
-		linkedAccessToken?: string
 		linkedRefreshToken?: string
 	}) => {
 		await db
@@ -77,9 +73,6 @@ const Course = ({ id }: { id: string }) => ({
 				...(section !== undefined ? { section } : {}),
 				...(googleClassroomId !== undefined
 					? { googleClassroomId }
-					: {}),
-				...(linkedAccessToken !== undefined
-					? { linkedAccessToken }
 					: {}),
 				...(linkedRefreshToken !== undefined
 					? { linkedRefreshToken }
@@ -95,28 +88,20 @@ const Course = ({ id }: { id: string }) => ({
 			db.delete(assignment).where(eq(assignment.courseId, id)),
 			db.delete(feedback).where(eq(feedback.courseId, id)),
 			db.delete(followUp).where(eq(followUp.courseId, id)),
-			Resource({ courseId: id }).delete({ where: {} }),
+			Resource({ courseId: id }).delete({ filter: {} }),
 		])
 	},
-	linkedCredentials: async () => {
-		const credentials = (
-			await db
-				.select({
-					linkedAccessToken: course.linkedAccessToken,
-					linkedRefreshToken: course.linkedRefreshToken,
-				})
-				.from(course)
-				.where(eq(course.id, id))
-		)[0]
-
-		return credentials &&
-			credentials.linkedAccessToken !== null &&
-			credentials.linkedRefreshToken !== null
-			? {
-					accessToken: credentials.linkedAccessToken,
-					refreshToken: credentials.linkedRefreshToken,
-			  }
-			: undefined
+	linkedRefreshToken: async () => {
+		return (
+			(
+				await db
+					.select({
+						linkedRefreshToken: course.linkedRefreshToken,
+					})
+					.from(course)
+					.where(eq(course.id, id))
+			)[0]?.linkedRefreshToken ?? undefined
+		)
 	},
 	roster: async () => {
 		const [teachers, students] = await Promise.all([
@@ -125,6 +110,7 @@ const Course = ({ id }: { id: string }) => ({
 					email: teacherToCourse.teacherEmail,
 					name: user.name,
 					photo: user.photo,
+					linked: teacherToCourse.linked,
 				})
 				.from(teacherToCourse)
 				.leftJoin(user, eq(user.email, teacherToCourse.teacherEmail))
@@ -134,6 +120,7 @@ const Course = ({ id }: { id: string }) => ({
 					email: studentToCourse.studentEmail,
 					name: user.name,
 					photo: user.photo,
+					linked: studentToCourse.linked,
 				})
 				.from(studentToCourse)
 				.leftJoin(user, eq(user.email, studentToCourse.studentEmail))
@@ -148,6 +135,7 @@ const Course = ({ id }: { id: string }) => ({
 							email: teacher.email,
 							name: teacher.name,
 							photo: teacher.photo ?? undefined,
+							linked: teacher.linked ?? false,
 					  }
 					: { signedUp: false as const, email: teacher.email }
 			),
@@ -158,6 +146,7 @@ const Course = ({ id }: { id: string }) => ({
 							email: student.email,
 							name: student.name,
 							photo: student.photo ?? undefined,
+							linked: student.linked ?? false,
 					  }
 					: { signedUp: false as const, email: student.email }
 			),
@@ -177,7 +166,18 @@ const Course = ({ id }: { id: string }) => ({
 			description: assignment.description ?? undefined,
 			instructions: assignment.instructions ?? undefined,
 			context: assignment.context ?? undefined,
-			dueAt: assignment.dueAt ?? undefined,
+			dueAt:
+				(assignment.dueAt &&
+					new Date(
+						Date.UTC(
+							assignment.dueAt.getFullYear(),
+							assignment.dueAt.getMonth(),
+							assignment.dueAt.getDate(),
+							assignment.dueAt.getHours(),
+							assignment.dueAt.getMinutes()
+						)
+					)) ??
+				undefined,
 			linkedUrl: assignment.linkedUrl ?? undefined,
 		}))
 	},

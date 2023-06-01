@@ -57,8 +57,19 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 			id,
 			name: nameInput.trim(),
 			section: sectionInput.trim() || undefined,
-			additionalTeacherEmails: additionalTeacherEmailInputs,
-			studentEmails: studentEmailInputs,
+			linkedAdditionalTeacherEmails:
+				linkedCourse?.roster.additionalTeacherEmails ?? [],
+			linkedStudentEmails: linkedCourse?.roster.studentEmails ?? [],
+			unlinkedAdditionalTeacherEmails:
+				additionalTeacherEmailInputs.filter(
+					(email) =>
+						!linkedCourse?.roster.additionalTeacherEmails.includes(
+							email
+						)
+				),
+			unlinkedStudentEmails: studentEmailInputs.filter(
+				(email) => !linkedCourse?.roster.studentEmails.includes(email)
+			),
 			linkedUrl: linkedCourse?.url,
 		})
 
@@ -87,7 +98,6 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 				"https://www.googleapis.com/auth/classroom.student-submissions.students.readonly",
 				"https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly",
 				"https://www.googleapis.com/auth/drive.readonly",
-				"https://www.googleapis.com/auth/classroom.push-notifications",
 			],
 			redirectTo: "/class/create",
 		})
@@ -107,6 +117,10 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 		name: string
 		section?: string
 		url: string
+		roster: {
+			additionalTeacherEmails: string[]
+			studentEmails: string[]
+		}
 	}>()
 
 	const onChooseClass = async () => {
@@ -139,7 +153,16 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 
 		setStudentEmailInputs(roster.students.map((student) => student.email))
 
-		setLinkedCourse(course)
+		setLinkedCourse({
+			...course,
+			roster: {
+				additionalTeacherEmails: roster.teachers
+					.map((teacher) => teacher.email)
+					.filter(Boolean)
+					.filter((email) => email !== profileEmail),
+				studentEmails: roster.students.map((student) => student.email),
+			},
+		})
 
 		setLinkClassModalOpen(false)
 

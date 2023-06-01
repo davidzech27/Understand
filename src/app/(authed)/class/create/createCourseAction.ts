@@ -6,7 +6,7 @@ import { z } from "zod"
 import Course from "~/data/Course"
 import User from "~/data/User"
 import { getAuthOrThrow } from "~/auth/jwt"
-import inngest from "~/background/inngest"
+import syncCourse from "~/sync/syncCourse"
 
 const isEmailValid = (email: string) =>
 	email.search(
@@ -18,8 +18,10 @@ const createCourseAction = zact(
 		id: z.string(),
 		name: z.string().min(1),
 		section: z.string().min(1).optional(),
-		additionalTeacherEmails: z.string().array(),
-		studentEmails: z.string().array(),
+		linkedAdditionalTeacherEmails: z.string().array(),
+		linkedStudentEmails: z.string().array(),
+		unlinkedAdditionalTeacherEmails: z.string().array(),
+		unlinkedStudentEmails: z.string().array(),
 		linkedUrl: z.string().url().optional(),
 	})
 )(
@@ -27,17 +29,25 @@ const createCourseAction = zact(
 		id,
 		name,
 		section,
-		additionalTeacherEmails,
-		studentEmails,
+		linkedAdditionalTeacherEmails,
+		linkedStudentEmails,
+		unlinkedAdditionalTeacherEmails,
+		unlinkedStudentEmails,
 		linkedUrl,
 	}) => {
 		const { email, ...creatorAuth } = await getAuthOrThrow({
 			cookies: cookies(),
 		})
 
-		additionalTeacherEmails = additionalTeacherEmails.filter(isEmailValid)
+		linkedAdditionalTeacherEmails =
+			linkedAdditionalTeacherEmails.filter(isEmailValid)
 
-		studentEmails = studentEmails.filter(isEmailValid)
+		linkedStudentEmails = linkedStudentEmails.filter(isEmailValid)
+
+		unlinkedAdditionalTeacherEmails =
+			unlinkedAdditionalTeacherEmails.filter(isEmailValid)
+
+		unlinkedStudentEmails = unlinkedStudentEmails.filter(isEmailValid)
 
 		await Promise.all([
 			Course({ id }).create({
@@ -46,28 +56,50 @@ const createCourseAction = zact(
 				...(linkedUrl !== undefined
 					? {
 							linkedUrl,
-							linkedAccessToken: creatorAuth.googleAccessToken,
 							linkedRefreshToken: creatorAuth.googleRefreshToken,
 					  }
 					: {
 							linkedUrl: undefined,
-							linkedAccessToken: undefined,
 							linkedRefreshToken: undefined,
 					  }),
 			}),
-			User({ email }).addToCourse({ id, role: "teacher" }),
-			additionalTeacherEmails.map((email) =>
-				User({ email }).addToCourse({ id, role: "teacher" })
+			User({ email }).addToCourse({ id, role: "teacher", linked: false }),
+			...linkedAdditionalTeacherEmails.map(
+				async (email) =>
+					await User({ email }).addToCourse({
+						id,
+						role: "teacher",
+						linked: true,
+					})
 			),
-			studentEmails.map((email) =>
-				User({ email }).addToCourse({ id, role: "student" })
+			...linkedStudentEmails.map(
+				async (email) =>
+					await User({ email }).addToCourse({
+						id,
+						role: "student",
+						linked: true,
+					})
+			),
+			...unlinkedAdditionalTeacherEmails.map(
+				async (email) =>
+					await User({ email }).addToCourse({
+						id,
+						role: "teacher",
+						linked: false,
+					})
+			),
+			...unlinkedStudentEmails.map(
+				async (email) =>
+					await User({ email }).addToCourse({
+						id,
+						role: "student",
+						linked: false,
+					})
 			),
 		])
 
 		if (linkedUrl !== undefined) {
-			inngest.send("app/linkedCourse.created", {
-				data: { id, name, creatorAuth },
-			})
+			await syncCourse({ id })
 		}
 	}
 )

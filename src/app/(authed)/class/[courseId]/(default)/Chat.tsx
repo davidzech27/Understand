@@ -46,12 +46,12 @@ const Chat: React.FC<Props> = ({ courseId, courseName, role }) => {
 					role: "user",
 					content:
 						messages.length === 1
-							? `Respond with something that sounds like it could hypothetically be found in the Google Classroom for a class named ${courseName} that would answer the following question or comment:
+							? `Respond with something that sounds like it could be content posted by the teacher in the Google Classroom for a class named ${courseName} that would answer the following question:
 
-${messages[0]}`
-							: `${messages.join("\n\n")}
+${newMessages}`
+							: `${newMessages.join("\n\n")}
 
-Respond with something that sounds like it could hypothetically be found in the Google Classroom for a class named ${courseName} that would answer the final question or comment in the above conversation.`,
+Respond with something that sounds like it could be content posted by the teacher in the Google Classroom for a class named ${courseName} that would answer the final question in the above conversation.`,
 				},
 			],
 			model: "gpt-3.5-turbo",
@@ -91,7 +91,7 @@ ${similarResources
 	.map((resource, index) => `${index + 1}. ${resource}`)
 	.join("\n\n")}
 
-Using this information, respond to the ${role} in that class in the conversation that follows. Reference details about specific assignments and documents, while also weaving in your own insights about them. If you can't find information on a particular topic, be transparent about it and ask for more context to aid you in your search for relevant assignments and documents. It is absolutely imperative that you do not assist in plagiarism, and refuse to plagiarize any work for the ${role}. Here's the ${role}'s first message:
+Using this information, respond to the ${role} in that class in the conversation that follows. Reference details about specific assignments and documents, covering all their subtleties, while also weaving in your own insights about them. If you can't find information on a particular topic, be transparent about it and ask for more context to aid you in your search for relevant assignments and documents. It is absolutely imperative that you do not assist in plagiarism, and refuse to plagiarize any work for the ${role}. Here's the ${role}'s first message:
 
 ${newMessages[0]}`,
 						},
@@ -144,7 +144,7 @@ ${newMessages[0]}`,
 		<div className="relative h-full">
 			<div
 				ref={scrollerRef}
-				className="absolute top-0 left-0 right-0 bottom-0 flex flex-col space-y-1 overflow-y-scroll rounded-md border-[0.75px] border-border bg-surface-hover pl-3 pr-1 pt-3 pb-14"
+				className="absolute top-0 left-0 right-0 bottom-0 flex flex-col space-y-1 overflow-y-scroll rounded-md border-[0.75px] border-border bg-surface-hover pl-3 pr-1 pt-3 pb-[57.5px]"
 			>
 				{messages.map((message, index) => (
 					<div
@@ -169,7 +169,11 @@ ${newMessages[0]}`,
 							? "Generating..."
 							: "Ask a question that could be answered by the content in the Google Classroom for this class"
 					}
-					className="back h-min py-2 px-3"
+					ref={(textArea) => {
+						textArea && (textArea.style.height = "auto")
+					}}
+					style={{ height: 42 }}
+					className="py-2 px-3"
 				/>
 
 				<Send

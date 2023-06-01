@@ -7,6 +7,7 @@ import {
 	text,
 	json,
 	uniqueIndex,
+	boolean,
 } from "drizzle-orm/mysql-core"
 
 export const user = mysqlTable("user", {
@@ -20,6 +21,7 @@ export const teacherToCourse = mysqlTable(
 	{
 		teacherEmail: varchar("teacher_email", { length: 100 }).notNull(),
 		courseId: varchar("course_id", { length: 100 }).notNull(),
+		linked: boolean("linked"),
 	},
 	(table) => ({
 		cpk: primaryKey(table.teacherEmail, table.courseId),
@@ -35,6 +37,7 @@ export const studentToCourse = mysqlTable(
 	{
 		studentEmail: varchar("student_email", { length: 100 }).notNull(),
 		courseId: varchar("course_id", { length: 100 }).notNull(),
+		linked: boolean("linked"),
 	},
 	(table) => ({
 		cpk: primaryKey(table.studentEmail, table.courseId),
@@ -50,7 +53,6 @@ export const course = mysqlTable("course", {
 	name: text("name").notNull(),
 	section: text("section"),
 	linkedUrl: text("linked_url"),
-	linkedAccessToken: text("linked_access_token"),
 	linkedRefreshToken: text("linked_refresh_token"),
 })
 

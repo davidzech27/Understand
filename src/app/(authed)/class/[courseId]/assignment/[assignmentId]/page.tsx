@@ -84,7 +84,7 @@ const AssignmentPage = async ({
 				<AssignmentTabs assignment={assignment} />
 			</Card>
 
-			<Card className="flex h-full flex-col py-5 px-6">
+			<Card className="flex h-full flex-col overflow-y-scroll py-5 px-6">
 				{assignment.instructions !== undefined ? (
 					<>
 						<div className="ml-1 mb-2 text-lg font-medium opacity-60">

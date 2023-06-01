@@ -99,8 +99,8 @@ const studentSubmissionAttachmentSchema = z.discriminatedUnion("type", [
 		}),
 	}),
 	z.object({
-		type: z.literal("youTubeVideo"), // the capital t is the only difference between this is and attachmentSchema
-		youTubeVideo: z.object({
+		type: z.literal("youtubeVideo"),
+		youtubeVideo: z.object({
 			id: z.string(),
 			title: z.string().optional(),
 			url: z.string().url(),
@@ -126,30 +126,9 @@ const studentSubmissionAttachmentSchema = z.discriminatedUnion("type", [
 	}),
 ])
 
-const GoogleAPI = async ({
-	accessToken,
-	refreshToken,
-	expiresMillis,
-	onRefreshAccessToken,
-}: {
-	accessToken: string
-	refreshToken: string
-	expiresMillis: number
-	onRefreshAccessToken: ({}: {
-		accessToken: string
-		expiresMillis: number
-	}) => void
-}) => {
-	if (expiresMillis < new Date().valueOf()) {
-		const credentials = await getCredentialsFromRefreshToken(refreshToken)
-
-		accessToken = credentials.accessToken
-
-		expiresMillis = credentials.expiresMillis
-
-		onRefreshAccessToken &&
-			onRefreshAccessToken({ accessToken, expiresMillis })
-	}
+const GoogleAPI = async ({ refreshToken }: { refreshToken: string }) => {
+	const accessToken = (await getCredentialsFromRefreshToken(refreshToken))
+		.accessToken
 
 	return {
 		me: async () => {
@@ -531,11 +510,13 @@ const GoogleAPI = async ({
 											dueTime.hours &&
 											dueTime.minutes
 												? new Date(
-														dueDate.year,
-														dueDate.month - 1,
-														dueDate.day,
-														dueTime.hours,
-														dueTime.minutes
+														Date.UTC(
+															dueDate.year,
+															dueDate.month - 1,
+															dueDate.day,
+															dueTime.hours,
+															dueTime.minutes
+														)
 												  )
 												: undefined
 
@@ -682,11 +663,13 @@ const GoogleAPI = async ({
 						dueTime.hours &&
 						dueTime.minutes
 							? new Date(
-									dueDate.year,
-									dueDate.month - 1,
-									dueDate.day,
-									dueTime.hours,
-									dueTime.minutes
+									Date.UTC(
+										dueDate.year,
+										dueDate.month - 1,
+										dueDate.day,
+										dueTime.hours,
+										dueTime.minutes
+									)
 							  )
 							: undefined
 
@@ -845,11 +828,13 @@ const GoogleAPI = async ({
 							dueTime.hours &&
 							dueTime.minutes
 							? new Date(
-									dueDate.year,
-									dueDate.month - 1,
-									dueDate.day,
-									dueTime.hours,
-									dueTime.minutes
+									Date.UTC(
+										dueDate.year,
+										dueDate.month - 1,
+										dueDate.day,
+										dueTime.hours,
+										dueTime.minutes
+									)
 							  )
 							: undefined
 					})(),
@@ -962,8 +947,8 @@ const GoogleAPI = async ({
 										}
 									if (youTubeVideo)
 										return {
-											type: "youTubeVideo",
-											youTubeVideo: {
+											type: "youtubeVideo",
+											youtubeVideo: {
 												id: youTubeVideo.id,
 												title: youTubeVideo.title,
 												url: youTubeVideo.alternateLink,

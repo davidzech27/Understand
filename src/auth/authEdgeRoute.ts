@@ -17,14 +17,10 @@ export const oauthCallbackHandler = async (request: NextRequest) => {
 
 	if (typeof code !== "string") return new NextResponse(null, { status: 400 })
 
-	const { accessToken, refreshToken, expiresMillis, scopes } =
-		await getCredentialsFromCode(code)
+	const { refreshToken, scopes } = await getCredentialsFromCode(code)
 
 	const googleAPI = await GoogleAPI({
-		accessToken,
 		refreshToken,
-		expiresMillis,
-		onRefreshAccessToken: () => {},
 	})
 
 	const { email, name, photo } = await googleAPI.me()
@@ -42,9 +38,7 @@ export const oauthCallbackHandler = async (request: NextRequest) => {
 			cookies: response.cookies,
 			auth: {
 				email,
-				googleAccessToken: accessToken,
 				googleRefreshToken: refreshToken,
-				googleRefreshTokenExpiresMillis: expiresMillis,
 				googleScopes: scopes,
 			},
 		}),
@@ -54,7 +48,6 @@ export const oauthCallbackHandler = async (request: NextRequest) => {
 				Promise.all(
 					teaching.map(({ id }) =>
 						Course({ id }).update({
-							linkedAccessToken: accessToken,
 							linkedRefreshToken: refreshToken,
 						})
 					)

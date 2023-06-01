@@ -20,13 +20,13 @@ const getSimilarResourcesAction = zact(
 	const similarResourcesUntransformed = await Resource({ courseId }).search({
 		similarText,
 		topK: 10,
-		where: {},
+		filter: {},
 	})
 
 	const similarResourcesUnfiltered = (
 		await Promise.all(
 			similarResourcesUntransformed.map(async (resource, index) => {
-				if ("instructionsForAssignmentId" in resource) {
+				if (resource.instructionsForAssignmentId !== undefined) {
 					if (
 						similarResourcesUntransformed
 							.slice(0, index)
@@ -61,9 +61,8 @@ Assignment due date: ${
 							: "No due date set"
 					}`
 				} else {
-					// consider including parent assignment or material. although this may be too much information for the AI
 					return `${
-						resource.driveTitle !== undefined
+						"driveTitle" in resource
 							? `Document title: ${resource.driveTitle}\n\n`
 							: ""
 					}Content: ${resource.text}`

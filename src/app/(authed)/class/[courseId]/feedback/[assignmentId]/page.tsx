@@ -41,20 +41,12 @@ const FeedbackPage = async ({
 					Course({
 						id: courseId,
 					})
-						.linkedCredentials()
-						.then(async (credentials) => {
-							if (credentials === undefined) return []
+						.linkedRefreshToken()
+						.then(async (refreshToken) => {
+							if (refreshToken === undefined) return []
 
 							const googleAPI = await GoogleAPI({
-								accessToken: credentials.accessToken,
-								refreshToken: credentials.refreshToken,
-								expiresMillis: 0,
-								onRefreshAccessToken: async ({ accessToken }) =>
-									await Course({
-										id: courseId,
-									}).update({
-										linkedAccessToken: accessToken,
-									}),
+								refreshToken,
 							})
 
 							return (

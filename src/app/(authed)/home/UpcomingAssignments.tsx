@@ -20,12 +20,12 @@ const UpcomingAssignments: React.FC<Props> = ({ assignments, role }) => {
 			items={assignments}
 			renderEmptyState={
 				role === "teacher" ? (
-					<span className="opacity-60">
+					<span className="ml-1 opacity-60">
 						This is where you&apos;ll see the upcoming assignments
 						for all the classes you&apos;re teaching
 					</span>
 				) : (
-					<span className="opacity-60">
+					<span className="ml-1 opacity-60">
 						This is where you&apos;ll see the upcoming assignments
 						for all the classes you&apos;re in
 					</span>

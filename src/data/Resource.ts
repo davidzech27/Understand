@@ -12,28 +12,19 @@ const resourceMetadataSchema = z.intersection(
 			z.object({
 				driveId: z.string(),
 				driveTitle: z.string().optional(),
+				instructionsForAssignmentId: z.string().optional(),
 			}),
 			z.union([
 				z.object({
 					attachmentOnAssignmentId: z.string(),
-					attachmentOnAssignmentTitle: z.string(),
 				}),
 				z.object({
 					attachmentOnMaterialId: z.string(),
-					attachmentOnMaterialTitle: z.string(),
 				}),
-			]),
-			z.union([
-				z.object({
-					instructionsForAssignmentId: z.string(),
-					instructionsForAssignmentTitle: z.string(),
-				}),
-				z.object({}),
 			])
 		),
 		z.object({
 			instructionsForAssignmentId: z.string(),
-			instructionsForAssignmentTitle: z.string(),
 		}),
 	])
 )
@@ -89,7 +80,7 @@ const Resource = ({ courseId }: { courseId: string }) => {
 				},
 			})
 		},
-		getMany: async ({ where }: { where: Partial<Resource> }) => {
+		getMany: async ({ filter }: { filter: object }) => {
 			const vdb = await vdbPromise
 
 			return (
@@ -98,9 +89,9 @@ const Resource = ({ courseId }: { courseId: string }) => {
 						queryRequest: {
 							vector: Array(1536).fill(0),
 							filter:
-								Object.keys(where).length === 0
+								Object.keys(filter).length === 0
 									? undefined
-									: where,
+									: filter,
 							topK: 10_000,
 							includeMetadata: true,
 							namespace,
@@ -111,11 +102,11 @@ const Resource = ({ courseId }: { courseId: string }) => {
 		},
 		search: async ({
 			similarText,
-			where,
+			filter,
 			topK,
 		}: {
 			similarText: string
-			where: Partial<Resource> // Pick and Omit weren't working well with union types
+			filter: object
 			topK: number
 		}) => {
 			const vdb = await vdbPromise
@@ -126,9 +117,9 @@ const Resource = ({ courseId }: { courseId: string }) => {
 						queryRequest: {
 							vector: await getEmbedding(similarText),
 							filter:
-								Object.keys(where).length === 0
+								Object.keys(filter).length === 0
 									? undefined
-									: where,
+									: filter,
 							topK,
 							includeMetadata: true,
 							namespace,
@@ -139,10 +130,10 @@ const Resource = ({ courseId }: { courseId: string }) => {
 		},
 		update: async ({
 			set,
-			where,
+			filter,
 		}: {
 			set: Partial<Resource>
-			where: Partial<Resource>
+			filter: object
 		}) => {
 			const [vdb, values] = await Promise.all([
 				vdbPromise,
@@ -158,9 +149,9 @@ const Resource = ({ courseId }: { courseId: string }) => {
 							queryRequest: {
 								vector: Array(1536).fill(0),
 								filter:
-									Object.keys(where).length === 0
+									Object.keys(filter).length === 0
 										? undefined
-										: where,
+										: filter,
 								topK: 10_000,
 								namespace,
 							},
@@ -178,10 +169,10 @@ const Resource = ({ courseId }: { courseId: string }) => {
 				)
 			)
 		},
-		delete: async ({ where }: { where: Partial<Resource> }) => {
+		delete: async ({ filter }: { filter: object }) => {
 			const vdb = await vdbPromise
 
-			if (Object.keys(where).length === 0) {
+			if (Object.keys(filter).length === 0) {
 				await vdb.delete1({
 					deleteAll: true,
 					namespace: `resource:${courseId}`,
@@ -191,7 +182,7 @@ const Resource = ({ courseId }: { courseId: string }) => {
 					await vdb.query({
 						queryRequest: {
 							vector: Array(1536).fill(0),
-							filter: where,
+							filter,
 							namespace,
 							topK: 10_000,
 						},
@@ -201,8 +192,7 @@ const Resource = ({ courseId }: { courseId: string }) => {
 				if (ids === undefined) return
 
 				await vdb.delete1({
-					ids, //! currently throwing an error. investigate later
-					namespace,
+					ids,
 				})
 			}
 		},

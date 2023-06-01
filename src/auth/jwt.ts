@@ -9,9 +9,7 @@ const authorizationCookieKey = "Authorization"
 
 const accessTokenPayloadSchema = z.object({
 	email: z.string(),
-	googleAccessToken: z.string(),
 	googleRefreshToken: z.string(),
-	googleRefreshTokenExpiresMillis: z.number(),
 	googleScopes: z.enum(scopes).array(),
 })
 

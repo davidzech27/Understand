@@ -25,7 +25,7 @@ const Assignments: React.FC<Props> = ({ courseId, role, assignments }) => {
 			items={assignments}
 			renderEmptyState={
 				<>
-					<span className="font-medium leading-relaxed opacity-60">
+					<span className="ml-1 font-medium leading-relaxed opacity-60">
 						{`This is where you'll see ${
 							role === "teacher"
 								? "your created assignments"
@@ -34,7 +34,7 @@ const Assignments: React.FC<Props> = ({ courseId, role, assignments }) => {
 					</span>
 
 					{role === "teacher" && (
-						<span className="mt-1 leading-relaxed opacity-60">
+						<span className="ml-1 mt-1 leading-relaxed opacity-60">
 							Use the plus button in the upper right corner to
 							create some
 						</span>

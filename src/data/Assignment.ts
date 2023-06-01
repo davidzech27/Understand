@@ -77,7 +77,18 @@ const Assignment = ({
 			description: row.description ?? undefined,
 			instructions: row.instructions ?? undefined,
 			context: row.context ?? undefined,
-			dueAt: row.dueAt ?? undefined,
+			dueAt:
+				(row.dueAt &&
+					new Date(
+						Date.UTC(
+							row.dueAt.getFullYear(),
+							row.dueAt.getMonth(),
+							row.dueAt.getDate(),
+							row.dueAt.getHours(),
+							row.dueAt.getMinutes()
+						)
+					)) ??
+				undefined,
 			linkedUrl: row.linkedUrl ?? undefined,
 		}
 	},
@@ -137,12 +148,12 @@ const Assignment = ({
 					)
 				),
 			Resource({ courseId }).delete({
-				where: {
+				filter: {
 					attachmentOnAssignmentId: assignmentId,
 				},
 			}),
 			Resource({ courseId }).delete({
-				where: {
+				filter: {
 					instructionsForAssignmentId: assignmentId,
 				},
 			}),

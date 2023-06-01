@@ -23,6 +23,7 @@ import breakIntoSentences from "~/utils/breakIntoSentences"
 import cn from "~/utils/cn"
 import registerFeedbackAction from "./registerFeedbackAction"
 import registerFollowUpAction from "./registerFollowUpAction"
+import colors from "~/colors.cjs"
 
 // todo - re-add feature that allows students to import work from google classroom
 
@@ -773,8 +774,21 @@ const Submission = forwardRef<
 							<span
 								dangerouslySetInnerHTML={{ __html: segment }}
 								id={highlightId}
-								style={child.style as unknown as CSSProperties}
-								className="-my-1.5 -mx-1 select-text rounded-md bg-surface py-1.5 px-1 transition"
+								style={{
+									...(child.style as unknown as CSSProperties),
+									marginTop: -6,
+									marginBottom: -6,
+									marginLeft: -4,
+									marginRight: -4,
+									userSelect: "text",
+									borderRadius: 6,
+									backgroundColor: colors.surface,
+									paddingTop: 6,
+									paddingBottom: 6,
+									paddingLeft: 4,
+									paddingRight: 4,
+								}}
+								className="transition"
 							/>
 						)
 					)

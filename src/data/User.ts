@@ -93,9 +93,11 @@ const User = ({ email }: { email: string }) => ({
 	addToCourse: async ({
 		id,
 		role,
+		linked,
 	}: {
 		id: string
 		role: "teacher" | "student"
+		linked: boolean
 	}) => {
 		if (role === "teacher") {
 			await db
@@ -103,6 +105,7 @@ const User = ({ email }: { email: string }) => ({
 				.values({
 					teacherEmail: email,
 					courseId: id,
+					linked,
 				})
 				.onDuplicateKeyUpdate({ set: { teacherEmail: email } })
 		}
@@ -113,6 +116,7 @@ const User = ({ email }: { email: string }) => ({
 				.values({
 					studentEmail: email,
 					courseId: id,
+					linked,
 				})
 				.onDuplicateKeyUpdate({ set: { studentEmail: email } })
 		}

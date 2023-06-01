@@ -17,6 +17,7 @@
 		box-sizing: border-box;
 		user-select: none;
 		overscroll-behavior: none;
+		overflow-wrap: anywhere;
 	}
 
 	*::-webkit-scrollbar-track {
@@ -34,9 +35,5 @@
 	* {
 		scrollbar-color: #bfbfbf #00000000;
 		scrollbar-width: thin;
-	}
-
-	* {
-		overflow-wrap: anywhere;
 	}
 }
