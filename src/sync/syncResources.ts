@@ -229,9 +229,20 @@ const syncResources = async ({ courseId }: { courseId: string }) => {
 							classroomDriveFile.id
 						)
 
-						const classroomDriveFileText = await (
-							await googleAPIPromise
-						).driveFileText({ id: classroomDriveFile.id })
+						const classroomDriveFileText =
+							await new Promise<string>((res) =>
+								setTimeout(
+									async () =>
+										res(
+											await (
+												await googleAPIPromise
+											).driveFileText({
+												id: classroomDriveFile.id,
+											})
+										),
+									Math.random() * 1000 * 5
+								)
+							)
 
 						if (vdbDriveFile === undefined) {
 							await Resource({ courseId }).create({
@@ -291,11 +302,20 @@ const syncResources = async ({ courseId }: { courseId: string }) => {
 											classroomDriveFile.id
 										)
 
-									const classroomDriveFileText = await (
-										await googleAPIPromise
-									).driveFileText({
-										id: classroomDriveFile.id,
-									})
+									const classroomDriveFileText =
+										await new Promise<string>((res) =>
+											setTimeout(
+												async () =>
+													res(
+														await (
+															await googleAPIPromise
+														).driveFileText({
+															id: classroomDriveFile.id,
+														})
+													),
+												Math.random() * 1000 * 5
+											)
+										)
 
 									if (vdbDriveFile === undefined) {
 										return await Resource({
