@@ -18,6 +18,7 @@ const Assignment = ({
 		context,
 		dueAt,
 		linkedUrl,
+		instructionsLinked,
 	}: {
 		title: string
 		description: string | undefined
@@ -25,6 +26,7 @@ const Assignment = ({
 		context: string | undefined
 		dueAt: Date | undefined
 		linkedUrl: string | undefined
+		instructionsLinked: boolean
 	}) => {
 		await db
 			.insert(assignment)
@@ -37,6 +39,7 @@ const Assignment = ({
 				context,
 				dueAt,
 				linkedUrl,
+				instructionsLinked,
 			})
 			.onDuplicateKeyUpdate({
 				set: {
@@ -45,6 +48,9 @@ const Assignment = ({
 					...(instructions !== undefined ? { instructions } : {}),
 					...(context !== undefined ? { context } : {}),
 					...(dueAt !== undefined ? { dueAt } : {}),
+					...(instructionsLinked !== undefined
+						? { instructionsLinked }
+						: {}),
 				},
 			})
 	},
@@ -58,6 +64,7 @@ const Assignment = ({
 					context: assignment.context,
 					dueAt: assignment.dueAt,
 					linkedUrl: assignment.linkedUrl,
+					instructionsLinked: assignment.instructionsLinked,
 				})
 				.from(assignment)
 				.where(
@@ -90,6 +97,7 @@ const Assignment = ({
 					)) ??
 				undefined,
 			linkedUrl: row.linkedUrl ?? undefined,
+			instructionsLinked: row.instructionsLinked ?? false,
 		}
 	},
 	update: async ({
@@ -98,12 +106,14 @@ const Assignment = ({
 		instructions,
 		context,
 		dueAt,
+		instructionsLinked,
 	}: {
 		title?: string
 		description?: string
 		instructions?: string
 		context?: string
 		dueAt?: Date
+		instructionsLinked?: boolean
 	}) => {
 		await db
 			.update(assignment)
@@ -113,6 +123,9 @@ const Assignment = ({
 				...(instructions !== undefined ? { instructions } : {}),
 				...(context !== undefined ? { context } : {}),
 				...(dueAt !== undefined ? { dueAt } : {}),
+				...(instructionsLinked !== undefined
+					? { instructionsLinked }
+					: {}),
 			})
 			.where(
 				and(

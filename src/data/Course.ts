@@ -179,6 +179,7 @@ const Course = ({ id }: { id: string }) => ({
 					)) ??
 				undefined,
 			linkedUrl: assignment.linkedUrl ?? undefined,
+			instructionsLinked: assignment.instructionsLinked ?? false,
 		}))
 	},
 })

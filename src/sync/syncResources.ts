@@ -98,6 +98,7 @@ const syncResources = async ({ courseId }: { courseId: string }) => {
 						linkedUrl: classroomAssignment.url,
 						instructions: undefined,
 						context: undefined,
+						instructionsLinked: true,
 					}),
 					...classroomAssignment.attachments
 						.map((attachment) =>
@@ -401,7 +402,16 @@ const syncResources = async ({ courseId }: { courseId: string }) => {
 			}),
 	])
 
-	return { assignmentIdsToSync: [...new Set(assignmentIdsToSync)] }
+	return {
+		assignmentIdsToSync: [
+			...new Set(
+				assignmentIdsToSync.filter(
+					(id) =>
+						idToDBLinkedAssignmentMap.get(id)?.instructionsLinked
+				)
+			),
+		],
+	}
 }
 
 export default syncResources

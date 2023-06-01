@@ -14,6 +14,7 @@ const updateAssignmentAction = zact(
 		title: z.string().min(1),
 		description: z.string().min(1).optional(),
 		instructions: z.string().min(1),
+		instructionsLinked: z.boolean(),
 		dueAt: z.date().optional(),
 	})
 )(
@@ -23,6 +24,7 @@ const updateAssignmentAction = zact(
 		title,
 		description,
 		instructions,
+		instructionsLinked,
 		dueAt,
 	}) => {
 		const { email } = await getAuthOrThrow({ cookies: cookies() })
@@ -36,6 +38,7 @@ const updateAssignmentAction = zact(
 			description,
 			instructions,
 			dueAt,
+			instructionsLinked,
 		})
 	}
 )

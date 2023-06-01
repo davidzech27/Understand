@@ -38,6 +38,7 @@ const createAssignmentAction = zact(
 			context: undefined,
 			dueAt,
 			linkedUrl: undefined,
+			instructionsLinked: false,
 		})
 	}
 )

@@ -20,6 +20,7 @@ interface Props {
 		title: string
 		description?: string
 		instructions?: string
+		instructionsLinked: boolean
 		context?: string
 		dueAt?: Date
 	}
@@ -62,6 +63,9 @@ const AssignmentTabs: React.FC<Props> = ({ assignment }) => {
 			title: titleInput.trim(),
 			description: descriptionInput.trim() || undefined,
 			instructions: instructionsInput.trim(),
+			instructionsLinked:
+				assignment.instructionsLinked &&
+				instructionsInput.trim() === assignment.instructions?.trim(),
 		})
 
 		setSettingsModalOpen(false)

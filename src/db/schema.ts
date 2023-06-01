@@ -67,6 +67,7 @@ export const assignment = mysqlTable(
 		context: text("context"),
 		dueAt: datetime("due_at"),
 		linkedUrl: text("linked_url"),
+		instructionsLinked: boolean("instructions_linked"),
 	},
 	(table) => ({
 		cpk: primaryKey(table.courseId, table.assignmentId),
