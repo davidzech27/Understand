@@ -5,14 +5,14 @@ const syncCourse = async ({ id }: { id: string }) => {
 		callSync({
 			name: "roster",
 			courseId: id,
-			deduplicationId: `roster-${Math.floor(
+			deduplicationId: `roster-${id}-${Math.floor(
 				new Date().valueOf() / (1000 * 60 * 5)
 			)}`,
 		}),
 		callSync({
 			name: "resources",
 			courseId: id,
-			deduplicationId: `resources-${Math.floor(
+			deduplicationId: `resources-${id}-${Math.floor(
 				new Date().valueOf() / (1000 * 60 * 5)
 			)}`,
 		}),
