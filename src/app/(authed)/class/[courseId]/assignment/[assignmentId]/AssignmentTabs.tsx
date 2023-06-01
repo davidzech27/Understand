@@ -126,9 +126,9 @@ const AssignmentTabs: React.FC<Props> = ({ assignment }) => {
 
 						onUpdateAssignment()
 					}}
-					className="flex h-full flex-col justify-between"
+					className="relative h-full"
 				>
-					<div className="flex h-[calc(60vh-6.5rem-5.75rem)] flex-col space-y-2 overflow-y-scroll">
+					<div className="absolute left-0 right-0 top-0 bottom-0 flex flex-col space-y-2 overflow-y-scroll pb-[100px]">
 						<div className="ml-1 font-medium opacity-80">Title</div>
 
 						<TextInput
@@ -153,12 +153,14 @@ const AssignmentTabs: React.FC<Props> = ({ assignment }) => {
 							Instructions
 						</div>
 
-						<TextArea
-							value={instructionsInput}
-							setValue={setInstructionsInput}
-							placeholder="Instructions"
-							className="py-2.5 pl-4 text-base"
-						/>
+						<div>
+							<TextArea
+								value={instructionsInput}
+								setValue={setInstructionsInput}
+								placeholder="Instructions"
+								className="py-2.5 pl-4 text-base"
+							/>
+						</div>
 
 						<div className="flex space-x-3 pt-3">
 							<Button
@@ -202,8 +204,8 @@ const AssignmentTabs: React.FC<Props> = ({ assignment }) => {
 						</div>
 					</div>
 
-					<div className="flex space-x-3">
-						<Form.Submit className="w-1/2">
+					<div className="absolute bottom-0 left-0 right-0 z-50 flex space-x-3">
+						<Form.Submit asChild className="w-1/2">
 							<FancyButton
 								loading={isUpdatingAssignment}
 								disabled={updateDisabled}

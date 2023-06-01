@@ -24,14 +24,17 @@
 		background-color: transparent;
 		border-radius: 6px;
 	}
+
 	*::-webkit-scrollbar-thumb {
 		background-color: #bfbfbf;
 		border-radius: 6px;
 	}
+
 	*::-webkit-scrollbar {
 		width: 8px;
 		height: 8px;
 	}
+
 	* {
 		scrollbar-color: #bfbfbf #00000000;
 		scrollbar-width: thin;

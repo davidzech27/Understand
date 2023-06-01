@@ -400,7 +400,7 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 							onClick={onChooseClass}
 							loading={courseLoading}
 							disabled={selectedCourseId === undefined}
-							className="h-20 text-3xl"
+							className="h-20 w-full text-3xl"
 						>
 							Import class
 						</Button>

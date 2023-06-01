@@ -140,108 +140,95 @@ const ClassTabs: React.FC<Props> = ({
 
 						onUpdateCourse()
 					}}
-					className="flex h-full flex-col justify-between"
+					className="relative h-full"
 				>
-					<div className="h-[calc(60vh-6.5rem-5.75rem)] space-y-2 overflow-y-scroll">
-						<div className="flex flex-col space-y-2">
-							<div className="ml-1 font-medium opacity-80">
-								Name
-							</div>
+					<div className="absolute top-0 bottom-0 left-0 right-0 flex flex-col space-y-2 overflow-y-scroll pb-[100px]">
+						<div className="ml-1 font-medium opacity-80">Name</div>
 
-							<TextInput
-								value={nameInput}
-								setValue={setNameInput}
-								placeholder="Class name"
-								className="h-min py-2.5 pl-4 text-base"
-							/>
+						<TextInput
+							value={nameInput}
+							setValue={setNameInput}
+							placeholder="Class name"
+							className="h-min py-2.5 pl-4 text-base"
+						/>
 
-							<div className="ml-1 font-medium opacity-80">
-								Section
-							</div>
-
-							<TextInput
-								value={sectionInput}
-								setValue={setSectionInput}
-								placeholder="Class section"
-								className="h-min py-2.5 pl-4 text-base"
-							/>
-
-							<div className="flex-col space-y-2">
-								<div className="ml-1 font-medium opacity-80">
-									Students
-								</div>
-
-								<ListInput
-									values={studentEmailInputs}
-									setValues={setStudentEmailInputs}
-									singleWord
-									placeholder="Student email"
-									className="h-min"
-									textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)] h-min"
-									buttonClassName="h-[46px] w-[46px]"
-								/>
-
-								<div className="ml-1 font-medium opacity-80">
-									Teachers
-								</div>
-
-								<ListInput
-									values={teacherEmailInputs}
-									setValues={setTeacherEmailInputs}
-									singleWord
-									placeholder="Teacher email"
-									className="h-min"
-									textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)] h-min"
-									buttonClassName="h-[46px] w-[46px]"
-								/>
-							</div>
+						<div className="ml-1 font-medium opacity-80">
+							Section
 						</div>
 
-						<div className="flex space-x-3 pt-3">
-							<>
-								<Button
-									onClick={() =>
-										setConfirmingDeleteClass(true)
-									}
-									disabled={confirmingDeleteClass}
-									type="button"
-									className="text-lg"
-								>
-									Delete class
-								</Button>
+						<TextInput
+							value={sectionInput}
+							setValue={setSectionInput}
+							placeholder="Class section"
+							className="h-min py-2.5 pl-4 text-base"
+						/>
 
-								{confirmingDeleteClass && (
-									<>
+						<div className="ml-1 font-medium opacity-80">
+							Students
+						</div>
+
+						<ListInput
+							values={studentEmailInputs}
+							setValues={setStudentEmailInputs}
+							singleWord
+							placeholder="Student email"
+							className="h-min"
+							textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)] h-min"
+							buttonClassName="h-[46px] w-[46px]"
+						/>
+
+						<div className="ml-1 font-medium opacity-80">
+							Teachers
+						</div>
+
+						<ListInput
+							values={teacherEmailInputs}
+							setValues={setTeacherEmailInputs}
+							singleWord
+							placeholder="Teacher email"
+							className="h-min"
+							textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)] h-min"
+							buttonClassName="h-[46px] w-[46px]"
+						/>
+
+						<div className="flex space-x-3 pt-3">
+							<Button
+								onClick={() => setConfirmingDeleteClass(true)}
+								disabled={confirmingDeleteClass}
+								type="button"
+								className="text-lg"
+							>
+								Delete class
+							</Button>
+
+							{confirmingDeleteClass && (
+								<>
+									<Button
+										onClick={onDeleteCourse}
+										type="button"
+										loading={isDeletingCourse}
+										className="text-lg"
+									>
+										Do you really want to delete this class?
+									</Button>
+
+									{!isDeletingCourse && (
 										<Button
-											onClick={onDeleteCourse}
+											onClick={() =>
+												setConfirmingDeleteClass(false)
+											}
 											type="button"
-											loading={isDeletingCourse}
 											className="text-lg"
 										>
-											Do you really want to delete this
-											class?
+											Actually, never mind
 										</Button>
-
-										{!isDeletingCourse && (
-											<Button
-												onClick={() =>
-													setConfirmingDeleteClass(
-														false
-													)
-												}
-												type="button"
-												className="text-lg"
-											>
-												Actually, never mind
-											</Button>
-										)}
-									</>
-								)}
-							</>
+									)}
+								</>
+							)}
 						</div>
 					</div>
 
-					<div className="flex space-x-3">
+					<div className="absolute bottom-0 left-0 right-0 z-50 flex space-x-3">
 						<Form.Submit asChild className="w-1/2">
 							<FancyButton
 								loading={isUpdatingCourse}

@@ -158,7 +158,7 @@ ${newMessages[0]}`,
 				))}
 			</div>
 
-			<div className="absolute right-3 left-3 bottom-3">
+			<div className="absolute right-3 left-3 bottom-3 backdrop-blur-sm">
 				<TextArea
 					value={messageInput}
 					setValue={setMessageInput}
@@ -169,10 +169,7 @@ ${newMessages[0]}`,
 							? "Generating..."
 							: "Ask a question that could be answered by the content in the Google Classroom for this class"
 					}
-					ref={(textArea) => {
-						textArea && (textArea.style.height = "auto")
-					}}
-					style={{ height: 42 }}
+					style={{ height: messageInput.length === 0 ? 42 : "auto" }}
 					className="py-2 px-3"
 				/>
 
@@ -181,7 +178,7 @@ ${newMessages[0]}`,
 					size={20}
 					aria-disabled={disabled}
 					className={cn(
-						"absolute bottom-2.5 right-3 backdrop-blur-lg transition-all duration-150",
+						"absolute bottom-2.5 right-3 transition-all duration-150",
 						!disabled
 							? "cursor-pointer opacity-60 hover:opacity-80"
 							: "opacity-40"

@@ -778,13 +778,13 @@ const Submission = forwardRef<
 									marginBottom: -6,
 									marginLeft: -4,
 									marginRight: -4,
-									userSelect: "text",
-									borderRadius: 6,
-									backgroundColor: colors.surface,
 									paddingTop: 6,
 									paddingBottom: 6,
 									paddingLeft: 4,
 									paddingRight: 4,
+									borderRadius: 6,
+									backgroundColor: colors.surface,
+									userSelect: "text",
 								}}
 								className="transition"
 							/>
@@ -905,26 +905,20 @@ const Submission = forwardRef<
 					) {
 						switch (currentSpecificFeedback.state) {
 							case "focus":
-								highlightSpan.classList.replace(
-									"bg-surface",
-									"bg-surface-selected-hover"
-								)
+								highlightSpan.style.backgroundColor =
+									colors["surface-selected-hover"]
 
 								break
 
 							case "hover":
-								highlightSpan.classList.replace(
-									"bg-surface",
-									"bg-surface-selected-hover"
-								)
+								highlightSpan.style.backgroundColor =
+									colors["surface-selected-hover"]
 
 								break
 
 							case undefined:
-								highlightSpan.classList.replace(
-									"bg-surface-selected-hover",
-									"bg-surface"
-								)
+								highlightSpan.style.backgroundColor =
+									colors["surface"]
 
 								break
 						}
