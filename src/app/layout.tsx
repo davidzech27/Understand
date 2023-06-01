@@ -11,6 +11,7 @@ export const metadata = {
 	description:
 		"The personalized educational content and student insight platform",
 	referrer: "no-referrer",
+	metadataBase: new URL("https://understand.school"),
 }
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
