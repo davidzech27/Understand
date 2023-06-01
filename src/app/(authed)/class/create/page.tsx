@@ -14,12 +14,7 @@ const ClassCreatePage = async () => {
 	const authPromise = getAuthOrThrow({ cookies: cookies() })
 
 	const googleAPIPromise = authPromise.then(
-		({
-			googleAccessToken,
-			googleRefreshToken,
-			googleRefreshTokenExpiresMillis,
-			googleScopes,
-		}) =>
+		({ googleRefreshToken, googleScopes }) =>
 			!googleScopes.includes(
 				"https://www.googleapis.com/auth/classroom.courses.readonly"
 			) ||
@@ -40,19 +35,10 @@ const ClassCreatePage = async () => {
 			) ||
 			!googleScopes.includes(
 				"https://www.googleapis.com/auth/drive.readonly"
-			) ||
-			!googleScopes.includes(
-				"https://www.googleapis.com/auth/classroom.push-notifications"
 			)
 				? undefined
 				: GoogleAPI({
-						accessToken: googleAccessToken,
 						refreshToken: googleRefreshToken,
-						expiresMillis: googleRefreshTokenExpiresMillis,
-						onRefreshAccessToken: ({
-							accessToken,
-							expiresMillis,
-						}) => {}, //!
 				  })
 	)
 
