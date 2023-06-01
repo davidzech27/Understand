@@ -157,7 +157,7 @@ const GoogleAPI = async ({ refreshToken }: { refreshToken: string }) => {
 		},
 		coursesTeaching: async () => {
 			type Response = {
-				courses: (unknown & { alternateLink: unknown })[]
+				courses: (unknown & { alternateLink: unknown })[] | undefined
 				nextPageToken: string | undefined
 			}
 
@@ -184,13 +184,13 @@ const GoogleAPI = async ({ refreshToken }: { refreshToken: string }) => {
 					)
 				).json()) as Response
 
-				courses.push(...response.courses)
+				courses?.push(...(response?.courses ?? []))
 
 				nextPageToken = response.nextPageToken
 			}
 
 			return courseSchema.array().parse(
-				courses.map((course) => ({
+				(courses ?? []).map((course) => ({
 					...course,
 					url: course.alternateLink,
 				}))
@@ -198,9 +198,11 @@ const GoogleAPI = async ({ refreshToken }: { refreshToken: string }) => {
 		},
 		coursesEnrolled: async () => {
 			type Response = {
-				courses: (unknown & {
-					alternateLink: unknown
-				})[]
+				courses:
+					| (unknown & {
+							alternateLink: unknown
+					  })[]
+					| undefined
 				nextPageToken: string | undefined
 			}
 
@@ -227,13 +229,13 @@ const GoogleAPI = async ({ refreshToken }: { refreshToken: string }) => {
 					)
 				).json()) as Response
 
-				courses.push(...response.courses)
+				courses?.push(...(response?.courses ?? []))
 
 				nextPageToken = response.nextPageToken
 			}
 
 			return courseSchema.array().parse(
-				courses.map((course) => ({
+				(courses ?? []).map((course) => ({
 					...course,
 					url: course.alternateLink,
 				}))
@@ -346,54 +348,58 @@ const GoogleAPI = async ({ refreshToken }: { refreshToken: string }) => {
 		},
 		courseAssignments: async ({ courseId }: { courseId: string }) => {
 			type Response = {
-				courseWork: {
-					id: unknown
-					title: unknown
-					description: unknown
-					materials:
-						| {
-								driveFile:
-									| {
-											driveFile: {
-												id: unknown
-												title: unknown
-												alternateLink: unknown
-												thumbnailUrl: unknown
-											}
-									  }
-									| undefined
-								youtubeVideo:
-									| {
-											id: unknown
-											title: unknown
-											alternateLink: unknown
-											thumbnailUrl: unknown
-									  }
-									| undefined
-								link:
-									| {
-											title: unknown
-											url: unknown
-											thumbnailUrl: unknown
-									  }
-									| undefined
-								form:
-									| {
-											title: unknown
-											formUrl: unknown
-											responseUrl: unknown
-											thumbnailUrl: unknown
-									  }
-									| undefined
-						  }[]
-						| undefined
-					dueDate:
-						| { year: number; month: number; day: number }
-						| undefined
-					dueTime: { hours: number; minutes: number } | undefined
-					workType: unknown
-					alternateLink: unknown
-				}[]
+				courseWork:
+					| {
+							id: unknown
+							title: unknown
+							description: unknown
+							materials:
+								| {
+										driveFile:
+											| {
+													driveFile: {
+														id: unknown
+														title: unknown
+														alternateLink: unknown
+														thumbnailUrl: unknown
+													}
+											  }
+											| undefined
+										youtubeVideo:
+											| {
+													id: unknown
+													title: unknown
+													alternateLink: unknown
+													thumbnailUrl: unknown
+											  }
+											| undefined
+										link:
+											| {
+													title: unknown
+													url: unknown
+													thumbnailUrl: unknown
+											  }
+											| undefined
+										form:
+											| {
+													title: unknown
+													formUrl: unknown
+													responseUrl: unknown
+													thumbnailUrl: unknown
+											  }
+											| undefined
+								  }[]
+								| undefined
+							dueDate:
+								| { year: number; month: number; day: number }
+								| undefined
+							dueTime:
+								| { hours: number; minutes: number }
+								| undefined
+							workType: unknown
+							alternateLink: unknown
+					  }[]
+					| undefined
 				nextPageToken: string | undefined
 			}
 
@@ -420,12 +426,12 @@ const GoogleAPI = async ({ refreshToken }: { refreshToken: string }) => {
 					)
 				).json()) as Response
 
-				courseWork.push(...response.courseWork)
+				courseWork?.push(...(response?.courseWork ?? []))
 
 				nextPageToken = response.nextPageToken
 			}
 
-			const assignments = courseWork
+			const assignments = (courseWork ?? [])
 				.map(
 					({
 						id,
@@ -536,64 +542,58 @@ const GoogleAPI = async ({ refreshToken }: { refreshToken: string }) => {
 			courseId: string
 			assignmentId: string
 		}) => {
-			type Response = {
-				id: unknown
-				title: unknown
-				description: unknown
-				materials:
-					| {
-							driveFile:
-								| {
-										driveFile: {
-											id: unknown
-											title: unknown
-											alternateLink: unknown
-											thumbnailUrl: unknown
-										}
-								  }
-								| undefined
-							youtubeVideo:
-								| {
-										id: unknown
-										title: unknown
-										alternateLink: unknown
-										thumbnailUrl: unknown
-								  }
-								| undefined
-							link:
-								| {
-										title: unknown
-										url: unknown
-										thumbnailUrl: unknown
-								  }
-								| undefined
-							form:
-								| {
-										title: unknown
-										formUrl: unknown
-										responseUrl: unknown
-										thumbnailUrl: unknown
-								  }
-								| undefined
-					  }[]
-					| undefined
-				dueDate:
-					| { year: number; month: number; day: number }
-					| undefined
-				dueTime: { hours: number; minutes: number } | undefined
-				workType: unknown
-				alternateLink: unknown
-			}
+			type Response =
+				| {
+						id: unknown
+						title: unknown
+						description: unknown
+						materials:
+							| {
+									driveFile:
+										| {
+												driveFile: {
+													id: unknown
+													title: unknown
+													alternateLink: unknown
+													thumbnailUrl: unknown
+												}
+										  }
+										| undefined
+									youtubeVideo:
+										| {
+												id: unknown
+												title: unknown
+												alternateLink: unknown
+												thumbnailUrl: unknown
+										  }
+										| undefined
+									link:
+										| {
+												title: unknown
+												url: unknown
+												thumbnailUrl: unknown
+										  }
+										| undefined
+									form:
+										| {
+												title: unknown
+												formUrl: unknown
+												responseUrl: unknown
+												thumbnailUrl: unknown
+										  }
+										| undefined
+							  }[]
+							| undefined
+						dueDate:
+							| { year: number; month: number; day: number }
+							| undefined
+						dueTime: { hours: number; minutes: number } | undefined
+						workType: unknown
+						alternateLink: unknown
+				  }
+				| undefined
 
-			const {
-				id,
-				title,
-				description,
-				alternateLink,
-				materials,
-				dueDate,
-				dueTime,
-			} = (await (
+			const response = (await (
 				await fetch(
 					`https://classroom.googleapis.com/v1/courses/${courseId}/courseWork/${assignmentId}`,
 					{
@@ -603,6 +603,18 @@ const GoogleAPI = async ({ refreshToken }: { refreshToken: string }) => {
 					}
 				)
 			).json()) as Response
+
+			if (response === undefined) return undefined
+
+			const {
+				id,
+				title,
+				description,
+				alternateLink,
+				materials,
+				dueDate,
+				dueTime,
+			} = response
 
 			return assignmentSchema.parse({
 				id,
@@ -679,57 +691,61 @@ const GoogleAPI = async ({ refreshToken }: { refreshToken: string }) => {
 		},
 		courseMaterials: async ({ courseId }: { courseId: string }) => {
 			type Response = {
-				courseWorkMaterial: {
-					id: unknown
-					title: unknown
-					description: unknown
-					materials:
-						| {
-								driveFile:
-									| {
-											driveFile: {
-												id: unknown
-												title: unknown
-												alternateLink: unknown
-												thumbnailUrl: unknown
-											}
-									  }
-									| undefined
-								youtubeVideo:
-									| {
-											id: unknown
-											title: unknown
-											alternateLink: unknown
-											thumbnailUrl: unknown
-									  }
-									| undefined
-								link:
-									| {
-											title: unknown
-											url: unknown
-											thumbnailUrl: unknown
-									  }
-									| undefined
-								form:
-									| {
-											title: unknown
-											formUrl: unknown
-											responseUrl: unknown
-											thumbnailUrl: unknown
-									  }
-									| undefined
-						  }[]
-						| undefined
-					dueDate:
-						| {
-								year: number
-								month: number
-								day: number
-						  }
-						| undefined
-					dueTime: { hours: number; minutes: number } | undefined
-					alternateLink: unknown
-				}[]
+				courseWorkMaterial:
+					| {
+							id: unknown
+							title: unknown
+							description: unknown
+							materials:
+								| {
+										driveFile:
+											| {
+													driveFile: {
+														id: unknown
+														title: unknown
+														alternateLink: unknown
+														thumbnailUrl: unknown
+													}
+											  }
+											| undefined
+										youtubeVideo:
+											| {
+													id: unknown
+													title: unknown
+													alternateLink: unknown
+													thumbnailUrl: unknown
+											  }
+											| undefined
+										link:
+											| {
+													title: unknown
+													url: unknown
+													thumbnailUrl: unknown
+											  }
+											| undefined
+										form:
+											| {
+													title: unknown
+													formUrl: unknown
+													responseUrl: unknown
+													thumbnailUrl: unknown
+											  }
+											| undefined
+								  }[]
+								| undefined
+							dueDate:
+								| {
+										year: number
+										month: number
+										day: number
+								  }
+								| undefined
+							dueTime:
+								| { hours: number; minutes: number }
+								| undefined
+							alternateLink: unknown
+					  }[]
+					| undefined
 				nextPageToken: string | undefined
 			}
 
@@ -756,12 +772,16 @@ const GoogleAPI = async ({ refreshToken }: { refreshToken: string }) => {
 					)
 				).json()) as Response
 
-				courseWorkMaterial.push(...response.courseWorkMaterial)
+				courseWorkMaterial?.push(
+					...(response?.courseWorkMaterial ?? [])
+				)
 
 				nextPageToken = response.nextPageToken
 			}
 
-			const courseWorkMaterialTransformed = courseWorkMaterial.map(
+			const courseWorkMaterialTransformed = (
+				courseWorkMaterial ?? []
+			).map(
 				({
 					id,
 					title,
@@ -1013,51 +1033,6 @@ const GoogleAPI = async ({ refreshToken }: { refreshToken: string }) => {
 					}
 				)
 			).text()
-		},
-		subscribeToPushNotifications: async ({
-			courseId,
-		}: {
-			courseId: string
-		}) => {
-			await Promise.all([
-				fetch("https://classroom.googleapis.com/v1/registrations", {
-					method: "POST",
-					body: JSON.stringify({
-						feed: {
-							feedType: "COURSE_ROSTER_CHANGES",
-							courseRosterChangesInfo: {
-								courseId,
-							},
-						},
-						cloudPubsubTopic: {
-							topicName:
-								"projects/understand-381816/topics/classroom-push-notifications",
-						},
-					}),
-					headers: {
-						Authorization: `Bearer ${accessToken}`,
-					},
-				}).then((response) => response.json()),
-				fetch("https://classroom.googleapis.com/v1/registrations", {
-					method: "POST",
-					body: JSON.stringify({
-						feed: {
-							feedType: "COURSE_WORK_CHANGES",
-							courseWorkChangesInfo: {
-								courseId,
-							},
-						},
-						cloudPubsubTopic: {
-							topicName:
-								"projects/understand-381816/topics/classroom-push-notifications",
-						},
-					}),
-					headers: {
-						Authorization: `Bearer ${accessToken}`,
-					},
-				}).then((response) => response.json()),
-			])
-			//! not implementing unsubscribe yet because it's hard and not that important
 		},
 	}
 }

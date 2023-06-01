@@ -35,26 +35,29 @@ const syncAssignment = async ({
 				assignmentId,
 			})
 
-			return {
-				...assignmentWithAllAttachments,
-				attachments: (
-					await Promise.all(
-						assignmentWithAllAttachments.attachments.map(
-							async (attachment) =>
-								attachment.type === "driveFile"
-									? {
-											...attachment.driveFile,
-											text: await googleAPI.driveFileText(
-												{
-													id: attachment.driveFile.id,
-												}
-											),
-									  }
-									: undefined
+			return (
+				assignmentWithAllAttachments && {
+					...assignmentWithAllAttachments,
+					attachments: (
+						await Promise.all(
+							assignmentWithAllAttachments.attachments.map(
+								async (attachment) =>
+									attachment.type === "driveFile"
+										? {
+												...attachment.driveFile,
+												text: await googleAPI.driveFileText(
+													{
+														id: attachment.driveFile
+															.id,
+													}
+												),
+										  }
+										: undefined
+							)
 						)
-					)
-				).filter(Boolean),
-			}
+					).filter(Boolean),
+				}
+			)
 		})(),
 		Course({ id: courseId })
 			.get()
@@ -65,6 +68,12 @@ const syncAssignment = async ({
 				return course.name
 			}),
 	])
+
+	if (assignment === undefined) {
+		return console.error(
+			`Assignment with course id ${courseId} and assignment id ${assignmentId} could not be found`
+		)
+	}
 
 	const usedAttachments: {
 		id: string
