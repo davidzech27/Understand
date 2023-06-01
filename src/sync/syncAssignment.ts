@@ -14,7 +14,7 @@ const syncAssignment = async ({
 	console.info(
 		`Syncing assignment with course id ${courseId} and assignment id ${assignmentId}`
 	)
-	console.time(`${courseId}-${assignmentId}`)
+
 	const [assignment, courseName] = await Promise.all([
 		(async () => {
 			const refreshToken = await Course({
@@ -457,8 +457,6 @@ Identify the numbers corresponding to the resources that are likely to provide h
 		}).update({
 			context,
 		})
-
-	console.timeEnd(`${courseId}-${assignmentId}`)
 }
 
 export default syncAssignment

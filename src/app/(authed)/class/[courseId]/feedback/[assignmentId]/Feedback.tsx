@@ -25,8 +25,6 @@ import registerFeedbackAction from "./registerFeedbackAction"
 import registerFollowUpAction from "./registerFollowUpAction"
 import colors from "~/colors.cjs"
 
-// todo - re-add feature that allows students to import work from google classroom
-
 interface Props {
 	assignment: {
 		courseId: string

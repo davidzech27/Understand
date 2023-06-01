@@ -853,47 +853,49 @@ const GoogleAPI = async ({ refreshToken }: { refreshToken: string }) => {
 			email?: string
 		}) => {
 			type Response = {
-				studentSubmissions: {
-					assignmentSubmission:
-						| {
-								attachments:
-									| {
-											driveFile:
-												| {
-														id: unknown
-														title: unknown
-														alternateLink: unknown
-														thumbnailUrl: unknown
-												  }
-												| undefined
-											youTubeVideo:
-												| {
-														id: unknown
-														title: unknown
-														alternateLink: unknown
-														thumbnailUrl: unknown
-												  }
-												| undefined
-											link:
-												| {
-														title: unknown
-														url: unknown
-														thumbnailUrl: unknown
-												  }
-												| undefined
-											form:
-												| {
-														title: unknown
-														formUrl: unknown
-														responseUrl: unknown
-														thumbnailUrl: unknown
-												  }
-												| undefined
-									  }[]
-									| undefined
-						  }
-						| undefined
-				}[]
+				studentSubmissions:
+					| {
+							assignmentSubmission:
+								| {
+										attachments:
+											| {
+													driveFile:
+														| {
+																id: unknown
+																title: unknown
+																alternateLink: unknown
+																thumbnailUrl: unknown
+														  }
+														| undefined
+													youTubeVideo:
+														| {
+																id: unknown
+																title: unknown
+																alternateLink: unknown
+																thumbnailUrl: unknown
+														  }
+														| undefined
+													link:
+														| {
+																title: unknown
+																url: unknown
+																thumbnailUrl: unknown
+														  }
+														| undefined
+													form:
+														| {
+																title: unknown
+																formUrl: unknown
+																responseUrl: unknown
+																thumbnailUrl: unknown
+														  }
+														| undefined
+											  }[]
+											| undefined
+								  }
+								| undefined
+					  }[]
+					| undefined
 				nextPageToken: string | undefined
 			}
 
@@ -924,12 +926,14 @@ const GoogleAPI = async ({ refreshToken }: { refreshToken: string }) => {
 					)
 				).json()) as Response
 
-				studentSubmissions.push(...response.studentSubmissions)
+				studentSubmissions?.push(
+					...(response?.studentSubmissions ?? [])
+				)
 
 				nextPageToken = response.nextPageToken
 			}
 
-			const studentSubmissionsTransformed = studentSubmissions
+			const studentSubmissionsTransformed = (studentSubmissions ?? [])
 				.map(({ assignmentSubmission }) =>
 					assignmentSubmission !== undefined
 						? (assignmentSubmission.attachments ?? []).map(
