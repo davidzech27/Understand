@@ -1293,7 +1293,14 @@ const SpecificFeedbackColumn: React.FC<{
 						key={`${feedback.paragraph},${feedback.sentence}`}
 						style={{
 							top: tops[index],
-							zIndex: feedback.paragraph * 10 + feedback.sentence,
+							zIndex:
+								feedback.paragraph * 10 +
+								feedback.sentence +
+								(feedback.state === "focus"
+									? 40
+									: feedback.state === "hover"
+									? 20
+									: 0),
 						}}
 						className="absolute left-4 right-4"
 					>

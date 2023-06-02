@@ -35,9 +35,11 @@ const Chat: React.FC<Props> = ({ courseId, courseName, role }) => {
 
 		setGenerating(true)
 
-		scrollerRef.current?.scroll({
-			top: scrollerRef.current.scrollHeight,
-		})
+		setTimeout(() => {
+			scrollerRef.current?.scroll({
+				top: scrollerRef.current.scrollHeight,
+			})
+		}, 10)
 
 		fetchOpenAIStream({
 			messages: [
