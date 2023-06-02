@@ -3,6 +3,7 @@ import { cookies } from "next/headers"
 import syncCourse from "~/sync/syncCourse"
 import { getAuthOrThrow } from "~/auth/jwt"
 import User from "~/data/User"
+import Course from "~/data/Course"
 
 interface Params {
 	courseId: string
@@ -17,10 +18,14 @@ const CourseLayout = async ({
 }) => {
 	void getAuthOrThrow({ cookies: cookies() })
 		.then(({ email }) =>
-			User({ email }).courseRole({ id: params.courseId })
+			Promise.all([
+				User({ email }).courseRole({ id: params.courseId }),
+				Course({ id: params.courseId }).get(),
+			])
 		)
-		.then((role) => {
-			if (role !== "none") syncCourse({ id: params.courseId })
+		.then(([role, course]) => {
+			if (role !== "none" && course?.linkedUrl !== undefined)
+				syncCourse({ id: params.courseId })
 		})
 
 	return children

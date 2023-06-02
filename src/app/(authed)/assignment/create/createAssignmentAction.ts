@@ -5,6 +5,7 @@ import { z } from "zod"
 
 import Assignment from "~/data/Assignment"
 import User from "~/data/User"
+import Resource from "~/data/Resource"
 import { getAuthOrThrow } from "~/auth/jwt"
 
 const createAssignmentAction = zact(
@@ -31,15 +32,21 @@ const createAssignmentAction = zact(
 
 		if (role !== "teacher") return
 
-		await Assignment({ courseId, assignmentId }).create({
-			title,
-			description,
-			instructions,
-			context: undefined,
-			dueAt,
-			linkedUrl: undefined,
-			instructionsLinked: false,
-		})
+		await Promise.all([
+			Assignment({ courseId, assignmentId }).create({
+				title,
+				description,
+				instructions,
+				context: undefined,
+				dueAt,
+				linkedUrl: undefined,
+				instructionsLinked: false,
+			}),
+			Resource({ courseId }).create({
+				instructionsForAssignmentId: assignmentId,
+				text: instructions,
+			}),
+		])
 	}
 )
 

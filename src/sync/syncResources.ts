@@ -179,7 +179,8 @@ const syncResources = async ({ courseId }: { courseId: string }) => {
 				(async () => {
 					if (
 						dbLinkedAssignment.description !==
-						classroomAssignment.description
+							classroomAssignment.description &&
+						dbLinkedAssignment.instructionsLinked
 					) {
 						const instructionsOnAssignment = vdbResources.filter(
 							(resource) =>

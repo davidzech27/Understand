@@ -61,7 +61,7 @@ const Resource = ({ courseId }: { courseId: string }) => {
 								"driveId" in resource
 									? "drive"
 									: "instructionsForAssignmentId" in resource
-									? "description"
+									? "description" // outdated, because now non-synced resources are indexed as well
 									: ""
 							}:${
 								"driveId" in resource
@@ -195,6 +195,21 @@ const Resource = ({ courseId }: { courseId: string }) => {
 					ids,
 				})
 			}
+		},
+		any: async () => {
+			const vdb = await vdbPromise
+
+			return (
+				(
+					await vdb.query({
+						queryRequest: {
+							vector: Array(1536).fill(0),
+							topK: 1,
+							namespace,
+						},
+					})
+				).matches?.length === 1
+			)
 		},
 	}
 }

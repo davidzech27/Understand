@@ -167,7 +167,7 @@ ${newMessages[0]}`,
 					placeholder={
 						generating
 							? "Generating..."
-							: "Ask a question that could be answered by the content in the Google Classroom for this class"
+							: "Ask a question about the assignments or content in this class"
 					}
 					style={{ height: messageInput.length === 0 ? 42 : "auto" }}
 					className="py-2 px-3"
