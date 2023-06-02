@@ -35,9 +35,9 @@ const updateAssignmentAction = zact(
 
 		await Assignment({ courseId, assignmentId }).update({
 			title,
-			description,
+			description: description ?? null,
 			instructions,
-			dueAt,
+			dueAt: dueAt ?? null,
 			instructionsLinked,
 		})
 	}

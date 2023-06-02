@@ -109,10 +109,10 @@ const Assignment = ({
 		instructionsLinked,
 	}: {
 		title?: string
-		description?: string
+		description?: string | null
 		instructions?: string
 		context?: string
-		dueAt?: Date
+		dueAt?: Date | null
 		instructionsLinked?: boolean
 	}) => {
 		await db

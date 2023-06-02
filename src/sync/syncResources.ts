@@ -160,13 +160,15 @@ const syncResources = async ({ courseId }: { courseId: string }) => {
 							classroomAssignment.description
 								? {
 										description:
-											classroomAssignment.description,
+											classroomAssignment.description ??
+											null,
 								  }
 								: {}),
 							...(dbLinkedAssignment.dueAt !==
 							classroomAssignment.dueAt
 								? {
-										dueAt: classroomAssignment.dueAt,
+										dueAt:
+											classroomAssignment.dueAt ?? null,
 								  }
 								: {}),
 						})
@@ -200,6 +202,18 @@ const syncResources = async ({ courseId }: { courseId: string }) => {
 											: undefined
 									)
 									.filter(Boolean)
+
+							if (classroomAssignment.description === undefined) {
+								return await Resource({ courseId }).delete({
+									filter: {
+										instructionsForAssignmentId:
+											classroomAssignment.id,
+										driveId: {
+											$nin: driveIdsOfInstructionsOnAssignment,
+										},
+									},
+								})
+							}
 
 							await Resource({
 								courseId,

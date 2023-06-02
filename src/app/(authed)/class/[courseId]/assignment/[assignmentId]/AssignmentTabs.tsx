@@ -66,6 +66,7 @@ const AssignmentTabs: React.FC<Props> = ({ assignment }) => {
 			instructionsLinked:
 				assignment.instructionsLinked &&
 				instructionsInput.trim() === assignment.instructions?.trim(),
+			dueAt: assignment.dueAt,
 		})
 
 		setSettingsModalOpen(false)

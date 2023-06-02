@@ -34,7 +34,7 @@ const updateCourseAction = zact(
 		if (role !== "teacher") return
 
 		await Promise.all([
-			Course({ id }).update({ name, section }),
+			Course({ id }).update({ name, section: section ?? null }),
 			addTeacherEmails.map((email) =>
 				User({ email }).addToCourse({
 					id,

@@ -11,7 +11,6 @@ import {
 	followUp,
 } from "~/db/schema"
 import Resource from "./Resource"
-import User from "./User"
 
 const Course = ({ id }: { id: string }) => ({
 	create: async ({
@@ -62,7 +61,7 @@ const Course = ({ id }: { id: string }) => ({
 		linkedRefreshToken,
 	}: {
 		name?: string
-		section?: string
+		section?: string | null
 		googleClassroomId?: string
 		linkedRefreshToken?: string
 	}) => {
