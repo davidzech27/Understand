@@ -8,7 +8,7 @@ const GetStartedButton = () => {
 		<Link
 			href={
 				typeof localStorage !== "undefined" &&
-				localStorage.getItem("landed") === "true"
+				localStorage.getItem("landed-1.0") === "true"
 					? "/home"
 					: "/signIn"
 			}

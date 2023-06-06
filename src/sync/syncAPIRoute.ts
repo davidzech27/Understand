@@ -1,6 +1,7 @@
 import { verifySignature } from "@upstash/qstash/nextjs"
 import { NextApiHandler } from "next"
 import { z } from "zod"
+import { Highlight } from "@highlight-run/next"
 
 import callSync from "./callSync"
 import syncRoster from "./syncRoster"
@@ -56,4 +57,6 @@ const syncHandler: NextApiHandler = async (req, res) => {
 	res.status(200).end()
 }
 
-export default verifySignature(syncHandler)
+export default verifySignature(
+	Highlight({ projectID: env.NEXT_PUBLIC_HIGHLIGHT_PROJECT_ID })(syncHandler)
+)

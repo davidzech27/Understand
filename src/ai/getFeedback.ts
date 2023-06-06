@@ -6,7 +6,7 @@ import fetchOpenAIStream from "./fetchOpenAIStream"
 // general feedback isn't comprehensive enough
 // sometimes doesn't see the big picture. big problem with GPTs in general
 
-// should give student options for how to revise their work, and not prescribe its own
+// should give student options for how to revise their work, and not prescribe its own. suggested solutions are too specific
 
 // old comments, may not be relevant anymore:
 // currently feedback is too certain of itself and not varied. not very interesting feedback and doesn't go beyond the absolute surface level when providing reasoning.

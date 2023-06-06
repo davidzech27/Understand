@@ -2,7 +2,7 @@
 import { useState, use } from "react"
 import { useRouter } from "next/navigation"
 import * as Form from "@radix-ui/react-form"
-import * as Sentry from "@sentry/nextjs"
+import { H } from "highlight.run"
 import { useZact } from "zact/client"
 
 import TextInput from "~/components/TextInput"
@@ -34,18 +34,11 @@ const LandingForm: React.FC<Props> = (props) => {
 	const onGo = async () => {
 		if (!profile) return
 
-		Sentry.setUser({
-			id: profile.email,
-			email: profile.email,
-			username: profile.name,
-		})
+		H.identify(profile.email, profile)
 
-		await Promise.all([
-			Sentry.flush(),
-			await updateName({ name: nameInput.trim() }),
-		])
+		await Promise.all([await updateName({ name: nameInput.trim() })])
 
-		localStorage.setItem("landed", "true")
+		localStorage.setItem("landed-1.0", "true")
 
 		router.refresh()
 
