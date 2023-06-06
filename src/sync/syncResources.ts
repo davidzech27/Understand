@@ -77,7 +77,7 @@ const syncResources = async ({ courseId }: { courseId: string }) => {
 			.map(({ id, ...driveFile }) => [id, driveFile])
 	)
 
-	const assignmentIdsToSync: string[] = []
+	let assignmentIdsToSync: string[] = []
 
 	await Promise.all([
 		// create all assignments and index attachments on them not in classroom, and update all linked assignments and resources
@@ -417,15 +417,20 @@ const syncResources = async ({ courseId }: { courseId: string }) => {
 			}),
 	])
 
+	assignmentIdsToSync = [
+		...new Set(
+			assignmentIdsToSync.filter(
+				(id) =>
+					idToDBLinkedAssignmentMap.get(id)?.instructionsLinked ??
+					true
+			)
+		),
+	]
+
+	console.log("Assignment ids to sync: ", assignmentIdsToSync)
+
 	return {
-		assignmentIdsToSync: [
-			...new Set(
-				assignmentIdsToSync.filter(
-					(id) =>
-						idToDBLinkedAssignmentMap.get(id)?.instructionsLinked
-				)
-			),
-		],
+		assignmentIdsToSync,
 	}
 }
 
