@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
-import { eq } from "drizzle-orm/expressions"
 
 import { env } from "~/env.mjs"
 import { setAuth } from "~/auth/jwt"
 import redirectToCookieKey from "./redirectToCookieKey"
-import db from "~/db/db"
 import { getCredentialsFromCode } from "~/google/credentials"
 import GoogleAPI from "~/google/GoogleAPI"
 import User from "~/data/User"
