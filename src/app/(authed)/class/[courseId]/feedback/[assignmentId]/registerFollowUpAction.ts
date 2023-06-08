@@ -5,6 +5,7 @@ import { z } from "zod"
 
 import Feedback from "~/data/Feedback"
 import { getAuthOrThrow } from "~/auth/jwt"
+import User from "~/data/User"
 
 const registerFollowUpAction = zact(
 	z.object({
@@ -29,6 +30,10 @@ const registerFollowUpAction = zact(
 		metadata,
 	}) => {
 		const { email } = await getAuthOrThrow({ cookies: cookies() })
+
+		const role = await User({ email }).courseRole({ id: courseId })
+
+		if (role === "none") return
 
 		await Feedback({
 			courseId,

@@ -23,7 +23,9 @@ import breakIntoSentences from "~/utils/breakIntoSentences"
 import cn from "~/utils/cn"
 import registerFeedbackAction from "./registerFeedbackAction"
 import registerFollowUpAction from "./registerFollowUpAction"
+import registerInsightsAction from "./registerInsightsAction"
 import colors from "~/colors.cjs"
+import getInsights from "~/ai/getInsights"
 
 interface Props {
 	assignment: {
@@ -38,6 +40,7 @@ interface Props {
 	}
 	profileName: string
 	courseName: string
+	role: "teacher" | "student"
 	submissions: {
 		id: string
 		title?: string
@@ -61,6 +64,7 @@ const Feedback: React.FC<Props> = ({
 	assignment,
 	profileName,
 	courseName,
+	role,
 	submissions,
 }) => {
 	const submissionRef = useRef<{
@@ -253,14 +257,32 @@ const Feedback: React.FC<Props> = ({
 											1000,
 								  }
 								: {}),
-							secondsProducing:
-								(new Date().valueOf() -
-									producingStart.valueOf()) /
-								1000,
+							...(producingStart
+								? {
+										secondsProducing:
+											(new Date().valueOf() -
+												producingStart.valueOf()) /
+											1000,
+								  }
+								: {}),
 						},
 					})
 
-					console.log(rawResponse)
+					console.log("Feedback: ", rawResponse)
+
+					if (role === "student")
+						getInsights({
+							submission: submissionInput,
+							instructions: assignment.instructions,
+							specificFeedback,
+							generalFeedback,
+						}).then((insights) => {
+							registerInsightsAction({
+								courseId: assignment.courseId,
+								assignmentId: assignment.assignmentId,
+								insights,
+							})
+						})
 				},
 			})
 		}
@@ -559,7 +581,7 @@ const Feedback: React.FC<Props> = ({
 									<Button disabled className="text-lg">
 										{specificFeedbackList.length > 0
 											? "Generating feedback..."
-											: "Analyzing document..."}
+											: "Analyzing work..."}
 									</Button>
 								) : (
 									<Button
@@ -958,7 +980,20 @@ const Submission = forwardRef<
 			forwardedRef,
 			() => {
 				return {
-					getText: () => ref.current?.textContent ?? undefined,
+					getText: () => {
+						if (ref.current === null) return ""
+
+						const elementsText: string[] = []
+
+						for (const element of ref.current.querySelectorAll(
+							"p, div"
+						)) {
+							element.textContent &&
+								elementsText.push(element.textContent)
+						}
+
+						return elementsText.join("\n")
+					},
 					getTextOffset: ({ paragraph }) => {
 						let paragraphFound = false
 
@@ -1302,7 +1337,7 @@ const SpecificFeedbackColumn: React.FC<{
 									? 20
 									: 0),
 						}}
-						className="absolute left-4 right-4"
+						className="absolute left-4 right-4 backdrop-blur-sm"
 					>
 						<SpecificFeedbackItem
 							content={feedback.content}
@@ -1438,7 +1473,7 @@ const SpecificFeedbackItem: React.FC<{
 			{...focusWithinProps}
 			{...hoverProps}
 			className={cn(
-				"group absolute flex flex-col rounded-md border border-border bg-surface opacity-80 shadow-sm shadow-[#E5E5E5] backdrop-blur-sm transition-shadow duration-500",
+				"group absolute flex flex-col rounded-md border border-border bg-surface opacity-80 shadow-sm shadow-[#E5E5E5] transition-shadow duration-500",
 				state === "focus" && "shadow-lg",
 				state === "hover" && "shadow-lg"
 			)}

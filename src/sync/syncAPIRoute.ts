@@ -1,5 +1,5 @@
 import { verifySignature } from "@upstash/qstash/nextjs"
-import { NextApiHandler } from "next"
+import { type NextApiHandler } from "next"
 import { z } from "zod"
 import { Highlight } from "@highlight-run/next"
 

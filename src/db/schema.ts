@@ -8,6 +8,7 @@ import {
 	json,
 	uniqueIndex,
 	boolean,
+	index,
 } from "drizzle-orm/mysql-core"
 
 export const user = mysqlTable("user", {
@@ -117,5 +118,53 @@ export const followUp = mysqlTable(
 			table.feedbackGivenAt,
 			table.givenAt
 		),
+	})
+)
+
+export const insight = mysqlTable(
+	"insight",
+	{
+		courseId: varchar("course_id", { length: 100 }).notNull(),
+		assignmentId: varchar("assignment_id", { length: 100 }).notNull(),
+		studentEmail: varchar("student_email", { length: 100 }).notNull(),
+		insights: json("insights").notNull(),
+		synced: boolean("synced").notNull(),
+	},
+	(table) => ({
+		cpk: primaryKey(table.courseId, table.assignmentId, table.studentEmail),
+		courseIdSyncedIdx: index("course_id_synced_idx").on(
+			table.courseId,
+			table.synced
+		),
+		courseIdStudentEmailSyncedIdx: index(
+			"course_id_student_email_synced_idx"
+		).on(table.courseId, table.studentEmail, table.synced),
+		courseIdAssignmentIdSyncedIdx: index(
+			"course_id_assignment_id_synced_idx"
+		).on(table.courseId, table.assignmentId, table.synced),
+	})
+)
+
+export const studentInsight = mysqlTable(
+	"student_insight",
+	{
+		courseId: varchar("course_id", { length: 100 }).notNull(),
+		studentEmail: varchar("student_email", { length: 100 }).notNull(),
+		insights: json("insights").notNull(),
+	},
+	(table) => ({
+		cpk: primaryKey(table.courseId, table.studentEmail),
+	})
+)
+
+export const assignmentInsight = mysqlTable(
+	"assignment_insight",
+	{
+		courseId: varchar("course_id", { length: 100 }).notNull(),
+		assignmentId: varchar("assignment_id", { length: 100 }).notNull(),
+		insights: json("insights").notNull(),
+	},
+	(table) => ({
+		cpk: primaryKey(table.courseId, table.assignmentId),
 	})
 )

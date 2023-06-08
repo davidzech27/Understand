@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm/expressions"
+import { desc, eq } from "drizzle-orm"
 
 import db from "~/db/db"
 import {

@@ -73,9 +73,7 @@ The student has just responded to the following part of your feedback.
 ${feedback}
 </part-of-feedback>
 
-You will respond to them in a way that leads them to a deeper understanding of the subject matter, and must ultimately serve to guide the student to improve their ability to think critically and express their ideas effectively. Be conversational, concise, genuine, and try to engage the student. Generalize upon the points you make to larger contexts outside of this assignment in interesting ways in order to help the student understand the subject matter at a deeper level, even if it means going off on a tangent. Never give any ideas or content away to the student; instead, cleverly ask them a question or make an insightful comment to lead them in the right direction. Additionally, you could walk the student through a concrete example of a mental process they could take to improve their writing. Focus on elevating their strengths and reducing their weaknesses.
-
-Now, here's what they said:`, // consider removing "Focus on elevating their strengths and reducing their weaknesses."
+You will respond to the student in a way that helps them understand at a deeper level how they should improve their work. Make use of the Socratic method to lead the student in the right direction. Acknowledge what is already present in the student's work. Generalize to larger contexts outside the class in interesting ways in order to help the student understand the subject matter at a deeper level. Never give any ideas or content away to the student. Be entertaining but very concise.`,
 				},
 				...followUps.map((followUp, index) => ({
 					role:
@@ -88,7 +86,7 @@ Now, here's what they said:`, // consider removing "Focus on elevating their str
 			model: "gpt-4" as const,
 			temperature: 0.25,
 			presencePenalty: 0.5,
-			frequencyPenalty: 0.5,
+			frequencyPenalty: 0.75,
 		}
 
 	fetchOpenAIStream({

@@ -1,6 +1,7 @@
 import { cookies } from "next/headers"
 
 import syncCourse from "~/sync/syncCourse"
+import generateInsights from "~/insights/generateInsights"
 import { getAuthOrThrow } from "~/auth/jwt"
 import User from "~/data/User"
 import Course from "~/data/Course"
@@ -25,7 +26,14 @@ const CourseLayout = async ({
 		)
 		.then(([role, course]) => {
 			if (role !== "none" && course?.linkedUrl !== undefined)
-				syncCourse({ id: params.courseId })
+				syncCourse({
+					id: params.courseId,
+				})
+
+			if (role === "teacher")
+				generateInsights({
+					courseId: params.courseId,
+				})
 		})
 
 	return children

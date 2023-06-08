@@ -1,5 +1,5 @@
 import { cookies } from "next/headers"
-import { eq, and, isNotNull } from "drizzle-orm/expressions"
+import { eq } from "drizzle-orm"
 import Link from "next/link"
 
 import Card from "~/components/Card"

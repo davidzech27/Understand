@@ -46,9 +46,10 @@ const Avatar: React.FC<Props> = ({
 
 	return src && !isError ? (
 		<img
-			src={src}
+			src={`${src}?no-cache`}
 			alt={name ?? "No title"}
 			onError={() => setIsError(true)}
+			crossOrigin="anonymous" // not effective
 			className={cn(
 				"h-full w-full rounded-full",
 				border && "border-[0.75px] border-border",

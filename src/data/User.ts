@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm/expressions"
+import { and, eq } from "drizzle-orm"
 
 import db from "~/db/db"
 import { user, course, studentToCourse, teacherToCourse } from "~/db/schema"

@@ -92,6 +92,7 @@ const FeedbackPage = async ({
 			}}
 			profileName={profile.name}
 			courseName={course.name}
+			role={role}
 			submissions={submissions}
 		/>
 	)

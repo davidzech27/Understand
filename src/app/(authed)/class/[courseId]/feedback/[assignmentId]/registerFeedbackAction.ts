@@ -4,6 +4,7 @@ import { zact } from "zact/server"
 import { z } from "zod"
 
 import Feedback from "~/data/Feedback"
+import User from "~/data/User"
 import { getAuthOrThrow } from "~/auth/jwt"
 
 const registerFeedbackAction = zact(
@@ -17,7 +18,14 @@ const registerFeedbackAction = zact(
 )(async ({ courseId, assignmentId, submission, rawResponse, metadata }) => {
 	const { email } = await getAuthOrThrow({ cookies: cookies() })
 
+	const role = await User({ email }).courseRole({ id: courseId })
+
 	const givenAt = new Date()
+
+	if (role === "none")
+		return {
+			givenAt,
+		}
 
 	await Feedback({
 		courseId,
