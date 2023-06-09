@@ -68,35 +68,42 @@ const generateStudentInsights = async ({
 			.flat()
 	)
 
-	const mergedInsightsCompletion = await getCompletion({
-		messages: [
-			{
-				role: "system",
-				content: "You are a helpful teacher's assistant.",
-			},
-			{
-				role: "user",
-				content: `The following is a list of insights regarding the strengths/weaknesses of a student:${
-					concatenatedInsights
-						?.map(
-							(insight, index) =>
-								`\n\n${index + 1}. ${insight.content}`
-						)
-						.join("") ?? ""
-				}
+	const mergedInsightsPromptMessages = [
+		{
+			role: "system" as const,
+			content: "You are a helpful teacher's assistant.",
+		},
+		{
+			role: "user" as const,
+			content: `The following is a list of insights regarding the strengths/weaknesses of a student on various assignments:${
+				concatenatedInsights
+					?.map(
+						(insight, index) =>
+							`\n\n${index + 1}. ${insight.content}`
+					)
+					.join("") ?? ""
+			}
 
-Some of the above insights may express similar things about the student, and could be combined to form longer insights. Additionally, these insights should be expressed in the context of the student in general. Rewrite the above insights with this in mind, using the following format:
-Content: {the rewritten insight, copying language from the original insight(s) this corresponds to}
+Some of the above insights may express similar things about the student, and could be combined to form longer insights. Additionally, these insights should be expressed in the context of the student's understanding of the class in general. Rewrite the above insights with this in mind. Do not mix strengths and weaknesses. Use the following format:
+Content: {the rewritten insight}
 Sources: {the number(s) corresponding the original insight(s) that formed this insight, using a comma-separated list if necessary}
 
 Begin.`,
-			},
-		],
+		},
+	]
+
+	const mergedInsightsCompletion = await getCompletion({
+		messages: mergedInsightsPromptMessages,
 		model: "gpt-4",
 		temperature: 0,
-		presencePenalty: 0, // consider using negative presence penalty and/or frequency penalty
-		frequencyPenalty: 0,
+		presencePenalty: 0.5,
+		frequencyPenalty: 0.5,
 	})
+
+	console.info(
+		"Merged insight prompt messages: ",
+		mergedInsightsPromptMessages
+	)
 
 	console.info("Merged insight completion: ", mergedInsightsCompletion)
 
@@ -120,16 +127,36 @@ Begin.`,
 		.filter(Boolean)
 		.map((insight) => ({
 			type:
-				concatenatedInsights[(insight.sources[0] ?? 1) - 1]?.type ??
-				"weakness",
+				concatenatedInsights[(insight.sources[0] ?? 1) - 1]?.type ===
+				"weakness"
+					? ("weakness" as const)
+					: ("strength" as const),
 			content: insight.content,
-			sources: insight.sources
-				.map(
-					(sourceIndex) =>
-						concatenatedInsights[sourceIndex - 1]?.sources
-				)
-				.filter(Boolean)
-				.flat(),
+			sources: Object.entries(
+				insight.sources
+					.map(
+						(sourceIndex) =>
+							concatenatedInsights[sourceIndex - 1]?.sources
+					)
+					.filter(Boolean)
+					.flat()
+					.reduce(
+						(prev, cur) => ({
+							...prev,
+							[cur.assignmentId]:
+								prev[cur.assignmentId]?.includes(-1) ||
+								cur.paragraphs.includes(-1)
+									? [-1]
+									: (prev[cur.assignmentId] ?? []).concat(
+											cur.paragraphs
+									  ),
+						}),
+						{} as Record<string, number[]>
+					)
+			).map(([assignmentId, paragraphs]) => ({
+				assignmentId,
+				paragraphs,
+			})),
 		}))
 
 	await Promise.all([

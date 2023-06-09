@@ -17,6 +17,8 @@ export const generateMetadata = async ({
 }: {
 	params: Params
 }) => {
+	email = decodeURIComponent(email)
+
 	const name = (await User({ email }).get())?.name
 
 	return {

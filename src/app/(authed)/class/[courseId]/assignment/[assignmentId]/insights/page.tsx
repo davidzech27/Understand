@@ -1,63 +1,61 @@
-import Card from "~/components/Card"
-import StudentInsight from "~/data/StudentInsight"
-import Insight from "./Insight"
+import AssignmentInsight from "~/data/AssignmentInsight"
 import InsightData from "~/data/Insight"
-import Assignment from "~/data/Assignment"
+import User from "~/data/User"
+import Card from "~/components/Card"
+import Insight from "./Insight"
+
+export const metadata = {
+	title: "Insights",
+}
 
 export const dynamic = "force-dynamic"
 
 interface Params {
 	courseId: string
-	email: string
+	assignmentId: string
 }
 
-// consider adding stream-like interface. may belong in other places as well
-const StudentPage = async ({
-	params: { courseId, email },
+const AssignmentInsightsPage = async ({
+	params: { courseId, assignmentId },
 }: {
 	params: Params
 }) => {
-	email = decodeURIComponent(email)
-
-	const studentInsights = (
-		await StudentInsight({
+	const assignmentInsights = (
+		await AssignmentInsight({
 			courseId,
-			studentEmail: email,
+			assignmentId,
 		}).get()
 	)?.map((insight) => ({
 		...insight,
 		sources: insight.sources.map((source) => ({
-			assignment: Assignment({
-				courseId,
-				assignmentId: source.assignmentId,
+			student: User({
+				email: source.studentEmail,
 			})
 				.get()
-				.then(
-					(assignment) =>
-						assignment ?? { assignmentId: "", title: "" }
-				),
+				.then((student) => student ?? { email: "", name: "" }),
 			submission: InsightData({
 				courseId,
-				studentEmail: email,
-				assignmentId: source.assignmentId,
+				assignmentId,
+				studentEmail: source.studentEmail,
 			}).submission(),
 			paragraphs: source.paragraphs,
 		})),
 	}))
 
-	const strengths = (studentInsights ?? []).filter(
+	const strengths = (assignmentInsights ?? []).filter(
 		(insight) => insight.type === "strength"
 	)
 
-	const weaknesses = (studentInsights ?? []).filter(
+	const weaknesses = (assignmentInsights ?? []).filter(
 		(insight) => insight.type === "weakness"
 	)
 
 	return (
 		<Card className="flex h-full flex-col space-y-2 px-6 pt-5 pb-80">
-			{studentInsights === undefined || studentInsights.length === 0 ? (
+			{assignmentInsights === undefined ||
+			assignmentInsights.length === 0 ? (
 				<span className="text-lg font-medium opacity-60">
-					No data for student
+					No data for assignment
 				</span>
 			) : (
 				<>
@@ -90,4 +88,4 @@ const StudentPage = async ({
 	)
 }
 
-export default StudentPage
+export default AssignmentInsightsPage

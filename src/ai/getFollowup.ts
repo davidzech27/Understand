@@ -38,7 +38,7 @@ const getFollowUp = ({
 				{
 					role: "system" as "user" | "system" | "assistant",
 					content:
-						"You are an uncommonly creative tutor for high school students that works hard to guide students to think critically and communicate their ideas effectively.",
+						"You are an uncommonly creative tutor for high school students.",
 				},
 				{
 					role: "user" as "user" | "system" | "assistant",
@@ -51,7 +51,7 @@ The following is a high school student's progress on that assignment:
 <student-progress>
 ${submission}
 </student-progress>
-					
+
 You have just analyzed this student's work and given them feedback on it:
 <analysis>
 Synopsis: ${synopsis}
@@ -68,18 +68,21 @@ ${specificFeedback}
 ${generalFeedback}
 </feedback-on-entire-work>
 
-The student has just responded to the following part of your feedback.
+The student responded to the following part of your feedback.
 <part-of-feedback>
 ${feedback}
 </part-of-feedback>
 
-You will respond to the student in a way that helps them understand at a deeper level how they should improve their work. Make use of the Socratic method to lead the student in the right direction. Acknowledge what is already present in the student's work. Generalize to larger contexts outside the class in interesting ways in order to help the student understand the subject matter at a deeper level. Never give any ideas or content away to the student. Be entertaining but very concise.`,
+You will respond to the student in a way that helps them understand the subject matter at a deeper, more nuanced level. Make use of the Socratic method to lead the student in the right direction. Generalize to larger contexts outside the class in interesting ways, or walk the student through a concrete example of a mental process they could take to improve their work. Never give any ideas or content away to the student. Prioritize unconventional advice, and avoid platitudes. Frequently reference the student's work. Be conversational but very concise.
+
+Here's their first message:
+${followUps[0]}`,
 				},
-				...followUps.map((followUp, index) => ({
+				...followUps.slice(1).map((followUp, index) => ({
 					role:
 						index % 2 === 0
-							? ("user" as const)
-							: ("assistant" as const),
+							? ("assistant" as const)
+							: ("user" as const),
 					content: followUp,
 				})),
 			],

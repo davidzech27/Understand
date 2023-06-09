@@ -7,6 +7,7 @@ import ClassTabs from "./ClassTabs"
 import Card from "~/components/Card"
 import User from "~/data/User"
 import Course from "~/data/Course"
+import Resource from "~/data/Resource"
 import { getAuthOrThrow } from "~/auth/jwt"
 
 interface Params {
@@ -35,11 +36,12 @@ const ClassLayout = async ({
 }) => {
 	const rosterPromise = Course({ id: courseId }).roster()
 
-	const [course, role] = await Promise.all([
+	const [course, role, anyIndexedResource] = await Promise.all([
 		Course({ id: courseId }).get(),
 		getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
 			User({ email }).courseRole({ id: courseId })
 		),
+		Resource({ courseId }).any(),
 	])
 
 	if (course === undefined || role === "none") notFound()
@@ -90,6 +92,7 @@ const ClassLayout = async ({
 						roster.students.map((student) => student.email)
 					)}
 					role={role}
+					anyIndexedResource={anyIndexedResource}
 				/>
 			</Card>
 

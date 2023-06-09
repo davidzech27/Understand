@@ -1,14 +1,12 @@
 import breakIntoSentences from "~/utils/breakIntoSentences"
 import fetchOpenAIStream from "./fetchOpenAIStream"
 
+// old comments, may not be relevant anymore:
 // specific feedback needs to ask a question or make an insightful comment to guide the student to a deeper understanding of the subject matter.
 // it also needs to reference other parts of the student's work so that no part of it is ignored
 // general feedback isn't comprehensive enough
 // sometimes doesn't see the big picture. big problem with GPTs in general
-
 // should give student options for how to revise their work, and not prescribe its own. suggested solutions are too specific
-
-// old comments, may not be relevant anymore:
 // currently feedback is too certain of itself and not varied. not very interesting feedback and doesn't go beyond the absolute surface level when providing reasoning.
 // needs to be more holistic. needs to understand that to improve one's writing, you must focus on elevating their strengths and reducing their weaknesses. don't suggest an improvement that has no bearing on the student's existing work.
 // perhaps being wrong isn't the worst thing, as it could train students to defend their essay. shouldn't be a feature though
@@ -92,16 +90,16 @@ ${submission
 <student-name>${studentName}</student-name>
 <course-name>${courseName}</course-name>
 
-You will serve as a tutor for the high school student, providing them with thoughtful, engaging, and actionable feedback on their work, serving to guide the student to improve their ability to express their ideas effectively and to a deeper understanding of critical thinking. The process by which you will accomplish this will consist of four steps, and should look exactly as follows:
+You will serve as a tutor for the high school student, providing them with holistic and actionable feedback on their work, serving to guide the student to improve their ability to express their ideas effectively and to a deeper understanding of critical thinking. The process by which you will accomplish this will consist of four steps:
 
 Synopsis
 Construct a very descriptive and comprehensive synopsis for the student's work.
 
 Commentary
-Identify one area where the student demonstrates their strengths or unique character as a writer and the two areas where the student could most easily improve the communication of their ideas or their depth of thought. For each area of commentary, ask a question about your commentary in order to assess its accuracy and validity, and then provide extremely in-depth evidence/reasoning in order to clarify it accordingly. Unless required by the assignment prompt, do not suggest that the student increase the scope of their work or that they alter their stylistic writing choices.
+Identify one area where the student demonstrates their strengths or unique character as a writer and the two areas where the student could most easily improve the communication of their ideas or their depth of thought. For each area of commentary, ask a question about the commentary in order to directly assess its accuracy, then answer it with comprehensive reasoning and direct references the student's work.
 
 Specific feedback
-Provide four areas of feedback of varying lengths pertaining to individual segments of the student's work. Explore these areas of feedback thoroughly in order to guide the student towards improving both their work and their understanding of the subject matter. Do not prescribe any particular solution to the student; instead, cleverly ask them a question to lead them in the right direction. Each area of specific feedback should be in a numbered list and use the following format:
+Provide five areas of feedback pertaining to the segments of the student's work that your commentary most applies to. Be extremely thorough in order to best help the student understand how to improve their work. Do not prescribe any particular solution to the student; instead, cleverly ask them a question or make an insightful comment to lead them in the right direction. Unless required by the assignment prompt, do not suggest that the student increase the scope of their work or that they alter their stylistic writing choices. Each area of specific feedback should use the following format:
 Paragraph number: {paragraph number of the segment of the student's work pertaining to the feedback}
 Sentence number: {sentence number of the segment of the student's work pertaining to the feedback, or -1 if the feedback applies to the paragraph as a whole}
 Feedback: {the feedback to the student}
@@ -114,7 +112,7 @@ Begin, and be interesting.`,
 			],
 			model: "gpt-4" as const,
 			temperature: 0,
-			presencePenalty: 0.5, // setting this and the one below made a huge difference. my theory is that it decreases the model's bias to take on a similar writing style to that of the prompt, increasing its likelihood to follow the instructions and not just attempt to match them in style. consider tweaking these further
+			presencePenalty: 0.35, // setting this and the one below made a huge difference. my theory is that it decreases the model's bias to take on a similar writing style to that of the prompt, increasing its likelihood to follow the instructions and not just attempt to match them in style. consider tweaking these further
 			frequencyPenalty: 0.35,
 		}
 
@@ -145,9 +143,8 @@ Begin, and be interesting.`,
 
 				if (lastLine !== undefined) {
 					if (
-						lastLine.search(
-							/^(\d+\.)?\s*Paragraph( number)?:? ?\d+:?$/
-						) !== -1
+						lastLine.search(/^\s*Paragraph( number)?:? ?\d+:?$/) !==
+						-1
 					) {
 						lastParagraphNumber = Number(
 							lastLine.match(/\d+/g)?.at(-1)

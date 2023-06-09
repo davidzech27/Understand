@@ -71,6 +71,7 @@ const Feedback: React.FC<Props> = ({
 		getText: () => string | undefined
 		getTextOffset: ({}: { paragraph: number }) => number
 		getWidth: () => number | undefined
+		getHTML: () => string
 		setHTML: (html: string) => void
 	}>(null)
 
@@ -152,6 +153,8 @@ const Feedback: React.FC<Props> = ({
 
 	const onGetFeedback = () => {
 		const submissionInput = submissionRef.current?.getText()
+
+		const submissionHTML = submissionRef.current?.getHTML()
 
 		if (submissionInput !== undefined) {
 			setGenerating(true)
@@ -280,6 +283,7 @@ const Feedback: React.FC<Props> = ({
 							registerInsightsAction({
 								courseId: assignment.courseId,
 								assignmentId: assignment.assignmentId,
+								submission: submissionHTML ?? "",
 								insights,
 							})
 						})
@@ -466,224 +470,219 @@ const Feedback: React.FC<Props> = ({
 	}
 
 	return (
-		<div className="flex h-full space-y-2.5">
-			<div className="relative flex h-full w-full overflow-y-scroll overscroll-y-contain rounded-md border border-border bg-white pt-16 shadow-lg shadow-[#00000016]">
-				{submissions.length > 0 && (
-					<Modal
-						title="Pick a submission"
-						open={modal === "submission"}
-						setOpen={(open) =>
-							open ? setModal("submission") : setModal(undefined)
-						}
-					>
-						<div className="flex h-full flex-col justify-between">
-							<AttachmentList
-								items={submissions}
-								selectionType="single"
-								selectionSet={
-									new Set(
-										selectedAttachmentId
-											? [selectedAttachmentId]
-											: []
+		<div className="relative flex h-full w-full overflow-y-scroll overscroll-y-contain rounded-md border border-border bg-white pt-16 shadow-lg shadow-[#00000016]">
+			{submissions.length > 0 && (
+				<Modal
+					title="Pick a submission"
+					open={modal === "submission"}
+					setOpen={(open) =>
+						open ? setModal("submission") : setModal(undefined)
+					}
+				>
+					<div className="flex h-full flex-col justify-between">
+						<AttachmentList
+							items={submissions}
+							selectionType="single"
+							selectionSet={
+								new Set(
+									selectedAttachmentId
+										? [selectedAttachmentId]
+										: []
+								)
+							}
+							setSelectionSet={(updater) => {
+								if (typeof updater === "object") {
+									setSelectedAttachmentId(
+										updater.values().next().value
+									)
+								} else {
+									setSelectedAttachmentId(
+										updater(
+											new Set(
+												selectedAttachmentId
+													? [selectedAttachmentId]
+													: []
+											)
+										)
+											.values()
+											.next().value
 									)
 								}
-								setSelectionSet={(updater) => {
-									if (typeof updater === "object") {
-										setSelectedAttachmentId(
-											updater.values().next().value
-										)
-									} else {
-										setSelectedAttachmentId(
-											updater(
-												new Set(
-													selectedAttachmentId
-														? [selectedAttachmentId]
-														: []
-												)
-											)
-												.values()
-												.next().value
-										)
-									}
-								}}
-							/>
+							}}
+						/>
 
-							<Button
-								onClick={onPickAttachment}
-								disabled={selectedAttachmentId === undefined}
-								className="h-20 text-3xl"
-							>
-								Pick attachment
-							</Button>
-						</div>
-					</Modal>
-				)}
+						<Button
+							onClick={onPickAttachment}
+							disabled={selectedAttachmentId === undefined}
+							className="h-20 text-3xl"
+						>
+							Pick attachment
+						</Button>
+					</div>
+				</Modal>
+			)}
 
-				<div
-					style={{ marginTop: headerHeight ?? 0 }}
-					className="flex-[0.75]"
-				>
-					<SpecificFeedbackColumn
-						feedbackList={specificFeedbackList.filter(
-							(_, index) => index % 2 === 1
-						)}
-						getSubmissionTextOffset={
-							submissionRef.current
-								? submissionRef.current.getTextOffset
-								: () => 0
-						}
-						onGetFollowUp={onGetFollowUp}
-						onStateChange={({ paragraph, sentence, update }) =>
-							setSpecificFeedbackList(
-								produce((feedbackList) => {
-									const feedback = feedbackList.find(
-										(feedback) =>
-											feedback.paragraph === paragraph &&
-											feedback.sentence === sentence
-									)
+			<div
+				style={{ marginTop: headerHeight ?? 0 }}
+				className="flex-[0.75]"
+			>
+				<SpecificFeedbackColumn
+					feedbackList={specificFeedbackList.filter(
+						(_, index) => index % 2 === 1
+					)}
+					getSubmissionTextOffset={
+						submissionRef.current
+							? submissionRef.current.getTextOffset
+							: () => 0
+					}
+					onGetFollowUp={onGetFollowUp}
+					onStateChange={({ paragraph, sentence, update }) =>
+						setSpecificFeedbackList(
+							produce((feedbackList) => {
+								const feedback = feedbackList.find(
+									(feedback) =>
+										feedback.paragraph === paragraph &&
+										feedback.sentence === sentence
+								)
 
-									if (!feedback) return
+								if (!feedback) return
 
-									feedback.state = update(feedback.state)
-								})
-							)
-						}
-					/>
-				</div>
+								feedback.state = update(feedback.state)
+							})
+						)
+					}
+				/>
+			</div>
 
-				<div className="relative flex basis-[704px] flex-col">
-					<div ref={headerRef} className="min-h-12 flex flex-col">
-						<div className="flex items-end justify-between">
-							<div className="select-text text-2xl font-bold">
-								{assignment.title}
-							</div>
-
-							{/* not sure why this is even necessary with justify-between */}
-							<div className="flex-1" />
-
-							<div className="flex-shrink-0">
-								{submissionEmpty && submissions.length > 0 ? (
-									<Button
-										onClick={() => setModal("submission")}
-										className="text-lg"
-									>
-										Import submission
-									</Button>
-								) : editing ? (
-									<Button
-										onClick={onGetFeedback}
-										disabled={submissionEmpty}
-										className="text-lg"
-									>
-										Get feedback
-									</Button>
-								) : generating ? (
-									<Button disabled className="text-lg">
-										{specificFeedbackList.length > 0
-											? "Generating feedback..."
-											: "Analyzing work..."}
-									</Button>
-								) : (
-									<Button
-										onClick={onTryAgain}
-										className="text-lg"
-									>
-										Try again
-									</Button>
-								)}
-							</div>
+			<div className="relative flex basis-[704px] flex-col">
+				<div ref={headerRef} className="min-h-12 flex flex-col">
+					<div className="flex items-end justify-between">
+						<div className="select-text text-2xl font-bold">
+							{assignment.title}
 						</div>
 
-						{assignment.description !== undefined && (
-							<p className="mt-3.5 mb-0.5 select-text text-sm opacity-60">
-								{assignment.description}
-							</p>
-						)}
+						{/* not sure why this is even necessary with justify-between */}
+						<div className="flex-1" />
+
+						<div className="flex-shrink-0">
+							{submissionEmpty && submissions.length > 0 ? (
+								<Button
+									onClick={() => setModal("submission")}
+									className="text-lg"
+								>
+									Import submission
+								</Button>
+							) : editing ? (
+								<Button
+									onClick={onGetFeedback}
+									disabled={submissionEmpty}
+									className="text-lg"
+								>
+									Get feedback
+								</Button>
+							) : generating ? (
+								<Button disabled className="text-lg">
+									{specificFeedbackList.length > 0
+										? "Generating feedback..."
+										: "Analyzing work..."}
+								</Button>
+							) : (
+								<Button
+									onClick={onTryAgain}
+									className="text-lg"
+								>
+									Try again
+								</Button>
+							)}
+						</div>
 					</div>
 
-					<hr className="mt-2 mb-3" />
-
-					<Submission
-						editing={editing}
-						onChangeEmpty={setSubmissionEmpty}
-						specificFeedbackList={specificFeedbackList}
-						onSpecificFeedbackStateChange={({
-							paragraph,
-							sentence,
-							update,
-						}) =>
-							setSpecificFeedbackList(
-								produce((feedbackList) => {
-									const feedback = feedbackList.find(
-										(feedback) =>
-											feedback.paragraph === paragraph &&
-											feedback.sentence === sentence
-									)
-
-									if (!feedback) return
-
-									feedback.state = update(feedback.state)
-								})
-							)
-						}
-						ref={submissionRef}
-					/>
-
-					<AnimatePresence>
-						{generalFeedback !== undefined && (
-							<GeneralFeedback
-								{...generalFeedback}
-								onGetFollowUp={(followUps) =>
-									onGetFollowUp({ followUps })
-								}
-								onStateChange={(update) =>
-									setGeneralFeedback(
-										(generalFeedback) =>
-											generalFeedback && {
-												...generalFeedback,
-												state: update(
-													generalFeedback.state
-												),
-											}
-									)
-								}
-								submissionWidth={submissionWidth ?? 0}
-							/>
-						)}
-					</AnimatePresence>
+					{assignment.description !== undefined && (
+						<p className="mt-3.5 mb-0.5 select-text text-sm opacity-60">
+							{assignment.description}
+						</p>
+					)}
 				</div>
 
-				<div
-					style={{ marginTop: headerHeight ?? 0 }}
-					className="flex-1"
-				>
-					<SpecificFeedbackColumn
-						feedbackList={specificFeedbackList.filter(
-							(_, index) => index % 2 === 0
-						)}
-						getSubmissionTextOffset={
-							submissionRef.current
-								? submissionRef.current.getTextOffset
-								: () => 0
-						}
-						onGetFollowUp={onGetFollowUp}
-						onStateChange={({ paragraph, sentence, update }) =>
-							setSpecificFeedbackList(
-								produce((feedbackList) => {
-									const feedback = feedbackList.find(
-										(feedback) =>
-											feedback.paragraph === paragraph &&
-											feedback.sentence === sentence
-									)
+				<hr className="mt-2 mb-3" />
 
-									if (!feedback) return
+				<Submission
+					editing={editing}
+					onChangeEmpty={setSubmissionEmpty}
+					specificFeedbackList={specificFeedbackList}
+					onSpecificFeedbackStateChange={({
+						paragraph,
+						sentence,
+						update,
+					}) =>
+						setSpecificFeedbackList(
+							produce((feedbackList) => {
+								const feedback = feedbackList.find(
+									(feedback) =>
+										feedback.paragraph === paragraph &&
+										feedback.sentence === sentence
+								)
 
-									feedback.state = update(feedback.state)
-								})
-							)
-						}
-					/>
-				</div>
+								if (!feedback) return
+
+								feedback.state = update(feedback.state)
+							})
+						)
+					}
+					ref={submissionRef}
+				/>
+
+				<AnimatePresence>
+					{generalFeedback !== undefined && (
+						<GeneralFeedback
+							{...generalFeedback}
+							onGetFollowUp={(followUps) =>
+								onGetFollowUp({ followUps })
+							}
+							onStateChange={(update) =>
+								setGeneralFeedback(
+									(generalFeedback) =>
+										generalFeedback && {
+											...generalFeedback,
+											state: update(
+												generalFeedback.state
+											),
+										}
+								)
+							}
+							submissionWidth={submissionWidth ?? 0}
+						/>
+					)}
+				</AnimatePresence>
+			</div>
+
+			<div style={{ marginTop: headerHeight ?? 0 }} className="flex-1">
+				<SpecificFeedbackColumn
+					feedbackList={specificFeedbackList.filter(
+						(_, index) => index % 2 === 0
+					)}
+					getSubmissionTextOffset={
+						submissionRef.current
+							? submissionRef.current.getTextOffset
+							: () => 0
+					}
+					onGetFollowUp={onGetFollowUp}
+					onStateChange={({ paragraph, sentence, update }) =>
+						setSpecificFeedbackList(
+							produce((feedbackList) => {
+								const feedback = feedbackList.find(
+									(feedback) =>
+										feedback.paragraph === paragraph &&
+										feedback.sentence === sentence
+								)
+
+								if (!feedback) return
+
+								feedback.state = update(feedback.state)
+							})
+						)
+					}
+				/>
 			</div>
 		</div>
 	)
@@ -696,6 +695,7 @@ const Submission = forwardRef<
 		getText: () => string | undefined
 		getTextOffset: ({}: { paragraph: number }) => number
 		getWidth: () => number | undefined
+		getHTML: () => string
 		setHTML: (html: string) => void
 	},
 	{
@@ -1026,6 +1026,7 @@ const Submission = forwardRef<
 
 						return textOffset
 					},
+					getHTML: () => ref.current?.innerHTML ?? "",
 					setHTML: (html) => {
 						if (ref.current) {
 							const empty =
@@ -1173,11 +1174,6 @@ const GeneralFeedback = ({
 				<motion.div
 					onClick={() => {
 						onStateChange(() => "focus")
-
-						scrollerRef.current?.scroll({
-							top: scrollerRef.current.scrollHeight,
-							behavior: "smooth",
-						})
 					}}
 					initial={{ opacity: 0, y: 25 }}
 					animate={{ opacity: 1, y: 0 }}
@@ -1482,11 +1478,6 @@ const SpecificFeedbackItem: React.FC<{
 				ref={scrollerRef}
 				onClick={() => {
 					onStateChange(() => "focus")
-
-					scrollerRef.current?.scroll({
-						top: scrollerRef.current.scrollHeight,
-						behavior: "smooth",
-					})
 				}}
 				className="max-h-[384px] overflow-y-scroll overscroll-none"
 			>

@@ -1,5 +1,5 @@
 import { cookies } from "next/headers"
-import { eq } from "drizzle-orm"
+import { and, eq, gt, isNotNull, isNull, or } from "drizzle-orm"
 import Link from "next/link"
 
 import Card from "~/components/Card"
@@ -38,7 +38,15 @@ const HomePage = async () => {
 				assignment,
 				eq(assignment.courseId, teacherToCourse.courseId)
 			)
-			.where(eq(teacherToCourse.teacherEmail, email))
+			.where(
+				and(
+					eq(teacherToCourse.teacherEmail, email),
+					or(
+						gt(assignment.dueAt, new Date()),
+						isNull(assignment.dueAt)
+					)
+				)
+			)
 			.then((rows) => ({
 				isTeaching: rows.length !== 0,
 				assignmentsTeaching: rows
@@ -68,7 +76,15 @@ const HomePage = async () => {
 				assignment,
 				eq(assignment.courseId, studentToCourse.courseId)
 			)
-			.where(eq(studentToCourse.studentEmail, email))
+			.where(
+				and(
+					eq(studentToCourse.studentEmail, email),
+					or(
+						gt(assignment.dueAt, new Date()),
+						isNull(assignment.dueAt)
+					)
+				)
+			)
 			.then((rows) => ({
 				isEnrolled: rows.length !== 0,
 				assignmentsEnrolled: rows

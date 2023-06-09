@@ -11,9 +11,10 @@ const registerInsightsAction = zact(
 	z.object({
 		courseId: z.string(),
 		assignmentId: z.string(),
+		submission: z.string(),
 		insights: insightsSchema,
 	})
-)(async ({ courseId, assignmentId, insights }) => {
+)(async ({ courseId, assignmentId, submission, insights }) => {
 	const { email } = await getAuthOrThrow({ cookies: cookies() })
 
 	const role = await User({ email }).courseRole({ id: courseId })
@@ -21,6 +22,7 @@ const registerInsightsAction = zact(
 	if (role !== "student") return
 
 	await Insight({ courseId, assignmentId, studentEmail: email }).upsert({
+		submission,
 		insights,
 	})
 })

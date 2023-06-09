@@ -19,6 +19,7 @@ interface Props {
 	teacherEmailsPromise: Promise<string[]>
 	studentEmailsPromise: Promise<string[]>
 	role: "teacher" | "student"
+	anyIndexedResource: boolean
 }
 
 const ClassTabs: React.FC<Props> = ({
@@ -26,6 +27,7 @@ const ClassTabs: React.FC<Props> = ({
 	teacherEmailsPromise,
 	studentEmailsPromise,
 	role,
+	anyIndexedResource,
 }) => {
 	const [settingsModalOpen, setSettingsModalOpen] = useState(false)
 
@@ -42,9 +44,9 @@ const ClassTabs: React.FC<Props> = ({
 					People
 				</LinkButton>
 
-				{role === "teacher" && (
-					<LinkButton href={`/class/${course.id}/insights`}>
-						Insights
+				{anyIndexedResource && (
+					<LinkButton href={`/class/${course.id}/chat`}>
+						Chat
 					</LinkButton>
 				)}
 			</div>

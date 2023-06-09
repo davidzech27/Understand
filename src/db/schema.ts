@@ -127,6 +127,7 @@ export const insight = mysqlTable(
 		courseId: varchar("course_id", { length: 100 }).notNull(),
 		assignmentId: varchar("assignment_id", { length: 100 }).notNull(),
 		studentEmail: varchar("student_email", { length: 100 }).notNull(),
+		submission: text("submission"),
 		insights: json("insights").notNull(),
 		synced: boolean("synced").notNull(),
 	},

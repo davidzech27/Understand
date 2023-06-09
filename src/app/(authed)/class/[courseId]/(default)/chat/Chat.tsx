@@ -2,7 +2,7 @@
 import { useRef, useState } from "react"
 import { Send } from "lucide-react"
 
-import getSimilarResourcesAction from "./getSimilarResourcesAction"
+import getSimilarResourcesAction from "../getSimilarResourcesAction"
 import fetchOpenAIStream from "~/ai/fetchOpenAIStream"
 import TextArea from "~/components/TextArea"
 import cn from "~/utils/cn"

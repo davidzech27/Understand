@@ -44,17 +44,17 @@ The following is feedback provided to the student on their entire work:
 ${generalFeedback}
 </general-feedback>
 
-Provide the student's teacher with a few statements about the student in general using the following format:
+Provide the student's teacher with a few statements about the student's understanding of the subject using the following format:
 Type: {strength/weakness}
-Paragraph number: {paragraph number(s) for every paragraph where strength/weakness can be found, or -1 if it applies to student's entire work}
-Content: {the statement about the student in general. If it is a weakness, hypothesize as to where and why the student's understanding falters.}
+Paragraph number: {paragraph number(s) for every paragraph where strength/weakness can be found, using a comma-separated list if necessary, or -1 if it applies to student's entire work}
+Content: {a statement about the student's understanding of the subject. If it is a weakness, hypothesize as to what may have caused this weakness}
 
-Use a numbered list. Begin.`,
+Begin.`,
 				},
 			],
 			model: "gpt-4",
-			presencePenalty: 0,
-			frequencyPenalty: 0,
+			presencePenalty: 0.5,
+			frequencyPenalty: 0.5,
 			temperature: 0,
 			onContent: () => {},
 			onFinish: res,
@@ -68,7 +68,7 @@ Use a numbered list. Begin.`,
 		.map((insight) => ({
 			type:
 				insight
-					.match(/(?<=^(Insights:[ ]+)?\d\.[ ]Type:[ ]).+/g)?.[0]
+					.match(/(?<=^(Insights:[ ]+)?Type:[ ]).+/g)?.[0]
 					.toLowerCase() === "strength"
 					? ("strength" as const)
 					: ("weakness" as const),
