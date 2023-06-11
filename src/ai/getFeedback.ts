@@ -112,8 +112,8 @@ Begin, and be interesting.`,
 			],
 			model: "gpt-4" as const,
 			temperature: 0,
-			presencePenalty: 0.35, // setting this and the one below made a huge difference. my theory is that it decreases the model's bias to take on a similar writing style to that of the prompt, increasing its likelihood to follow the instructions and not just attempt to match them in style. consider tweaking these further
-			frequencyPenalty: 0.35,
+			presencePenalty: 0.4, // setting this and the one below made a huge difference. my theory is that it decreases the model's bias to take on a similar writing style to that of the prompt, increasing its likelihood to follow the instructions and not just attempt to match them in style. consider tweaking these further
+			frequencyPenalty: 0.4,
 		}
 
 	fetchOpenAIStream({
@@ -143,8 +143,9 @@ Begin, and be interesting.`,
 
 				if (lastLine !== undefined) {
 					if (
-						lastLine.search(/^\s*Paragraph( number)?:? ?\d+:?$/) !==
-						-1
+						lastLine.search(
+							/^(\d\.[ ])?\s*Paragraph( number)?:? ?\d+:?$/
+						) !== -1
 					) {
 						lastParagraphNumber = Number(
 							lastLine.match(/\d+/g)?.at(-1)

@@ -1,7 +1,14 @@
 import { and, eq } from "drizzle-orm"
 
 import db from "~/db/db"
-import { user, course, studentToCourse, teacherToCourse } from "~/db/schema"
+import {
+	user,
+	course,
+	studentToCourse,
+	teacherToCourse,
+	studentInsight,
+	insight,
+} from "~/db/schema"
 
 const User = ({ email }: { email: string }) => ({
 	create: async ({
@@ -51,6 +58,10 @@ const User = ({ email }: { email: string }) => ({
 			db
 				.delete(studentToCourse)
 				.where(eq(studentToCourse.studentEmail, email)),
+			db.delete(insight).where(eq(insight.studentEmail, email)),
+			db
+				.delete(studentInsight)
+				.where(eq(studentInsight.studentEmail, email)),
 		])
 	},
 	courses: async () => {

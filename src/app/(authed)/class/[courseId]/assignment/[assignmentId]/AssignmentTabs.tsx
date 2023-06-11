@@ -26,40 +26,40 @@ const AssignmentTabs: React.FC<Props> = ({ role, assignment }) => {
 	const [feedbackLinkCopied, setFeedbackLinkCopied] = useState(false)
 
 	return (
-		<div className="flex items-center justify-between">
-			<div className="flex space-x-1.5">
-				<LinkButton
-					href={`/class/${assignment.courseId}/assignment/${assignment.assignmentId}`}
-				>
-					Overview
-				</LinkButton>
+		<div className="flex items-center space-x-1.5">
+			<LinkButton
+				href={`/class/${assignment.courseId}/assignment/${assignment.assignmentId}`}
+			>
+				Overview
+			</LinkButton>
 
-				<LinkButton
-					href={`/class/${assignment.courseId}/assignment/${assignment.assignmentId}/insights`}
-				>
-					Insights
-				</LinkButton>
+			<LinkButton
+				href={`/class/${assignment.courseId}/assignment/${assignment.assignmentId}/insights`}
+			>
+				Insights
+			</LinkButton>
 
-				{assignment.instructions !== undefined && (
-					<Button
-						onClick={() => {
-							navigator.clipboard.writeText(
-								window.location.href.replace(
-									"assignment",
-									"feedback"
-								)
+			<div className="flex-1" />
+
+			{assignment.instructions !== undefined && (
+				<Button
+					onClick={() => {
+						navigator.clipboard.writeText(
+							window.location.href.replace(
+								"assignment",
+								"feedback"
 							)
+						)
 
-							setFeedbackLinkCopied(true)
-						}}
-						className="text-base"
-					>
-						{!feedbackLinkCopied
-							? "Copy student feedback link"
-							: "Student feedback link copied"}
-					</Button>
-				)}
-			</div>
+						setFeedbackLinkCopied(true)
+					}}
+					className="text-base"
+				>
+					{!feedbackLinkCopied
+						? "Copy student feedback link"
+						: "Student feedback link copied"}
+				</Button>
+			)}
 
 			<div
 				onClick={() => setSettingsModalOpen(true)}

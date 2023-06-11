@@ -9,6 +9,9 @@ import {
 	assignment,
 	feedback,
 	followUp,
+	insight,
+	studentInsight,
+	assignmentInsight,
 } from "~/db/schema"
 import Resource from "./Resource"
 
@@ -88,6 +91,11 @@ const Course = ({ id }: { id: string }) => ({
 			db.delete(feedback).where(eq(feedback.courseId, id)),
 			db.delete(followUp).where(eq(followUp.courseId, id)),
 			Resource({ courseId: id }).delete({ filter: {} }),
+			db.delete(insight).where(eq(insight.courseId, id)),
+			db.delete(studentInsight).where(eq(studentInsight.courseId, id)),
+			db
+				.delete(assignmentInsight)
+				.where(eq(assignmentInsight.courseId, id)),
 		])
 	},
 	linkedRefreshToken: async () => {

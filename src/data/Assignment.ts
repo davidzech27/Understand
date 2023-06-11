@@ -1,7 +1,14 @@
 import { eq, and } from "drizzle-orm"
 
 import db from "~/db/db"
-import { assignment, feedback, followUp } from "~/db/schema"
+import {
+	assignment,
+	assignmentInsight,
+	feedback,
+	followUp,
+	insight,
+	studentInsight,
+} from "~/db/schema"
 import Resource from "./Resource"
 
 const Assignment = ({
@@ -170,6 +177,22 @@ const Assignment = ({
 					instructionsForAssignmentId: assignmentId,
 				},
 			}),
+			db
+				.delete(insight)
+				.where(
+					and(
+						eq(insight.courseId, courseId),
+						eq(insight.assignmentId, assignmentId)
+					)
+				),
+			db
+				.delete(assignmentInsight)
+				.where(
+					and(
+						eq(assignmentInsight.courseId, courseId),
+						eq(assignmentInsight.assignmentId, assignmentId)
+					)
+				),
 		])
 	},
 })

@@ -1333,7 +1333,7 @@ const SpecificFeedbackColumn: React.FC<{
 									? 20
 									: 0),
 						}}
-						className="absolute left-4 right-4 backdrop-blur-sm"
+						className="absolute left-4 right-4"
 					>
 						<SpecificFeedbackItem
 							content={feedback.content}
