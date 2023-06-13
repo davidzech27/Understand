@@ -1214,7 +1214,7 @@ const GeneralFeedback = ({
 						{followUps.map((followUp, index) => (
 							<div
 								key={index}
-								className="border-t border-border px-4 py-2.5 even:font-medium even:opacity-50"
+								className="border-t border-border px-4 py-2.5 odd:opacity-80 even:font-medium even:opacity-40"
 							>
 								<p className="select-text whitespace-pre-line">
 									{followUp}
@@ -1234,7 +1234,7 @@ const GeneralFeedback = ({
 								"overflow-hidden rounded-b-md bg-surface-hover transition-all"
 							)}
 						>
-							<div className="border-t border-border p-1">
+							<div className="border-t border-border p-1 opacity-80">
 								<TextArea
 									value={followUpInput}
 									setValue={setFollowUpInput}
@@ -1502,7 +1502,7 @@ const SpecificFeedbackItem: React.FC<{
 					// figure out if 1px or 0.75px border looks better
 					<div
 						key={index}
-						className="border-t border-border px-3 py-2 even:font-medium even:opacity-50"
+						className="border-t border-border px-3 py-2 odd:opacity-80 even:font-medium even:opacity-40"
 					>
 						<p className="select-text whitespace-pre-line opacity-80">
 							{followUp}
@@ -1523,7 +1523,7 @@ const SpecificFeedbackItem: React.FC<{
 					state === undefined && "delay-150"
 				)}
 			>
-				<div className="border-t border-border p-1">
+				<div className="border-t border-border p-1 opacity-80">
 					<TextArea
 						value={followUpInput}
 						setValue={setFollowUpInput}
