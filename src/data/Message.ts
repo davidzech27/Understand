@@ -121,7 +121,7 @@ const Message = ({ courseId }: { courseId: string }) => {
 					sentAt,
 				}))
 				.map(({ from, content, sentAt }) =>
-					from.name !== undefined && from.photo !== undefined
+					from.name !== undefined
 						? { from, content, sentAt }
 						: undefined
 				)
