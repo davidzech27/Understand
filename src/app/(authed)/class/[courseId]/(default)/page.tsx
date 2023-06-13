@@ -4,6 +4,7 @@ import Card from "~/components/Card"
 import User from "~/data/User"
 import { getAuthOrThrow } from "~/auth/jwt"
 import FeedbackHistory from "./FeedbackHistory"
+import MessageBoard from "./MessageBoard"
 import Course from "~/data/Course"
 
 interface Params {
@@ -39,7 +40,11 @@ const ClassPage = async ({ params: { courseId } }: { params: Params }) => {
 			</Card>
 		)
 	} else if (role === "student") {
-		return <Card className="flex flex-1 flex-col py-5 px-6">{null}</Card>
+		return (
+			<Card className="flex flex-1 flex-col py-5 px-6">
+				<MessageBoard courseId={courseId} />
+			</Card>
+		)
 	}
 }
 

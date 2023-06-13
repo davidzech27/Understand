@@ -183,8 +183,8 @@ const Resource = ({ courseId }: { courseId: string }) => {
 						queryRequest: {
 							vector: Array(1536).fill(0),
 							filter,
-							namespace,
 							topK: 10_000,
+							namespace,
 						},
 					})
 				).matches?.map(({ id }) => id)
