@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm"
+import { desc, eq, and, lt } from "drizzle-orm"
 
 import db from "~/db/db"
 import {
@@ -188,6 +188,66 @@ const Course = ({ id }: { id: string }) => ({
 			linkedUrl: assignment.linkedUrl ?? undefined,
 			instructionsLinked: assignment.instructionsLinked ?? false,
 		}))
+	},
+	feedbackHistory: async ({
+		limit,
+		cursor,
+	}: {
+		limit: number
+		cursor?: number
+	}) => {
+		const feedbackHistory = (
+			await db
+				.select({
+					assignmentId: assignment.assignmentId,
+					assignmentTitle: assignment.title,
+					userEmail: user.email,
+					userName: user.name,
+					userPhoto: user.photo,
+					givenAt: feedback.givenAt,
+				})
+				.from(feedback)
+				.where(
+					cursor === undefined
+						? eq(feedback.courseId, id)
+						: and(
+								eq(feedback.courseId, id),
+								lt(feedback.givenAt, new Date(cursor))
+						  )
+				)
+				.orderBy(desc(feedback.givenAt))
+				.limit(limit)
+				.innerJoin(user, eq(user.email, feedback.userEmail))
+				.innerJoin(
+					assignment,
+					and(
+						eq(assignment.courseId, id),
+						eq(assignment.assignmentId, feedback.assignmentId)
+					)
+				)
+		).map(({ givenAt, userPhoto, ...feedback }) => ({
+			...feedback,
+			givenAt: new Date(
+				Date.UTC(
+					givenAt.getFullYear(),
+					givenAt.getMonth(),
+					givenAt.getDate(),
+					givenAt.getHours(),
+					givenAt.getMinutes(),
+					givenAt.getSeconds(),
+					givenAt.getMilliseconds()
+				)
+			),
+			userPhoto: userPhoto ?? undefined,
+		}))
+
+		return {
+			feedbackHistory,
+			cursor:
+				feedbackHistory.length === limit
+					? feedbackHistory.at(-1)?.givenAt.valueOf()
+					: undefined,
+		}
 	},
 })
 

@@ -68,6 +68,15 @@ export const getCredentialsFromRefreshToken = async (refreshToken: string) => {
 
 	if (tokens === undefined) throw new Error("No Google tokens")
 
+	if ("error" in tokens)
+		throw new Error(
+			`Google credentials error: ${tokens.error}${
+				"error_description" in tokens
+					? `: ${tokens.error_description}`
+					: ""
+			}`
+		)
+
 	return tokensSchema.parse({
 		accessToken: tokens?.access_token,
 		refreshToken,

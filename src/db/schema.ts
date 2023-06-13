@@ -83,6 +83,7 @@ export const feedback = mysqlTable(
 		userEmail: varchar("user_email", { length: 100 }).notNull(),
 		givenAt: datetime("given_at").notNull(),
 		submission: text("submission").notNull(),
+		submissionHTML: text("submission_html"),
 		rawResponse: text("raw_response").notNull(),
 		metadata: json("metadata").notNull(),
 	},
@@ -93,6 +94,7 @@ export const feedback = mysqlTable(
 			table.userEmail,
 			table.givenAt
 		),
+		idx: index("course_id_given_at_idx").on(table.courseId, table.givenAt),
 	})
 )
 

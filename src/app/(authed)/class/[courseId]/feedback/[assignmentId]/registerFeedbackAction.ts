@@ -12,35 +12,46 @@ const registerFeedbackAction = zact(
 		courseId: z.string(),
 		assignmentId: z.string(),
 		submission: z.string(),
+		submissionHTML: z.string(),
 		rawResponse: z.string(),
 		metadata: z.record(z.unknown()),
 	})
-)(async ({ courseId, assignmentId, submission, rawResponse, metadata }) => {
-	const { email } = await getAuthOrThrow({ cookies: cookies() })
+)(
+	async ({
+		courseId,
+		assignmentId,
+		submission,
+		submissionHTML,
+		rawResponse,
+		metadata,
+	}) => {
+		const { email } = await getAuthOrThrow({ cookies: cookies() })
 
-	const role = await User({ email }).courseRole({ id: courseId })
+		const role = await User({ email }).courseRole({ id: courseId })
 
-	const givenAt = new Date()
+		const givenAt = new Date()
 
-	if (role === "none")
+		if (role === "none")
+			return {
+				givenAt,
+			}
+
+		await Feedback({
+			courseId,
+			assignmentId,
+			userEmail: email,
+			givenAt,
+		}).create({
+			submission,
+			submissionHTML,
+			rawResponse,
+			metadata,
+		})
+
 		return {
 			givenAt,
 		}
-
-	await Feedback({
-		courseId,
-		assignmentId,
-		userEmail: email,
-		givenAt,
-	}).create({
-		submission,
-		rawResponse,
-		metadata,
-	})
-
-	return {
-		givenAt,
 	}
-})
+)
 
 export default registerFeedbackAction

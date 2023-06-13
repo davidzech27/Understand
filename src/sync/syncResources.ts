@@ -427,7 +427,7 @@ const syncResources = async ({ courseId }: { courseId: string }) => {
 		),
 	]
 
-	console.log("Assignment ids to sync: ", assignmentIdsToSync)
+	console.info("Assignment ids to sync: ", assignmentIdsToSync)
 
 	return {
 		assignmentIdsToSync,

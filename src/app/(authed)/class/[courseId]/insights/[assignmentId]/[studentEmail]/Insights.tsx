@@ -1,8 +1,8 @@
 "use client"
-import { useRef, useState, useEffect, useMemo } from "react"
+import { useRef, useState, useEffect } from "react"
 import { renderToStaticMarkup } from "react-dom/server"
 
-import colors from "~/colors.cjs"
+import { motion } from "framer-motion"
 import cn from "~/utils/cn"
 
 interface Props {
@@ -165,7 +165,13 @@ const Insights: React.FC<Props> = ({ assignment, insights, submission }) => {
 						.filter((insight) => insight.paragraphs[0] !== -1)
 						.filter((_, index) => index % 2 === 1)
 						.map(({ content }, index) => (
-							<div
+							<motion.div
+								initial={{ opacity: 0, y: 10 }}
+								animate={{ opacity: 0.8, y: 0 }}
+								transition={{
+									duration: 0.35,
+									ease: "easeOut",
+								}}
 								onMouseEnter={() =>
 									setInsightHovers((hovers) => [
 										...hovers.slice(0, index * 2 + 1),
@@ -183,14 +189,14 @@ const Insights: React.FC<Props> = ({ assignment, insights, submission }) => {
 								key={index}
 								style={{ top: tops[index * 2 + 1] }}
 								className={cn(
-									"absolute left-4 right-4 rounded-md border-[0.75px] border-border bg-surface px-3 py-2 opacity-80 shadow-[#E5E5E5]",
+									"absolute left-4 right-4 select-text rounded-md border-[0.75px] border-border bg-surface px-3 py-2 shadow-[#E5E5E5]",
 									insightHovers[index * 2 + 1]
 										? "shadow-md"
 										: "shadow-sm"
 								)}
 							>
 								{content}
-							</div>
+							</motion.div>
 						))}
 			</div>
 
@@ -224,7 +230,7 @@ const Insights: React.FC<Props> = ({ assignment, insights, submission }) => {
 						.map(({ content }, index) => (
 							<div
 								key={index}
-								className="rounded-md border-[0.75px] border-border bg-surface px-3 py-2 opacity-80 shadow-sm shadow-[#E5E5E5]"
+								className="select-text rounded-md border-[0.75px] border-border bg-surface px-3 py-2 opacity-80 shadow-sm shadow-[#E5E5E5]"
 							>
 								{content}
 							</div>
@@ -245,7 +251,13 @@ const Insights: React.FC<Props> = ({ assignment, insights, submission }) => {
 						.filter((insight) => insight.paragraphs[0] !== -1)
 						.filter((_, index) => index % 2 === 0)
 						.map(({ content }, index) => (
-							<div
+							<motion.div
+								initial={{ opacity: 0, y: 10 }}
+								animate={{ opacity: 0.8, y: 0 }}
+								transition={{
+									duration: 0.35,
+									ease: "easeOut",
+								}}
 								onMouseEnter={() =>
 									setInsightHovers((hovers) => [
 										...hovers.slice(0, index * 2),
@@ -263,14 +275,14 @@ const Insights: React.FC<Props> = ({ assignment, insights, submission }) => {
 								key={index}
 								style={{ top: tops[index * 2] }}
 								className={cn(
-									"absolute left-4 right-4 rounded-md border-[0.75px] border-border bg-surface px-3 py-2 opacity-80 shadow-[#E5E5E5]",
+									"absolute left-4 right-4 select-text rounded-md border-[0.75px] border-border bg-surface px-3 py-2 shadow-[#E5E5E5]",
 									insightHovers[index * 2]
 										? "shadow-md"
 										: "shadow-sm"
 								)}
 							>
 								{content}
-							</div>
+							</motion.div>
 						))}
 			</div>
 		</div>

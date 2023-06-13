@@ -9,7 +9,7 @@ interface Props {
 const FormattedDate: React.FC<Props> = ({ date, prefix }) => {
 	const timeString = `${
 		(date.getHours() % 12) + (date.getHours() % 12 === 0 ? 12 : 0)
-	}:${date.getMinutes()} ${
+	}:${date.getMinutes() < 10 ? "0" : ""}${date.getMinutes()} ${
 		date.getHours() >= 12 && date.getHours() !== 24 ? "PM" : "AM"
 	}`
 

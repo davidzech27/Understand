@@ -245,6 +245,7 @@ const Feedback: React.FC<Props> = ({
 						courseId: assignment.courseId,
 						assignmentId: assignment.assignmentId,
 						submission: submissionInput,
+						submissionHTML: submissionHTML ?? "",
 						rawResponse,
 						metadata: {
 							model,
@@ -271,7 +272,7 @@ const Feedback: React.FC<Props> = ({
 						},
 					})
 
-					console.log("Feedback: ", rawResponse)
+					console.info(rawResponse)
 
 					if (role === "student")
 						getInsights({
@@ -280,6 +281,8 @@ const Feedback: React.FC<Props> = ({
 							specificFeedback,
 							generalFeedback,
 						}).then((insights) => {
+							console.info(insights)
+
 							registerInsightsAction({
 								courseId: assignment.courseId,
 								assignmentId: assignment.assignmentId,
@@ -815,44 +818,51 @@ const Submission = forwardRef<
 
 					child.innerHTML = newParagraphHTML
 
-					const highlightSpan = document.getElementById(highlightId)
+					break
+				}
+			}
 
-					if (highlightSpan === null) {
-						console.error(
-							"This shouldn't happen. Span corresponding to feedback element should be in DOM"
-						)
+			for (const { paragraph, sentence } of specificFeedbackList) {
+				const highlightId = getDomIdOfSpecificFeedbackHighlight({
+					paragraph,
+					sentence,
+				})
 
-						break
-					}
+				const highlightSpan = document.getElementById(highlightId)
 
-					highlightSpan.addEventListener("click", () =>
-						onSpecificFeedbackStateChange({
-							paragraph,
-							sentence,
-							update: () => "focus",
-						})
-					)
-
-					highlightSpan.addEventListener("pointerenter", () =>
-						onSpecificFeedbackStateChange({
-							paragraph,
-							sentence,
-							update: (prevState) =>
-								prevState === "focus" ? "focus" : "hover",
-						})
-					)
-
-					highlightSpan.addEventListener("pointerleave", () =>
-						onSpecificFeedbackStateChange({
-							paragraph,
-							sentence,
-							update: (prevState) =>
-								prevState === "focus" ? "focus" : undefined,
-						})
+				if (highlightSpan === null) {
+					console.error(
+						"This shouldn't happen. Span corresponding to feedback element should be in DOM"
 					)
 
 					break
 				}
+
+				highlightSpan.addEventListener("click", () =>
+					onSpecificFeedbackStateChange({
+						paragraph,
+						sentence,
+						update: () => "focus",
+					})
+				)
+
+				highlightSpan.addEventListener("pointerenter", () =>
+					onSpecificFeedbackStateChange({
+						paragraph,
+						sentence,
+						update: (prevState) =>
+							prevState === "focus" ? "focus" : "hover",
+					})
+				)
+
+				highlightSpan.addEventListener("pointerleave", () =>
+					onSpecificFeedbackStateChange({
+						paragraph,
+						sentence,
+						update: (prevState) =>
+							prevState === "focus" ? "focus" : undefined,
+					})
+				)
 			}
 		}
 
@@ -1469,7 +1479,7 @@ const SpecificFeedbackItem: React.FC<{
 			{...focusWithinProps}
 			{...hoverProps}
 			className={cn(
-				"group absolute flex flex-col rounded-md border border-border bg-surface opacity-80 shadow-sm shadow-[#E5E5E5] transition-shadow duration-500",
+				"group absolute flex flex-col rounded-md border border-border bg-surface shadow-sm shadow-[#E5E5E5] transition-shadow duration-500",
 				state === "focus" && "shadow-lg",
 				state === "hover" && "shadow-lg"
 			)}
@@ -1479,10 +1489,12 @@ const SpecificFeedbackItem: React.FC<{
 				onClick={() => {
 					onStateChange(() => "focus")
 				}}
-				className="max-h-[384px] overflow-y-scroll overscroll-none"
+				className="max-h-[300px] overflow-y-scroll overscroll-none"
 			>
 				<div className="px-3 py-2">
-					<p className="select-text whitespace-pre-line">{content}</p>
+					<p className="select-text whitespace-pre-line opacity-80">
+						{content}
+					</p>
 				</div>
 
 				{followUps.map((followUp, index) => (
@@ -1492,7 +1504,7 @@ const SpecificFeedbackItem: React.FC<{
 						key={index}
 						className="border-t border-border px-3 py-2 even:font-medium even:opacity-50"
 					>
-						<p className="select-text whitespace-pre-line">
+						<p className="select-text whitespace-pre-line opacity-80">
 							{followUp}
 						</p>
 					</div>

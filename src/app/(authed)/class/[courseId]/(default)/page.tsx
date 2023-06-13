@@ -1,17 +1,46 @@
-import { notFound } from "next/navigation"
 import { cookies } from "next/headers"
 
-import Course from "~/data/Course"
 import Card from "~/components/Card"
 import User from "~/data/User"
 import { getAuthOrThrow } from "~/auth/jwt"
+import FeedbackHistory from "./FeedbackHistory"
+import Course from "~/data/Course"
 
 interface Params {
 	courseId: string
 }
 // have student feedback activity with links to feedback
 const ClassPage = async ({ params: { courseId } }: { params: Params }) => {
-	return <Card className="flex flex-1 flex-col py-5 px-6">{null}</Card>
+	const { email } = await getAuthOrThrow({ cookies: cookies() })
+
+	const role = await User({ email }).courseRole({ id: courseId })
+
+	if (role === "teacher") {
+		const { feedbackHistory, cursor } = await Course({
+			id: courseId,
+		}).feedbackHistory({
+			limit: 20,
+		})
+
+		return (
+			<Card className="flex flex-1 flex-col space-y-2 py-5 px-6">
+				{feedbackHistory.length !== 0 ? (
+					<FeedbackHistory
+						courseId={courseId}
+						initialFeedbackHistory={feedbackHistory}
+						cursor={cursor}
+					/>
+				) : (
+					<div className="text-lg font-medium opacity-60">
+						When your students get feedback on their work,
+						it&apos;ll show up here
+					</div>
+				)}
+			</Card>
+		)
+	} else if (role === "student") {
+		return <Card className="flex flex-1 flex-col py-5 px-6">{null}</Card>
+	}
 }
 
 export default ClassPage

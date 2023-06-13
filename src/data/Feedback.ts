@@ -16,10 +16,12 @@ const Feedback = ({
 }) => ({
 	create: async ({
 		submission,
+		submissionHTML,
 		rawResponse,
 		metadata,
 	}: {
 		submission: string
+		submissionHTML: string
 		rawResponse: string
 		metadata: Record<string, unknown>
 	}) => {
@@ -29,6 +31,7 @@ const Feedback = ({
 			userEmail,
 			givenAt,
 			submission,
+			submissionHTML,
 			rawResponse,
 			metadata,
 		})
@@ -37,9 +40,8 @@ const Feedback = ({
 		const row = (
 			await db
 				.select({
-					submission: feedback.submission,
+					submissionHTML: feedback.submissionHTML,
 					rawResponse: feedback.rawResponse,
-					metadata: feedback.metadata,
 				})
 				.from(feedback)
 				.where(
@@ -55,13 +57,105 @@ const Feedback = ({
 		if (!row) return undefined
 
 		return {
-			courseId,
-			assignmentId,
-			userEmail,
-			givenAt,
-			submission: row.submission,
+			submissionHTML: row.submissionHTML ?? "",
 			rawResponse: row.rawResponse,
-			metadata: row.metadata,
+		}
+	},
+	followUps: async () => {
+		const rows = await db
+			.select({
+				givenAt: followUp.givenAt,
+				query: followUp.query,
+				rawResponse: followUp.rawResponse,
+				paragraphNumber: followUp.paragraphNumber,
+				sentenceNumber: followUp.sentenceNumber,
+			})
+			.from(followUp)
+			.where(
+				and(
+					eq(followUp.courseId, courseId),
+					eq(followUp.assignmentId, assignmentId),
+					eq(followUp.userEmail, userEmail),
+					eq(followUp.feedbackGivenAt, givenAt)
+				)
+			)
+
+		return {
+			specific: rows
+				.map((row) =>
+					row.paragraphNumber !== null && row.sentenceNumber !== null
+						? {
+								paragraphNumber: row.paragraphNumber,
+								sentenceNumber: row.sentenceNumber,
+								givenAt: row.givenAt,
+								query: row.query,
+								rawResponse: row.rawResponse,
+						  }
+						: undefined
+				)
+				.filter(Boolean)
+				.reduce(
+					(prev, cur) => {
+						const feedback = prev.find(
+							(feedback) =>
+								feedback.paragraphNumber ===
+									cur.paragraphNumber &&
+								feedback.sentenceNumber === cur.sentenceNumber
+						)
+
+						const message = {
+							givenAt: cur.givenAt,
+							query: cur.query,
+							rawResponse: cur.rawResponse,
+						}
+
+						if (feedback === undefined) {
+							return [
+								...prev,
+								{
+									paragraphNumber: cur.paragraphNumber,
+									sentenceNumber: cur.sentenceNumber,
+									messages: [message],
+								},
+							]
+						} else {
+							feedback.messages.push(message)
+
+							return prev
+						}
+					},
+					[] as {
+						paragraphNumber: number
+						sentenceNumber: number
+						messages: {
+							givenAt: Date
+							query: string
+							rawResponse: string
+						}[]
+					}[]
+				)
+				.map((feedback) => ({
+					...feedback,
+					messages: feedback.messages
+						.sort(
+							(row1, row2) =>
+								row1.givenAt.valueOf() - row2.givenAt.valueOf()
+						)
+						.map((row) => [row.query, row.rawResponse])
+						.flat(),
+				})),
+			general: rows
+				.filter(
+					(row) =>
+						row.paragraphNumber === null &&
+						row.sentenceNumber === null
+				)
+				.sort(
+					(row1, row2) =>
+						row1.givenAt.valueOf() - row2.givenAt.valueOf()
+				)
+				.map((row) => [row.query, row.rawResponse])
+				.flat(),
 		}
 	},
 	delete: async () => {
@@ -101,7 +195,7 @@ const Feedback = ({
 		rawResponse: string
 		metadata: Record<string, unknown>
 	}) => {
-		db.insert(followUp).values({
+		await db.insert(followUp).values({
 			courseId,
 			assignmentId,
 			userEmail,

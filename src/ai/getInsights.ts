@@ -46,7 +46,7 @@ ${generalFeedback}
 
 Provide the student's teacher with a few statements about the student's understanding of the subject using the following format:
 Type: {strength/weakness}
-Paragraph number: {paragraph number(s) for every paragraph where strength/weakness can be found, using a comma-separated list if necessary, or -1 if it applies to student's entire work}
+Paragraph number: {paragraph number(s) for every paragraph where strength/weakness could be found, using a comma-separated list if necessary, or -1 if it applies to student's entire work}
 Content: {a statement about the student's understanding of the subject. If it is a weakness, hypothesize as to what may have caused this weakness}
 
 Begin.`,
@@ -60,8 +60,6 @@ Begin.`,
 			onFinish: res,
 		})
 	)
-
-	console.log("Insights: ", completion)
 
 	return completion
 		.split("\n\n")

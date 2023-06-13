@@ -63,14 +63,14 @@ Respond with something that sounds like it could be content posted by the teache
 			maxTokens: 100,
 			onContent: () => {},
 			onFinish: async (content) => {
-				console.log("Predicted similar resources: ", content)
+				console.info("Predicted similar resources: ", content)
 
 				const similarResources = await getSimilarResourcesAction({
 					courseId,
 					similarText: content,
 				})
 
-				console.log("Similar resources: ", similarResources)
+				console.info("Similar resources: ", similarResources)
 
 				fetchOpenAIStream({
 					messages: [
