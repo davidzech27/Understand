@@ -61,10 +61,10 @@ const FeedbackPage = async ({
 
 	const headerLineIndex = {
 		specificFeedback: lines.findIndex(
-			(line) => line.search(/^Specific feedback:?\s*$/) !== -1
+			(line) => line.search(/^Specific Feedback:?\s*$/) !== -1
 		),
 		generalFeedback: lines.findIndex(
-			(line) => line.search(/^General feedback:?\s*$/) !== -1
+			(line) => line.search(/^General Feedback:?\s*$/) !== -1
 		),
 	}
 

@@ -98,13 +98,13 @@ Construct a very descriptive and comprehensive synopsis for the student's work.
 Commentary
 Identify one area where the student demonstrates their strengths or unique character as a writer and the two areas where the student could most easily improve the communication of their ideas or their depth of thought. For each area of commentary, ask a question about the commentary in order to directly assess its accuracy, then answer it with comprehensive reasoning and direct references the student's work.
 
-Specific feedback
+Specific Feedback
 Provide five areas of feedback pertaining to the segments of the student's work that your commentary most applies to. Be extremely thorough in order to best help the student understand how to improve their work. Do not prescribe any particular solution to the student; instead, cleverly ask them a question or make an insightful comment to lead them in the right direction. Unless required by the assignment prompt, do not suggest that the student increase the scope of their work or that they alter their stylistic writing choices. Each area of specific feedback should use the following format:
 Paragraph number: {paragraph number of the segment of the student's work pertaining to the feedback}
 Sentence number: {sentence number of the segment of the student's work pertaining to the feedback, or -1 if the feedback applies to the paragraph as a whole}
 Feedback: {the feedback to the student}
 
-General feedback
+General Feedback
 Provide thoughtful, engaging, and actionable feedback on the student's work as a whole. Begin by acknowledging an interesting strength or unique characteristic of the student. In the next two paragraphs, delve deeply into the two biggest areas for improvement in the student's work. Include as many direct references to the student's work as possible. End on an appropriately positive, and perhaps creative, note.
 
 Begin, and be interesting.`,
@@ -123,8 +123,9 @@ Begin, and be interesting.`,
 		presencePenalty,
 		frequencyPenalty,
 		onContent: (content) => {
+			console.log(content)
 			const generalFeedbackHeaderIndex = content.search(
-				/\nGeneral feedback:?\n.+/
+				/\nGeneral Feedback:?\n.+/
 			)
 
 			if (generalFeedbackHeaderIndex !== -1) {
@@ -134,7 +135,7 @@ Begin, and be interesting.`,
 							1
 					)
 				)
-			} else if (content.search(/\nSpecific feedback:?\n/) !== -1) {
+			} else if (content.search(/\nSpecific Feedback:?\n/) !== -1) {
 				const lines = content.split("\n")
 
 				const lastLine = lines.at(-1)
@@ -206,10 +207,10 @@ Begin, and be interesting.`,
 					(line) => line.search(/^Commentary:?\s*$/) !== -1
 				),
 				specificFeedback: lines.findIndex(
-					(line) => line.search(/^Specific feedback:?\s*$/) !== -1
+					(line) => line.search(/^Specific Feedback:?\s*$/) !== -1
 				),
 				generalFeedback: lines.findIndex(
-					(line) => line.search(/^General feedback:?\s*$/) !== -1
+					(line) => line.search(/^General Feedback:?\s*$/) !== -1
 				),
 			}
 
