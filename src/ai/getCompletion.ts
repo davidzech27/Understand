@@ -24,7 +24,7 @@ const getCompletion = async ({
 			},
 			body: JSON.stringify({
 				messages,
-				model,
+				model: model === "gpt-4" ? "gpt-4-0613" : "gpt-3.5-turbo-0613",
 				temperature,
 				presence_penalty: presencePenalty,
 				frequency_penalty: frequencyPenalty,
