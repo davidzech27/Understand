@@ -1234,7 +1234,7 @@ const GeneralFeedback = ({
 								"overflow-hidden rounded-b-md bg-surface-hover transition-all"
 							)}
 						>
-							<div className="border-t border-border p-1 opacity-80">
+							<div className="border-t border-border p-1">
 								<TextArea
 									value={followUpInput}
 									setValue={setFollowUpInput}
@@ -1245,6 +1245,7 @@ const GeneralFeedback = ({
 									}
 									onEnter={onGetFollowUp}
 									ref={inputRef}
+									className="opacity-80"
 								/>
 							</div>
 						</div>
@@ -1523,7 +1524,7 @@ const SpecificFeedbackItem: React.FC<{
 					state === undefined && "delay-150"
 				)}
 			>
-				<div className="border-t border-border p-1 opacity-80">
+				<div className="border-t border-border p-1">
 					<TextArea
 						value={followUpInput}
 						setValue={setFollowUpInput}
@@ -1532,6 +1533,7 @@ const SpecificFeedbackItem: React.FC<{
 						}
 						onEnter={onGetFollowUp}
 						ref={inputRef}
+						className="opacity-80"
 					/>
 				</div>
 			</div>
