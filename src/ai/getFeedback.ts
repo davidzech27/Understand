@@ -123,7 +123,6 @@ Begin, and be interesting.`,
 		presencePenalty,
 		frequencyPenalty,
 		onContent: (content) => {
-			console.log(content)
 			const generalFeedbackHeaderIndex = content.search(
 				/\nGeneral Feedback:?\n.+/
 			)
