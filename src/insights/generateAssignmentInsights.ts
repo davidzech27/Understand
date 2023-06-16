@@ -84,7 +84,7 @@ const generateAssignmentInsights = async ({
 					.join("") ?? ""
 			}
 
-Some of the above insights may express similar things about the strengths/weaknesses of the class on the assignment, and could be combined to form longer insights. Additionally, these insights should be expressed in the context of the students in the class in general. Rewrite the above insights with this in mind. Do not mix strengths and weaknesses. Use the following format:
+Some of the above insights may express nearly identical things about the strengths/weaknesses of the class on the assignment, and could be combined to form longer insights. Additionally, these insights should be expressed in the context of the students in the class in general. Rewrite the above insights with this in mind. Do not mix strengths and weaknesses. Use the following format:
 Content: {the rewritten insight}
 Sources: {the number(s) corresponding the original insight(s) that formed this insight, using a comma-separated list if necessary}
 
@@ -113,7 +113,7 @@ Begin.`,
 			content: insight.match(/(?<=^Content:[ ]).+/g)?.[0],
 			sources: insight
 				.match(/(?<=\nSources:[ ]).+/g)?.[0]
-				.split(", ")
+				.split(/,[ ]*/)
 				.map(Number),
 		}))
 		.map((insight) =>
@@ -127,8 +127,8 @@ Begin.`,
 		.filter(Boolean)
 		.map((insight) => ({
 			type:
-				concatenatedInsights[(insight.sources[0] ?? 1) - 1]?.type ===
-				"weakness"
+				concatenatedInsights[(insight.sources.at(-1) ?? 1) - 1]
+					?.type === "weakness"
 					? ("weakness" as const)
 					: ("strength" as const),
 			content: insight.content,

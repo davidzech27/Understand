@@ -17,7 +17,7 @@ const getInsights = async ({
 				{
 					role: "system",
 					content:
-						"You are an uncommonly friendly and creative teacher's assistant.",
+						"You are an uncommonly creative and nuanced teacher's assistant.",
 				},
 				{
 					role: "user",

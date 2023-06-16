@@ -123,9 +123,8 @@ Begin.`,
 		presencePenalty,
 		frequencyPenalty,
 		onContent: (content) => {
-			console.log(content)
 			const generalFeedbackHeaderIndex = content.search(
-				/\nGeneral Feedback:?\n.+/
+				/\nGeneral Feedback:?\n+.+/
 			)
 
 			if (generalFeedbackHeaderIndex !== -1) {

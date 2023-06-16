@@ -65,13 +65,22 @@ const StudentPage = async ({
 						Strengths
 					</div>
 
-					<ul className="flex flex-col space-y-2.5">
-						{strengths.map((strength, index) => (
-							<li key={index}>
-								<Insight {...strength} />
-							</li>
-						))}
-					</ul>
+					{strengths.length !== 0 ? (
+						<ul className="flex flex-col space-y-2.5">
+							{strengths.map((strength, index) => (
+								<li key={index}>
+									<Insight {...strength} />
+								</li>
+							))}
+						</ul>
+					) : (
+						<div className="ml-1 opacity-60">
+							No strengths found for student. Most likely, these
+							got mixed in with their weaknesses, so try checking
+							there instead - it&apos;s unlikely that this student
+							has no strengths!
+						</div>
+					)}
 
 					<div className="ml-1 text-lg font-medium opacity-60">
 						Weaknesses

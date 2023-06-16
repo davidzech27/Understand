@@ -44,7 +44,7 @@ const generateStudentInsights = async ({
 		?.map((insight) => ({
 			...insight,
 			sources: insight.sources.filter(
-				(source) => !unsyncedAssignmentIdSet.has(source.assignmentId)
+				(source) => !unsyncedAssignmentIdSet.has(source.assignmentId) // consider removing student insight entirely if any of its sources are unsynced. however, then you'd have to fetch all the insights on these student insights, not just the unsynced ones
 			),
 		}))
 		.filter((insight) => insight.sources.length > 0)
@@ -84,7 +84,7 @@ const generateStudentInsights = async ({
 					.join("") ?? ""
 			}
 
-Some of the above insights may express similar things about the student, and could be combined to form longer insights. Additionally, these insights should be expressed in the context of the student's understanding of the class in general. Rewrite the above insights with this in mind. Do not mix strengths and weaknesses. Use the following format:
+Some of the above insights may express nearly identical things about the student, and could be combined to form longer insights. Additionally, these insights should be expressed in the context of the student's understanding of the class in general. Rewrite the above insights with this in mind. Do not mix discussion of the student's strengths with discussion of their weaknesses. Use the following format:
 Content: {the rewritten insight}
 Sources: {the number(s) corresponding the original insight(s) that formed this insight, using a comma-separated list if necessary}
 
@@ -113,7 +113,7 @@ Begin.`,
 			content: insight.match(/(?<=^Content:[ ]).+/g)?.[0],
 			sources: insight
 				.match(/(?<=\nSources:[ ]).+/g)?.[0]
-				.split(", ")
+				.split(/,[ ]*/)
 				.map(Number),
 		}))
 		.map((insight) =>
@@ -127,8 +127,8 @@ Begin.`,
 		.filter(Boolean)
 		.map((insight) => ({
 			type:
-				concatenatedInsights[(insight.sources[0] ?? 1) - 1]?.type ===
-				"weakness"
+				concatenatedInsights[(insight.sources.at(-1) ?? 1) - 1]
+					?.type === "weakness"
 					? ("weakness" as const)
 					: ("strength" as const),
 			content: insight.content,

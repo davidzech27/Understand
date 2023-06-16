@@ -298,9 +298,13 @@ const Feedback: React.FC<Props> = ({
 		}
 	}
 
+	const [linkCopied, setLinkCopied] = useState(false)
+
 	const onTryAgain = () => {
 		setSpecificFeedbackList([])
 		setGeneralFeedback(undefined)
+
+		setLinkCopied(false)
 	}
 
 	const [feedbackResponse, setFeedbackResponse] = useState<{
@@ -593,12 +597,32 @@ const Feedback: React.FC<Props> = ({
 										: "Analyzing work..."}
 								</Button>
 							) : (
-								<Button
-									onClick={onTryAgain}
-									className="text-lg"
-								>
-									Try again
-								</Button>
+								<div className="flex space-x-1.5">
+									{feedbackData && (
+										<Button
+											onClick={() => {
+												navigator.clipboard.writeText(
+													`${
+														window.location.href
+													}/${email}/${feedbackData.givenAt.valueOf()}`
+												)
+
+												setLinkCopied(true)
+											}}
+											className="text-lg"
+										>
+											{linkCopied
+												? "Link copied"
+												: "Copy link"}
+										</Button>
+									)}
+									<Button
+										onClick={onTryAgain}
+										className="text-lg"
+									>
+										Try again
+									</Button>
+								</div>
 							)}
 						</div>
 					</div>

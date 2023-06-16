@@ -29,7 +29,7 @@ const registerFeedbackAction = zact(
 
 		const role = await User({ email }).courseRole({ id: courseId })
 
-		const givenAt = new Date()
+		const givenAt = new Date(Math.round(new Date().valueOf() / 1000) * 1000)
 
 		if (role === "none")
 			return {
@@ -49,7 +49,7 @@ const registerFeedbackAction = zact(
 		})
 
 		return {
-			givenAt: new Date(givenAt.valueOf() - (givenAt.valueOf() % 1000)),
+			givenAt,
 		}
 	}
 )
