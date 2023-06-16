@@ -94,7 +94,7 @@ Begin.`,
 
 	const mergedInsightsCompletion = await getCompletion({
 		messages: mergedInsightsPromptMessages,
-		model: "gpt-4",
+		model: "gpt-4-0613",
 		temperature: 0,
 		presencePenalty: 0.5,
 		frequencyPenalty: 0.5,

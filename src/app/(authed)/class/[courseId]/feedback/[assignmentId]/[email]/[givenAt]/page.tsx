@@ -78,13 +78,13 @@ const FeedbackPage = async ({
 		.map((feedback) => ({
 			paragraph: Number(
 				feedback.match(
-					/(?<=^(\d\.[ ])?\s*Paragraph( number)?:? ?)\d+/g
+					/(?<=^(\d\.[ ])?\s*Paragraph( number)?[ ]?:? ?)\d+/g
 				)?.[0]
 			),
 			sentence: Number(
-				feedback.match(/(?<=\nSentence( number)?:? ?)-?\d+/g)?.[0]
+				feedback.match(/(?<=\nSentence( number)?[ ]?:? ?)-?\d+/g)?.[0]
 			),
-			content: feedback.match(/(?<=\nFeedback: ).+/g)?.[0] ?? "",
+			content: feedback.match(/(?<=\nFeedback[ ]?: ).+/g)?.[0] ?? "",
 		}))
 		.map((feedback) => ({
 			...feedback,

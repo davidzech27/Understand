@@ -4,6 +4,7 @@ import {
 	useState,
 	useEffect,
 	useImperativeHandle,
+	useTransition,
 	forwardRef,
 	CSSProperties,
 } from "react"
@@ -38,6 +39,7 @@ interface Props {
 		dueAt?: Date
 		linkedUrl?: string
 	}
+	email: string
 	profileName: string
 	courseName: string
 	role: "teacher" | "student"
@@ -62,6 +64,7 @@ const getDomIdOfSpecificFeedbackHighlight = ({
 
 const Feedback: React.FC<Props> = ({
 	assignment,
+	email,
 	profileName,
 	courseName,
 	role,
@@ -280,8 +283,8 @@ const Feedback: React.FC<Props> = ({
 							instructions: assignment.instructions,
 							specificFeedback,
 							generalFeedback,
-						}).then((insights) => {
-							console.info(insights)
+						}).then(({ insights, rawResponse }) => {
+							console.info(rawResponse)
 
 							registerInsightsAction({
 								courseId: assignment.courseId,
@@ -319,7 +322,7 @@ const Feedback: React.FC<Props> = ({
 		sentence?: number
 		followUps: string[]
 	}) => {
-		if (feedbackResponse && feedbackData !== null) {
+		if (feedbackResponse && feedbackData) {
 			const start = new Date()
 
 			if (paragraph === undefined && sentence === undefined) {
@@ -1284,6 +1287,14 @@ const SpecificFeedbackColumn: React.FC<{
 	onGetFollowUp,
 	onStateChange,
 }) => {
+	feedbackList = feedbackList.sort(
+		(feedback1, feedback2) =>
+			feedback1.paragraph * 10 +
+			feedback1.sentence -
+			feedback2.paragraph * 10 -
+			feedback2.sentence
+	)
+
 	const ref = useRef<HTMLDivElement>(null)
 
 	const [tops, setTops] = useState<number[]>([])

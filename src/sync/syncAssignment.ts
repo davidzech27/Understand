@@ -133,7 +133,7 @@ ${
 					}`,
 				},
 			],
-			model: "gpt-3.5-turbo",
+			model: "gpt-3.5-turbo-0613",
 			temperature: 0,
 			presencePenalty: 0,
 			frequencyPenalty: 0,
@@ -188,7 +188,7 @@ ${
 					} in a course named ${courseName} in Google Classroom.`,
 				},
 			],
-			model: "gpt-3.5-turbo",
+			model: "gpt-3.5-turbo-0613",
 			temperature: 0,
 			presencePenalty: 0,
 			frequencyPenalty: 0,
@@ -268,7 +268,7 @@ Given that the title of the assignment in Google Classroom is ${
 					}, identify the numbers corresponding to the content that is likely to be a part of the instructions on that assignment. If there are multiple answers, use a comma-separated list. Respond with "None" if none of the provided content is likely to be instructions on the assignment.`,
 				},
 			],
-			model: "gpt-3.5-turbo",
+			model: "gpt-3.5-turbo-0613",
 			temperature: 0,
 			presencePenalty: 0,
 			frequencyPenalty: 0,
@@ -379,7 +379,7 @@ Given that the title of the assignment in Google Classroom is ${
 
 		const driveFiles: typeof driveFilesUnfiltered = []
 
-		const wordLimit = 3000
+		const wordLimit = 10000
 
 		let words = 0
 
@@ -425,7 +425,7 @@ ${driveFiles
 Identify the numbers corresponding to the resources that are likely to provide helpful context for someone to better understand what the teacher may be looking for in a student's work on the assignment. If there are multiple answers, use a comma-separated list. Respond with "None" if none of the provided resources are likely to help someone to better understand what the teacher is looking for in a student's work on the assignment.`,
 				},
 			],
-			model: "gpt-3.5-turbo",
+			model: "gpt-3.5-turbo-16k-0613",
 			temperature: 0,
 			presencePenalty: 0,
 			frequencyPenalty: 0,

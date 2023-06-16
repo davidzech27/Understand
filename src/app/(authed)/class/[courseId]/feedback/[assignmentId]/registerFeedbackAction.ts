@@ -49,7 +49,7 @@ const registerFeedbackAction = zact(
 		})
 
 		return {
-			givenAt,
+			givenAt: new Date(givenAt.valueOf() - (givenAt.valueOf() % 1000)),
 		}
 	}
 )

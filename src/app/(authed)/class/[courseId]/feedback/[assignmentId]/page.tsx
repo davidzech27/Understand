@@ -90,6 +90,7 @@ const FeedbackPage = async ({
 				...assignment,
 				instructions: assignment.instructions,
 			}}
+			email={profile.email}
 			profileName={profile.name}
 			courseName={course.name}
 			role={role}

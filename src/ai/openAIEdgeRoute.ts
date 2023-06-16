@@ -16,7 +16,11 @@ const requestSchema = z.object({
 			})
 		)
 		.min(1),
-	model: z.enum(["gpt-4", "gpt-3.5-turbo"]),
+	model: z.enum([
+		"gpt-4-0613",
+		"gpt-3.5-turbo-0613",
+		"gpt-3.5-turbo-16k-0613",
+	]),
 	temperature: z.number().min(0).max(2),
 	presencePenalty: z.number().min(-2).max(2),
 	frequencyPenalty: z.number().min(-2).max(2),
@@ -54,7 +58,7 @@ const openaiHandler = async (request: NextRequest) => {
 			},
 			body: JSON.stringify({
 				messages,
-				model: model === "gpt-4" ? "gpt-4-0613" : "gpt-3.5-turbo-0613",
+				model,
 				temperature,
 				presence_penalty: presencePenalty,
 				frequency_penalty: frequencyPenalty,

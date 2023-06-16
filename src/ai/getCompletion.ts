@@ -9,7 +9,7 @@ const getCompletion = async ({
 	maxTokens,
 }: {
 	messages: { role: "assistant" | "user" | "system"; content: string }[]
-	model: "gpt-4" | "gpt-3.5-turbo"
+	model: "gpt-4-0613" | "gpt-3.5-turbo-0613" | "gpt-3.5-turbo-16k-0613"
 	temperature: number
 	presencePenalty: number
 	frequencyPenalty: number
@@ -24,7 +24,7 @@ const getCompletion = async ({
 			},
 			body: JSON.stringify({
 				messages,
-				model: model === "gpt-4" ? "gpt-4-0613" : "gpt-3.5-turbo-0613",
+				model,
 				temperature,
 				presence_penalty: presencePenalty,
 				frequency_penalty: frequencyPenalty,

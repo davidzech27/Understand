@@ -73,7 +73,7 @@ Assignment due date: ${
 
 	const similarResources: typeof similarResourcesUnfiltered = []
 
-	const wordLimit = 2400 // potentially make dynamic later
+	const wordLimit = 8000 // potentially make dynamic later
 
 	let words = 0
 

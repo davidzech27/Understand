@@ -52,7 +52,7 @@ Content: {a statement about the student's understanding of the subject. If it is
 Begin.`,
 				},
 			],
-			model: "gpt-4",
+			model: "gpt-4-0613",
 			presencePenalty: 0.5,
 			frequencyPenalty: 0.5,
 			temperature: 0,
@@ -61,31 +61,34 @@ Begin.`,
 		})
 	)
 
-	return completion
-		.split("\n\n")
-		.map((insight) => ({
-			type:
-				insight
-					.match(/(?<=^(Insights:[ ]+)?Type:[ ]).+/g)?.[0]
-					.toLowerCase() === "strength"
-					? ("strength" as const)
-					: ("weakness" as const),
-			paragraphs: insight
-				.match(/(?<=\nParagraph number:[ ]).+/g)?.[0]
-				.split(", ")
-				.map(Number),
-			content: insight.match(/(?<=\nContent:[ ]).+/g)?.[0],
-		}))
-		.map((insight) =>
-			insight.paragraphs && insight.content
-				? {
-						type: insight.type,
-						paragraphs: insight.paragraphs,
-						content: insight.content,
-				  }
-				: undefined
-		)
-		.filter(Boolean)
+	return {
+		insights: completion
+			.split("\n\n")
+			.map((insight) => ({
+				type:
+					insight
+						.match(/(?<=^(Insights:[ ]+)?Type:[ ]).+/g)?.[0]
+						.toLowerCase() === "strength"
+						? ("strength" as const)
+						: ("weakness" as const),
+				paragraphs: insight
+					.match(/(?<=\nParagraph number:[ ]).+/g)?.[0]
+					.split(/,[ ]*/)
+					.map(Number),
+				content: insight.match(/(?<=\nContent:[ ]).+/g)?.[0],
+			}))
+			.map((insight) =>
+				insight.paragraphs && insight.content
+					? {
+							type: insight.type,
+							paragraphs: insight.paragraphs,
+							content: insight.content,
+					  }
+					: undefined
+			)
+			.filter(Boolean),
+		rawResponse: completion,
+	}
 }
 
 export default getInsights

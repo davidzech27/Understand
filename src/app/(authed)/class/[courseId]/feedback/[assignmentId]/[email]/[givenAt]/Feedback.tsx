@@ -476,11 +476,6 @@ const Submission = forwardRef<
 				getHTML: () => ref.current?.innerHTML ?? "",
 				setHTML: (html) => {
 					if (ref.current) {
-						const empty =
-							html === "" ||
-							html === "<br>" ||
-							html === "<div><br></div>"
-
 						ref.current.innerHTML = html
 					}
 				},
@@ -564,6 +559,14 @@ const SpecificFeedbackColumn: React.FC<{
 		update: ((prevHover: boolean) => boolean) | boolean
 	}) => void
 }> = ({ feedbackList, getSubmissionTextOffset, onHoverChange }) => {
+	feedbackList = feedbackList.sort(
+		(feedback1, feedback2) =>
+			feedback1.paragraph * 10 +
+			feedback1.sentence -
+			feedback2.paragraph * 10 -
+			feedback2.sentence
+	)
+
 	const ref = useRef<HTMLDivElement>(null)
 
 	const [tops, setTops] = useState<number[]>()
