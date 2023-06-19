@@ -45,14 +45,6 @@ const StudentPage = async ({
 		})),
 	}))
 
-	const strengths = (studentInsights ?? []).filter(
-		(insight) => insight.type === "strength"
-	)
-
-	const weaknesses = (studentInsights ?? []).filter(
-		(insight) => insight.type === "weakness"
-	)
-
 	return (
 		<Card className="flex h-full flex-col space-y-2 px-6 pt-5 pb-80">
 			{studentInsights === undefined || studentInsights.length === 0 ? (
@@ -60,40 +52,18 @@ const StudentPage = async ({
 					No data for student
 				</span>
 			) : (
-				<>
-					<div className="ml-1 text-lg font-medium opacity-60">
-						Strengths
-					</div>
-
-					{strengths.length !== 0 ? (
-						<ul className="flex flex-col space-y-2.5">
-							{strengths.map((strength, index) => (
-								<li key={index}>
-									<Insight {...strength} />
-								</li>
-							))}
-						</ul>
-					) : (
-						<div className="ml-1 opacity-60">
-							No strengths found for student. Most likely, these
-							got mixed in with their weaknesses, so try checking
-							there instead - it&apos;s unlikely that this student
-							has no strengths!
+				studentInsights.map((insight) => (
+					<>
+						<div className="ml-1 text-lg font-medium opacity-60">
+							{insight.type}
 						</div>
-					)}
 
-					<div className="ml-1 text-lg font-medium opacity-60">
-						Weaknesses
-					</div>
-
-					<ul className="flex flex-col space-y-2.5">
-						{weaknesses.map((weakness, index) => (
-							<div key={index}>
-								<Insight {...weakness} />
-							</div>
-						))}
-					</ul>
-				</>
+						<Insight
+							content={insight.content}
+							sources={insight.sources}
+						/>
+					</>
+				))
 			)}
 		</Card>
 	)

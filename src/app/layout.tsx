@@ -1,8 +1,5 @@
-import { Analytics } from "@vercel/analytics/react"
-import { HighlightInit } from "@highlight-run/next/highlight-init"
-
-import { env } from "~/env.mjs"
 import "./global.css"
+import Providers from "./providers"
 
 export const metadata = {
 	title: {
@@ -18,23 +15,11 @@ export const metadata = {
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
 	return (
 		<>
-			<HighlightInit
-				projectId={env.NEXT_PUBLIC_HIGHLIGHT_PROJECT_ID}
-				tracingOrigins
-				networkRecording={{
-					enabled: true,
-					recordHeadersAndBody: true,
-					urlBlocklist: [],
-				}}
-			/>
-
 			<html lang="en">
 				<head />
 
 				<body>
-					{children}
-
-					{env.NODE_ENV === "production" && <Analytics />}
+					<Providers>{children}</Providers>
 				</body>
 			</html>
 		</>

@@ -75,7 +75,7 @@ const generateStudentInsights = async ({
 		},
 		{
 			role: "user" as const,
-			content: `The following is a list of insights regarding the strengths/weaknesses of a student on various assignments:${
+			content: `The following is a list of insights regarding the strengths/weaknesses of a student across various assignments:${
 				concatenatedInsights
 					?.map(
 						(insight, index) =>
@@ -84,7 +84,8 @@ const generateStudentInsights = async ({
 					.join("") ?? ""
 			}
 
-Some of the above insights may express nearly identical things about the student, and could be combined to form longer insights. Additionally, these insights should be expressed in the context of the student's understanding of the class in general. Rewrite the above insights with this in mind. Do not mix discussion of the student's strengths with discussion of their weaknesses. Use the following format:
+Some of the above insights may be similar in meaning. Rewrite them while expressing them in the context of the student's understanding of the class in general, while keeping every detail. Use the following format:
+Title: {a title}
 Content: {the rewritten insight}
 Sources: {the number(s) corresponding the original insight(s) that formed this insight, using a comma-separated list if necessary}
 
@@ -96,8 +97,8 @@ Begin.`,
 		messages: mergedInsightsPromptMessages,
 		model: "gpt-4-0613",
 		temperature: 0,
-		presencePenalty: 0.5,
-		frequencyPenalty: 0.5,
+		presencePenalty: 0.0,
+		frequencyPenalty: 0.0,
 	})
 
 	console.info(
@@ -110,15 +111,19 @@ Begin.`,
 	const mergedInsights = mergedInsightsCompletion
 		.split("\n\n")
 		.map((insight) => ({
-			content: insight.match(/(?<=^Content:[ ]).+/g)?.[0],
+			type: insight.match(/(?<=^Title:[ ]).+/g)?.[0],
+			content: insight.match(/(?<=\nContent:[ ]).+/g)?.[0],
 			sources: insight
 				.match(/(?<=\nSources:[ ]).+/g)?.[0]
 				.split(/,[ ]*/)
 				.map(Number),
 		}))
 		.map((insight) =>
-			insight.content && insight.sources?.length
+			insight.type && insight.content && insight.sources?.length
 				? {
+						type:
+							insight.type[0] +
+							insight.type.slice(1).toLowerCase(),
 						content: insight.content,
 						sources: insight.sources,
 				  }
@@ -126,11 +131,7 @@ Begin.`,
 		)
 		.filter(Boolean)
 		.map((insight) => ({
-			type:
-				concatenatedInsights[(insight.sources.at(-1) ?? 1) - 1]
-					?.type === "weakness"
-					? ("weakness" as const)
-					: ("strength" as const),
+			type: insight.type,
 			content: insight.content,
 			sources: Object.entries(
 				insight.sources

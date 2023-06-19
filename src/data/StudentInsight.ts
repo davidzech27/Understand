@@ -6,7 +6,7 @@ import { studentInsight } from "~/db/schema"
 
 const insightsSchema = z
 	.object({
-		type: z.enum(["strength", "weakness"]),
+		type: z.string(),
 		content: z.string(),
 		sources: z
 			.object({

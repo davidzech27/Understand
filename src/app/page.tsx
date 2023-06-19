@@ -22,12 +22,12 @@ const IndexPage = async () => {
 								backgroundClip: "text",
 								color: "transparent",
 							}}
-							className="select-none py-2 text-[4rem] font-extrabold leading-[1.1] tracking-tight md:text-[5.5rem] lg:whitespace-pre"
+							className="select-none py-2 text-[2.6rem] font-extrabold leading-[1.1] tracking-tight lg:whitespace-pre lg:text-[3.5rem] xl:text-[4.5rem] 2xl:text-[5.5rem]"
 						>
 							The future of education{"\n"}is personalized
 						</h1>
 
-						<p className="mb-8 mt-2.5 w-full select-text text-xl font-medium opacity-60 lg:w-3/4">
+						<p className="mb-8 mt-2.5 w-full select-text text-base font-medium opacity-60 lg:w-3/4 lg:text-lg xl:text-xl">
 							Understand is an AI-powered educational platform
 							that gives you the tools and insights you need to
 							personalize your class to the needs of your

@@ -48,6 +48,8 @@ const getFeedback = ({
 	let lastParagraphNumber = undefined as number | undefined
 	let lastSentenceNumber = undefined as number | undefined
 
+	let previousFeedbackLength = undefined as number | undefined
+
 	const { messages, model, temperature, presencePenalty, frequencyPenalty } =
 		{
 			messages: [
@@ -135,62 +137,51 @@ Begin.`,
 					)
 				)
 			} else if (content.search(/\nSpecific Feedback:?\n/) !== -1) {
-				const lines = content.split("\n")
+				const feedback = content
+					.match(/(?<=\nFeedback[ ]*:[ ]*).+/g)
+					?.at(-1)
 
-				const lastLine = lines.at(-1)
-				const secondToLastLine = lines.at(-2)
-				const thirdToLastLine = lines.at(-3)
-
-				if (lastLine !== undefined) {
+				if (feedback !== undefined) {
 					if (
-						lastLine.search(
-							/^(\d\.[ ])?\s*Paragraph( number)?[ ]?:? ?\d+:?$/
-						) !== -1
+						previousFeedbackLength === undefined ||
+						previousFeedbackLength > feedback.length
 					) {
 						lastParagraphNumber = Number(
-							lastLine.match(/\d+/g)?.at(-1)
+							content
+								.match(
+									/(?<=\n(\d\.[ ]*)?[ ]*Paragraph( number)?[ ]*:?[ ]*)\d+/g
+								)
+								?.at(-1)
 						)
-					} else if (
-						lastLine.search(
-							/^\s*Sentence( number)?[ ]?:? ?-?\d+:?$/
-						) !== -1
-					) {
+
+						if (lastParagraphNumber !== lastParagraphNumber)
+							lastParagraphNumber = undefined
+
 						lastSentenceNumber = Number(
-							lastLine.match(/-?\d+/g)?.at(-1)
+							content
+								.match(
+									/(?<=\n[ ]*Sentence( number)?[ ]*:?[ ]*)-?\d+/g
+								)
+								?.at(-1)
 						)
-					} else if (lastLine.search(/^\s*Feedback[ ]?: .+/) !== -1) {
-						if (
-							lastParagraphNumber !== undefined &&
-							lastSentenceNumber !== undefined
-						) {
-							onSpecificContent({
-								content: lastLine.replace(/Feedback[ ]?: /, ""),
-								paragraph: lastParagraphNumber,
-								sentence: lastSentenceNumber,
-							})
-						} else {
-							console.error(
-								"This shouldn't happen, as lastParagraphNumber and lastSentenceNumber should be defined before feedback is streamed", // has happened before when there was "Sentence number:-1" or "2. Paragraph 3:"
-								{ lastParagraphNumber, lastSentenceNumber }
-							)
-						}
-					} else if (
-						secondToLastLine?.includes("Feedback: ") &&
-						lastParagraphNumber !== undefined &&
-						lastSentenceNumber !== undefined
+
+						if (lastSentenceNumber !== lastSentenceNumber)
+							lastSentenceNumber = undefined
+					}
+
+					previousFeedbackLength = feedback.length
+
+					if (
+						lastParagraphNumber === undefined ||
+						lastSentenceNumber === undefined
 					) {
+						console.error(
+							"This shouldn't happen, as lastParagraphNumber and lastSentenceNumber should be defined before feedback is streamed",
+							{ lastParagraphNumber, lastSentenceNumber }
+						)
+					} else {
 						onSpecificContent({
-							content: secondToLastLine.replace("Feedback: ", ""),
-							paragraph: lastParagraphNumber,
-							sentence: lastSentenceNumber,
-						})
-					} else if (
-						thirdToLastLine?.includes("Feedback: ") &&
-						lastParagraphNumber !== undefined &&
-						lastSentenceNumber !== undefined
-					) {
-						onSpecificContent({
-							content: thirdToLastLine.replace("Feedback: ", ""),
+							content: feedback,
 							paragraph: lastParagraphNumber,
 							sentence: lastSentenceNumber,
 						})

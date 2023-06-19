@@ -13,14 +13,16 @@ const server = z.object({
 	QSTASH_CURRENT_SIGNING_KEY: z.string(),
 	QSTASH_NEXT_SIGNING_KEY: z.string(),
 	NEXT_PUBLIC_URL: z.string().url(),
-	NEXT_PUBLIC_HIGHLIGHT_PROJECT_ID: z.string(),
+	NEXT_PUBLIC_POSTHOG_KEY: z.string(),
+	NEXT_PUBLIC_POSTHOG_HOST: z.string().url(),
 })
 
 const client = z.object({
 	NEXT_PUBLIC_URL: z.string().url(),
 	NEXT_PUBLIC_GOOGLE_CLIENT_ID: z.string(),
 	NEXT_PUBLIC_LEARN_MORE_URL: z.string().url(),
-	NEXT_PUBLIC_HIGHLIGHT_PROJECT_ID: z.string(),
+	NEXT_PUBLIC_POSTHOG_KEY: z.string(),
+	NEXT_PUBLIC_POSTHOG_HOST: z.string().url(),
 })
 
 /**
@@ -40,8 +42,8 @@ const processEnv = {
 	GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
 	OPENAI_SECRET_KEY: process.env.OPENAI_SECRET_KEY,
 	NEXT_PUBLIC_LEARN_MORE_URL: process.env.NEXT_PUBLIC_LEARN_MORE_URL,
-	NEXT_PUBLIC_HIGHLIGHT_PROJECT_ID:
-		process.env.NEXT_PUBLIC_HIGHLIGHT_PROJECT_ID,
+	NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
+	NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
 }
 
 // Don't touch the part below

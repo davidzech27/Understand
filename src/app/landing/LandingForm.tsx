@@ -2,8 +2,8 @@
 import { useState, use } from "react"
 import { useRouter } from "next/navigation"
 import * as Form from "@radix-ui/react-form"
-import { H } from "highlight.run"
 import { useZact } from "zact/client"
+import { usePostHog } from "posthog-js/react"
 
 import TextInput from "~/components/TextInput"
 import FancyButton from "~/components/FancyButton"
@@ -31,14 +31,21 @@ const LandingForm: React.FC<Props> = (props) => {
 
 	const router = useRouter()
 
+	const posthog = usePostHog()
+
 	const onGo = async () => {
 		if (!profile) return
 
-		H.identify(profile.email, profile)
+		posthog &&
+			posthog.identify(profile.email, {
+				email: profile.email,
+				name: nameInput.trim(),
+				photo: profile.photo,
+			})
 
 		await Promise.all([await updateName({ name: nameInput.trim() })])
 
-		localStorage.setItem("landed-1.0", "true")
+		localStorage.setItem("landed-2.0", "true")
 
 		router.refresh()
 

@@ -2,12 +2,10 @@ import { and, eq } from "drizzle-orm"
 import { verifySignature } from "@upstash/qstash/nextjs"
 import { type NextApiHandler } from "next"
 import { z } from "zod"
-import { Highlight } from "@highlight-run/next"
 
 import db from "~/db/db"
 import { insight } from "~/db/schema"
 import { insightsSchema } from "~/data/Insight"
-import { env } from "~/env.mjs"
 import callGenerate from "./callGenerate"
 import generateStudentInsights from "./generateStudentInsights"
 import generateAssignmentInsights from "./generateAssignmentInsights"
@@ -95,8 +93,4 @@ const insightsHandler: NextApiHandler = async (req, res) => {
 	res.status(200).end()
 }
 
-export default verifySignature(
-	Highlight({ projectID: env.NEXT_PUBLIC_HIGHLIGHT_PROJECT_ID })(
-		insightsHandler
-	)
-)
+export default verifySignature(insightsHandler)

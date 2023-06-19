@@ -10,7 +10,6 @@ import FormattedDate from "~/utils/FormattedDate"
 import cn from "~/utils/cn"
 
 interface Props {
-	type: "strength" | "weakness"
 	content: string
 	sources: {
 		assignment: Promise<{
@@ -23,7 +22,7 @@ interface Props {
 	}[]
 }
 
-const Insight: React.FC<Props> = ({ type, content, sources }) => {
+const Insight: React.FC<Props> = ({ content, sources }) => {
 	const { hoverProps, isHovered } = useHover({})
 
 	const sourceListRef = useRef<HTMLDivElement>(null)
