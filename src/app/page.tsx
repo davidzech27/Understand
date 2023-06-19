@@ -12,7 +12,7 @@ export const metadata = {
 const IndexPage = async () => {
 	return (
 		<>
-			<main className="flex w-screen flex-col bg-white">
+			<main className="absolute top-0 bottom-0 left-0 right-0 flex flex-col overflow-y-scroll bg-white">
 				<div className="flex h-screen w-full items-center justify-center">
 					<div className="flex h-screen flex-[2.5] flex-col justify-center px-[16%]">
 						<h1
@@ -55,7 +55,7 @@ const IndexPage = async () => {
 						</div>
 					</div>
 
-					<div className="hidden h-screen flex-1 md:flex">
+					<div className="hidden h-screen flex-1 lg:flex">
 						<ReviewScroller />
 					</div>
 				</div>
