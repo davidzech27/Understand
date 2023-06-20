@@ -155,7 +155,11 @@ const GoogleAPI = async ({ refreshToken }: { refreshToken: string }) => {
 
 			return profileSchema.parse({ email, name, photo })
 		},
-		coursesTeaching: async () => {
+		coursesTeaching: async (
+			{ includeArchived }: { includeArchived: boolean } = {
+				includeArchived: false,
+			}
+		) => {
 			type Response = {
 				courses: (unknown & { alternateLink: unknown })[] | undefined
 				nextPageToken: string | undefined
@@ -163,7 +167,9 @@ const GoogleAPI = async ({ refreshToken }: { refreshToken: string }) => {
 
 			let { courses, nextPageToken } = (await (
 				await fetch(
-					"https://classroom.googleapis.com/v1/courses?teacherId=me&courseStates=ACTIVE",
+					`https://classroom.googleapis.com/v1/courses?teacherId=me&courseStates=ACTIVE${
+						includeArchived ? ",ARCHIVED" : ""
+					}`,
 					{
 						headers: {
 							Authorization: `Bearer ${accessToken}`,
@@ -175,7 +181,9 @@ const GoogleAPI = async ({ refreshToken }: { refreshToken: string }) => {
 			while (nextPageToken !== undefined) {
 				const response = (await (
 					await fetch(
-						`https://classroom.googleapis.com/v1/courses?teacherId=me&courseStates=ACTIVE&pageToken=${nextPageToken}`,
+						`https://classroom.googleapis.com/v1/courses?teacherId=me&courseStates=ACTIVE${
+							includeArchived ? ",ARCHIVED" : ""
+						}&pageToken=${nextPageToken}`,
 						{
 							headers: {
 								Authorization: `Bearer ${accessToken}`,
@@ -196,7 +204,11 @@ const GoogleAPI = async ({ refreshToken }: { refreshToken: string }) => {
 				}))
 			)
 		},
-		coursesEnrolled: async () => {
+		coursesEnrolled: async (
+			{ includeArchived }: { includeArchived: boolean } = {
+				includeArchived: false,
+			}
+		) => {
 			type Response = {
 				courses:
 					| (unknown & {
@@ -208,7 +220,9 @@ const GoogleAPI = async ({ refreshToken }: { refreshToken: string }) => {
 
 			let { courses, nextPageToken } = (await (
 				await fetch(
-					"https://classroom.googleapis.com/v1/courses?studentId=me&courseStates=ACTIVE",
+					`https://classroom.googleapis.com/v1/courses?studentId=me&courseStates=ACTIVE${
+						includeArchived ? ",ARCHIVED" : ""
+					}`,
 					{
 						headers: {
 							Authorization: `Bearer ${accessToken}`,
@@ -220,7 +234,9 @@ const GoogleAPI = async ({ refreshToken }: { refreshToken: string }) => {
 			while (nextPageToken !== undefined) {
 				const response = (await (
 					await fetch(
-						`https://classroom.googleapis.com/v1/courses?studentId=me&courseStates=ACTIVE&pageToken=${nextPageToken}`,
+						`https://classroom.googleapis.com/v1/courses?studentId=me&courseStates=ACTIVE${
+							includeArchived ? ",ARCHIVED" : ""
+						}&pageToken=${nextPageToken}`,
 						{
 							headers: {
 								Authorization: `Bearer ${accessToken}`,

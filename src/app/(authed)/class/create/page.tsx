@@ -58,8 +58,12 @@ const ClassCreatePage = () => {
 				(superuser
 					? (
 							await Promise.all([
-								googleAPI.coursesTeaching(),
-								googleAPI.coursesEnrolled(),
+								googleAPI.coursesTeaching({
+									includeArchived: true,
+								}),
+								googleAPI.coursesEnrolled({
+									includeArchived: true,
+								}),
 							])
 					  ).flat()
 					: await googleAPI.coursesTeaching()
