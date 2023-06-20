@@ -7,6 +7,7 @@ import Course from "~/data/Course"
 import User from "~/data/User"
 import { getAuthOrThrow } from "~/auth/jwt"
 import syncCourse from "~/sync/syncCourse"
+import GoogleAPI from "~/google/GoogleAPI"
 
 const isEmailValid = (email: string) =>
 	email.search(
@@ -38,6 +39,20 @@ const createCourseAction = zact(
 		const { email, ...creatorAuth } = await getAuthOrThrow({
 			cookies: cookies(),
 		})
+
+		if (linkedUrl !== undefined) {
+			const googleAPI = await GoogleAPI({
+				refreshToken: creatorAuth.googleRefreshToken,
+			})
+
+			const teachers = await googleAPI.coursesTeaching()
+
+			if (!teachers.map(({ id }) => id).includes(id)) {
+				throw new Error(
+					"Must be teacher of Google Classroom course to link to it"
+				)
+			}
+		}
 
 		linkedAdditionalTeacherEmails =
 			linkedAdditionalTeacherEmails.filter(isEmailValid)
