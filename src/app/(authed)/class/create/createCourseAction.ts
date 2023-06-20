@@ -45,9 +45,12 @@ const createCourseAction = zact(
 				refreshToken: creatorAuth.googleRefreshToken,
 			})
 
-			const teachers = await googleAPI.coursesTeaching()
+			const coursesTeaching = await googleAPI.coursesTeaching()
 
-			if (!teachers.map(({ id }) => id).includes(id)) {
+			if (
+				!coursesTeaching.map(({ id }) => id).includes(id) &&
+				!(await User({ email }).get())?.superuser
+			) {
 				throw new Error(
 					"Must be teacher of Google Classroom course to link to it"
 				)

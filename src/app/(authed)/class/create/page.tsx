@@ -3,6 +3,7 @@ import { cookies } from "next/headers"
 import { getAuthOrThrow, setAuth } from "~/auth/jwt"
 import CreateClassForm from "./CreateClassForm"
 import GoogleAPI from "~/google/GoogleAPI"
+import User from "~/data/User"
 
 //! export const runtime = "edge" add back when server components error is fixed
 
@@ -10,7 +11,7 @@ export const metadata = {
 	title: "Create class",
 }
 
-const ClassCreatePage = async () => {
+const ClassCreatePage = () => {
 	const authPromise = getAuthOrThrow({ cookies: cookies() })
 
 	const googleAPIPromise = authPromise.then(
@@ -44,13 +45,29 @@ const ClassCreatePage = async () => {
 
 	const emailPromise = authPromise.then(({ email }) => email)
 
+	const superuserPromise = emailPromise.then((email) =>
+		User({ email })
+			.get()
+			.then((user) => user?.superuser ?? false)
+	)
+
 	const coursesPromise = googleAPIPromise.then(
-		async (googleAPI) =>
+		(googleAPI) =>
 			googleAPI &&
-			(await googleAPI.coursesTeaching())?.map((course) => ({
-				...course,
-				roster: googleAPI.courseRoster({ courseId: course.id }),
-			}))
+			superuserPromise.then(async (superuser) =>
+				(superuser
+					? (
+							await Promise.all([
+								googleAPI.coursesTeaching(),
+								googleAPI.coursesEnrolled(),
+							])
+					  ).flat()
+					: await googleAPI.coursesTeaching()
+				)?.map((course) => ({
+					...course,
+					roster: googleAPI.courseRoster({ courseId: course.id }),
+				}))
+			)
 	)
 
 	return (

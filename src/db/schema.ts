@@ -15,6 +15,7 @@ export const user = mysqlTable("user", {
 	email: varchar("email", { length: 100 }).primaryKey(),
 	name: varchar("name", { length: 100 }).notNull(),
 	photo: varchar("photo", { length: 2000 }),
+	superuser: boolean("superuser"),
 })
 
 export const teacherToCourse = mysqlTable(

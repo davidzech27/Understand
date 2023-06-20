@@ -26,7 +26,11 @@ const User = ({ email }: { email: string }) => ({
 	get: async () => {
 		const row = (
 			await db
-				.select({ name: user.name, photo: user.photo })
+				.select({
+					name: user.name,
+					photo: user.photo,
+					superuser: user.superuser,
+				})
 				.from(user)
 				.where(eq(user.email, email))
 		)[0]
@@ -37,6 +41,7 @@ const User = ({ email }: { email: string }) => ({
 			email,
 			name: row.name,
 			photo: row.photo ?? undefined,
+			superuser: row.superuser ?? false,
 		}
 	},
 	update: async ({ name, photo }: { name?: string; photo?: string }) => {

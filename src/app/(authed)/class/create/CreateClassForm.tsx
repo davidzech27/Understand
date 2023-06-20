@@ -151,7 +151,11 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 				.filter((email) => email !== profileEmail)
 		)
 
-		setStudentEmailInputs(roster.students.map((student) => student.email))
+		setStudentEmailInputs(
+			roster.students
+				.map((student) => student.email)
+				.filter((email) => email !== profileEmail)
+		)
 
 		setLinkedCourse({
 			...course,
@@ -160,7 +164,9 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 					.map((teacher) => teacher.email)
 					.filter(Boolean)
 					.filter((email) => email !== profileEmail),
-				studentEmails: roster.students.map((student) => student.email),
+				studentEmails: roster.students
+					.map((student) => student.email)
+					.filter((email) => email !== profileEmail),
 			},
 		})
 
@@ -364,7 +370,15 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 			>
 				{linkClassModalOpen && (
 					<div className="flex h-full flex-col justify-between">
-						<Row.List items={use(coursesPromise) ?? []}>
+						<Row.List
+							items={use(coursesPromise) ?? []}
+							renderEmptyState={
+								<div className="text-lg font-medium opacity-60">
+									You&apos;re not teaching any classes in
+									Google Classroom
+								</div>
+							}
+						>
 							{({ item: { id, name, section } }) => (
 								<Row.Item
 									key={id}
@@ -395,7 +409,6 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 								</Row.Item>
 							)}
 						</Row.List>
-
 						<Button
 							onClick={onChooseClass}
 							loading={courseLoading}
