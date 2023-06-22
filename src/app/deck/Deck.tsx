@@ -22,12 +22,12 @@ const Deck = () => {
 
 			<div className="text-[3rem] font-medium leading-[1.25] text-white">
 				Teachers can&apos;t know what each of their students struggle
-				with or why they do.
+				with or why.
 			</div>
 
 			<div className="text-[3rem] font-medium leading-[1.25] text-white">
-				Even when they have a vague idea, these can&apos;t efficiently
-				be addressed during class time.
+				Even with a vague idea of what these are, there&apos;s no way to
+				address them efficiently.
 			</div>
 		</div>,
 		<div key={2} className="w-full space-y-12">
@@ -45,6 +45,7 @@ const Deck = () => {
 				Students are disengaged, and teachers are burning out. If
 				nothing changes, this will only worsen as class sizes increase
 				in the coming years.
+				{/* maybe add more at beginning. not the most smooth or logical transition */}
 			</div>
 		</div>,
 		<div key={3} className="w-full space-y-2.5">
@@ -55,7 +56,8 @@ const Deck = () => {
 			<div className="text-[3rem] font-medium leading-[1.25] text-white">
 				We&apos;ve built a product that provides students with in-depth
 				feedback on their assignments and their teachers with meaningful
-				findings about them.
+				findings about them. It requires no changes to the way that
+				teachers already teach.
 			</div>
 		</div>,
 		<div key={4} className="w-full space-y-2.5">
@@ -64,7 +66,7 @@ const Deck = () => {
 			</div>
 
 			<div className="text-[3.5rem] font-medium leading-[1.25] text-white">
-				Reengage the world&apos;s students and teachers
+				Reengage the world&apos;s students and teachers.
 			</div>
 		</div>,
 	]
@@ -115,25 +117,11 @@ const Deck = () => {
 
 export default Deck
 
-// Tailored instruction is markedly difficult to provide.
-
-//
-
-//
-// and this is especially true at the beginning of the year, before teachers are aquainted with
-
+// some spoken lines
+// and this is especially true at the beginning of the year
 // they'll often have 200+ students, so as helpful as it may be, it's infeasible. students may go through an entire year of school only receiving any kind of feedback once or twice
-
-// Students respond best to instruction aligned with their specific needs and interests.
 // it's what I've found to be true in my own life, what others have found to be true in their experience teaching, and what's backed up by pedagogical research
-// But it's unreasonable to expect teachers to provide this level of attention for all their students.
-
-// As a result students are disengaged, and teachers are burning out. If nothing changes, this will only worsen as class sizes increase in the coming years.
-
-// We've built a product that provides students with in-depth feedback on their assignments and their teachers with meaningful findings about them.
-
-// Mission
-// Reengage the world's students and teachers
+// Every student will have their own follow-up questions they keep to themselves. Additionally, addressing them will often difficult to do without the student's work pulled up in front of them, something not well-suited for the classroom settings.
 
 // product slide
 //
