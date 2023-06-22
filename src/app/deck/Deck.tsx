@@ -5,67 +5,67 @@ import cn from "~/utils/cn"
 
 const Deck = () => {
 	const slides = [
-		<div key={0} className="w-full space-y-12">
-			<div className="text-[12rem] font-semibold leading-none tracking-tight text-white">
+		<div key={0} className="w-full space-y-[2.870813397vw]">
+			<div className="text-[11.4832535885vw] font-semibold leading-none tracking-tight text-white">
 				Understand
 			</div>
 
-			<div className="ml-2 text-[6rem] font-medium leading-none text-white">
+			<div className="ml-2 text-[5.74162679426vw] font-medium leading-none text-white">
 				Engage easier
 			</div>
 		</div>,
 
-		<div key={1} className="w-full space-y-12">
-			<div className="text-[3rem] font-medium leading-[1.25] text-white">
+		<div key={1} className="w-full space-y-[2.870813397vw]">
+			<div className="text-[2.87081339713vw] font-medium leading-[1.25] text-white">
 				Tailored instruction is markedly difficult to provide.
 			</div>
 
-			<div className="text-[3rem] font-medium leading-[1.25] text-white">
+			<div className="text-[2.87081339713vw] font-medium leading-[1.25] text-white">
 				Teachers can&apos;t know what each of their students struggle
 				with or why.
 			</div>
 
-			<div className="text-[3rem] font-medium leading-[1.25] text-white">
+			<div className="text-[2.87081339713vw] font-medium leading-[1.25] text-white">
 				Even with a vague idea of what these are, there&apos;s no way to
 				address them efficiently.
 			</div>
 		</div>,
-		<div key={2} className="w-full space-y-12">
-			<div className="text-[3rem] font-medium leading-[1.25] text-white">
+		<div key={2} className="w-full space-y-[2.870813397vw]">
+			<div className="text-[2.87081339713vw] font-medium leading-[1.25] text-white">
 				Students respond best to instruction aligned with their specific
 				needs and interests.
 			</div>
 
-			<div className="text-[3rem] font-medium leading-[1.25] text-white">
+			<div className="text-[2.87081339713vw] font-medium leading-[1.25] text-white">
 				But it&apos;s unreasonable to expect teachers to provide this
 				level of attention for all their students, or anything near it.
 			</div>
 
-			<div className="text-[3rem] font-medium leading-[1.25] text-white">
+			<div className="text-[2.87081339713vw] font-medium leading-[1.25] text-white">
 				Students are disengaged, and teachers are burning out. If
 				nothing changes, this will only worsen as class sizes increase
 				in the coming years.
 				{/* maybe add more at beginning. not the most smooth or logical transition */}
 			</div>
 		</div>,
-		<div key={3} className="w-full space-y-2.5">
-			<div className="text-[1.25rem] font-semibold leading-none text-white">
+		<div key={3} className="w-full space-y-[0.5980861244vw]">
+			<div className="text-[1.1961722488vw] font-semibold leading-none text-white">
 				SOLUTION
 			</div>
 
-			<div className="text-[3rem] font-medium leading-[1.25] text-white">
+			<div className="text-[2.87081339713vw] font-medium leading-[1.25] text-white">
 				We&apos;ve built a product that provides students with in-depth
 				feedback on their assignments and their teachers with meaningful
 				findings about them. It requires no changes to the way that
 				teachers already teach.
 			</div>
 		</div>,
-		<div key={4} className="w-full space-y-2.5">
-			<div className="text-[1.25rem] font-semibold leading-none text-white">
+		<div key={4} className="w-full space-y-[0.5980861244vw]">
+			<div className="text-[1.1961722488vw] font-semibold leading-none text-white">
 				MISSION
 			</div>
 
-			<div className="text-[3.5rem] font-medium leading-[1.25] text-white">
+			<div className="text-[3.34928229665vw] font-medium leading-[1.25] text-white">
 				Reengage the world&apos;s students and teachers.
 			</div>
 		</div>,
@@ -99,7 +99,7 @@ const Deck = () => {
 
 	return (
 		<div className="flex h-screen w-full items-center justify-center bg-gradient-to-tr from-primary to-secondary">
-			<div className="flex aspect-video w-full items-center px-72">
+			<div className="flex aspect-video w-full items-center px-[17.2248803828vw]">
 				{slides[slideIndex]}
 			</div>
 
