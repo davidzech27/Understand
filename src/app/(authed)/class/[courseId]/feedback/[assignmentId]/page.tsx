@@ -7,6 +7,7 @@ import User from "~/data/User"
 import Course from "~/data/Course"
 import Feedback from "./Feedback"
 import GoogleAPI from "~/google/GoogleAPI"
+import FeedbackData from "~/data/Feedback"
 
 export const generateMetadata = async ({
 	params: { courseId, assignmentId },
@@ -30,7 +31,7 @@ const FeedbackPage = async ({
 }: {
 	params: Params
 }) => {
-	const [[role, profile, submissions], assignment, course] =
+	const [[role, profile, submissions, feedback], assignment, course] =
 		await Promise.all([
 			getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
 				Promise.all([
@@ -69,6 +70,117 @@ const FeedbackPage = async ({
 									}),
 								}))
 						}),
+					User({ email })
+						.feedback({ courseId, assignmentId })
+						.then((feedback) =>
+							feedback.map(({ givenAt }) => {
+								const feedbackInfoPromise = Promise.all([
+									FeedbackData({
+										courseId,
+										assignmentId,
+										userEmail: email,
+										givenAt,
+									}).get(),
+									FeedbackData({
+										courseId,
+										assignmentId,
+										userEmail: email,
+										givenAt,
+									}).followUps(),
+								]).then(([feedback, followUps]) => {
+									if (feedback === undefined) notFound()
+
+									const lines =
+										feedback.rawResponse.split("\n")
+
+									const headerLineIndex = {
+										specificFeedback: lines.findIndex(
+											(line) =>
+												line.search(
+													/^Specific Feedback:?\s*$/
+												) !== -1
+										),
+										generalFeedback: lines.findIndex(
+											(line) =>
+												line.search(
+													/^General Feedback:?\s*$/
+												) !== -1
+										),
+									}
+
+									const specificFeedbackList = lines
+										.slice(
+											headerLineIndex.specificFeedback +
+												1,
+											headerLineIndex.generalFeedback
+										)
+										.join("\n")
+										.split("\n\n")
+										.map((feedback) => ({
+											paragraph: Number(
+												feedback.match(
+													/(?<=^(\d\.[ ])?\s*Paragraph( number)?[ ]?:? ?)\d+/g
+												)?.[0]
+											),
+											sentence: Number(
+												feedback.match(
+													/(?<=\nSentence( number)?[ ]?:? ?)-?\d+/g
+												)?.[0]
+											),
+											content:
+												feedback.match(
+													/(?<=\nFeedback[ ]?: ).+/g
+												)?.[0] ?? "",
+										}))
+										.map((feedback) => ({
+											...feedback,
+											followUps:
+												followUps.specific.find(
+													(followUpList) =>
+														followUpList.paragraphNumber ===
+															feedback.paragraph &&
+														followUpList.sentenceNumber ===
+															feedback.sentence
+												)?.messages ?? [],
+										}))
+
+									const generalFeedback = {
+										content: lines
+											.slice(
+												headerLineIndex.generalFeedback +
+													1
+											)
+											.join("\n"),
+										followUps: followUps.general,
+									}
+
+									return {
+										submissionHTML: feedback.submissionHTML,
+										specificFeedbackList,
+										generalFeedback,
+									}
+								})
+
+								return {
+									givenAt,
+									submissionHTMLPromise:
+										feedbackInfoPromise.then(
+											({ submissionHTML }) =>
+												submissionHTML
+										),
+									specificFeedbackListPromise:
+										feedbackInfoPromise.then(
+											({ specificFeedbackList }) =>
+												specificFeedbackList
+										),
+									generalFeedbackPromise:
+										feedbackInfoPromise.then(
+											({ generalFeedback }) =>
+												generalFeedback
+										),
+								}
+							})
+						),
 				])
 			),
 			Assignment({ courseId, assignmentId }).get(),
@@ -90,6 +202,7 @@ const FeedbackPage = async ({
 				...assignment,
 				instructions: assignment.instructions,
 			}}
+			feedbackHistory={feedback}
 			email={profile.email}
 			profileName={profile.name}
 			courseName={course.name}

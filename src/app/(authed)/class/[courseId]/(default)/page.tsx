@@ -10,7 +10,6 @@ import Course from "~/data/Course"
 interface Params {
 	courseId: string
 }
-// have student feedback activity with links to feedback
 const ClassPage = async ({ params: { courseId } }: { params: Params }) => {
 	const { email } = await getAuthOrThrow({ cookies: cookies() })
 

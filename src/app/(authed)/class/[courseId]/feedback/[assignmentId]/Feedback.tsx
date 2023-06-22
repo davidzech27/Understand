@@ -4,7 +4,6 @@ import {
 	useState,
 	useEffect,
 	useImperativeHandle,
-	useTransition,
 	forwardRef,
 	CSSProperties,
 } from "react"
@@ -27,6 +26,7 @@ import registerFollowUpAction from "./registerFollowUpAction"
 import registerInsightsAction from "./registerInsightsAction"
 import colors from "~/colors.cjs"
 import getInsights from "~/ai/getInsights"
+import FormattedDate from "~/utils/FormattedDate"
 
 interface Props {
 	assignment: {
@@ -39,6 +39,22 @@ interface Props {
 		dueAt?: Date
 		linkedUrl?: string
 	}
+	feedbackHistory: {
+		givenAt: Date
+		submissionHTMLPromise: Promise<string>
+		specificFeedbackListPromise: Promise<
+			{
+				content: string
+				followUps: string[]
+				paragraph: number
+				sentence: number
+			}[]
+		>
+		generalFeedbackPromise: Promise<{
+			content: string
+			followUps: string[]
+		}>
+	}[]
 	email: string
 	profileName: string
 	courseName: string
@@ -64,12 +80,60 @@ const getDomIdOfSpecificFeedbackHighlight = ({
 
 const Feedback: React.FC<Props> = ({
 	assignment,
+	feedbackHistory: feedbackHistoryProp,
 	email,
 	profileName,
 	courseName,
 	role,
 	submissions,
 }) => {
+	const [feedbackHistory, setFeedbackHistory] = useState(feedbackHistoryProp)
+
+	const [selectedFeedbackGivenAt, setSelectedFeedbackGivenAt] =
+		useState<Date>()
+
+	const [copiedFeedbackLinkGivenAt, setCopiedFeedbackLinkGivenAt] =
+		useState<Date>()
+
+	useEffect(() => {
+		if (selectedFeedbackGivenAt === undefined) {
+			submissionRef.current?.setHTML("")
+
+			setSpecificFeedbackList([])
+
+			setGeneralFeedback(undefined)
+		} else {
+			const feedbackInfo = feedbackHistory.find(
+				({ givenAt }) =>
+					givenAt.valueOf() === selectedFeedbackGivenAt.valueOf()
+			)
+
+			feedbackInfo &&
+				(async () => {
+					submissionRef.current?.setHTML(
+						await feedbackInfo.submissionHTMLPromise
+					)
+
+					setSpecificFeedbackList(
+						(
+							(await feedbackInfo.specificFeedbackListPromise) ??
+							[]
+						).map((specificFeedback) => ({
+							...specificFeedback,
+							generating: false,
+							state: undefined,
+						}))
+					)
+
+					setGeneralFeedback({
+						...(await feedbackInfo.generalFeedbackPromise),
+						generating: false,
+						state: undefined,
+					})
+				})()
+		}
+	}, [selectedFeedbackGivenAt, feedbackHistory])
+
 	const submissionRef = useRef<{
 		getText: () => string | undefined
 		getTextOffset: ({}: { paragraph: number }) => number
@@ -118,7 +182,7 @@ const Feedback: React.FC<Props> = ({
 			}
 
 			if (headerRef.current) {
-				setHeaderHeight(headerRef.current.offsetHeight + 20)
+				setHeaderHeight(headerRef.current.offsetHeight + 108) //!
 			}
 		}
 
@@ -153,6 +217,32 @@ const Feedback: React.FC<Props> = ({
 	const { mutate: registerFeedback, data: feedbackData } = useZact(
 		registerFeedbackAction
 	)
+
+	useEffect(() => {
+		if (
+			feedbackData?.givenAt &&
+			feedbackHistory.at(-1)?.givenAt.valueOf() !==
+				feedbackData?.givenAt.valueOf() &&
+			generalFeedback !== undefined
+		) {
+			setFeedbackHistory((feedbackHistory) => [
+				...feedbackHistory,
+				{
+					givenAt: feedbackData.givenAt,
+					submissionHTMLPromise: Promise.resolve(
+						submissionRef.current?.getHTML() ?? ""
+					),
+					specificFeedbackListPromise:
+						Promise.resolve(specificFeedbackList),
+					generalFeedbackPromise: Promise.resolve(generalFeedback),
+				},
+			])
+
+			setSelectedFeedbackGivenAt(feedbackData.givenAt)
+		}
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- feedbackData and feedbackHistory will change after specificFeedbackList and generalFeedback
+	}, [feedbackData, feedbackHistory])
 
 	const onGetFeedback = () => {
 		const submissionInput = submissionRef.current?.getText()
@@ -298,13 +388,9 @@ const Feedback: React.FC<Props> = ({
 		}
 	}
 
-	const [linkCopied, setLinkCopied] = useState(false)
-
 	const onTryAgain = () => {
 		setSpecificFeedbackList([])
 		setGeneralFeedback(undefined)
-
-		setLinkCopied(false)
 	}
 
 	const [feedbackResponse, setFeedbackResponse] = useState<{
@@ -480,7 +566,7 @@ const Feedback: React.FC<Props> = ({
 	}
 
 	return (
-		<div className="relative flex h-full w-full overflow-y-scroll overscroll-y-contain rounded-md border border-border bg-white pt-16 shadow-lg shadow-[#00000016]">
+		<>
 			{submissions.length > 0 && (
 				<Modal
 					title="Pick a submission"
@@ -532,189 +618,238 @@ const Feedback: React.FC<Props> = ({
 				</Modal>
 			)}
 
-			<div
-				style={{ marginTop: headerHeight ?? 0 }}
-				className="flex-[0.75]"
-			>
-				<SpecificFeedbackColumn
-					feedbackList={specificFeedbackList.filter(
-						(_, index) => index % 2 === 1
-					)}
-					getSubmissionTextOffset={
-						submissionRef.current
-							? submissionRef.current.getTextOffset
-							: () => 0
-					}
-					onGetFollowUp={onGetFollowUp}
-					onStateChange={({ paragraph, sentence, update }) =>
-						setSpecificFeedbackList(
-							produce((feedbackList) => {
-								const feedback = feedbackList.find(
-									(feedback) =>
-										feedback.paragraph === paragraph &&
-										feedback.sentence === sentence
-								)
+			<div className="relative flex h-full w-full overflow-y-scroll overscroll-y-contain rounded-md border border-border bg-white shadow-lg shadow-[#00000016]">
+				<div
+					style={{ marginTop: headerHeight ?? 0 }}
+					className="flex-[0.75]"
+				>
+					<SpecificFeedbackColumn
+						feedbackList={specificFeedbackList.filter(
+							(_, index) => index % 2 === 1
+						)}
+						getSubmissionTextOffset={
+							submissionRef.current
+								? submissionRef.current.getTextOffset
+								: () => 0
+						}
+						onGetFollowUp={onGetFollowUp}
+						onStateChange={({ paragraph, sentence, update }) =>
+							setSpecificFeedbackList(
+								produce((feedbackList) => {
+									const feedback = feedbackList.find(
+										(feedback) =>
+											feedback.paragraph === paragraph &&
+											feedback.sentence === sentence
+									)
 
-								if (!feedback) return
+									if (!feedback) return
 
-								feedback.state = update(feedback.state)
-							})
-						)
-					}
-				/>
-			</div>
+									feedback.state = update(feedback.state)
+								})
+							)
+						}
+					/>
+				</div>
 
-			<div className="relative flex basis-[704px] flex-col">
-				<div ref={headerRef} className="min-h-12 flex flex-col">
-					<div className="flex items-end justify-between">
-						<div className="select-text text-2xl font-bold">
-							{assignment.title}
-						</div>
-
-						{/* not sure why this is even necessary with justify-between */}
-						<div className="flex-1" />
-
-						<div className="flex-shrink-0">
-							{submissionEmpty && submissions.length > 0 ? (
-								<Button
-									onClick={() => setModal("submission")}
-									className="text-lg"
-								>
-									Import submission
-								</Button>
-							) : editing ? (
-								<Button
-									onClick={onGetFeedback}
-									disabled={submissionEmpty}
-									className="text-lg"
-								>
-									Get feedback
-								</Button>
-							) : generating ? (
-								<Button disabled className="text-lg">
-									{specificFeedbackList.length > 0
-										? "Generating feedback..."
-										: "Analyzing work..."}
-								</Button>
+				<div className="relative flex basis-[704px] flex-col">
+					<div ref={headerRef} className="min-h-12 flex flex-col">
+						<div className="mb-2.5 mt-2.5 flex flex-col space-y-2.5">
+							{feedbackHistory.length === 0 ? (
+								<div className="h-16" />
 							) : (
-								<div className="flex space-x-1.5">
-									{feedbackData && (
-										<Button
-											onClick={() => {
+								feedbackHistory.map(({ givenAt }, index) => (
+									<div
+										onClick={() =>
+											setSelectedFeedbackGivenAt(givenAt)
+										}
+										key={index}
+										className={cn(
+											"flex h-20 cursor-pointer items-center justify-between rounded-md border-[0.75px] border-border pl-6 pr-8 transition duration-150",
+											givenAt.valueOf() ===
+												selectedFeedbackGivenAt?.valueOf()
+												? "bg-surface-selected hover:bg-surface-selected-hover"
+												: "hover:bg-surface-hover"
+										)}
+									>
+										<span className="font-medium opacity-80">
+											<FormattedDate
+												prefix=""
+												date={givenAt}
+											/>
+										</span>
+
+										<button
+											className="rounded-md border-border px-3 py-1.5 font-medium opacity-60 transition-all duration-150 hover:bg-surface-selected-hover hover:opacity-80"
+											onClick={(e) => {
+												e.stopPropagation()
+
 												navigator.clipboard.writeText(
 													`${
 														window.location.href
-													}/${email}/${feedbackData.givenAt.valueOf()}`
+													}/${email}/${givenAt.valueOf()}`
 												)
 
-												setLinkCopied(true)
+												setCopiedFeedbackLinkGivenAt(
+													givenAt
+												)
 											}}
-											className="text-lg"
 										>
-											{linkCopied
+											{givenAt.valueOf() ===
+											copiedFeedbackLinkGivenAt?.valueOf()
 												? "Link copied"
 												: "Copy link"}
-										</Button>
-									)}
-									<Button
-										onClick={onTryAgain}
-										className="text-lg"
-									>
-										Try again
-									</Button>
-								</div>
+										</button>
+									</div>
+								))
+							)}
+
+							{selectedFeedbackGivenAt && (
+								<Button
+									className="h-20"
+									onClick={() =>
+										setSelectedFeedbackGivenAt(undefined)
+									}
+								>
+									Start over
+								</Button>
 							)}
 						</div>
+
+						<div className="flex items-end justify-between">
+							<div className="select-text text-2xl font-bold">
+								{assignment.title}
+							</div>
+
+							{/* not sure why this is even necessary with justify-between */}
+							<div className="flex-1" />
+
+							<div className="flex-shrink-0">
+								{submissionEmpty && submissions.length > 0 ? (
+									<Button
+										onClick={() => setModal("submission")}
+										className="text-lg"
+									>
+										Import submission
+									</Button>
+								) : editing ? (
+									<Button
+										onClick={onGetFeedback}
+										disabled={submissionEmpty}
+										className="text-lg"
+									>
+										Get feedback
+									</Button>
+								) : generating ? (
+									<Button disabled className="text-lg">
+										{specificFeedbackList.length > 0
+											? "Generating feedback..."
+											: "Analyzing work..."}
+									</Button>
+								) : (
+									<div className="flex space-x-1.5">
+										<Button
+											onClick={onTryAgain}
+											className="text-lg"
+										>
+											Try again
+										</Button>
+									</div>
+								)}
+							</div>
+						</div>
+
+						{assignment.description !== undefined && (
+							<p className="mt-3.5 mb-0.5 select-text text-sm opacity-60">
+								{assignment.description}
+							</p>
+						)}
 					</div>
 
-					{assignment.description !== undefined && (
-						<p className="mt-3.5 mb-0.5 select-text text-sm opacity-60">
-							{assignment.description}
-						</p>
-					)}
+					<hr className="mt-2 mb-3" />
+
+					<Submission
+						editing={editing}
+						onChangeEmpty={setSubmissionEmpty}
+						specificFeedbackList={specificFeedbackList}
+						onSpecificFeedbackStateChange={({
+							paragraph,
+							sentence,
+							update,
+						}) =>
+							setSpecificFeedbackList(
+								produce((feedbackList) => {
+									const feedback = feedbackList.find(
+										(feedback) =>
+											feedback.paragraph === paragraph &&
+											feedback.sentence === sentence
+									)
+
+									if (!feedback) return
+
+									feedback.state = update(feedback.state)
+								})
+							)
+						}
+						ref={submissionRef}
+					/>
+
+					<AnimatePresence>
+						{generalFeedback !== undefined && (
+							<GeneralFeedback
+								{...generalFeedback}
+								onGetFollowUp={(followUps) =>
+									onGetFollowUp({ followUps })
+								}
+								onStateChange={(update) =>
+									setGeneralFeedback(
+										(generalFeedback) =>
+											generalFeedback && {
+												...generalFeedback,
+												state: update(
+													generalFeedback.state
+												),
+											}
+									)
+								}
+								submissionWidth={submissionWidth ?? 0}
+							/>
+						)}
+					</AnimatePresence>
 				</div>
 
-				<hr className="mt-2 mb-3" />
+				<div
+					style={{ marginTop: headerHeight ?? 0 }}
+					className="flex-1"
+				>
+					<SpecificFeedbackColumn
+						feedbackList={specificFeedbackList.filter(
+							(_, index) => index % 2 === 0
+						)}
+						getSubmissionTextOffset={
+							submissionRef.current
+								? submissionRef.current.getTextOffset
+								: () => 0
+						}
+						onGetFollowUp={onGetFollowUp}
+						onStateChange={({ paragraph, sentence, update }) =>
+							setSpecificFeedbackList(
+								produce((feedbackList) => {
+									const feedback = feedbackList.find(
+										(feedback) =>
+											feedback.paragraph === paragraph &&
+											feedback.sentence === sentence
+									)
 
-				<Submission
-					editing={editing}
-					onChangeEmpty={setSubmissionEmpty}
-					specificFeedbackList={specificFeedbackList}
-					onSpecificFeedbackStateChange={({
-						paragraph,
-						sentence,
-						update,
-					}) =>
-						setSpecificFeedbackList(
-							produce((feedbackList) => {
-								const feedback = feedbackList.find(
-									(feedback) =>
-										feedback.paragraph === paragraph &&
-										feedback.sentence === sentence
-								)
+									if (!feedback) return
 
-								if (!feedback) return
-
-								feedback.state = update(feedback.state)
-							})
-						)
-					}
-					ref={submissionRef}
-				/>
-
-				<AnimatePresence>
-					{generalFeedback !== undefined && (
-						<GeneralFeedback
-							{...generalFeedback}
-							onGetFollowUp={(followUps) =>
-								onGetFollowUp({ followUps })
-							}
-							onStateChange={(update) =>
-								setGeneralFeedback(
-									(generalFeedback) =>
-										generalFeedback && {
-											...generalFeedback,
-											state: update(
-												generalFeedback.state
-											),
-										}
-								)
-							}
-							submissionWidth={submissionWidth ?? 0}
-						/>
-					)}
-				</AnimatePresence>
+									feedback.state = update(feedback.state)
+								})
+							)
+						}
+					/>
+				</div>
 			</div>
-
-			<div style={{ marginTop: headerHeight ?? 0 }} className="flex-1">
-				<SpecificFeedbackColumn
-					feedbackList={specificFeedbackList.filter(
-						(_, index) => index % 2 === 0
-					)}
-					getSubmissionTextOffset={
-						submissionRef.current
-							? submissionRef.current.getTextOffset
-							: () => 0
-					}
-					onGetFollowUp={onGetFollowUp}
-					onStateChange={({ paragraph, sentence, update }) =>
-						setSpecificFeedbackList(
-							produce((feedbackList) => {
-								const feedback = feedbackList.find(
-									(feedback) =>
-										feedback.paragraph === paragraph &&
-										feedback.sentence === sentence
-								)
-
-								if (!feedback) return
-
-								feedback.state = update(feedback.state)
-							})
-						)
-					}
-				/>
-			</div>
-		</div>
+		</>
 	)
 }
 
@@ -732,6 +867,7 @@ const Submission = forwardRef<
 		editing: boolean
 		onChangeEmpty: (empty: boolean) => void
 		specificFeedbackList: {
+			content: string
 			paragraph: number
 			sentence: number
 			state: "focus" | "hover" | undefined
@@ -756,17 +892,23 @@ const Submission = forwardRef<
 	) => {
 		const ref = useRef<HTMLDivElement>(null)
 
-		const [
-			previousSpecificFeedbackListLength,
-			setPreviousSpecificFeedbackListLength,
-		] = useState(0)
+		const [previousSpecificFeedbackList, setPreviousSpecificFeedbackList] =
+			useState<typeof specificFeedbackList>()
 
 		if (
-			previousSpecificFeedbackListLength !==
-				specificFeedbackList.length &&
+			(previousSpecificFeedbackList?.length !==
+				specificFeedbackList.length ||
+				!specificFeedbackList
+					.map(({ content }) => content)
+					.join("")
+					.startsWith(
+						previousSpecificFeedbackList
+							.map(({ content }) => content)
+							.join("")
+					)) &&
 			ref.current !== null
 		) {
-			setPreviousSpecificFeedbackListLength(specificFeedbackList.length)
+			setPreviousSpecificFeedbackList(specificFeedbackList)
 
 			for (const { paragraph, sentence } of specificFeedbackList) {
 				const highlightId = getDomIdOfSpecificFeedbackHighlight({
@@ -930,10 +1072,7 @@ const Submission = forwardRef<
 					addSelectTextToChildren(div)
 				}
 			}
-		}, [editing])
-
-		const [previousSpecificFeedbackList, setPreviousSpecificFeedbackList] =
-			useState(specificFeedbackList)
+		}, [editing, specificFeedbackList])
 
 		useEffect(() => {
 			if (previousSpecificFeedbackList !== specificFeedbackList) {
@@ -941,7 +1080,7 @@ const Submission = forwardRef<
 
 				for (const currentSpecificFeedback of specificFeedbackList) {
 					const previousSpecificFeedback =
-						previousSpecificFeedbackList.find(
+						previousSpecificFeedbackList?.find(
 							(specificFeedback) =>
 								specificFeedback.paragraph ===
 									currentSpecificFeedback.paragraph &&
@@ -957,9 +1096,9 @@ const Submission = forwardRef<
 					)
 
 					if (
-						previousSpecificFeedback !== undefined &&
-						previousSpecificFeedback.state !==
-							currentSpecificFeedback.state &&
+						(previousSpecificFeedback === undefined ||
+							previousSpecificFeedback.state !==
+								currentSpecificFeedback.state) &&
 						highlightSpan !== null
 					) {
 						switch (currentSpecificFeedback.state) {
@@ -1323,11 +1462,19 @@ const SpecificFeedbackColumn: React.FC<{
 
 	const [tops, setTops] = useState<number[]>([])
 
-	const [previousFeedbackListLength, setPreviousFeedbackListLength] =
-		useState(0)
+	const [previousFeedbackList, setPreviousFeedbackList] =
+		useState<typeof feedbackList>()
 
-	if (previousFeedbackListLength !== feedbackList.length) {
-		setPreviousFeedbackListLength(feedbackList.length)
+	if (
+		previousFeedbackList?.length !== feedbackList.length ||
+		!feedbackList
+			.map(({ content }) => content)
+			.join("")
+			.startsWith(
+				previousFeedbackList.map(({ content }) => content).join("")
+			)
+	) {
+		setPreviousFeedbackList(feedbackList)
 
 		const newTops = [] as number[]
 

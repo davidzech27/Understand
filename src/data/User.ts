@@ -8,6 +8,7 @@ import {
 	teacherToCourse,
 	studentInsight,
 	insight,
+	feedback,
 } from "~/db/schema"
 
 const User = ({ email }: { email: string }) => ({
@@ -195,6 +196,40 @@ const User = ({ email }: { email: string }) => ({
 		if (studentRow !== undefined) return "student" as const
 
 		return "none" as const
+	},
+	feedback: async ({
+		courseId,
+		assignmentId,
+	}: {
+		courseId: string
+		assignmentId: string
+	}) => {
+		return (
+			await db
+				.select({
+					givenAt: feedback.givenAt,
+				})
+				.from(feedback)
+				.where(
+					and(
+						eq(feedback.courseId, courseId),
+						eq(feedback.assignmentId, assignmentId),
+						eq(feedback.userEmail, email)
+					)
+				)
+		).map(({ givenAt }) => ({
+			givenAt: new Date(
+				Date.UTC(
+					givenAt.getFullYear(),
+					givenAt.getMonth(),
+					givenAt.getDate(),
+					givenAt.getHours(),
+					givenAt.getMinutes(),
+					givenAt.getSeconds(),
+					givenAt.getMilliseconds()
+				)
+			),
+		}))
 	},
 })
 
