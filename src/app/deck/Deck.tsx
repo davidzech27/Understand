@@ -14,7 +14,6 @@ const Deck = () => {
 				Engage easier
 			</div>
 		</div>,
-
 		<div key={1} className="w-full space-y-[2.870813397vw]">
 			<div className="text-[2.87081339713vw] font-medium leading-[1.25] text-white"></div>
 
@@ -111,7 +110,7 @@ const Deck = () => {
 	}, [slides.length])
 
 	return (
-		<div className="flex h-screen w-full items-center justify-center bg-gradient-to-tr from-primary to-secondary">
+		<div className="flex h-screen w-full items-center justify-center overflow-hidden bg-gradient-to-tr from-primary to-secondary">
 			<div className="flex aspect-video w-full items-center px-[17.2248803828vw]">
 				{slides[slideIndex]}
 			</div>

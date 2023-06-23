@@ -105,7 +105,7 @@ const HomePage = async () => {
 	])
 
 	return (
-		<Card className="-mr-2 flex h-full flex-col justify-between overflow-y-scroll border py-5 px-6 shadow-lg">
+		<Card className="flex h-full flex-col justify-between overflow-y-scroll border py-5 px-6 shadow-lg">
 			{!isTeaching && !isEnrolled ? (
 				<span className="opacity-60">
 					You&apos;re not teaching or enrolled in any classes. Either

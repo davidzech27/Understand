@@ -182,7 +182,7 @@ const Feedback: React.FC<Props> = ({
 			}
 
 			if (headerRef.current) {
-				setHeaderHeight(headerRef.current.offsetHeight + 108) //!
+				setHeaderHeight(headerRef.current.offsetHeight + 20) //!
 			}
 		}
 
@@ -388,9 +388,8 @@ const Feedback: React.FC<Props> = ({
 		}
 	}
 
-	const onTryAgain = () => {
-		setSpecificFeedbackList([])
-		setGeneralFeedback(undefined)
+	const onStartOver = () => {
+		setSelectedFeedbackGivenAt(undefined)
 	}
 
 	const [feedbackResponse, setFeedbackResponse] = useState<{
@@ -618,7 +617,7 @@ const Feedback: React.FC<Props> = ({
 				</Modal>
 			)}
 
-			<div className="relative flex h-full w-full overflow-y-scroll overscroll-y-contain rounded-md border border-border bg-white shadow-lg shadow-[#00000016]">
+			<div className="relative flex h-full w-full overflow-y-scroll overscroll-y-contain rounded-md border border-border bg-white pt-16 shadow-lg shadow-[#00000016]">
 				<div
 					style={{ marginTop: headerHeight ?? 0 }}
 					className="flex-[0.75]"
@@ -651,69 +650,68 @@ const Feedback: React.FC<Props> = ({
 					/>
 				</div>
 
-				<div className="relative flex basis-[704px] flex-col">
+				<div className="relative flex h-fit basis-[704px] flex-col overflow-x-auto">
 					<div ref={headerRef} className="min-h-12 flex flex-col">
-						<div className="mb-2.5 mt-2.5 flex flex-col space-y-2.5">
-							{feedbackHistory.length === 0 ? (
-								<div className="h-16" />
-							) : (
-								feedbackHistory.map(({ givenAt }, index) => (
-									<div
-										onClick={() =>
-											setSelectedFeedbackGivenAt(givenAt)
-										}
-										key={index}
-										className={cn(
-											"flex h-20 cursor-pointer items-center justify-between rounded-md border-[0.75px] border-border pl-6 pr-8 transition duration-150",
-											givenAt.valueOf() ===
-												selectedFeedbackGivenAt?.valueOf()
-												? "bg-surface-selected hover:bg-surface-selected-hover"
-												: "hover:bg-surface-hover"
-										)}
-									>
-										<span className="font-medium opacity-80">
-											<FormattedDate
-												prefix=""
-												date={givenAt}
-											/>
-										</span>
+						{feedbackHistory.length !== 0 && (
+							<div
+								ref={(div) =>
+									div && (div.scrollLeft = div.scrollWidth)
+								}
+								className="mb-2.5 overflow-x-scroll"
+							>
+								<div className="flex w-max space-x-1.5">
+									{feedbackHistory.map(
+										({ givenAt }, index) => (
+											<div
+												onClick={() =>
+													setSelectedFeedbackGivenAt(
+														givenAt
+													)
+												}
+												key={index}
+												className={cn(
+													"flex h-16 w-[304px] cursor-pointer items-center justify-between rounded-md border-[0.75px] border-border pl-6 pr-3.5 transition duration-150",
+													givenAt.valueOf() ===
+														selectedFeedbackGivenAt?.valueOf()
+														? "bg-surface-selected hover:bg-surface-selected-hover"
+														: "hover:bg-surface-hover"
+												)}
+											>
+												<span className="font-medium opacity-80">
+													<FormattedDate
+														prefix=""
+														date={givenAt}
+													/>
+												</span>
 
-										<button
-											className="rounded-md border-border px-3 py-1.5 font-medium opacity-60 transition-all duration-150 hover:bg-surface-selected-hover hover:opacity-80"
-											onClick={(e) => {
-												e.stopPropagation()
+												<button
+													className="rounded-md border-border px-3 py-1.5 text-sm font-medium opacity-60 transition-all duration-150 hover:bg-surface-selected-hover hover:opacity-80"
+													onClick={(e) => {
+														e.stopPropagation()
 
-												navigator.clipboard.writeText(
-													`${
-														window.location.href
-													}/${email}/${givenAt.valueOf()}`
-												)
+														navigator.clipboard.writeText(
+															`${
+																window.location
+																	.href
+															}/${email}/${givenAt.valueOf()}`
+														)
 
-												setCopiedFeedbackLinkGivenAt(
-													givenAt
-												)
-											}}
-										>
-											{givenAt.valueOf() ===
-											copiedFeedbackLinkGivenAt?.valueOf()
-												? "Link copied"
-												: "Copy link"}
-										</button>
-									</div>
-								))
-							)}
-
-							{selectedFeedbackGivenAt && (
-								<Button
-									className="h-20"
-									onClick={() =>
-										setSelectedFeedbackGivenAt(undefined)
-									}
-								>
-									Start over
-								</Button>
-							)}
-						</div>
+														setCopiedFeedbackLinkGivenAt(
+															givenAt
+														)
+													}}
+												>
+													{givenAt.valueOf() ===
+													copiedFeedbackLinkGivenAt?.valueOf()
+														? "Link copied"
+														: "Copy link"}
+												</button>
+											</div>
+										)
+									)}
+								</div>
+							</div>
+						)}
 
 						<div className="flex items-end justify-between">
 							<div className="select-text text-2xl font-bold">
@@ -748,10 +746,10 @@ const Feedback: React.FC<Props> = ({
 								) : (
 									<div className="flex space-x-1.5">
 										<Button
-											onClick={onTryAgain}
+											onClick={onStartOver}
 											className="text-lg"
 										>
-											Try again
+											Start over
 										</Button>
 									</div>
 								)}

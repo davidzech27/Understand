@@ -41,7 +41,7 @@ const AuthedLayout = ({ children }: { children: React.ReactNode }) => {
 					<SideBar />
 				</nav>
 
-				<main className="w-full">
+				<main className="w-[calc(100vw-324px)]">
 					<Suspense
 						fallback={<Card className="h-full w-full">{null}</Card>}
 					>
