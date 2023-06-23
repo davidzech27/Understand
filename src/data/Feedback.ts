@@ -158,6 +158,25 @@ const Feedback = ({
 				.flat(),
 		}
 	},
+	update: async ({
+		submission,
+		submissionHTML,
+	}: {
+		submission: string
+		submissionHTML: string
+	}) => {
+		await db
+			.update(feedback)
+			.set({ submission, submissionHTML })
+			.where(
+				and(
+					eq(feedback.courseId, courseId),
+					eq(feedback.assignmentId, assignmentId),
+					eq(feedback.userEmail, userEmail),
+					eq(feedback.givenAt, givenAt)
+				)
+			)
+	},
 	delete: async () => {
 		await Promise.all([
 			db

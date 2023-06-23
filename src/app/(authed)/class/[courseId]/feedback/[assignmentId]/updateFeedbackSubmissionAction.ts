@@ -7,49 +7,41 @@ import Feedback from "~/data/Feedback"
 import User from "~/data/User"
 import { getAuthOrThrow } from "~/auth/jwt"
 
-const registerFeedbackAction = zact(
+const updateFeedbackSubmissionAction = zact(
 	z.object({
 		courseId: z.string(),
 		assignmentId: z.string(),
+		feedbackGivenAt: z.date(),
 		submission: z.string(),
 		submissionHTML: z.string(),
-		rawResponse: z.string(),
-		metadata: z.record(z.unknown()),
 	})
 )(
 	async ({
 		courseId,
 		assignmentId,
+		feedbackGivenAt,
 		submission,
 		submissionHTML,
-		rawResponse,
-		metadata,
 	}) => {
 		const { email } = await getAuthOrThrow({ cookies: cookies() })
 
 		const role = await User({ email }).courseRole({ id: courseId })
 
-		const givenAt = new Date(Math.round(new Date().valueOf() / 1000) * 1000)
-
 		if (role === "none")
-			throw new Error("User must be in class to register feedback")
+			throw new Error(
+				"User must be in class to update submission on feedback"
+			)
 
 		await Feedback({
 			courseId,
 			assignmentId,
 			userEmail: email,
-			givenAt,
-		}).create({
+			givenAt: feedbackGivenAt,
+		}).update({
 			submission,
 			submissionHTML,
-			rawResponse,
-			metadata,
 		})
-
-		return {
-			givenAt,
-		}
 	}
 )
 
-export default registerFeedbackAction
+export default updateFeedbackSubmissionAction

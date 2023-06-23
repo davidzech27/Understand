@@ -33,7 +33,10 @@ const registerFollowUpAction = zact(
 
 		const role = await User({ email }).courseRole({ id: courseId })
 
-		if (role === "none") return
+		if (role === "none")
+			throw new Error(
+				"User must be in class to register feedback follow-ups"
+			)
 
 		await Feedback({
 			courseId,

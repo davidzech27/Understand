@@ -27,6 +27,7 @@ import registerInsightsAction from "./registerInsightsAction"
 import colors from "~/colors.cjs"
 import getInsights from "~/ai/getInsights"
 import FormattedDate from "~/utils/FormattedDate"
+import updateFeedbackSubmissionAction from "./updateFeedbackSubmissionAction"
 
 interface Props {
 	assignment: {
@@ -54,6 +55,7 @@ interface Props {
 			content: string
 			followUps: string[]
 		}>
+		rawResponsePromise: Promise<string>
 	}[]
 	email: string
 	profileName: string
@@ -113,6 +115,52 @@ const Feedback: React.FC<Props> = ({
 					submissionRef.current?.setHTML(
 						await feedbackInfo.submissionHTMLPromise
 					)
+
+					setUnrevisedSubmission(submissionRef.current?.getText())
+
+					const rawResponse = await feedbackInfo.rawResponsePromise
+
+					const lines = rawResponse.split("\n")
+
+					const headerLineIndex = {
+						commentary: lines.findIndex(
+							(line) => line.search(/^Commentary:?\s*$/) !== -1
+						),
+						specificFeedback: lines.findIndex(
+							(line) =>
+								line.search(/^Specific Feedback:?\s*$/) !== -1
+						),
+						generalFeedback: lines.findIndex(
+							(line) =>
+								line.search(/^General Feedback:?\s*$/) !== -1
+						),
+					}
+
+					setFeedbackResponse({
+						rawResponse: rawResponse,
+						synopsis: lines
+							.slice(1, headerLineIndex.commentary)
+							.join("\n")
+							.trim(),
+						commentary: lines
+							.slice(
+								headerLineIndex.commentary + 1,
+								headerLineIndex.specificFeedback
+							)
+							.join("\n")
+							.trim(),
+						specificFeedback: lines
+							.slice(
+								headerLineIndex.specificFeedback + 1,
+								headerLineIndex.generalFeedback
+							)
+							.join("\n")
+							.trim(),
+						generalFeedback: lines
+							.slice(headerLineIndex.generalFeedback + 1)
+							.join("\n")
+							.trim(),
+					})
 
 					setSpecificFeedbackList(
 						(
@@ -195,10 +243,7 @@ const Feedback: React.FC<Props> = ({
 		}
 	}, [])
 
-	const editing =
-		!generating &&
-		generalFeedback === undefined &&
-		specificFeedbackList.length === 0
+	const editing = !generating
 
 	const [selectedAttachmentId, setSelectedAttachmentId] = useState<string>()
 
@@ -235,6 +280,9 @@ const Feedback: React.FC<Props> = ({
 					specificFeedbackListPromise:
 						Promise.resolve(specificFeedbackList),
 					generalFeedbackPromise: Promise.resolve(generalFeedback),
+					rawResponsePromise: Promise.resolve(
+						feedbackResponse?.rawResponse ?? ""
+					),
 				},
 			])
 
@@ -243,6 +291,8 @@ const Feedback: React.FC<Props> = ({
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps -- feedbackData and feedbackHistory will change after specificFeedbackList and generalFeedback
 	}, [feedbackData, feedbackHistory])
+
+	const [unrevisedSubmission, setUnrevisedSubmission] = useState<string>()
 
 	const onGetFeedback = () => {
 		const submissionInput = submissionRef.current?.getText()
@@ -402,6 +452,10 @@ const Feedback: React.FC<Props> = ({
 
 	const { mutate: registerFollowUp } = useZact(registerFollowUpAction)
 
+	const { mutate: updateFeedbackSubmission } = useZact(
+		updateFeedbackSubmissionAction
+	)
+
 	const onGetFollowUp = ({
 		paragraph,
 		sentence,
@@ -411,7 +465,11 @@ const Feedback: React.FC<Props> = ({
 		sentence?: number
 		followUps: string[]
 	}) => {
-		if (feedbackResponse && feedbackData) {
+		if (
+			feedbackResponse &&
+			selectedFeedbackGivenAt &&
+			unrevisedSubmission
+		) {
 			const start = new Date()
 
 			if (paragraph === undefined && sentence === undefined) {
@@ -441,6 +499,49 @@ const Feedback: React.FC<Props> = ({
 				)
 			}
 
+			let revision: { paragraph?: number; content: string } | undefined =
+				undefined
+
+			const revisedSubmission = submissionRef.current?.getText() ?? ""
+
+			if (unrevisedSubmission?.trim() !== revisedSubmission.trim()) {
+				updateFeedbackSubmission({
+					courseId: assignment.courseId,
+					assignmentId: assignment.assignmentId,
+					feedbackGivenAt: selectedFeedbackGivenAt,
+					submission: revisedSubmission,
+					submissionHTML: submissionRef.current?.getHTML() ?? "",
+				})
+
+				if (paragraph === undefined) {
+					revision = { content: revisedSubmission }
+				} else {
+					const unrevisedParagraph = unrevisedSubmission
+						.split("\n")
+						.filter(
+							(line) =>
+								line.indexOf(".") !== -1 &&
+								line.indexOf(".") !== line.lastIndexOf(".")
+						)[paragraph - 1]
+
+					const revisedParagraph = revisedSubmission
+						.split("\n")
+						.filter(
+							(line) =>
+								line.indexOf(".") !== -1 &&
+								line.indexOf(".") !== line.lastIndexOf(".")
+						)[paragraph - 1]
+
+					if (
+						unrevisedParagraph?.trim() !==
+							revisedParagraph?.trim() &&
+						revisedParagraph !== undefined
+					) {
+						revision = { paragraph, content: revisedParagraph }
+					}
+				}
+			}
+
 			getFollowup({
 				feedback:
 					paragraph === undefined && sentence === undefined
@@ -451,8 +552,9 @@ const Feedback: React.FC<Props> = ({
 									specificFeedback.sentence === sentence
 						  )?.content ?? "",
 				followUps,
+				revision,
 				instructions: assignment.instructions,
-				submission: submissionRef.current?.getText() ?? "",
+				submission: unrevisedSubmission ?? "",
 				...feedbackResponse,
 				onContent: (content) =>
 					paragraph === undefined && sentence === undefined
@@ -544,7 +646,7 @@ const Feedback: React.FC<Props> = ({
 					registerFollowUp({
 						courseId: assignment.courseId,
 						assignmentId: assignment.assignmentId,
-						feedbackGivenAt: feedbackData.givenAt,
+						feedbackGivenAt: selectedFeedbackGivenAt,
 						paragraphNumber: paragraph,
 						sentenceNumber: sentence,
 						query: followUps.at(-1) ?? "",
@@ -722,29 +824,46 @@ const Feedback: React.FC<Props> = ({
 							<div className="flex-1" />
 
 							<div className="flex-shrink-0">
-								{submissionEmpty && submissions.length > 0 ? (
-									<Button
-										onClick={() => setModal("submission")}
-										className="text-lg"
-									>
-										Import submission
-									</Button>
-								) : editing ? (
-									<Button
-										onClick={onGetFeedback}
-										disabled={submissionEmpty}
-										className="text-lg"
-									>
-										Get feedback
-									</Button>
-								) : generating ? (
+								{generating ? (
 									<Button disabled className="text-lg">
 										{specificFeedbackList.length > 0
 											? "Generating feedback..."
 											: "Analyzing work..."}
 									</Button>
+								) : selectedFeedbackGivenAt === undefined ? (
+									<div className="flex space-x-1.5">
+										{submissions.length > 0 && (
+											<Button
+												onClick={() =>
+													setModal("submission")
+												}
+												className="text-lg"
+											>
+												Import submission
+											</Button>
+										)}
+
+										<Button
+											onClick={onGetFeedback}
+											disabled={submissionEmpty}
+											className="text-lg"
+										>
+											Get feedback
+										</Button>
+									</div>
 								) : (
 									<div className="flex space-x-1.5">
+										{submissions.length > 0 && (
+											<Button
+												onClick={() =>
+													setModal("submission")
+												}
+												className="text-lg"
+											>
+												Import submission
+											</Button>
+										)}
+
 										<Button
 											onClick={onStartOver}
 											className="text-lg"

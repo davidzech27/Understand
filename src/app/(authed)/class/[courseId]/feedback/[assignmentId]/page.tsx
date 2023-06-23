@@ -158,6 +158,7 @@ const FeedbackPage = async ({
 										submissionHTML: feedback.submissionHTML,
 										specificFeedbackList,
 										generalFeedback,
+										rawResponse: feedback.rawResponse,
 									}
 								})
 
@@ -177,6 +178,10 @@ const FeedbackPage = async ({
 										feedbackInfoPromise.then(
 											({ generalFeedback }) =>
 												generalFeedback
+										),
+									rawResponsePromise:
+										feedbackInfoPromise.then(
+											({ rawResponse }) => rawResponse
 										),
 								}
 							})

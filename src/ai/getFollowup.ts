@@ -3,6 +3,7 @@ import fetchOpenAIStream from "./fetchOpenAIStream"
 const getFollowUp = ({
 	feedback,
 	followUps,
+	revision,
 	instructions,
 	submission,
 	synopsis,
@@ -14,6 +15,12 @@ const getFollowUp = ({
 }: {
 	feedback: string
 	followUps: string[]
+	revision:
+		| {
+				paragraph?: number
+				content: string
+		  }
+		| undefined
 	instructions: string
 	submission: string
 	synopsis: string
@@ -32,6 +39,22 @@ const getFollowUp = ({
 		}[]
 	}) => void
 }) => {
+	if (revision !== undefined) {
+		followUps[
+			followUps.length - 1
+		] = `The student has made a revision to their work:
+${
+	revision.paragraph !== undefined
+		? `<paragraph-number>${revision.paragraph}</paragraph-number>\n`
+		: ""
+}<revision>
+${revision.content}
+</revision>
+
+Here's what they said:
+${followUps[followUps.length - 1]}`
+	}
+
 	const { messages, model, temperature, presencePenalty, frequencyPenalty } =
 		{
 			messages: [
@@ -75,7 +98,7 @@ ${feedback}
 
 You will respond to the student in a way that helps them understand the subject matter at a deeper, more nuanced level. Make use of the Socratic method to lead the student in the right direction. Generalize to larger contexts outside the class in interesting ways, or walk the student through a concrete example of a mental process they could take to improve their work. Never give any ideas or content away to the student. Prioritize unconventional advice, and avoid platitudes. Frequently reference the student's work. Be conversational but very concise.
 
-Here's their first message:
+Here's what they said:
 ${followUps[0]}`,
 				},
 				...followUps.slice(1).map((followUp, index) => ({

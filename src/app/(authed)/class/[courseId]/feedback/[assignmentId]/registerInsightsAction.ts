@@ -19,7 +19,8 @@ const registerInsightsAction = zact(
 
 	const role = await User({ email }).courseRole({ id: courseId })
 
-	if (role !== "student") return
+	if (role !== "student")
+		throw new Error("User must be student of course to register insights")
 
 	await Insight({ courseId, assignmentId, studentEmail: email }).upsert({
 		submission,

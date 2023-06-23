@@ -5,6 +5,7 @@ import { Settings2 } from "lucide-react"
 import Button from "~/components/Button"
 import SettingsModal from "./SettingsModal"
 import LinkButton from "~/components/LinkButton"
+import { env } from "~/env.mjs"
 
 interface Props {
 	role: "teacher" | "student"
@@ -45,10 +46,7 @@ const AssignmentTabs: React.FC<Props> = ({ role, assignment }) => {
 				<Button
 					onClick={() => {
 						navigator.clipboard.writeText(
-							window.location.href.replace(
-								"assignment",
-								"feedback"
-							)
+							`${env.NEXT_PUBLIC_URL}/class/${assignment.courseId}/feedback/${assignment.assignmentId}`
 						)
 
 						setFeedbackLinkCopied(true)
