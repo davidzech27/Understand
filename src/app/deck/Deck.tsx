@@ -16,8 +16,16 @@ const Deck = () => {
 		</div>,
 
 		<div key={1} className="w-full space-y-[2.870813397vw]">
-			<div className="text-[2.87081339713vw] font-medium leading-[1.25] text-white">
-				Tailored instruction is markedly difficult to provide.
+			<div className="text-[2.87081339713vw] font-medium leading-[1.25] text-white"></div>
+
+			<div className="w-full space-y-[0.5980861244vw]">
+				<div className="text-[1.1961722488vw] font-semibold leading-none text-white">
+					PROBLEM
+				</div>
+
+				<div className="text-[2.87081339713vw] font-medium leading-[1.25] text-white">
+					Tailored instruction is markedly difficult to provide.
+				</div>
 			</div>
 
 			<div className="text-[2.87081339713vw] font-medium leading-[1.25] text-white">
@@ -31,16 +39,21 @@ const Deck = () => {
 			</div>
 		</div>,
 		<div key={2} className="w-full space-y-[2.870813397vw]">
-			<div className="text-[2.87081339713vw] font-medium leading-[1.25] text-white">
-				Students respond best to instruction aligned with their specific
-				needs and interests.
+			<div className="w-full space-y-[0.5980861244vw]">
+				<div className="text-[1.1961722488vw] font-semibold leading-none text-white">
+					WHY IT MATTERS
+				</div>
+
+				<div className="text-[2.87081339713vw] font-medium leading-[1.25] text-white">
+					Students respond best to instruction aligned with their
+					specific needs and interests.
+				</div>
 			</div>
 
 			<div className="text-[2.87081339713vw] font-medium leading-[1.25] text-white">
 				But it&apos;s unreasonable to expect teachers to provide this
 				level of attention for all their students, or anything near it.
 			</div>
-
 			<div className="text-[2.87081339713vw] font-medium leading-[1.25] text-white">
 				Students are disengaged, and teachers are burning out. If
 				nothing changes, this will only worsen as class sizes increase
