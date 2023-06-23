@@ -40,6 +40,8 @@ const getFollowUp = ({
 	}) => void
 }) => {
 	if (revision !== undefined) {
+		followUps = structuredClone(followUps)
+
 		followUps[
 			followUps.length - 1
 		] = `The student has made a revision to their work:

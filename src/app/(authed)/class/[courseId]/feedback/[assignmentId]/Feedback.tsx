@@ -513,6 +513,8 @@ const Feedback: React.FC<Props> = ({
 					submissionHTML: submissionRef.current?.getHTML() ?? "",
 				})
 
+				setUnrevisedSubmission(revisedSubmission)
+
 				if (paragraph === undefined) {
 					revision = { content: revisedSubmission }
 				} else {
@@ -531,6 +533,20 @@ const Feedback: React.FC<Props> = ({
 								line.indexOf(".") !== -1 &&
 								line.indexOf(".") !== line.lastIndexOf(".")
 						)[paragraph - 1]
+					console.log(unrevisedSubmission
+						.split("\n")
+						.filter(
+							(line) =>
+								line.indexOf(".") !== -1 &&
+								line.indexOf(".") !== line.lastIndexOf(".")
+						))
+					console.log(revisedSubmission
+						.split("\n")
+						.filter(
+							(line) =>
+								line.indexOf(".") !== -1 &&
+								line.indexOf(".") !== line.lastIndexOf(".")
+						))
 
 					if (
 						unrevisedParagraph?.trim() !==
