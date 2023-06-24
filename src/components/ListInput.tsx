@@ -84,6 +84,7 @@ const ListInput: React.FC<Props> = ({
 							])
 						}
 					}}
+					onFocus={(e) => e.target.select()}
 					placeholder={placeholder}
 					className={textInputClassname}
 					ref={index === values.length - 1 ? lastInputRef : null}

@@ -98,10 +98,10 @@ Synopsis
 Construct a very thorough synopsis of the student's work.
 
 Commentary
-Identify one area where the student demonstrates their strengths or unique character as a writer and the three areas where the student could most easily improve the communication of their ideas or their depth of thought. For each area of commentary, ask a question that the student may have about the commentary, then answer it with direct references to the student's work.
+Identify one area where the student demonstrates their strengths or unique character as a writer and the three areas where the student could most improve the communication of their ideas or their depth of thought. For each area of commentary, ask a question that the student may have about the commentary, then answer it with direct references to the student's work.
 
 Specific Feedback
-Provide several areas of feedback pertaining to the segments of the student's work that your commentary most applies to. In each area of feedback, frequently reference the student's work and provide in-depth reasoning in order to best help them understand how to improve their work. Do not prescribe any particular solution to the student; instead, cleverly ask them a question or make an insightful comment to lead them in the right direction. Unless required by the assignment prompt, do not suggest that the student increase the scope of their work or that they alter their stylistic writing choices. Each area of specific feedback should use the following format:
+Provide many areas of feedback pertaining to the segments of the student's work that your commentary most applies to. In each area of feedback, frequently reference the student's work and provide in-depth reasoning in order to best help them understand how to improve their work. Do not prescribe any particular solution to the student; instead, cleverly ask them a question or make an insightful comment to lead them in the right direction. Unless required by the assignment prompt, do not suggest that the student increase the scope of their work or that they alter their stylistic writing choices. Each area of specific feedback should use the following format:
 Paragraph number: {paragraph number of the segment of the student's work pertaining to the feedback}
 Sentence number: {sentence number of the segment of the student's work pertaining to the feedback, or -1 if the feedback applies to the entire paragraph}
 Feedback: {the feedback to the student}

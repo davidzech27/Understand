@@ -35,6 +35,12 @@ const AssignmentTabs: React.FC<Props> = ({ role, assignment }) => {
 			</LinkButton>
 
 			<LinkButton
+				href={`/class/${assignment.courseId}/assignment/${assignment.assignmentId}/students`}
+			>
+				Students
+			</LinkButton>
+
+			<LinkButton
 				href={`/class/${assignment.courseId}/assignment/${assignment.assignmentId}/insights`}
 			>
 				Insights
