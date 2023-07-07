@@ -1,19 +1,12 @@
 "use client"
-import {
-	forwardRef,
-	type DetailedHTMLProps,
-	type InputHTMLAttributes,
-} from "react"
+import { forwardRef, type HTMLProps } from "react"
 
 import cn from "../utils/cn"
 
-interface Props
-	extends DetailedHTMLProps<
-		InputHTMLAttributes<HTMLInputElement>,
-		HTMLInputElement
-	> {
+interface Props extends HTMLProps<HTMLInputElement> {
 	value: string
 	setValue: (value: string) => void
+	autoComplete: string
 }
 
 const TextInput = forwardRef<HTMLInputElement, Props>(
@@ -26,7 +19,7 @@ const TextInput = forwardRef<HTMLInputElement, Props>(
 				onChange={(e) => setValue(e.target.value)}
 				ref={ref}
 				className={cn(
-					"h-full w-full cursor-pointer select-text resize-none rounded-md border-[1px] border-border bg-surface py-1.5 px-3 text-xl font-medium opacity-80 outline-none transition-all duration-150 focus:cursor-auto focus:bg-surface-bright",
+					"w-full cursor-pointer select-text resize-none rounded-md border-[1px] border-border bg-surface px-4 py-2.5 font-medium opacity-80 outline-none transition-all duration-150 focus:cursor-auto focus:bg-surface-bright",
 					className
 				)}
 			/>
@@ -34,6 +27,6 @@ const TextInput = forwardRef<HTMLInputElement, Props>(
 	}
 )
 
-TextInput.displayName = "TextArea"
+TextInput.displayName = "TextInput"
 
 export default TextInput

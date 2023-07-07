@@ -3,8 +3,9 @@ import { cookies } from "next/headers"
 import { zact } from "zact/server"
 import { z } from "zod"
 
+import Course from "~/data/Course"
 import User from "~/data/User"
-import Message from "~/data/Message"
+
 import { getAuthOrThrow } from "~/auth/jwt"
 
 const postMessageAction = zact(
@@ -24,8 +25,8 @@ const postMessageAction = zact(
 		)
 
 	const [similarMessages, { sentAt: postedSentAt }] = await Promise.all([
-		Message({ courseId }).getSimilar({ content, limit }),
-		Message({ courseId }).create({ fromEmail: email, content }),
+		Course({ id: courseId }).getSimilarMessages({ content, limit }),
+		Course({ id: courseId }).createMessage({ fromEmail: email, content }),
 	])
 
 	return similarMessages.filter(

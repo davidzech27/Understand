@@ -2,8 +2,8 @@
 import { useState, useTransition } from "react"
 import Link from "next/link"
 
+import formatDate from "~/utils/formatDate"
 import Avatar from "~/components/Avatar"
-import FormattedDate from "~/utils/FormattedDate"
 import getFeedbackHistoryAction from "./getFeedbackHistoryAction"
 import Button from "~/components/Button"
 
@@ -88,7 +88,7 @@ const FeedbackHistory: React.FC<Props> = ({
 							</div>
 
 							<span className="opacity-60">
-								<FormattedDate date={givenAt} />
+								{formatDate(givenAt)}
 							</span>
 						</div>
 					</Link>

@@ -3,7 +3,7 @@ import { cookies } from "next/headers"
 import { zact } from "zact/server"
 import { z } from "zod"
 
-import Insight, { insightsSchema } from "~/data/Insight"
+import Feedback, { insightsSchema } from "~/data/Feedback"
 import User from "~/data/User"
 import { getAuthOrThrow } from "~/auth/jwt"
 
@@ -11,10 +11,11 @@ const registerInsightsAction = zact(
 	z.object({
 		courseId: z.string(),
 		assignmentId: z.string(),
-		submission: z.string(),
+		givenAt: z.date(),
+		submissionHTML: z.string(),
 		insights: insightsSchema,
 	})
-)(async ({ courseId, assignmentId, submission, insights }) => {
+)(async ({ courseId, assignmentId, givenAt, submissionHTML, insights }) => {
 	const { email } = await getAuthOrThrow({ cookies: cookies() })
 
 	const role = await User({ email }).courseRole({ id: courseId })
@@ -22,8 +23,13 @@ const registerInsightsAction = zact(
 	if (role !== "student")
 		throw new Error("User must be student of course to register insights")
 
-	await Insight({ courseId, assignmentId, studentEmail: email }).upsert({
-		submission,
+	await Feedback({
+		courseId,
+		assignmentId,
+		userEmail: email,
+		givenAt,
+	}).update({
+		submissionHTML,
 		insights,
 	})
 })

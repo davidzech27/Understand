@@ -7,7 +7,6 @@ import ClassTabs from "./ClassTabs"
 import Card from "~/components/Card"
 import User from "~/data/User"
 import Course from "~/data/Course"
-import Resource from "~/data/Resource"
 import { getAuthOrThrow } from "~/auth/jwt"
 
 interface Params {
@@ -41,7 +40,7 @@ const ClassLayout = async ({
 		getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
 			User({ email }).courseRole({ id: courseId })
 		),
-		Resource({ courseId }).any(),
+		Course({ id: courseId }).hasResources(),
 	])
 
 	if (course === undefined || role === "none") notFound()

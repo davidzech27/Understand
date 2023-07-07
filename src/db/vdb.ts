@@ -1,6 +1,6 @@
-import { env } from "~/env.mjs"
-
 import { PineconeClient } from "@pinecone-database/pinecone"
+
+import { env } from "~/env.mjs"
 
 const pinecone = new PineconeClient()
 

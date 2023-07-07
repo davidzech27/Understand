@@ -15,9 +15,7 @@ const GetStartedButton = () => {
 			legacyBehavior
 		>
 			<a>
-				<FancyButton className="px-12 text-2xl">
-					Get started
-				</FancyButton>
+				<FancyButton size="medium">Get started</FancyButton>
 			</a>
 		</Link>
 	)

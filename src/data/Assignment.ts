@@ -1,15 +1,25 @@
-import { eq, and } from "drizzle-orm"
+import { eq, and, isNotNull } from "drizzle-orm"
+import { z } from "zod"
 
 import db from "~/db/db"
-import {
-	assignment,
-	assignmentInsight,
-	feedback,
-	followUp,
-	insight,
-	studentInsight,
-} from "~/db/schema"
-import Resource from "./Resource"
+import { assignment, assignmentInsight, feedback, followUp } from "~/db/schema"
+import Course from "./Course"
+import { insightsSchema as feedbackInsightsSchema } from "./Feedback"
+
+const insightsSchema = z
+	.object({
+		type: z.enum(["strength", "weakness"]),
+		content: z.string(),
+		sources: z
+			.object({
+				studentEmail: z.string(),
+				paragraphs: z.number().array(),
+			})
+			.array(),
+	})
+	.array()
+
+type Insights = z.infer<typeof insightsSchema>
 
 const Assignment = ({
 	courseId,
@@ -141,6 +151,60 @@ const Assignment = ({
 				)
 			)
 	},
+	upsertInsights: async ({ insights }: { insights: Insights }) => {
+		await db
+			.insert(assignmentInsight)
+			.values({
+				courseId,
+				assignmentId,
+				insights,
+			})
+			.onDuplicateKeyUpdate({
+				set: {
+					insights,
+				},
+			})
+	},
+	insights: async () => {
+		const row = (
+			await db
+				.select()
+				.from(assignmentInsight)
+				.where(
+					and(
+						eq(assignmentInsight.courseId, courseId),
+						eq(assignmentInsight.assignmentId, assignmentId)
+					)
+				)
+		)[0]
+
+		return row && insightsSchema.parse(row.insights)
+	},
+	//! make sure that only students
+	unsyncedInsights: async () => {
+		return await db
+			.select({
+				studentEmail: feedback.userEmail,
+				insights: feedback.insights,
+				givenAt: feedback.givenAt,
+			})
+			.from(feedback)
+			.where(
+				and(
+					eq(feedback.courseId, courseId),
+					eq(feedback.assignmentId, assignmentId),
+					eq(feedback.synced, false),
+					isNotNull(feedback.insights)
+				)
+			)
+			.then((insights) =>
+				insights.map((insight) => ({
+					studentEmail: insight.studentEmail,
+					insights: feedbackInsightsSchema.parse(insight.insights),
+					givenAt: insight.givenAt,
+				}))
+			)
+	},
 	delete: async () => {
 		await Promise.all([
 			db
@@ -167,24 +231,16 @@ const Assignment = ({
 						eq(feedback.assignmentId, assignmentId)
 					)
 				),
-			Resource({ courseId }).delete({
+			Course({ id: courseId }).deleteResources({
 				filter: {
 					attachmentOnAssignmentId: assignmentId,
 				},
 			}),
-			Resource({ courseId }).delete({
+			Course({ id: courseId }).deleteResources({
 				filter: {
 					instructionsForAssignmentId: assignmentId,
 				},
 			}),
-			db
-				.delete(insight)
-				.where(
-					and(
-						eq(insight.courseId, courseId),
-						eq(insight.assignmentId, assignmentId)
-					)
-				),
 			db
 				.delete(assignmentInsight)
 				.where(

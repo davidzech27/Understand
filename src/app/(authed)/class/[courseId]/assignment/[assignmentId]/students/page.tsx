@@ -2,7 +2,7 @@ import { and, eq } from "drizzle-orm"
 
 import Card from "~/components/Card"
 import db from "~/db/db"
-import { insight, studentToCourse, user } from "~/db/schema"
+import { studentToCourse, user, feedback } from "~/db/schema"
 import ClassFeedback from "./ClassFeedback"
 
 export const metadata = {
@@ -32,17 +32,15 @@ const AssignmentStudentsPage = async ({
 			.innerJoin(user, eq(user.email, studentToCourse.studentEmail))
 			.where(eq(studentToCourse.courseId, courseId)),
 		db
-			.select({ studentEmail: insight.studentEmail })
-			.from(insight)
+			.selectDistinct({ userEmail: feedback.userEmail })
+			.from(feedback)
 			.where(
 				and(
-					eq(insight.courseId, courseId),
-					eq(insight.assignmentId, assignmentId)
+					eq(feedback.courseId, courseId),
+					eq(feedback.assignmentId, assignmentId)
 				)
 			)
-			.then(
-				(rows) => new Set(rows.map(({ studentEmail }) => studentEmail))
-			),
+			.then((rows) => new Set(rows.map(({ userEmail }) => userEmail))),
 	])
 
 	const students = studentProfiles.map(({ email, name, photo }) => ({

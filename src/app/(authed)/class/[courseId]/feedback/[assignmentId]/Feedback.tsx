@@ -16,7 +16,8 @@ import { useFocusWithin, useHover } from "react-aria"
 import getFeedback from "~/ai/getFeedback"
 import getFollowup from "~/ai/getFollowup"
 import Modal from "~/components/Modal"
-import AttachmentList from "~/components/AttachmentList"
+import SelectList from "~/components/SelectList"
+import AttachmentItem from "~/components/AttachmentItem"
 import Button from "~/components/Button"
 import TextArea from "~/components/TextArea"
 import breakIntoSentences from "~/utils/breakIntoSentences"
@@ -26,7 +27,7 @@ import registerFollowUpAction from "./registerFollowUpAction"
 import registerInsightsAction from "./registerInsightsAction"
 import colors from "~/colors.cjs"
 import getInsights from "~/ai/getInsights"
-import FormattedDate from "~/utils/FormattedDate"
+import formatDate from "~/utils/formatDate"
 import updateFeedbackSubmissionAction from "./updateFeedbackSubmissionAction"
 
 interface Props {
@@ -387,7 +388,6 @@ const Feedback: React.FC<Props> = ({
 					registerFeedback({
 						courseId: assignment.courseId,
 						assignmentId: assignment.assignmentId,
-						submission: submissionInput,
 						submissionHTML: submissionHTML ?? "",
 						rawResponse,
 						metadata: {
@@ -425,13 +425,14 @@ const Feedback: React.FC<Props> = ({
 							generalFeedback,
 						}).then(({ insights, rawResponse }) => {
 							console.info(rawResponse)
-
-							registerInsightsAction({
-								courseId: assignment.courseId,
-								assignmentId: assignment.assignmentId,
-								submission: submissionHTML ?? "",
-								insights,
-							})
+							if (feedbackData)
+								registerInsightsAction({
+									courseId: assignment.courseId,
+									assignmentId: assignment.assignmentId,
+									givenAt: feedbackData.givenAt,
+									submissionHTML: submissionHTML ?? "",
+									insights,
+								})
 						})
 				},
 			})
@@ -489,10 +490,8 @@ const Feedback: React.FC<Props> = ({
 								specificFeedback.paragraph === paragraph &&
 								specificFeedback.sentence === sentence
 						)
-
 						if (specificFeedback) {
 							specificFeedback.followUps = followUps
-
 							specificFeedback.generating = true
 						}
 					})
@@ -509,7 +508,6 @@ const Feedback: React.FC<Props> = ({
 					courseId: assignment.courseId,
 					assignmentId: assignment.assignmentId,
 					feedbackGivenAt: selectedFeedbackGivenAt,
-					submission: revisedSubmission,
 					submissionHTML: submissionRef.current?.getHTML() ?? "",
 				})
 
@@ -679,7 +677,7 @@ const Feedback: React.FC<Props> = ({
 					}
 				>
 					<div className="flex h-full flex-col justify-between">
-						<AttachmentList
+						<SelectList
 							items={submissions}
 							selectionType="single"
 							selectionSet={
@@ -708,6 +706,19 @@ const Feedback: React.FC<Props> = ({
 									)
 								}
 							}}
+							renderItem={({
+								item: { title, id, thumbnailUrl, html, url },
+								selected,
+							}) => (
+								<AttachmentItem
+									name={title ?? ""}
+									photoUrl={thumbnailUrl}
+									url={url}
+									key={id}
+									selected={selected}
+								/>
+							)}
+							renderEmpty={() => null}
 						/>
 
 						<Button
@@ -782,10 +793,7 @@ const Feedback: React.FC<Props> = ({
 												)}
 											>
 												<span className="font-medium opacity-80">
-													<FormattedDate
-														prefix=""
-														date={givenAt}
-													/>
+													{formatDate(givenAt)}
 												</span>
 
 												<button
@@ -1530,6 +1538,7 @@ const GeneralFeedback = ({
 									}
 									onEnter={onGetFollowUp}
 									ref={inputRef}
+									autoComplete="off"
 									className="opacity-80"
 								/>
 							</div>
@@ -1833,6 +1842,7 @@ const SpecificFeedbackItem: React.FC<{
 							generating ? "Generating..." : "Say something"
 						}
 						onEnter={onGetFollowUp}
+						autoComplete="off"
 						ref={inputRef}
 						className="opacity-80"
 					/>

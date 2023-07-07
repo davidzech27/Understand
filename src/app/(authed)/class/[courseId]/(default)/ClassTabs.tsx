@@ -9,8 +9,8 @@ import LinkButton from "~/components/LinkButton"
 import Button from "~/components/Button"
 import FancyButton from "~/components/FancyButton"
 import TextInput from "~/components/TextInput"
-import ListInput from "~/components/ListInput"
 import Modal from "~/components/Modal"
+import InputList from "~/components/InputList"
 import updateCourseAction from "./updateCourseAction"
 import deleteCourseAction from "./deleteCourseAction"
 
@@ -178,6 +178,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 						value={nameInput}
 						setValue={setNameInput}
 						placeholder="Class name"
+						autoComplete="off"
 						className="h-min py-2.5 pl-4 text-base"
 					/>
 
@@ -187,16 +188,18 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 						value={sectionInput}
 						setValue={setSectionInput}
 						placeholder="Class section"
+						autoComplete="off"
 						className="h-min py-2.5 pl-4 text-base"
 					/>
 
 					<div className="ml-1 font-medium opacity-80">Students</div>
 
-					<ListInput
+					<InputList
 						values={studentEmailInputs}
 						setValues={setStudentEmailInputs}
 						singleWord
 						placeholder="Student email"
+						autoComplete="off"
 						className="h-min"
 						textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)] h-min"
 						buttonClassName="h-[46px] w-[46px]"
@@ -204,11 +207,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
 					<div className="ml-1 font-medium opacity-80">Teachers</div>
 
-					<ListInput
+					<InputList
 						values={teacherEmailInputs}
 						setValues={setTeacherEmailInputs}
 						singleWord
 						placeholder="Teacher email"
+						autoComplete="off"
 						className="h-min"
 						textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)] h-min"
 						buttonClassName="h-[46px] w-[46px]"

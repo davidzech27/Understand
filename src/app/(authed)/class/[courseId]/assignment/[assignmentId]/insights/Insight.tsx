@@ -8,7 +8,6 @@ import { parse } from "node-html-parser"
 
 import Avatar from "~/components/Avatar"
 import cn from "~/utils/cn"
-import sub from "date-fns/esm/fp/sub/index.js"
 
 interface Props {
 	type: "strength" | "weakness"

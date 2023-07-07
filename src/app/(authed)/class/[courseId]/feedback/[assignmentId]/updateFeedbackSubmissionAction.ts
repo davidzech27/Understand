@@ -12,36 +12,26 @@ const updateFeedbackSubmissionAction = zact(
 		courseId: z.string(),
 		assignmentId: z.string(),
 		feedbackGivenAt: z.date(),
-		submission: z.string(),
 		submissionHTML: z.string(),
 	})
-)(
-	async ({
+)(async ({ courseId, assignmentId, feedbackGivenAt, submissionHTML }) => {
+	const { email } = await getAuthOrThrow({ cookies: cookies() })
+
+	const role = await User({ email }).courseRole({ id: courseId })
+
+	if (role === "none")
+		throw new Error(
+			"User must be in class to update submission on feedback"
+		)
+
+	await Feedback({
 		courseId,
 		assignmentId,
-		feedbackGivenAt,
-		submission,
+		userEmail: email,
+		givenAt: feedbackGivenAt,
+	}).update({
 		submissionHTML,
-	}) => {
-		const { email } = await getAuthOrThrow({ cookies: cookies() })
-
-		const role = await User({ email }).courseRole({ id: courseId })
-
-		if (role === "none")
-			throw new Error(
-				"User must be in class to update submission on feedback"
-			)
-
-		await Feedback({
-			courseId,
-			assignmentId,
-			userEmail: email,
-			givenAt: feedbackGivenAt,
-		}).update({
-			submission,
-			submissionHTML,
-		})
-	}
-)
+	})
+})
 
 export default updateFeedbackSubmissionAction

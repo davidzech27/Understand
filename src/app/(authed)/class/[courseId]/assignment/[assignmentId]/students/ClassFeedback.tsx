@@ -1,7 +1,8 @@
 "use client"
 import Link from "next/link"
 
-import Row from "~/components/Row"
+import UnorderedList from "~/components/UnorderedList"
+import UserItem from "~/components/UserItem"
 import Avatar from "~/components/Avatar"
 
 interface Props {
@@ -21,13 +22,9 @@ const ClassFeedback: React.FC<Props> = ({
 	students,
 }) => {
 	return (
-		<Row.List
+		<UnorderedList
 			items={students}
-			renderEmptyState={
-				<span className="text-lg opacity-60">No students in class</span>
-			}
-		>
-			{({ item: { email, name, photo, feedback } }) => {
+			renderItem={({ email, name, photo, feedback }) => {
 				const inner = (
 					<>
 						<div className="flex items-center">
@@ -59,26 +56,30 @@ const ClassFeedback: React.FC<Props> = ({
 
 				if (feedback) {
 					return (
-						<Row.Item key={email}>
-							<Link
-								href={`/class/${courseId}/insights/${assignmentId}/${email}`}
-								className="flex h-20 items-center justify-between"
-							>
-								{inner}
-							</Link>
-						</Row.Item>
+						<UserItem
+							email={email}
+							name={name}
+							href={`/class/${courseId}/insights/${assignmentId}/${email}`}
+							photo={photo}
+							key={email}
+						/>
 					)
 				} else {
 					return (
-						<Row.Item key={email} disabled>
-							<div className="flex h-20 items-center justify-between">
-								{inner}
-							</div>
-						</Row.Item>
+						<UserItem
+							email={email}
+							name={name}
+							photo={photo}
+							key={email}
+							disabled
+						/>
 					)
 				}
 			}}
-		</Row.List>
+			renderEmpty={() => (
+				<span className="text-lg opacity-60">No students in class</span>
+			)}
+		/>
 	)
 }
 

@@ -1,4 +1,5 @@
-import { and, eq } from "drizzle-orm"
+import { desc, and, eq, or, gt, isNull, isNotNull } from "drizzle-orm"
+import { z } from "zod"
 
 import db from "~/db/db"
 import {
@@ -7,9 +8,25 @@ import {
 	studentToCourse,
 	teacherToCourse,
 	studentInsight,
-	insight,
 	feedback,
+	assignment,
 } from "~/db/schema"
+import { insightsSchema as feedbackInsightsSchema } from "./Feedback"
+
+const insightsSchema = z
+	.object({
+		type: z.string(),
+		content: z.string(),
+		sources: z
+			.object({
+				assignmentId: z.string(),
+				paragraphs: z.number().array(),
+			})
+			.array(),
+	})
+	.array()
+
+type Insights = z.infer<typeof insightsSchema>
 
 const User = ({ email }: { email: string }) => ({
 	create: async ({
@@ -22,7 +39,7 @@ const User = ({ email }: { email: string }) => ({
 		await db
 			.insert(user)
 			.values({ email, name, photo })
-			.onDuplicateKeyUpdate({ set: { email, photo } }) //! remove when feature to change photo is added
+			.onDuplicateKeyUpdate({ set: { email, photo } }) // remove when feature to change photo is added
 	},
 	get: async () => {
 		const row = (
@@ -54,6 +71,109 @@ const User = ({ email }: { email: string }) => ({
 			})
 			.where(eq(user.email, email))
 	},
+	upsertInsights: async ({
+		courseId,
+		insights,
+	}: {
+		courseId: string
+		insights: Insights
+	}) => {
+		await db
+			.insert(studentInsight)
+			.values({
+				courseId,
+				studentEmail: email,
+				insights,
+			})
+			.onDuplicateKeyUpdate({
+				set: {
+					insights,
+				},
+			})
+	},
+	insights: async ({ courseId }: { courseId: string }) => {
+		const row = (
+			await db
+				.select()
+				.from(studentInsight)
+				.where(
+					and(
+						eq(studentInsight.courseId, courseId),
+						eq(studentInsight.studentEmail, email)
+					)
+				)
+		)[0]
+
+		return row && insightsSchema.parse(row.insights)
+	},
+	lastSubmissionHTML: async ({
+		courseId,
+		assignmentId,
+	}: {
+		courseId: string
+		assignmentId: string
+	}) => {
+		return (
+			await db
+				.select({
+					submissionHTML: feedback.submissionHTML,
+				})
+				.from(feedback)
+				.where(
+					and(
+						eq(feedback.courseId, courseId),
+						eq(feedback.assignmentId, assignmentId)
+					)
+				)
+				.orderBy(desc(feedback.givenAt))
+				.limit(1)
+		)[0]?.submissionHTML
+	},
+	lastInsights: async ({
+		courseId,
+		assignmentId,
+	}: {
+		courseId: string
+		assignmentId: string
+	}) => {
+		const [row] = await db
+			.select({
+				insights: feedback.insights,
+			})
+			.from(feedback)
+			.where(
+				and(
+					eq(feedback.courseId, courseId),
+					eq(feedback.assignmentId, assignmentId)
+				)
+			)
+			.orderBy(desc(feedback.givenAt))
+			.limit(1)
+
+		return row && feedbackInsightsSchema.parse(row.insights)
+	},
+	unsyncedInsights: async ({ courseId }: { courseId: string }) => {
+		return (
+			await db
+				.select({
+					assignmentId: feedback.assignmentId,
+					givenAt: feedback.givenAt,
+					insights: feedback.insights,
+				})
+				.from(feedback)
+				.where(
+					and(
+						eq(feedback.courseId, courseId),
+						eq(feedback.userEmail, email),
+						eq(feedback.synced, false),
+						isNotNull(feedback.insights)
+					)
+				)
+		).map((row) => ({
+			...row,
+			insights: feedbackInsightsSchema.parse(row.insights),
+		}))
+	},
 	delete: async () => {
 		// consider deleting user's feedback
 		await Promise.all([
@@ -64,7 +184,6 @@ const User = ({ email }: { email: string }) => ({
 			db
 				.delete(studentToCourse)
 				.where(eq(studentToCourse.studentEmail, email)),
-			db.delete(insight).where(eq(insight.studentEmail, email)),
 			db
 				.delete(studentInsight)
 				.where(eq(studentInsight.studentEmail, email)),
@@ -230,6 +349,96 @@ const User = ({ email }: { email: string }) => ({
 				)
 			),
 		}))
+	},
+	upcomingAssignments: async () => {
+		const [
+			{ assignmentsTeaching, isTeaching },
+			{ assignmentsEnrolled, isEnrolled },
+		] = await Promise.all([
+			db
+				.select({
+					courseId: teacherToCourse.courseId,
+					assignmentId: assignment.assignmentId,
+					title: assignment.title,
+					dueAt: assignment.dueAt,
+				})
+				.from(teacherToCourse)
+				.leftJoin(
+					assignment,
+					eq(assignment.courseId, teacherToCourse.courseId)
+				)
+				.where(
+					and(
+						eq(teacherToCourse.teacherEmail, email),
+						or(
+							gt(assignment.dueAt, new Date()),
+							isNull(assignment.dueAt)
+						)
+					)
+				)
+				.then((rows) => ({
+					isTeaching: rows.length !== 0,
+					assignmentsTeaching: rows
+						.map((row) =>
+							row.assignmentId !== null &&
+							row.title !== null &&
+							row.dueAt !== null
+								? {
+										courseId: row.courseId,
+										assignmentId: row.assignmentId,
+										title: row.title,
+										dueAt: row.dueAt,
+								  }
+								: undefined
+						)
+						.filter(Boolean),
+				})),
+			db
+				.select({
+					courseId: studentToCourse.courseId,
+					assignmentId: assignment.assignmentId,
+					title: assignment.title,
+					dueAt: assignment.dueAt,
+				})
+				.from(studentToCourse)
+				.leftJoin(
+					assignment,
+					eq(assignment.courseId, studentToCourse.courseId)
+				)
+				.where(
+					and(
+						eq(studentToCourse.studentEmail, email),
+						or(
+							gt(assignment.dueAt, new Date()),
+							isNull(assignment.dueAt)
+						)
+					)
+				)
+				.then((rows) => ({
+					isEnrolled: rows.length !== 0,
+					assignmentsEnrolled: rows
+						.map((row) =>
+							row.assignmentId !== null &&
+							row.title !== null &&
+							row.dueAt !== null
+								? {
+										courseId: row.courseId,
+										assignmentId: row.assignmentId,
+										title: row.title,
+										dueAt: row.dueAt,
+								  }
+								: undefined
+						)
+						.filter(Boolean),
+				})),
+		])
+
+		return {
+			assignmentsTeaching,
+			assignmentsEnrolled,
+			isTeaching,
+			isEnrolled,
+		}
 	},
 })
 

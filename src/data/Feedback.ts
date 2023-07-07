@@ -1,7 +1,18 @@
 import { eq, and } from "drizzle-orm"
+import { z } from "zod"
 
 import db from "~/db/db"
 import { feedback, followUp } from "~/db/schema"
+
+export const insightsSchema = z
+	.object({
+		type: z.enum(["strength", "weakness"]),
+		paragraphs: z.number().array(),
+		content: z.string(),
+	})
+	.array()
+
+type Insights = z.infer<typeof insightsSchema>
 
 const Feedback = ({
 	courseId,
@@ -15,12 +26,10 @@ const Feedback = ({
 	givenAt: Date
 }) => ({
 	create: async ({
-		submission,
 		submissionHTML,
 		rawResponse,
 		metadata,
 	}: {
-		submission: string
 		submissionHTML: string
 		rawResponse: string
 		metadata: Record<string, unknown>
@@ -30,7 +39,6 @@ const Feedback = ({
 			assignmentId,
 			userEmail,
 			givenAt,
-			submission,
 			submissionHTML,
 			rawResponse,
 			metadata,
@@ -158,16 +166,44 @@ const Feedback = ({
 				.flat(),
 		}
 	},
+	insights: async () => {
+		const row = (
+			await db
+				.select({
+					insights: feedback.insights,
+					submissionHTML: feedback.submissionHTML,
+				})
+				.from(feedback)
+				.where(
+					and(
+						eq(feedback.courseId, courseId),
+						eq(feedback.assignmentId, assignmentId),
+						eq(feedback.userEmail, userEmail),
+						eq(feedback.givenAt, givenAt)
+					)
+				)
+		)[0]
+
+		return (
+			row && {
+				insights: insightsSchema.parse(row.insights),
+				submissionHTML: row.submissionHTML,
+			}
+		)
+	},
 	update: async ({
-		submission,
 		submissionHTML,
+		insights,
 	}: {
-		submission: string
-		submissionHTML: string
+		submissionHTML?: string
+		insights?: Insights
 	}) => {
 		await db
 			.update(feedback)
-			.set({ submission, submissionHTML })
+			.set({
+				submissionHTML,
+				insights,
+			})
 			.where(
 				and(
 					eq(feedback.courseId, courseId),
@@ -176,6 +212,46 @@ const Feedback = ({
 					eq(feedback.givenAt, givenAt)
 				)
 			)
+	},
+	updateSynced: async ({ insights: oldInsights }: { insights: Insights }) => {
+		await db.transaction(
+			async (tx) => {
+				const newInsights = insightsSchema.parse(
+					(
+						await tx
+							.select({ insights: feedback.insights })
+							.from(feedback)
+							.where(
+								and(
+									eq(feedback.courseId, courseId),
+									eq(feedback.assignmentId, assignmentId),
+									eq(feedback.userEmail, userEmail),
+									eq(feedback.givenAt, givenAt)
+								)
+							)
+					)[0]?.insights
+				)
+
+				if (
+					oldInsights.map((insight) => insight.content).join("\n") ===
+					newInsights.map((insight) => insight.content).join("\n")
+				) {
+					await tx
+						.update(feedback)
+						.set({ synced: true })
+						.where(
+							and(
+								eq(feedback.courseId, courseId),
+								eq(feedback.assignmentId, assignmentId),
+								eq(feedback.userEmail, userEmail)
+							)
+						)
+				}
+			},
+			{
+				isolationLevel: "serializable",
+			}
+		)
 	},
 	delete: async () => {
 		await Promise.all([

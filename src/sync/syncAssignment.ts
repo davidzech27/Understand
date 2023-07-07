@@ -1,5 +1,4 @@
 import getCompletion from "~/ai/getCompletion"
-import Resource from "~/data/Resource"
 import GoogleAPI from "~/google/GoogleAPI"
 import Course from "~/data/Course"
 import Assignment from "~/data/Assignment"
@@ -202,9 +201,9 @@ ${
 			}
 		)
 
-		const attachmentCandidates = await Resource({
-			courseId,
-		}).search({
+		const attachmentCandidates = await Course({
+			id: courseId,
+		}).searchResources({
 			similarText: predictedInstructions,
 			filter: {},
 			topK: 15,
@@ -330,7 +329,7 @@ Given that the title of the assignment in Google Classroom is ${
 
 	await Promise.all([
 		...usedAttachments.map((attachment) =>
-			Resource({ courseId }).update({
+			Course({ id: courseId }).updateResources({
 				set: {
 					instructionsForAssignmentId: assignment.id,
 				},
@@ -341,7 +340,7 @@ Given that the title of the assignment in Google Classroom is ${
 		),
 		useDescription &&
 			assignment.description &&
-			Resource({ courseId }).create({
+			Course({ id: courseId }).createResource({
 				text: assignment.description,
 				instructionsForAssignmentId: assignment.id,
 			}),
@@ -357,9 +356,9 @@ Given that the title of the assignment in Google Classroom is ${
 	let context: string | undefined = undefined
 
 	if (instructions !== undefined) {
-		const contextCandidates = await Resource({
-			courseId,
-		}).search({
+		const contextCandidates = await Course({
+			id: courseId,
+		}).searchResources({
 			similarText: instructions,
 			filter: {},
 			topK: 15,

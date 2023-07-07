@@ -1,7 +1,6 @@
 import Card from "~/components/Card"
-import StudentInsight from "~/data/StudentInsight"
+import User from "~/data/User"
 import Insight from "./Insight"
-import InsightData from "~/data/Insight"
 import Assignment from "~/data/Assignment"
 
 export const dynamic = "force-dynamic"
@@ -20,10 +19,9 @@ const StudentPage = async ({
 	email = decodeURIComponent(email)
 
 	const studentInsights = (
-		await StudentInsight({
-			courseId,
-			studentEmail: email,
-		}).get()
+		await User({
+			email,
+		}).insights({ courseId })
 	)?.map((insight) => ({
 		...insight,
 		sources: insight.sources.map((source) => ({
@@ -36,11 +34,12 @@ const StudentPage = async ({
 					(assignment) =>
 						assignment ?? { assignmentId: "", title: "" }
 				),
-			submission: InsightData({
-				courseId,
-				studentEmail: email,
-				assignmentId: source.assignmentId,
-			}).submission(),
+			submissionHTML: User({ email })
+				.lastSubmissionHTML({
+					courseId,
+					assignmentId: source.assignmentId,
+				})
+				.then((submissionHTML) => submissionHTML ?? ""),
 			paragraphs: source.paragraphs,
 		})),
 	}))

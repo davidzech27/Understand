@@ -6,7 +6,7 @@ import { useHover } from "react-aria"
 import * as ScrollArea from "@radix-ui/react-scroll-area"
 import { parse } from "node-html-parser"
 
-import FormattedDate from "~/utils/FormattedDate"
+import formatDate from "~/utils/formatDate"
 import cn from "~/utils/cn"
 
 interface Props {
@@ -17,7 +17,7 @@ interface Props {
 			title: string
 			dueAt?: Date
 		}>
-		submission: Promise<string>
+		submissionHTML: Promise<string>
 		paragraphs: number[]
 	}[]
 }
@@ -65,13 +65,13 @@ interface SourceProps {
 		title: string
 		dueAt?: Date
 	}>
-	submission: Promise<string>
+	submissionHTML: Promise<string>
 	paragraphs: number[]
 }
 
 const Source: React.FC<SourceProps> = ({
 	assignment: assignmentPromise,
-	submission,
+	submissionHTML,
 	paragraphs,
 }) => {
 	const assignment = use(assignmentPromise)
@@ -93,14 +93,9 @@ const Source: React.FC<SourceProps> = ({
 					</span>
 
 					<span className="opacity-60">
-						{assignment.dueAt ? (
-							<FormattedDate
-								prefix="Due "
-								date={assignment.dueAt}
-							/>
-						) : (
-							"No due date"
-						)}
+						{assignment.dueAt
+							? `Due ${formatDate(assignment.dueAt)}`
+							: "No due date"}
 					</span>
 				</div>
 			</Link>
@@ -115,7 +110,7 @@ const Source: React.FC<SourceProps> = ({
 					>
 						<Suspense>
 							<SubmissionPreview
-								submission={submission}
+								submissionHTML={submissionHTML}
 								paragraphs={paragraphs}
 								courseId={courseId}
 								assignmentId={assignment.assignmentId}
@@ -134,7 +129,7 @@ const Source: React.FC<SourceProps> = ({
 }
 
 interface SubmissionPreviewProps {
-	submission: Promise<string>
+	submissionHTML: Promise<string>
 	paragraphs: number[]
 	courseId: string
 	assignmentId: string
@@ -142,16 +137,16 @@ interface SubmissionPreviewProps {
 }
 
 const SubmissionPreview: React.FC<SubmissionPreviewProps> = ({
-	submission: submissionPromise,
+	submissionHTML: submissionHTMLPromise,
 	paragraphs,
 	courseId,
 	assignmentId,
 	studentEmail,
 }) => {
-	const submission = use(submissionPromise)
+	const submissionHTML = use(submissionHTMLPromise)
 
 	const submissionPortions = useMemo(() => {
-		const submissionWithoutFontSizeStyle = submission.replaceAll(
+		const submissionWithoutFontSizeStyle = submissionHTML.replaceAll(
 			/font-size:\w+;/g,
 			""
 		)
@@ -170,7 +165,7 @@ const SubmissionPreview: React.FC<SubmissionPreviewProps> = ({
 			)
 			.filter((_, index) => paragraphs.includes(index + 1))
 			.map((paragraph) => paragraph.outerHTML)
-	}, [submission, paragraphs])
+	}, [submissionHTML, paragraphs])
 
 	return (
 		<>

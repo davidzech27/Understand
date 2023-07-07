@@ -1,6 +1,5 @@
 import Assignment from "~/data/Assignment"
 import Course from "~/data/Course"
-import Resource from "~/data/Resource"
 import GoogleAPI from "~/google/GoogleAPI"
 
 const syncResources = async ({ courseId }: { courseId: string }) => {
@@ -21,7 +20,7 @@ const syncResources = async ({ courseId }: { courseId: string }) => {
 		[classroomAssignments, classroomMaterials],
 	] = await Promise.all([
 		Course({ id: courseId }).assignments(),
-		Resource({ courseId }).getMany({ filter: {} }),
+		Course({ id: courseId }).getResources({ filter: {} }),
 		googleAPIPromise.then((googleAPI) =>
 			Promise.all([
 				googleAPI.courseAssignments({ courseId }),
@@ -109,7 +108,7 @@ const syncResources = async ({ courseId }: { courseId: string }) => {
 						.filter(Boolean)
 						.map(
 							async (driveFile) =>
-								await Resource({ courseId }).create({
+								await Course({ id: courseId }).createResource({
 									driveId: driveFile.id,
 									driveTitle: driveFile.title,
 									attachmentOnAssignmentId:
@@ -205,7 +204,9 @@ const syncResources = async ({ courseId }: { courseId: string }) => {
 									.filter(Boolean)
 
 							if (classroomAssignment.description === undefined) {
-								return await Resource({ courseId }).delete({
+								return await Course({
+									id: courseId,
+								}).deleteResources({
 									filter: {
 										instructionsForAssignmentId:
 											classroomAssignment.id,
@@ -216,9 +217,9 @@ const syncResources = async ({ courseId }: { courseId: string }) => {
 								})
 							}
 
-							await Resource({
-								courseId,
-							}).update({
+							await Course({
+								id: courseId,
+							}).updateResources({
 								set: {
 									text: classroomAssignment.description,
 								},
@@ -261,7 +262,7 @@ const syncResources = async ({ courseId }: { courseId: string }) => {
 							)
 
 						if (vdbDriveFile === undefined) {
-							await Resource({ courseId }).create({
+							await Course({ id: courseId }).createResource({
 								driveId: classroomDriveFile.id,
 								driveTitle: classroomDriveFile.title,
 								attachmentOnAssignmentId:
@@ -279,7 +280,7 @@ const syncResources = async ({ courseId }: { courseId: string }) => {
 								classroomDriveFileText.trim() ||
 							vdbDriveFile.driveTitle !== classroomDriveFile.title
 						) {
-							await Resource({ courseId }).update({
+							await Course({ id: courseId }).updateResources({
 								filter: {
 									driveId: classroomDriveFile.id,
 								},
@@ -334,9 +335,9 @@ const syncResources = async ({ courseId }: { courseId: string }) => {
 										)
 
 									if (vdbDriveFile === undefined) {
-										return await Resource({
-											courseId,
-										}).create({
+										return await Course({
+											id: courseId,
+										}).createResource({
 											driveId: classroomDriveFile.id,
 											driveTitle:
 												classroomDriveFile.title,
@@ -352,7 +353,9 @@ const syncResources = async ({ courseId }: { courseId: string }) => {
 										vdbDriveFile.driveTitle !==
 											classroomDriveFile.title
 									) {
-										await Resource({ courseId }).update({
+										await Course({
+											id: courseId,
+										}).updateResources({
 											filter: {
 												driveId: classroomDriveFile.id,
 											},
@@ -401,7 +404,7 @@ const syncResources = async ({ courseId }: { courseId: string }) => {
 				)
 
 				if (classroomDriveFile === undefined) {
-					await Resource({ courseId }).delete({
+					await Course({ id: courseId }).deleteResources({
 						filter: { driveId: vdbDriveFile.driveId },
 					})
 

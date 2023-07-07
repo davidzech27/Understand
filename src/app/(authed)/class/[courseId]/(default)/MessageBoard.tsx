@@ -6,7 +6,7 @@ import { useZact } from "zact/client"
 import TextArea from "~/components/TextArea"
 import Avatar from "~/components/Avatar"
 import FancyButton from "~/components/FancyButton"
-import FormattedDate from "~/utils/FormattedDate"
+import formatDate from "~/utils/formatDate"
 import postMessageAction from "./postMessageAction"
 
 interface Props {
@@ -45,6 +45,7 @@ const MessageBoard: React.FC<Props> = ({ courseId }) => {
 							height: messageInput.length === 0 ? 80 : "auto",
 						}}
 						autoFocus
+						autoComplete="off"
 						className="min-h-[80px] py-2 px-3"
 					/>
 				</Form.Control>
@@ -87,9 +88,7 @@ const MessageBoard: React.FC<Props> = ({ courseId }) => {
 							</div>
 						</div>
 
-						<span className="opacity-60">
-							<FormattedDate date={sentAt} />
-						</span>
+						<span className="opacity-60">{formatDate(sentAt)}</span>
 					</div>
 				))
 			) : (

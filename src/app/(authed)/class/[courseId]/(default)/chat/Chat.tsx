@@ -171,6 +171,7 @@ ${newMessages[0]}`,
 							? "Generating..."
 							: "Ask a question about the assignments or content in this class"
 					}
+					autoComplete="off"
 					style={{ height: messageInput.length === 0 ? 42 : "auto" }}
 					className="py-2 px-3"
 				/>

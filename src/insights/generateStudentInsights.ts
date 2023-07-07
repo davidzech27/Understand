@@ -1,10 +1,9 @@
 import { and, eq } from "drizzle-orm"
 
 import db from "~/db/db"
-import { insight } from "~/db/schema"
-import Insight, { insightsSchema } from "~/data/Insight"
-import StudentInsight from "~/data/StudentInsight"
+import User from "~/data/User"
 import getCompletion from "~/ai/getCompletion"
+import Feedback from "~/data/Feedback"
 
 const generateStudentInsights = async ({
 	courseId,
@@ -14,26 +13,8 @@ const generateStudentInsights = async ({
 	studentEmail: string
 }) => {
 	const [previousStudentInsights, unsyncedInsights] = await Promise.all([
-		StudentInsight({ courseId, studentEmail }).get(),
-		db
-			.select({
-				assignmentId: insight.assignmentId,
-				insights: insight.insights,
-			})
-			.from(insight)
-			.where(
-				and(
-					eq(insight.courseId, courseId),
-					eq(insight.studentEmail, studentEmail),
-					eq(insight.synced, false)
-				)
-			)
-			.then((insights) =>
-				insights.map((insight) => ({
-					assignmentId: insight.assignmentId,
-					insights: insightsSchema.parse(insight.insights),
-				}))
-			),
+		User({ email: studentEmail }).insights({ courseId }),
+		User({ email: studentEmail }).unsyncedInsights({ courseId }),
 	])
 
 	const unsyncedAssignmentIdSet = new Set(
@@ -162,13 +143,15 @@ Begin.`,
 
 	await Promise.all([
 		...unsyncedInsights.map((insight) =>
-			Insight({
+			Feedback({
 				courseId,
 				assignmentId: insight.assignmentId,
-				studentEmail,
+				userEmail: studentEmail,
+				givenAt: insight.givenAt,
 			}).updateSynced({ insights: insight.insights })
 		),
-		StudentInsight({ courseId, studentEmail }).upsert({
+		User({ email: studentEmail }).upsertInsights({
+			courseId,
 			insights: mergedInsights,
 		}),
 	])

@@ -73,13 +73,20 @@ const LandingForm: React.FC<Props> = (props) => {
 					className="my-8 flex h-12 flex-col space-y-4"
 				>
 					{loading ? (
-						<TextInput value="" setValue={() => {}} />
+						<TextInput
+							value=""
+							setValue={() => {}}
+							autoComplete="name"
+							className="text-lg"
+						/>
 					) : (
 						<TextInput
 							value={nameInput}
 							setValue={setNameInput}
 							placeholder="Your name"
 							autoFocus
+							autoComplete="name"
+							className="text-lg"
 						/>
 					)}
 				</Form.Control>

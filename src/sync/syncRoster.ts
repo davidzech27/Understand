@@ -43,42 +43,44 @@ const syncRoster = async ({ courseId }: { courseId: string }) => {
 	)
 
 	await Promise.all([
-		...classroomRoster.teachers.map(
-			({ email }) =>
-				email &&
-				!dbTeacherEmailSet.has(email) &&
-				User({ email }).addToCourse({
+		...classroomRoster.teachers.map(({ email }) => {
+			if (email && !dbTeacherEmailSet.has(email))
+				return User({ email }).addToCourse({
 					id: courseId,
 					role: "teacher",
 					linked: true,
 				})
-		),
-		...dbLinkedTeacherEmails.map(
-			(email) =>
-				!classroomTeacherEmailSet.has(email) &&
-				User({ email }).removeFromCourse({
+
+			return undefined
+		}),
+		...dbLinkedTeacherEmails.map((email) => {
+			if (!classroomTeacherEmailSet.has(email))
+				return User({ email }).removeFromCourse({
 					id: courseId,
 					role: "teacher",
 				})
-		),
-		...classroomRoster.students.map(
-			({ email }) =>
-				email &&
-				!dbStudentEmailSet.has(email) &&
-				User({ email }).addToCourse({
+
+			return undefined
+		}),
+		...classroomRoster.students.map(({ email }) => {
+			if (!dbStudentEmailSet.has(email))
+				return User({ email }).addToCourse({
 					id: courseId,
 					role: "student",
 					linked: true,
 				})
-		),
-		...dbLinkedStudentEmails.map(
-			(email) =>
-				!classroomStudentEmailSet.has(email) &&
-				User({ email }).removeFromCourse({
+
+			return undefined
+		}),
+		...dbLinkedStudentEmails.map((email) => {
+			if (!classroomStudentEmailSet.has(email))
+				return User({ email }).removeFromCourse({
 					id: courseId,
 					role: "student",
 				})
-		),
+
+			return undefined
+		}),
 	])
 }
 

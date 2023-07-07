@@ -1,5 +1,4 @@
-import AssignmentInsight from "~/data/AssignmentInsight"
-import InsightData from "~/data/Insight"
+import Assignment from "~/data/Assignment"
 import User from "~/data/User"
 import Card from "~/components/Card"
 import Insight from "./Insight"
@@ -21,10 +20,10 @@ const AssignmentInsightsPage = async ({
 	params: Params
 }) => {
 	const assignmentInsights = (
-		await AssignmentInsight({
+		await Assignment({
 			courseId,
 			assignmentId,
-		}).get()
+		}).insights()
 	)?.map((insight) => ({
 		...insight,
 		sources: insight.sources.map((source) => ({
@@ -33,11 +32,11 @@ const AssignmentInsightsPage = async ({
 			})
 				.get()
 				.then((student) => student ?? { email: "", name: "" }),
-			submission: InsightData({
-				courseId,
-				assignmentId,
-				studentEmail: source.studentEmail,
-			}).submission(),
+			submission: User({
+				email: source.studentEmail,
+			})
+				.lastSubmissionHTML({ courseId, assignmentId })
+				.then((submissionHTML) => submissionHTML ?? ""),
 			paragraphs: source.paragraphs,
 		})),
 	}))

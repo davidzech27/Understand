@@ -15,7 +15,7 @@ export const user = mysqlTable("user", {
 	email: varchar("email", { length: 100 }).primaryKey(),
 	name: varchar("name", { length: 100 }).notNull(),
 	photo: varchar("photo", { length: 2000 }),
-	superuser: boolean("superuser"),
+	superuser: boolean("superuser").default(false),
 })
 
 export const teacherToCourse = mysqlTable(
@@ -23,7 +23,7 @@ export const teacherToCourse = mysqlTable(
 	{
 		teacherEmail: varchar("teacher_email", { length: 100 }).notNull(),
 		courseId: varchar("course_id", { length: 100 }).notNull(),
-		linked: boolean("linked"),
+		linked: boolean("linked").notNull(),
 	},
 	(table) => ({
 		cpk: primaryKey(table.teacherEmail, table.courseId),
@@ -39,7 +39,7 @@ export const studentToCourse = mysqlTable(
 	{
 		studentEmail: varchar("student_email", { length: 100 }).notNull(),
 		courseId: varchar("course_id", { length: 100 }).notNull(),
-		linked: boolean("linked"),
+		linked: boolean("linked").notNull(),
 	},
 	(table) => ({
 		cpk: primaryKey(table.studentEmail, table.courseId),
@@ -83,10 +83,11 @@ export const feedback = mysqlTable(
 		assignmentId: varchar("assignment_id", { length: 100 }).notNull(),
 		userEmail: varchar("user_email", { length: 100 }).notNull(),
 		givenAt: datetime("given_at").notNull(),
-		submission: text("submission").notNull(),
-		submissionHTML: text("submission_html"),
+		submissionHTML: text("submission_html").notNull(),
 		rawResponse: text("raw_response").notNull(),
 		metadata: json("metadata").notNull(),
+		insights: json("insights"),
+		synced: boolean("synced").default(false),
 	},
 	(table) => ({
 		cpk: primaryKey(
@@ -96,6 +97,12 @@ export const feedback = mysqlTable(
 			table.givenAt
 		),
 		idx: index("course_id_given_at_idx").on(table.courseId, table.givenAt),
+		courseIdStudentEmailSyncedIdx: index(
+			"course_id_user_email_synced_idx"
+		).on(table.courseId, table.userEmail, table.synced),
+		courseIdAssignmentIdSyncedIdx: index(
+			"course_id_assignment_id_synced_idx"
+		).on(table.courseId, table.assignmentId, table.synced),
 	})
 )
 
@@ -121,31 +128,6 @@ export const followUp = mysqlTable(
 			table.feedbackGivenAt,
 			table.givenAt
 		),
-	})
-)
-
-export const insight = mysqlTable(
-	"insight",
-	{
-		courseId: varchar("course_id", { length: 100 }).notNull(),
-		assignmentId: varchar("assignment_id", { length: 100 }).notNull(),
-		studentEmail: varchar("student_email", { length: 100 }).notNull(),
-		submission: text("submission"),
-		insights: json("insights").notNull(),
-		synced: boolean("synced").notNull(),
-	},
-	(table) => ({
-		cpk: primaryKey(table.courseId, table.assignmentId, table.studentEmail),
-		courseIdSyncedIdx: index("course_id_synced_idx").on(
-			table.courseId,
-			table.synced
-		),
-		courseIdStudentEmailSyncedIdx: index(
-			"course_id_student_email_synced_idx"
-		).on(table.courseId, table.studentEmail, table.synced),
-		courseIdAssignmentIdSyncedIdx: index(
-			"course_id_assignment_id_synced_idx"
-		).on(table.courseId, table.assignmentId, table.synced),
 	})
 )
 

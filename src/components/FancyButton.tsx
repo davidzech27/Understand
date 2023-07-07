@@ -14,11 +14,23 @@ interface Props
 		ButtonHTMLAttributes<HTMLButtonElement>,
 		HTMLButtonElement
 	> {
+	size?: "medium" | "large"
 	loading?: boolean
 }
 
 const FancyButton = forwardRef<HTMLButtonElement, Props>(
-	({ children, onClick, loading, disabled, className, ...props }, ref) => {
+	(
+		{
+			children,
+			onClick,
+			size = "large",
+			loading,
+			disabled,
+			className,
+			...props
+		},
+		ref
+	) => {
 		if (loading) disabled = true
 
 		const buttonClassName = className
@@ -38,19 +50,26 @@ const FancyButton = forwardRef<HTMLButtonElement, Props>(
 				disabled={disabled}
 				ref={ref}
 				className={cn(
-					"group relative flex h-full w-full items-center justify-center outline-none",
+					"group relative flex items-center justify-center outline-none",
+					{
+						medium: "px-12 py-4",
+						large: "h-20 w-full",
+					}[size],
 					buttonClassName
 				)}
 			>
 				<span
 					className={cn(
-						"z-10 text-2xl font-medium transition-all duration-150",
+						"z-10 font-medium transition-all duration-150",
+						{
+							medium: "text-2xl",
+							large: "text-3xl",
+						}[size],
 						loading
 							? "text-white opacity-100"
 							: disabled
 							? "text-white opacity-80"
 							: "text-black opacity-80 group-focus-within:text-white group-focus-within:opacity-100 group-hover:text-white group-hover:opacity-100",
-
 						textClassName
 					)}
 				>

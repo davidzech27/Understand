@@ -101,6 +101,7 @@ const SettingsModal: React.FC<Props> = ({ open, setOpen, assignment }) => {
 						value={titleInput}
 						setValue={setTitleInput}
 						placeholder="Assignment title"
+						autoComplete="off"
 						className="h-min py-2.5 pl-4 text-base"
 					/>
 
@@ -112,6 +113,7 @@ const SettingsModal: React.FC<Props> = ({ open, setOpen, assignment }) => {
 						value={descriptionInput}
 						setValue={setDescriptionInput}
 						placeholder="Description"
+						autoComplete="off"
 						className="h-min py-2.5 pl-4 text-base"
 					/>
 
@@ -124,6 +126,7 @@ const SettingsModal: React.FC<Props> = ({ open, setOpen, assignment }) => {
 							value={instructionsInput}
 							setValue={setInstructionsInput}
 							placeholder="Instructions"
+							autoComplete="off"
 							className="py-2.5 pl-4 text-base"
 						/>
 					</div>

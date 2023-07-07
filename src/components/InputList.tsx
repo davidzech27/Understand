@@ -1,3 +1,4 @@
+"use client"
 import { useEffect, useRef, useState } from "react"
 import { produce } from "immer"
 import { Plus } from "lucide-react"
@@ -13,9 +14,12 @@ interface Props {
 	className?: string
 	textInputClassname?: string
 	buttonClassName?: string
+	id?: string
+	name?: string
+	autoComplete: string
 }
 
-const ListInput: React.FC<Props> = ({
+const InputList: React.FC<Props> = ({
 	values,
 	setValues,
 	singleWord = false,
@@ -23,6 +27,9 @@ const ListInput: React.FC<Props> = ({
 	className,
 	textInputClassname,
 	buttonClassName,
+	id,
+	name,
+	autoComplete,
 }) => {
 	const wordsSplit = useRef(false)
 
@@ -49,7 +56,7 @@ const ListInput: React.FC<Props> = ({
 	if (previousValuesLength !== values.length) {
 		setPreviousValuesLength(values.length)
 
-		process.nextTick(() => lastInputRef.current?.focus())
+		Promise.resolve().then(() => lastInputRef.current?.focus())
 	}
 
 	return (
@@ -61,7 +68,7 @@ const ListInput: React.FC<Props> = ({
 		>
 			{values.map((value, index) => (
 				<TextInput
-					key={index} // fine
+					key={index}
 					value={value}
 					setValue={(value) =>
 						setValues(
@@ -70,6 +77,9 @@ const ListInput: React.FC<Props> = ({
 							})
 						)
 					}
+					id={id}
+					name={name}
+					autoComplete={autoComplete}
 					onKeyDown={(e) => {
 						if (e.key === "Enter") {
 							e.preventDefault()
@@ -108,4 +118,4 @@ const ListInput: React.FC<Props> = ({
 	)
 }
 
-export default ListInput
+export default InputList

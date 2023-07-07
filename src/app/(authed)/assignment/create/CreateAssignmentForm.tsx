@@ -74,6 +74,7 @@ const CreateAssignmentForm: React.FC<Props> = ({ coursesTeachingPromise }) => {
 								setValue={setTitleInput}
 								placeholder="Assignment title"
 								autoFocus
+								autoComplete="off"
 								className="h-min py-2.5 pl-4 text-base"
 							/>
 						</Form.Control>
@@ -89,6 +90,7 @@ const CreateAssignmentForm: React.FC<Props> = ({ coursesTeachingPromise }) => {
 								value={descriptionInput}
 								setValue={setDescriptionInput}
 								placeholder="Assignment description (optional)"
+								autoComplete="off"
 								className="h-min py-2.5 pl-4 text-base"
 							/>
 						</Form.Control>
@@ -171,6 +173,7 @@ const CreateAssignmentForm: React.FC<Props> = ({ coursesTeachingPromise }) => {
 								value={instructionsInput}
 								setValue={setInstructionsInput}
 								placeholder="Instructions for feedback"
+								autoComplete="off"
 								className="h-full py-2.5 pl-4 text-base"
 							/>
 						</Form.Control>

@@ -4,11 +4,10 @@ import { type NextApiHandler } from "next"
 import { z } from "zod"
 
 import db from "~/db/db"
-import { insight } from "~/db/schema"
-import { insightsSchema } from "~/data/Insight"
 import callGenerate from "./callGenerate"
 import generateStudentInsights from "./generateStudentInsights"
 import generateAssignmentInsights from "./generateAssignmentInsights"
+import Course from "~/data/Course"
 
 const generateCallSchema = z.discriminatedUnion("name", [
 	z.object({
@@ -35,24 +34,9 @@ const insightsHandler: NextApiHandler = async (req, res) => {
 	const generateCall = generateCallSchema.parse(req.body)
 
 	if (generateCall.name === "course") {
-		const unsyncedInsights = (
-			await db
-				.select({
-					assignmentId: insight.assignmentId,
-					studentEmail: insight.studentEmail,
-					insights: insight.insights,
-				})
-				.from(insight)
-				.where(
-					and(
-						eq(insight.courseId, generateCall.courseId),
-						eq(insight.synced, false)
-					)
-				)
-		).map((row) => ({
-			...row,
-			insights: insightsSchema.parse(row.insights),
-		}))
+		const unsyncedInsights = await Course({
+			id: generateCall.courseId,
+		}).unsyncedInsights()
 
 		const unsyncedAssignmentIds = [
 			...new Set(unsyncedInsights.map((insight) => insight.assignmentId)),

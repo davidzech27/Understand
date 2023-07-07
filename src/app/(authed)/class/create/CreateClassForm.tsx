@@ -4,15 +4,17 @@ import { use, useState } from "react"
 import { useZact } from "zact/client"
 import { X } from "lucide-react"
 
+import Heading from "~/components/Heading"
 import TextInput from "~/components/TextInput"
 import Card from "~/components/Card"
-import ListInput from "~/components/ListInput"
+import InputList from "~/components/InputList"
 import Button from "~/components/Button"
 import FancyButton from "~/components/FancyButton"
 import Modal from "~/components/Modal"
 import Avatar from "~/components/Avatar"
+import SelectList from "~/components/SelectList"
+import AttachmentItem from "~/components/AttachmentItem"
 import getAuthenticationURL from "~/google/getAuthenticationURL"
-import Row from "~/components/Row"
 import createCourseAction from "./createCourseAction"
 import { useRouter } from "next/navigation"
 
@@ -210,6 +212,7 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 								setValue={setNameInput}
 								placeholder="Class name"
 								autoFocus
+								autoComplete="off"
 								className="h-min py-2.5 pl-4 text-base"
 							/>
 						</Form.Control>
@@ -223,6 +226,7 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 								value={sectionInput}
 								setValue={setSectionInput}
 								placeholder="Section (optional)"
+								autoComplete="off"
 								className="h-min py-2.5 pl-4 text-base"
 							/>
 						</Form.Control>
@@ -232,11 +236,12 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 				<Card className="flex-1 space-y-2 overflow-y-scroll px-6 py-5 shadow-sm">
 					<div className="ml-1 font-medium opacity-80">Students</div>
 
-					<ListInput
+					<InputList
 						values={studentEmailInputs}
 						setValues={setStudentEmailInputs}
 						singleWord
 						placeholder="Student email"
+						autoComplete="off"
 						className="h-min"
 						textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)] h-min"
 						buttonClassName="h-[46px] w-[46px]"
@@ -246,11 +251,12 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 						Additional teachers
 					</div>
 
-					<ListInput
+					<InputList
 						values={additionalTeacherEmailInputs}
 						setValues={setAdditionalTeacherEmailInputs}
 						singleWord
 						placeholder="Teacher email"
+						autoComplete="off"
 						className="h-min"
 						textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)] h-min"
 						buttonClassName="h-[46px] w-[46px]"
@@ -370,45 +376,52 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 			>
 				{linkClassModalOpen && (
 					<div className="flex h-full flex-col justify-between">
-						<Row.List
+						<SelectList
 							items={use(coursesPromise) ?? []}
-							renderEmptyState={
-								<div className="text-lg font-medium opacity-60">
+							renderItem={({
+								item: { id, name, section, url },
+								selected,
+							}) => (
+								<AttachmentItem
+									name={name}
+									subname={section}
+									url={url}
+									photoUrl={undefined}
+									key={id}
+									selected={selected}
+								/>
+							)}
+							renderEmpty={() => (
+								<Heading size="large">
 									You&apos;re not teaching any classes in
 									Google Classroom
-								</div>
-							}
-						>
-							{({ item: { id, name, section } }) => (
-								<Row.Item
-									key={id}
-									selected={id === selectedCourseId}
-									onAction={() => setSelectedCourseId(id)}
-									onKeyboardFocus={() =>
-										setSelectedCourseId(id)
-									}
-								>
-									<div className="flex h-20 cursor-pointer items-center">
-										<Avatar
-											src={undefined}
-											name={name}
-											fallbackColor="secondary"
-											className="h-12 w-12"
-										/>
-
-										<div className="ml-3 flex flex-shrink flex-col">
-											<span className="mb-[1px] font-medium leading-none opacity-90">
-												{name}
-											</span>
-
-											<span className="text-sm opacity-60">
-												{section}
-											</span>
-										</div>
-									</div>
-								</Row.Item>
+								</Heading>
 							)}
-						</Row.List>
+							selectionType="single"
+							selectionSet={
+								new Set(
+									selectedCourseId ? [selectedCourseId] : []
+								)
+							}
+							setSelectionSet={(updateSelectionSet) =>
+								typeof updateSelectionSet === "function"
+									? setSelectedCourseId(
+											[
+												...updateSelectionSet(
+													new Set(
+														selectedCourseId
+															? [selectedCourseId]
+															: []
+													)
+												),
+											][0]
+									  )
+									: setSelectedCourseId(
+											[...updateSelectionSet][0]
+									  )
+							}
+						/>
+
 						<Button
 							onClick={onChooseClass}
 							loading={courseLoading}

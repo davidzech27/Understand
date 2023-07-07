@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
 
-import PreviewDisplay from "~/components/PreviewDisplay"
+import NavigationButton from "./NavigationButton"
 import { getAuthOrThrow } from "~/auth/jwt"
 import Card from "~/components/Card"
 import Avatar from "~/components/Avatar"
@@ -18,7 +18,7 @@ const SideBar = async () => {
 
 	return (
 		<Card className="flex h-full w-72 flex-col py-3 px-3">
-			<PreviewDisplay
+			<NavigationButton
 				text={profile.name}
 				subtext={profile.email}
 				photo={
@@ -29,7 +29,7 @@ const SideBar = async () => {
 						className="h-full w-full"
 					/>
 				}
-				href="/home" // change later once there is a separate home and account buttons
+				href="/home"
 			/>
 
 			<div className="mr-[-8px] overflow-y-scroll">
@@ -42,7 +42,7 @@ const SideBar = async () => {
 								</span>
 								<div>
 									{courses.teaching.map((course) => (
-										<PreviewDisplay
+										<NavigationButton
 											text={course.name}
 											subtext={
 												course.section ?? undefined
@@ -70,7 +70,7 @@ const SideBar = async () => {
 								</span>
 								<div>
 									{courses.enrolled.map((course) => (
-										<PreviewDisplay
+										<NavigationButton
 											text={course.name}
 											subtext={
 												course.section ?? undefined

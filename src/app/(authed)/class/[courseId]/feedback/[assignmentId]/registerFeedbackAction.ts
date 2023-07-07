@@ -11,45 +11,34 @@ const registerFeedbackAction = zact(
 	z.object({
 		courseId: z.string(),
 		assignmentId: z.string(),
-		submission: z.string(),
 		submissionHTML: z.string(),
 		rawResponse: z.string(),
 		metadata: z.record(z.unknown()),
 	})
-)(
-	async ({
+)(async ({ courseId, assignmentId, submissionHTML, rawResponse, metadata }) => {
+	const { email } = await getAuthOrThrow({ cookies: cookies() })
+
+	const role = await User({ email }).courseRole({ id: courseId })
+
+	const givenAt = new Date(Math.round(new Date().valueOf() / 1000) * 1000)
+
+	if (role === "none")
+		throw new Error("User must be in class to register feedback")
+
+	await Feedback({
 		courseId,
 		assignmentId,
-		submission,
+		userEmail: email,
+		givenAt,
+	}).create({
 		submissionHTML,
 		rawResponse,
 		metadata,
-	}) => {
-		const { email } = await getAuthOrThrow({ cookies: cookies() })
+	})
 
-		const role = await User({ email }).courseRole({ id: courseId })
-
-		const givenAt = new Date(Math.round(new Date().valueOf() / 1000) * 1000)
-
-		if (role === "none")
-			throw new Error("User must be in class to register feedback")
-
-		await Feedback({
-			courseId,
-			assignmentId,
-			userEmail: email,
-			givenAt,
-		}).create({
-			submission,
-			submissionHTML,
-			rawResponse,
-			metadata,
-		})
-
-		return {
-			givenAt,
-		}
+	return {
+		givenAt,
 	}
-)
+})
 
 export default registerFeedbackAction

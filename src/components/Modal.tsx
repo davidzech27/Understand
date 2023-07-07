@@ -16,7 +16,7 @@ const Modal: React.FC<Props> = ({ children, title, open, setOpen, footer }) => {
 			<Dialog.Portal>
 				<Dialog.Overlay className="fixed inset-0 z-50 bg-[#00000060] fade-in fade-out duration-150" />
 
-				<Dialog.Content className="fixed top-0 left-0 z-50 flex h-3/5 w-2/3 translate-x-1/4 translate-y-1/3 flex-col justify-between rounded-md bg-white fade-in fade-out duration-150">
+				<Dialog.Content className="fixed left-0 top-0 z-50 flex h-3/5 w-2/3 translate-x-1/4 translate-y-1/3 flex-col justify-between rounded-md bg-white fade-in fade-out duration-150">
 					<div className="mx-6 mt-6 flex items-center justify-between">
 						<Dialog.Title className="mb-0.5 text-2xl font-medium leading-none opacity-80">
 							{title}

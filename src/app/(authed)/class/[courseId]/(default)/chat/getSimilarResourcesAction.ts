@@ -5,7 +5,7 @@ import { z } from "zod"
 
 import { getAuthOrThrow } from "~/auth/jwt"
 import Assignment from "~/data/Assignment"
-import Resource from "~/data/Resource"
+import Course from "~/data/Course"
 import User from "~/data/User"
 
 const getSimilarResourcesAction = zact(
@@ -17,7 +17,9 @@ const getSimilarResourcesAction = zact(
 
 	if (role === "none") throw new Error("User not in class")
 
-	const similarResourcesUntransformed = await Resource({ courseId }).search({
+	const similarResourcesUntransformed = await Course({
+		id: courseId,
+	}).searchResources({
 		similarText,
 		topK: 10,
 		filter: {},

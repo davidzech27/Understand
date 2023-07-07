@@ -9,12 +9,14 @@ interface Props
 		ButtonHTMLAttributes<HTMLButtonElement>,
 		HTMLButtonElement
 	> {
+	size?: "small" | "medium" | "large"
 	loading?: boolean
 }
 
 const Button: React.FC<Props> = ({
 	children,
 	onClick,
+	size = "medium",
 	loading,
 	disabled,
 	className,
@@ -26,6 +28,7 @@ const Button: React.FC<Props> = ({
 		<div
 			className={cn(
 				"relative",
+				size === "large" && "h-20",
 				className
 					?.split(" ")
 					.filter(
@@ -39,7 +42,12 @@ const Button: React.FC<Props> = ({
 				onClick={onClick}
 				disabled={disabled}
 				className={cn(
-					"rounded-md bg-surface-selected py-2.5 px-6 text-2xl font-medium outline-none transition-all duration-150",
+					"rounded-md bg-surface-selected px-6 py-2.5 font-medium outline-none transition-all duration-150",
+					{
+						small: "text-base", // maybe add height for consistency
+						medium: "text-lg",
+						large: "text-3xl",
+					}[size],
 					disabled
 						? "opacity-40"
 						: "opacity-60 hover:bg-surface-selected-hover hover:opacity-80 focus-visible:bg-surface-selected-hover focus-visible:opacity-80",

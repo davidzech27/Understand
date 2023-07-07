@@ -3,10 +3,10 @@ import { cookies } from "next/headers"
 import { zact } from "zact/server"
 import { z } from "zod"
 
-import Assignment from "~/data/Assignment"
-import User from "~/data/User"
-import Resource from "~/data/Resource"
 import { getAuthOrThrow } from "~/auth/jwt"
+import Assignment from "~/data/Assignment"
+import Course from "~/data/Course"
+import User from "~/data/User"
 
 const createAssignmentAction = zact(
 	z.object({
@@ -42,7 +42,7 @@ const createAssignmentAction = zact(
 				linkedUrl: undefined,
 				instructionsLinked: false,
 			}),
-			Resource({ courseId }).create({
+			Course({ id: courseId }).createResource({
 				instructionsForAssignmentId: assignmentId,
 				text: instructions,
 			}),

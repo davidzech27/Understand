@@ -2,7 +2,7 @@ import { notFound } from "next/navigation"
 
 import User from "~/data/User"
 import Assignment from "~/data/Assignment"
-import Insight from "~/data/Insight"
+import Feedback from "~/data/Feedback"
 import Insights from "./Insights"
 import { getAuthOrThrow } from "~/auth/jwt"
 import { cookies } from "next/headers"
@@ -37,28 +37,31 @@ const InsightsPage = async ({
 }) => {
 	studentEmail = decodeURIComponent(studentEmail)
 
-	const [insight, assignment, role] = await Promise.all([
-		Insight({
+	const [insights, submissionHTML, assignment, role] = await Promise.all([
+		User({ email: studentEmail }).lastInsights({ courseId, assignmentId }),
+		User({ email: studentEmail }).lastSubmissionHTML({
 			courseId,
 			assignmentId,
-			studentEmail,
-		}).get(),
+		}),
 		Assignment({ courseId, assignmentId }).get(),
 		getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
 			User({ email }).courseRole({ id: courseId })
 		),
 	])
 
-	if (insight === undefined || assignment === undefined || role !== "teacher")
+	if (
+		insights === undefined ||
+		submissionHTML === undefined ||
+		assignment === undefined ||
+		role !== "teacher"
+	)
 		notFound()
-
-	const { insights, submission } = insight
 
 	return (
 		<Insights
 			assignment={assignment}
 			insights={insights}
-			submission={submission}
+			submission={submissionHTML}
 		/>
 	)
 }

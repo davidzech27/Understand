@@ -52,7 +52,7 @@ const AssignmentTabs: React.FC<Props> = ({ role, assignment }) => {
 				<Button
 					onClick={() => {
 						navigator.clipboard.writeText(
-							`${env.NEXT_PUBLIC_URL}/class/${assignment.courseId}/feedback/${assignment.assignmentId}`
+							`${window.location.protocol}//${window.location.host}/class/${assignment.courseId}/feedback/${assignment.assignmentId}`
 						)
 
 						setFeedbackLinkCopied(true)

@@ -5,7 +5,7 @@ import Assignment from "~/data/Assignment"
 import User from "~/data/User"
 import Card from "~/components/Card"
 import AssignmentTabs from "./AssignmentTabs"
-import FormattedDate from "~/utils/FormattedDate"
+import formatDate from "~/utils/formatDate"
 import colors from "~/colors.cjs"
 import { getAuthOrThrow } from "~/auth/jwt"
 import cn from "~/utils/cn"
@@ -69,14 +69,9 @@ const AssignmentLayout = async ({
 					</a>
 
 					<span className="relative bottom-[1px] mr-3 ml-6 flex-shrink-0 text-lg font-medium leading-none opacity-60">
-						{assignment.dueAt ? (
-							<FormattedDate
-								prefix="Due "
-								date={assignment.dueAt}
-							/>
-						) : (
-							"No due date"
-						)}
+						{assignment.dueAt
+							? `Due ${formatDate(assignment.dueAt)}`
+							: "No due date"}
 					</span>
 				</div>
 

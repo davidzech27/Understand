@@ -2,7 +2,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
-import cn from "../utils/cn"
+import cn from "~/utils/cn"
 
 interface Props {
 	text: string
@@ -11,15 +11,16 @@ interface Props {
 	href: string
 }
 
-const PreviewDisplay: React.FC<Props> = ({ text, subtext, photo, href }) => {
-	const selected = usePathname()?.startsWith(href)
+const NavigationButton: React.FC<Props> = ({ text, subtext, photo, href }) => {
+	const pathname = usePathname()
 
 	return (
 		<Link
 			href={href}
+			prefetch={true}
 			className={cn(
 				"flex items-center rounded-xl px-3 py-2.5 transition-colors duration-150",
-				selected
+				pathname?.startsWith(href)
 					? "bg-surface-selected hover:bg-surface-selected-hover"
 					: "hover:bg-surface-hover"
 			)}
@@ -39,4 +40,4 @@ const PreviewDisplay: React.FC<Props> = ({ text, subtext, photo, href }) => {
 	)
 }
 
-export default PreviewDisplay
+export default NavigationButton

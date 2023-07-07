@@ -5,7 +5,9 @@ import { getAuthOrThrow } from "~/auth/jwt"
 import Card from "~/components/Card"
 import Course from "~/data/Course"
 import User from "~/data/User"
-import Assignments from "./Assignments"
+import SectionList from "~/components/SectionList"
+import Heading from "~/components/Heading"
+import AssignmentItem from "~/components/AssignmentItem"
 
 export const metadata = {
 	title: "Assignments",
@@ -38,30 +40,79 @@ const AssignmentsPage = async ({
 	)
 
 	return (
-		<Card className="flex flex-1 flex-col space-y-2 py-5 px-6">
-			{assignmentsWithoutInstructions.length !== 0 &&
-				role === "teacher" && (
-					<>
-						<div className="ml-1 text-lg font-medium opacity-60">
-							Assignments missing instructions
-						</div>
+		<Card className="flex-1 px-6 py-5">
+			<SectionList
+				sections={[
+					...(assignmentsWithoutInstructions.length === 0
+						? []
+						: [
+								{
+									heading: "Assignments missing instructions",
+									items: assignmentsWithoutInstructions,
+									renderItem: ({
+										item: { assignmentId, title, dueAt },
+									}: {
+										item: {
+											assignmentId: string
+											title: string
+											dueAt: Date | undefined
+										}
+									}) => (
+										<AssignmentItem
+											title={title}
+											dueAt={dueAt}
+											href={`/class/${courseId}/${
+												role === "teacher"
+													? "assignment"
+													: "feedback"
+											}/${assignmentId}`}
+										/>
+									),
+								},
+						  ]),
+					{
+						heading: "Assignments",
+						items: assignmentsWithInstructions,
+						renderItem: ({
+							item: { assignmentId, title, dueAt },
+						}) => (
+							<AssignmentItem
+								title={title}
+								dueAt={dueAt}
+								href={`/class/${courseId}/${
+									role === "teacher"
+										? "assignment"
+										: "feedback"
+								}/${assignmentId}`}
+							/>
+						),
+						renderEmpty: () => (
+							<>
+								<Heading
+									size="large"
+									className="ml-1 leading-relaxed"
+								>
+									{`This is where you'll see ${
+										role === "teacher"
+											? "your created assignments"
+											: "assigned assignments"
+									}`}
+								</Heading>
 
-						<Assignments
-							courseId={courseId}
-							role={role}
-							assignments={assignmentsWithoutInstructions}
-						/>
-
-						<div className="ml-1 text-lg font-medium opacity-60">
-							Assignments
-						</div>
-					</>
-				)}
-
-			<Assignments
-				courseId={courseId}
-				role={role}
-				assignments={assignmentsWithInstructions}
+								{role === "teacher" && (
+									<Heading
+										size="medium"
+										className="ml-1 mt-1 leading-relaxed opacity-60"
+									>
+										Use the plus button in the upper right
+										corner to create some
+									</Heading>
+								)}
+							</>
+						),
+					},
+				]}
+				headingSize="large"
 			/>
 		</Card>
 	)
