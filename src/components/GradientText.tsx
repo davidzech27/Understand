@@ -1,6 +1,6 @@
 import { Slot } from "@radix-ui/react-slot"
 
-import colors from "colors.cjs"
+import colors from "~/colors.cjs"
 
 interface Props extends React.PropsWithChildren {
 	asChild?: boolean
