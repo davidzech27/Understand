@@ -10,10 +10,6 @@ const syncAssignment = async ({
 	courseId: string
 	assignmentId: string
 }) => {
-	console.info(
-		`Syncing assignment with course id ${courseId} and assignment id ${assignmentId}`
-	)
-
 	const [assignment, courseName] = await Promise.all([
 		(async () => {
 			const refreshToken = await Course({
@@ -69,9 +65,7 @@ const syncAssignment = async ({
 	])
 
 	if (assignment === undefined) {
-		return console.error(
-			`Assignment with course id ${courseId} and assignment id ${assignmentId} could not be found`
-		)
+		return console.error("Not found", { courseId, assignmentId })
 	}
 
 	const usedAttachments: {
@@ -80,113 +74,98 @@ const syncAssignment = async ({
 		text: string
 	}[] = []
 
-	let useDescription = false
-
-	if (
-		assignment.attachments.length !== 0 ||
-		assignment.description !== undefined
-	) {
-		const response = await getCompletion({
-			messages: [
-				{
-					role: "system",
-					content: "You are careful and precise.",
-				},
-				{
-					role: "user",
-					content: `${
-						assignment.attachments.length !== 0
-							? `The following are the attachments on an assignment in Google Classroom with a title of ${
-									assignment.title
-							  }:
-
-${assignment.attachments
-	.map(
-		(attachment, index) =>
-			`${index + 1}. ${
-				attachment.title !== undefined
-					? `Document title: ${attachment.title}\n\n`
-					: ""
-			}Content: ${attachment.text}\n\n`
-	)
-	.join("")}`
-							: ""
-					}${
-						assignment.description !== undefined
-							? `The following is the description set by the teacher on ${
-									assignment.attachments.length !== 0
-										? `that same assignment`
-										: `an assignment in Google Classroom with a title of ${assignment.title}`
-							  }:
+	if (assignment.attachments.length !== 0) {
+		const internalAttachmentMessages = [
+			{
+				role: "system" as "system" | "user" | "assistant",
+				content: `You will be provided with the title${
+					assignment.description !== undefined
+						? ", teacher-set description,"
+						: ""
+				} and attachments for an assignment in Google Classroom. Based on this title${
+					assignment.description !== undefined
+						? " and description"
+						: ""
+				}, identify the numbers that correspond to content that could be included in the instructions on the assignment. If applicable, use a comma-separated list or write "None".`,
+			},
+			{
+				role: "user" as "system" | "user" | "assistant",
+				content: `<title>${assignment.title}</title>
 
 ${
-	assignment.attachments.length !== 0
-		? `${assignment.attachments.length + 1}. `
+	assignment.description !== undefined
+		? `<description>
+${assignment.description}
+</description>\n\n`
 		: ""
-}${assignment.description}\n\n`
-							: ""
-					}${
-						assignment.attachments.length !== 0
-							? `Given that the title of the assignment in Google Classroom is ${assignment.title}, identify the numbers corresponding to the content that is likely to be a part of the instructions on that assignment. If there are multiple answers, use a comma-separated list. Respond with "None" if none of the provided content is likely to be instructions on the assignment.`
-							: `Given that the title of the assignment in Google Classroom is ${assignment.title}, is this description likely to be a part of the instructions on the assignment? Respond with yes or no.`
-					}`,
-				},
-			],
+}${assignment.attachments
+					.map(
+						(attachment, index) =>
+							`<number>${index + 1}</number>
+${
+	attachment.title !== undefined
+		? `<document-title>${attachment.title}</document-title>\n`
+		: ""
+}<content>
+${attachment.text}
+</content>`
+					)
+					.join("\n\n")}`,
+			},
+		]
+
+		const response = await getCompletion({
+			messages: internalAttachmentMessages,
 			model: "gpt-3.5-turbo-0613",
 			temperature: 0,
 			presencePenalty: 0,
 			frequencyPenalty: 0,
 		})
 
-		if (assignment.attachments.length !== 0) {
-			const indexes = response
-				.replaceAll(/\s/g, "")
-				.toLowerCase()
-				.split(",")
-				.map(Number)
-				.map((number) => number - 1)
+		console.info("Sync", {
+			courseId,
+			assignmentId,
+			assignmentTitle: assignment.title,
+			internalAttachmentMessages: internalAttachmentMessages.concat({
+				role: "assistant",
+				content: response,
+			}),
+		})
 
-			usedAttachments.push(
-				...assignment.attachments
-					.map((attachment) => ({
-						id: attachment.id,
-						title: attachment.title,
-						text: attachment.text,
-					}))
-					.filter((_, index) => indexes.includes(index))
-			)
+		const indexes = response
+			.replaceAll(/\s/g, "")
+			.toLowerCase()
+			.split(",")
+			.map(Number)
+			.map((number) => number - 1)
 
-			useDescription = indexes.includes(assignment.attachments.length)
-		} else {
-			useDescription = response.toLowerCase().includes("yes")
-		}
-
-		console.info(
-			`Checked attachments and/or description for instructions for assignment with course id ${courseId} and assignment id ${assignmentId}`
+		usedAttachments.push(
+			...assignment.attachments
+				.map((attachment) => ({
+					id: attachment.id,
+					title: attachment.title,
+					text: attachment.text,
+				}))
+				.filter((_, index) => indexes.includes(index))
 		)
 	}
 
-	if (
-		usedAttachments.length === 0 &&
-		(!useDescription || assignment.attachments.length === 0)
-	) {
+	if (usedAttachments.length === 0) {
+		const instructionPredictionMessages = [
+			{
+				role: "user" as "system" | "user" | "assistant",
+				content: `Briefly respond with something that sounds like it would be the instructions on an assignment titled "${
+					assignment.title
+				}"${
+					assignment.description !== undefined
+						? ` with a description of "${assignment.description}"`
+						: ""
+				} in a course named ${courseName} in Google Classroom.`,
+			},
+		]
+
 		const predictedInstructions = await getCompletion({
-			messages: [
-				{
-					role: "system",
-					content: "You are careful and precise.",
-				},
-				{
-					role: "user",
-					content: `Briefly respond with something that sounds like it would be the instructions on an assignment titled "${
-						assignment.title
-					}"${
-						assignment.description !== undefined
-							? ` and with a description of ${assignment.description}`
-							: ""
-					} in a course named ${courseName} in Google Classroom.`,
-				},
-			],
+			messages: instructionPredictionMessages,
 			model: "gpt-3.5-turbo-0613",
 			temperature: 0,
 			presencePenalty: 0,
@@ -194,12 +173,14 @@ ${
 			maxTokens: 100,
 		})
 
-		console.info(
-			`Predicted instructions for assignment with course id ${courseId} and assignment id ${assignmentId}`,
-			{
-				predictedInstructions,
-			}
-		)
+		console.info("Sync", {
+			courseId,
+			assignmentId,
+			assignmentTitle: assignment.title,
+			instructionPredictionMessages: instructionPredictionMessages.concat(
+				{ role: "assistant", content: predictedInstructions }
+			),
+		})
 
 		const attachmentCandidates = await Course({
 			id: courseId,
@@ -239,68 +220,89 @@ ${
 			driveFiles.push(driveFile)
 		}
 
-		const response = await getCompletion({
-			messages: [
+		if (driveFiles.length !== 0) {
+			const externalAttachmentMessages = [
 				{
-					role: "system",
-					content: "You are careful and precise.",
+					role: "system" as "system" | "user" | "assistant",
+					content: `You will be provided with the title${
+						assignment.description !== undefined
+							? " and teacher-set description"
+							: ""
+					} of an assignment in Google Classroom along with documents in Google Classroom that are possibly instructions on this assignment. Based on this title${
+						assignment.description !== undefined
+							? " and description"
+							: ""
+					}, identify the numbers that correspond to documents that should be included in the instructions on the assignment. If applicable, use a comma-separated list or write "None".`,
 				},
 				{
-					role: "user",
-					content: `The following are attachments in a Google Classroom class that are potentially instructions for an assignment titled ${
-						assignment.title
-					}:
+					role: "user" as "system" | "user" | "assistant",
+					content: `<title>${assignment.title}</title>
 
-${driveFiles
-	.map(
-		(driveFile, index) =>
-			`${index + 1}. ${
-				driveFile.driveTitle !== undefined
-					? `Document title: ${driveFile.driveTitle}\n\n`
-					: ""
-			}Content: ${driveFile.text}`
-	)
-	.join("\n\n")}
-
-Given that the title of the assignment in Google Classroom is ${
-						assignment.title
-					}, identify the numbers corresponding to the content that is likely to be a part of the instructions on that assignment. If there are multiple answers, use a comma-separated list. Respond with "None" if none of the provided content is likely to be instructions on the assignment.`,
+${
+	assignment.description !== undefined
+		? `<description>
+${assignment.description}
+</description>\n\n`
+		: ""
+}${driveFiles
+						.map(
+							(attachment, index) =>
+								`<number>${index + 1}</number>
+${
+	attachment.driveTitle !== undefined
+		? `<document-title>${attachment.driveTitle}</document-title>\n`
+		: ""
+}<content>
+${attachment.text}
+</content>`
+						)
+						.join("\n\n")}`,
 				},
-			],
-			model: "gpt-3.5-turbo-0613",
-			temperature: 0,
-			presencePenalty: 0,
-			frequencyPenalty: 0,
-		})
+			]
 
-		const indexes = response
-			.replaceAll(/\s/g, "")
-			.toLowerCase()
-			.split(",")
-			.map(Number)
-			.map((number) => number - 1)
+			const response = await getCompletion({
+				messages: externalAttachmentMessages,
+				model: "gpt-3.5-turbo-0613",
+				temperature: 0,
+				presencePenalty: 0,
+				frequencyPenalty: 0,
+			})
 
-		usedAttachments.push(
-			...driveFiles
-				.map((driveFile) => ({
-					id: driveFile.driveId,
-					title: driveFile.driveTitle,
-					text: driveFile.text,
-				}))
-				.filter((_, index) => indexes.includes(index))
-		)
+			console.info("Sync", {
+				courseId,
+				assignmentId,
+				assignmentTitle: assignment.title,
+				externalAttachmentMessages: externalAttachmentMessages.concat({
+					role: "assistant",
+					content: response,
+				}),
+			})
 
-		console.info(
-			`Checked external attachments for instructions for assignment with course id ${courseId} and assignment id ${assignmentId}`
-		)
+			const indexes = response
+				.replaceAll(/\s/g, "")
+				.toLowerCase()
+				.split(",")
+				.map(Number)
+				.map((number) => number - 1)
+
+			usedAttachments.push(
+				...driveFiles
+					.map((driveFile) => ({
+						id: driveFile.driveId,
+						title: driveFile.driveTitle,
+						text: driveFile.text,
+					}))
+					.filter((_, index) => indexes.includes(index))
+			)
+		}
 	}
 
 	const instructions =
-		usedAttachments.length !== 0 || useDescription
+		usedAttachments.length !== 0 || assignment.description !== undefined
 			? `${
 					usedAttachments.length !== 0
 						? usedAttachments.length === 1 &&
-						  !useDescription &&
+						  assignment.description === undefined &&
 						  usedAttachments[0]
 							? usedAttachments[0].text
 							: `${usedAttachments
@@ -308,16 +310,18 @@ Given that the title of the assignment in Google Classroom is ${
 										(attachment) =>
 											`${
 												attachment.title !== undefined
-													? `Instructions document title: ${attachment.title}\n\n`
+													? `Document title: ${attachment.title}\n`
 													: ""
 											}Content: ${attachment.text}`
 									)
 									.join("\n\n")}${
-									useDescription ? "\n\n" : ""
+									assignment.description !== undefined
+										? "\n\n"
+										: ""
 							  }`
 						: ""
 			  }${
-					useDescription
+					assignment.description !== undefined
 						? `${
 								usedAttachments.length !== 0
 									? "Assignment description: "
@@ -338,8 +342,7 @@ Given that the title of the assignment in Google Classroom is ${
 				},
 			})
 		),
-		useDescription &&
-			assignment.description &&
+		assignment.description !== undefined &&
 			Course({ id: courseId }).createResource({
 				text: assignment.description,
 				instructionsForAssignmentId: assignment.id,
@@ -352,119 +355,6 @@ Given that the title of the assignment in Google Classroom is ${
 				instructions,
 			}),
 	])
-
-	let context: string | undefined = undefined
-
-	if (instructions !== undefined) {
-		const contextCandidates = await Course({
-			id: courseId,
-		}).searchResources({
-			similarText: instructions,
-			filter: {},
-			topK: 15,
-		})
-
-		const driveFilesUnfiltered = contextCandidates
-			.map((attachment) =>
-				"driveId" in attachment
-					? {
-							driveId: attachment.driveId,
-							driveTitle: attachment.driveTitle,
-							text: attachment.text,
-					  }
-					: undefined
-			)
-			.filter(Boolean)
-
-		const driveFiles: typeof driveFilesUnfiltered = []
-
-		const wordLimit = 10000
-
-		let words = 0
-
-		for (const driveFile of driveFilesUnfiltered) {
-			const wordCount = driveFile.text
-				.split(/\s/)
-				.filter((word) => word.trim() !== "").length
-
-			if (words + wordCount > wordLimit) break
-
-			words += wordCount
-
-			driveFiles.push(driveFile)
-		}
-
-		const response = await getCompletion({
-			messages: [
-				{
-					role: "system",
-					content: "You are careful and precise.",
-				},
-				{
-					role: "user",
-					content: `The following are instructions on an assignment in Google Classroom titled ${
-						assignment.title
-					}:
-
-${instructions}
-
-The following are resources in Google Classroom that are potentially relevant to the assignment.
-
-${driveFiles
-	.map(
-		(driveFile, index) =>
-			`${index + 1}. ${
-				driveFile.driveTitle !== undefined
-					? `Document title: ${driveFile.driveTitle}\n\n`
-					: ""
-			}Content: ${driveFile.text}`
-	)
-	.join("\n\n")}
-
-Identify the numbers corresponding to the resources that are likely to provide helpful context for someone to better understand what the teacher may be looking for in a student's work on the assignment. If there are multiple answers, use a comma-separated list. Respond with "None" if none of the provided resources are likely to help someone to better understand what the teacher is looking for in a student's work on the assignment.`,
-				},
-			],
-			model: "gpt-3.5-turbo-16k-0613",
-			temperature: 0,
-			presencePenalty: 0,
-			frequencyPenalty: 0,
-		})
-
-		const indexes = response
-			.replaceAll(/\s/g, "")
-			.toLowerCase()
-			.split(",")
-			.map(Number)
-			.map((number) => number - 1)
-
-		for (const index of indexes) {
-			const driveFile = driveFiles[index]
-
-			if (driveFile !== undefined) {
-				if (context === undefined) context = ""
-
-				context += `${
-					driveFile.driveTitle !== undefined
-						? `Document title: ${driveFile.driveTitle}\n\n`
-						: ""
-				}Content: ${driveFile.text}\n\n`
-			}
-		}
-
-		context = context?.trimEnd()
-
-		console.info(
-			`Checked external attachments for context for assignment with course id ${courseId} and assignment id ${assignmentId}`
-		)
-	}
-
-	if (context !== undefined)
-		await Assignment({
-			courseId,
-			assignmentId: assignment.id,
-		}).update({
-			context,
-		})
 }
 
 export default syncAssignment

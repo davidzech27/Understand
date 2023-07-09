@@ -1,4 +1,5 @@
 import { cookies } from "next/headers"
+import { notFound } from "next/navigation"
 
 import syncCourse from "~/sync/syncCourse"
 import generateInsights from "~/insights/generateInsights"
@@ -25,7 +26,9 @@ const CourseLayout = async ({
 			])
 		)
 		.then(([role, course]) => {
-			if (role !== "none" && course?.linkedUrl !== undefined)
+			if (role === "none" || course === undefined) notFound()
+
+			if (course.linkedUrl !== undefined)
 				syncCourse({
 					id: params.courseId,
 				})

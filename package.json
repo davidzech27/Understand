@@ -28,7 +28,7 @@
 		"immer": "^10.0.1",
 		"jose": "^4.13.1",
 		"lucide-react": "^0.214.0",
-		"next": "13.4.5",
+		"next": "^13.4.9",
 		"next-build-id": "^3.0.0",
 		"node-html-parser": "^6.1.5",
 		"posthog-js": "^1.68.1",
