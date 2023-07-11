@@ -79,6 +79,7 @@ const Roster: React.FC<Props> = ({ courseId, role, roster }) => {
 								note={
 									!signedUp ? "Not yet signed up" : undefined
 								}
+								key={email}
 							/>
 						),
 						renderEmpty: () => (

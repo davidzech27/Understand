@@ -18,6 +18,8 @@ export const metadata = {
 	title: "Home",
 }
 
+export const runtime = "edge"
+
 const HomePage = async () => {
 	const { email } = await getAuthOrThrow({ cookies: cookies() })
 

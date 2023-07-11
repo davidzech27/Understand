@@ -13,6 +13,8 @@ export const metadata = {
 	title: "Assignments",
 }
 
+export const runtime = "edge"
+
 interface Params {
 	courseId: string
 }
@@ -66,6 +68,7 @@ const AssignmentsPage = async ({
 													? "assignment"
 													: "feedback"
 											}/${assignmentId}`}
+											key={assignmentId}
 										/>
 									),
 								},
@@ -84,6 +87,7 @@ const AssignmentsPage = async ({
 										? "assignment"
 										: "feedback"
 								}/${assignmentId}`}
+								key={assignmentId}
 							/>
 						),
 						renderEmpty: () => (

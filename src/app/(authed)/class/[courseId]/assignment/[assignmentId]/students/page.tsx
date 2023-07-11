@@ -9,6 +9,8 @@ export const metadata = {
 	title: "Students",
 }
 
+export const runtime = "edge"
+
 export const dynamic = "force-dynamic"
 
 interface Params {

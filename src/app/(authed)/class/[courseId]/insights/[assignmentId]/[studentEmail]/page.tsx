@@ -24,6 +24,8 @@ export const generateMetadata = async ({
 	}
 }
 
+export const runtime = "edge"
+
 interface Params {
 	courseId: string
 	assignmentId: string

@@ -10,6 +10,8 @@ export const metadata = {
 	title: "People",
 }
 
+export const runtime = "edge"
+
 interface Params {
 	courseId: string
 }

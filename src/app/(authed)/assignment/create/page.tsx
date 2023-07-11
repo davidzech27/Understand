@@ -8,6 +8,8 @@ export const metadata = {
 	title: "Create assignment",
 }
 
+export const runtime = "edge"
+
 const AssignmentCreatePage = () => {
 	const coursesTeachingPromise = getAuthOrThrow({ cookies: cookies() })
 		.then(({ email }) => User({ email }).courses())

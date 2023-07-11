@@ -7,6 +7,8 @@ export const metadata = {
 	title: "Insights",
 }
 
+export const runtime = "edge"
+
 export const dynamic = "force-dynamic"
 
 interface Params {

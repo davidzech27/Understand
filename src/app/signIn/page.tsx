@@ -5,6 +5,8 @@ export const metadata = {
 	title: "Sign in",
 }
 
+export const runtime = "edge"
+
 // todo - add extra content to fill awkward whitespace. or perhaps make panel smaller, but this would make the gradient section too big
 
 const SignInPage = () => {

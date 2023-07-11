@@ -11,6 +11,8 @@ export const metadata = {
 	title: "Chat",
 }
 
+export const runtime = "edge"
+
 interface Params {
 	courseId: string
 }

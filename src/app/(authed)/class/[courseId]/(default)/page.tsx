@@ -7,9 +7,12 @@ import FeedbackHistory from "./FeedbackHistory"
 import MessageBoard from "./MessageBoard"
 import Course from "~/data/Course"
 
+export const runtime = "edge"
+
 interface Params {
 	courseId: string
 }
+
 const ClassPage = async ({ params: { courseId } }: { params: Params }) => {
 	const { email } = await getAuthOrThrow({ cookies: cookies() })
 

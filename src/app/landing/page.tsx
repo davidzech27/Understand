@@ -7,7 +7,7 @@ import User from "~/data/User"
 import LandingForm from "./LandingForm"
 import colors from "~/colors.cjs"
 
-//! export const runtime = "edge" add back when server components error is fixed
+export const runtime = "edge"
 
 export const metadata = {
 	title: "Landing",

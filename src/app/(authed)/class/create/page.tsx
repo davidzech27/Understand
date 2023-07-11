@@ -1,11 +1,11 @@
 import { cookies } from "next/headers"
 
-import { getAuthOrThrow, setAuth } from "~/auth/jwt"
+import { getAuthOrThrow } from "~/auth/jwt"
 import CreateClassForm from "./CreateClassForm"
 import GoogleAPI from "~/google/GoogleAPI"
 import User from "~/data/User"
 
-//! export const runtime = "edge" add back when server components error is fixed
+export const runtime = "edge"
 
 export const metadata = {
 	title: "Create class",

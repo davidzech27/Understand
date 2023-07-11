@@ -3,6 +3,8 @@ import User from "~/data/User"
 import Insight from "./Insight"
 import Assignment from "~/data/Assignment"
 
+export const runtime = "edge"
+
 export const dynamic = "force-dynamic"
 
 interface Params {

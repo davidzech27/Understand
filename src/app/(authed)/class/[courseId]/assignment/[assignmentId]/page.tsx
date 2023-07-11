@@ -11,6 +11,8 @@ export const metadata = {
 	title: "Overview",
 }
 
+export const runtime = "edge"
+
 interface Params {
 	courseId: string
 	assignmentId: string
