@@ -303,6 +303,22 @@ const Course = ({ id }: { id: string }) => ({
 		}
 	},
 	unsyncedFeedbackInsights: async () => {
+		console.log(
+			db
+				.select({
+					assignmentId: feedback.assignmentId,
+					studentEmail: feedback.userEmail,
+					insights: feedback.insights,
+				})
+				.from(feedback)
+				.where(
+					and(
+						eq(feedback.courseId, id),
+						eq(feedback.synced, false),
+						isNotNull(feedback.insights)
+					)
+				)
+		)
 		return (
 			await db
 				.select({
