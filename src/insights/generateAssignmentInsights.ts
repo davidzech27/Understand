@@ -75,8 +75,8 @@ Begin.`,
 		messages: mergedInsightsPromptMessages,
 		model: "gpt-4-0613",
 		temperature: 0,
-		presencePenalty: 0.5,
-		frequencyPenalty: 0.5,
+		presencePenalty: 0.0,
+		frequencyPenalty: 0.0,
 	})
 
 	console.info(

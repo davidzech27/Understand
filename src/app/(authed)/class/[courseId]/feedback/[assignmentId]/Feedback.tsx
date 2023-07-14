@@ -295,6 +295,12 @@ function Feedback({
 
 	const [unrevisedSubmission, setUnrevisedSubmission] = useState<string>()
 
+	const selectedFeedbackGivenAtRef = useRef<Date>()
+
+	useEffect(() => {
+		selectedFeedbackGivenAtRef.current = selectedFeedbackGivenAt
+	}, [selectedFeedbackGivenAt])
+
 	const onGetFeedback = () => {
 		const submissionInput = submissionRef.current?.getText()
 
@@ -425,11 +431,12 @@ function Feedback({
 							generalFeedback,
 						}).then(({ insights, rawResponse }) => {
 							console.info(rawResponse)
-							if (feedbackData)
+
+							if (selectedFeedbackGivenAtRef.current)
 								registerInsightsAction({
 									courseId: assignment.courseId,
 									assignmentId: assignment.assignmentId,
-									givenAt: feedbackData.givenAt,
+									givenAt: selectedFeedbackGivenAtRef.current,
 									submissionHTML: submissionHTML ?? "",
 									insights,
 								})
