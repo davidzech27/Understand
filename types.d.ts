@@ -1,3 +1,5 @@
+import "@total-typescript/ts-reset"
+
 import { ReactNode } from "react"
 
 declare global {

@@ -1,4 +1,4 @@
-import syncApiRoute from "~/sync/syncAPIRoute"
+import syncHandler from "~/sync/syncHandler"
 
 export const config = {
 	api: {
@@ -6,4 +6,4 @@ export const config = {
 	},
 }
 
-export default syncApiRoute
+export default syncHandler

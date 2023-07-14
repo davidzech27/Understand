@@ -1,5 +1,8 @@
-import SignInButton from "./SignInButton"
-import colors from "~/colors.cjs"
+import Link from "next/link"
+
+import getAuthenticationURL from "~/google/getAuthenticationURL"
+import FancyButton from "~/components/FancyButton"
+import GradientText from "~/components/GradientText"
 
 export const metadata = {
 	title: "Sign in",
@@ -9,7 +12,7 @@ export const runtime = "edge"
 
 // todo - add extra content to fill awkward whitespace. or perhaps make panel smaller, but this would make the gradient section too big
 
-const SignInPage = () => {
+export default function SignInPage() {
 	return (
 		<>
 			<main className="flex h-screen w-full justify-center bg-gradient-to-tr from-primary to-secondary">
@@ -28,17 +31,11 @@ const SignInPage = () => {
 				<div className="flex-1 py-5 px-6">
 					<div className="flex h-full w-full flex-col items-center rounded-lg bg-white px-[16%] shadow-xl">
 						<div className="flex flex-[0.875]">
-							<span
-								style={{
-									background: `linear-gradient(45deg, ${colors.primary}, ${colors.secondary})`,
-									WebkitBackgroundClip: "text",
-									backgroundClip: "text",
-									color: "transparent",
-								}}
-								className="mt-[24%] flex text-5xl font-bold md:hidden"
-							>
-								Understand
-							</span>
+							<GradientText asChild>
+								<span className="mt-[24%] flex text-5xl font-bold md:hidden">
+									Understand
+								</span>
+							</GradientText>
 						</div>
 
 						<div className="flex flex-col justify-between">
@@ -46,7 +43,19 @@ const SignInPage = () => {
 								Sign in with your school Google account
 							</h1>
 
-							<SignInButton />
+							<Link
+								href={getAuthenticationURL({
+									scopes: [
+										"https://www.googleapis.com/auth/userinfo.email",
+										"https://www.googleapis.com/auth/userinfo.profile",
+									],
+									redirectTo: "/landing",
+								})}
+								passHref
+								legacyBehavior
+							>
+								<FancyButton size="large">Sign in</FancyButton>
+							</Link>
 						</div>
 
 						<div className="flex-1" />
@@ -56,5 +65,3 @@ const SignInPage = () => {
 		</>
 	)
 }
-
-export default SignInPage

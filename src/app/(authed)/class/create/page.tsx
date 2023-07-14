@@ -11,7 +11,7 @@ export const metadata = {
 	title: "Create class",
 }
 
-const ClassCreatePage = () => {
+export default function ClassCreatePage() {
 	const authPromise = getAuthOrThrow({ cookies: cookies() })
 
 	const googleAPIPromise = authPromise.then(
@@ -81,5 +81,3 @@ const ClassCreatePage = () => {
 		/>
 	)
 }
-
-export default ClassCreatePage

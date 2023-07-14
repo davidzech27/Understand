@@ -3,10 +3,10 @@ import { z } from "zod"
 
 import db from "~/db/db"
 import { assignment, assignmentInsight, feedback, followUp } from "~/db/schema"
+import { feedbackInsightsSchema } from "./Feedback"
 import Course from "./Course"
-import { insightsSchema as feedbackInsightsSchema } from "./Feedback"
 
-const insightsSchema = z
+const assignmentInsightsSchema = z
 	.object({
 		type: z.enum(["strength", "weakness"]),
 		content: z.string(),
@@ -19,7 +19,7 @@ const insightsSchema = z
 	})
 	.array()
 
-type Insights = z.infer<typeof insightsSchema>
+type AssignmentInsights = z.infer<typeof assignmentInsightsSchema>
 
 const Assignment = ({
 	courseId,
@@ -151,60 +151,6 @@ const Assignment = ({
 				)
 			)
 	},
-	upsertInsights: async ({ insights }: { insights: Insights }) => {
-		await db
-			.insert(assignmentInsight)
-			.values({
-				courseId,
-				assignmentId,
-				insights,
-			})
-			.onDuplicateKeyUpdate({
-				set: {
-					insights,
-				},
-			})
-	},
-	insights: async () => {
-		const row = (
-			await db
-				.select()
-				.from(assignmentInsight)
-				.where(
-					and(
-						eq(assignmentInsight.courseId, courseId),
-						eq(assignmentInsight.assignmentId, assignmentId)
-					)
-				)
-		)[0]
-
-		return row && insightsSchema.parse(row.insights)
-	},
-	//! make sure that only students
-	unsyncedInsights: async () => {
-		return await db
-			.select({
-				studentEmail: feedback.userEmail,
-				insights: feedback.insights,
-				givenAt: feedback.givenAt,
-			})
-			.from(feedback)
-			.where(
-				and(
-					eq(feedback.courseId, courseId),
-					eq(feedback.assignmentId, assignmentId),
-					eq(feedback.synced, false),
-					isNotNull(feedback.insights)
-				)
-			)
-			.then((insights) =>
-				insights.map((insight) => ({
-					studentEmail: insight.studentEmail,
-					insights: feedbackInsightsSchema.parse(insight.insights),
-					givenAt: insight.givenAt,
-				}))
-			)
-	},
 	delete: async () => {
 		await Promise.all([
 			db
@@ -250,6 +196,61 @@ const Assignment = ({
 					)
 				),
 		])
+	},
+	upsertInsights: async ({ insights }: { insights: AssignmentInsights }) => {
+		await db
+			.insert(assignmentInsight)
+			.values({
+				courseId,
+				assignmentId,
+				insights,
+			})
+			.onDuplicateKeyUpdate({
+				set: {
+					insights,
+				},
+			})
+	},
+	insights: async () => {
+		const row = (
+			await db
+				.select()
+				.from(assignmentInsight)
+				.where(
+					and(
+						eq(assignmentInsight.courseId, courseId),
+						eq(assignmentInsight.assignmentId, assignmentId)
+					)
+				)
+		)[0]
+
+		return row && row.insights
+			? assignmentInsightsSchema.parse(row.insights)
+			: undefined
+	},
+	unsyncedFeedbackInsights: async () => {
+		return await db
+			.select({
+				studentEmail: feedback.userEmail,
+				givenAt: feedback.givenAt,
+				insights: feedback.insights,
+			})
+			.from(feedback)
+			.where(
+				and(
+					eq(feedback.courseId, courseId),
+					eq(feedback.assignmentId, assignmentId),
+					eq(feedback.synced, false),
+					isNotNull(feedback.insights)
+				)
+			)
+			.then((insights) =>
+				insights.map((insight) => ({
+					studentEmail: insight.studentEmail,
+					givenAt: insight.givenAt,
+					insights: feedbackInsightsSchema.parse(insight.insights),
+				}))
+			)
 	},
 })
 

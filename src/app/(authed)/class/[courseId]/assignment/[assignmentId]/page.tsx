@@ -18,11 +18,11 @@ interface Params {
 	assignmentId: string
 }
 
-const AssignmentPage = async ({
+export default async function AssignmentPage({
 	params: { courseId, assignmentId },
 }: {
 	params: Params
-}) => {
+}) {
 	const [role, assignment] = await Promise.all([
 		getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
 			User({ email }).courseRole({ id: courseId })
@@ -52,5 +52,3 @@ const AssignmentPage = async ({
 		</Card>
 	)
 }
-
-export default AssignmentPage

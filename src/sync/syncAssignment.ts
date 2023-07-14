@@ -3,13 +3,13 @@ import GoogleAPI from "~/google/GoogleAPI"
 import Course from "~/data/Course"
 import Assignment from "~/data/Assignment"
 
-const syncAssignment = async ({
+export default async function syncAssignment({
 	courseId,
 	assignmentId,
 }: {
 	courseId: string
 	assignmentId: string
-}) => {
+}) {
 	const [assignment, courseName] = await Promise.all([
 		(async () => {
 			const refreshToken = await Course({
@@ -356,5 +356,3 @@ ${attachment.text}
 			}),
 	])
 }
-
-export default syncAssignment

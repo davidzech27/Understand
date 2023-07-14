@@ -1,6 +1,6 @@
-import fetchOpenAIStream from "./fetchOpenAIStream"
+import fetchOpenAI from "./fetchOpenAI"
 
-const getFollowUp = ({
+export default function getFollowUp({
 	feedback,
 	followUps,
 	revision,
@@ -38,7 +38,7 @@ const getFollowUp = ({
 			content: string
 		}[]
 	}) => void
-}) => {
+}) {
 	if (revision !== undefined) {
 		followUps = structuredClone(followUps)
 
@@ -117,7 +117,7 @@ ${followUps[0]}`,
 			frequencyPenalty: 0.75,
 		}
 
-	fetchOpenAIStream({
+	fetchOpenAI({
 		messages,
 		model,
 		temperature,
@@ -138,5 +138,3 @@ ${followUps[0]}`,
 		},
 	})
 }
-
-export default getFollowUp

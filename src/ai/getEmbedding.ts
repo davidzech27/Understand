@@ -1,6 +1,6 @@
-import { env } from "~/env.mjs"
+import env from "env.mjs"
 
-const getEmbedding = async (text: string) => {
+export default async function getEmbedding(text: string) {
 	return (
 		(await (
 			await fetch("https://api.openai.com/v1/embeddings", {
@@ -17,5 +17,3 @@ const getEmbedding = async (text: string) => {
 		).json()) as { data: [{ embedding: number[] }] }
 	).data[0].embedding
 }
-
-export default getEmbedding

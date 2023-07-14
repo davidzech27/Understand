@@ -3,7 +3,7 @@ import * as jose from "jose"
 import { z } from "zod"
 
 import scopes from "~/google/scopes"
-import { env } from "~/env.mjs"
+import env from "env.mjs"
 
 const authorizationCookieKey = "Authorization"
 
@@ -31,11 +31,11 @@ const decodeAccessToken = async ({ accessToken }: { accessToken: string }) =>
 		).payload
 	)
 
-export const getAuth = async ({
+export async function getAuth({
 	cookies,
 }: {
 	cookies: { get: (key: string) => { value: string } | undefined }
-}) => {
+}) {
 	const authorization = cookies.get(authorizationCookieKey)?.value
 
 	if (authorization === undefined) return undefined
@@ -53,11 +53,11 @@ export const getAuth = async ({
 	}
 }
 
-export const getAuthOrThrow = async ({
+export async function getAuthOrThrow({
 	cookies,
 }: {
 	cookies: { get: (key: string) => { value: string } | undefined }
-}) => {
+}) {
 	const auth = await getAuth({ cookies })
 
 	if (auth === undefined) throw new Error("Unauthenticated")
@@ -65,13 +65,13 @@ export const getAuthOrThrow = async ({
 	return auth
 }
 
-export const setAuth = async ({
+export async function setAuth({
 	auth,
 	cookies,
 }: {
 	auth: z.infer<typeof accessTokenPayloadSchema>
 	cookies: ResponseCookies
-}) => {
+}) {
 	const accessToken = await encodeAccessToken(auth)
 
 	const authorization = `Bearer ${accessToken}`

@@ -4,7 +4,7 @@ interface Props {
 	className?: string
 }
 
-const LoadingSpinner: React.FC<Props> = ({ className }) => {
+export default function LoadingSpinner({ className }: Props) {
 	return (
 		<div role="status">
 			<svg
@@ -25,5 +25,3 @@ const LoadingSpinner: React.FC<Props> = ({ className }) => {
 		</div>
 	)
 }
-
-export default LoadingSpinner

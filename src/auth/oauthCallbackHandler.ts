@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 
-import { env } from "~/env.mjs"
+import env from "env.mjs"
 import { setAuth } from "~/auth/jwt"
 import redirectToCookieKey from "./redirectToCookieKey"
 import { getCredentialsFromCode } from "~/google/credentials"
@@ -8,7 +8,7 @@ import GoogleAPI from "~/google/GoogleAPI"
 import User from "~/data/User"
 import Course from "~/data/Course"
 
-export const oauthCallbackHandler = async (request: NextRequest) => {
+export default async function oauthCallbackHandler(request: NextRequest) {
 	const { searchParams } = new URL(request.url)
 
 	const code = searchParams.get("code")
@@ -41,10 +41,10 @@ export const oauthCallbackHandler = async (request: NextRequest) => {
 			},
 		}),
 		User({ email })
-			.courses()
-			.then(({ teaching }) =>
+			.coursesTeaching()
+			.then((coursesTeaching) =>
 				Promise.all(
-					teaching.map(({ id }) =>
+					coursesTeaching.map(({ id }) =>
 						Course({ id }).update({
 							linkedRefreshToken: refreshToken,
 						})

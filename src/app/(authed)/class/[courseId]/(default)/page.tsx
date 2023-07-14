@@ -13,7 +13,11 @@ interface Params {
 	courseId: string
 }
 
-const ClassPage = async ({ params: { courseId } }: { params: Params }) => {
+export default async function ClassPage({
+	params: { courseId },
+}: {
+	params: Params
+}) {
 	const { email } = await getAuthOrThrow({ cookies: cookies() })
 
 	const role = await User({ email }).courseRole({ id: courseId })
@@ -49,11 +53,3 @@ const ClassPage = async ({ params: { courseId } }: { params: Params }) => {
 		)
 	}
 }
-
-export default ClassPage
-
-/*  <div className="text-lg font-medium opacity-60">
-		Assignments are being imported from Google Classroom.
-		They&apos;ll be found in the &quot;assignments&quot; tab
-		when they&apos;re ready
-	</div> */

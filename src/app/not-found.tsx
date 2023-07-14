@@ -1,4 +1,4 @@
-import { env } from "~/env.mjs"
+import env from "env.mjs"
 
 export const metadata = {
 	title: "Link not found | Understand",
@@ -6,7 +6,7 @@ export const metadata = {
 		"The personalized educational content and student insight platform",
 }
 
-const NotFoundPage = () => {
+export default function NotFoundPage() {
 	if (env.NODE_ENV === "production") {
 	}
 
@@ -23,5 +23,3 @@ const NotFoundPage = () => {
 		</div>
 	)
 }
-
-export default NotFoundPage

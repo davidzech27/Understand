@@ -1,4 +1,4 @@
-const breakIntoSentences = (text: string) => {
+export default function breakIntoSentences(text: string) {
 	if (Intl.Segmenter === undefined) {
 		return text.split(
 			/(?<!\b(?:Mr|Mrs|Dr|Ms|Prof|Sr|Jr|St|e\.g|i\.e|etc)\.)(?<=[.?!][’”']?)\s+(?=[A-Z0-9])/g
@@ -17,5 +17,3 @@ const breakIntoSentences = (text: string) => {
 
 	return sentences
 }
-
-export default breakIntoSentences

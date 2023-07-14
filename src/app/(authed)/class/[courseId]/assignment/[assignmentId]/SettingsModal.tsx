@@ -2,13 +2,15 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useZact } from "zact/client"
 import * as Form from "@radix-ui/react-form"
+import { Label } from "@radix-ui/react-form"
 
+import updateAssignmentAction from "./updateAssignmentAction"
+import deleteAssignmentAction from "./deleteAssignmentAction"
 import Button from "~/components/Button"
+import Heading from "~/components/Heading"
 import FancyButton from "~/components/FancyButton"
 import TextInput from "~/components/TextInput"
 import Modal from "~/components/Modal"
-import updateAssignmentAction from "./updateAssignmentAction"
-import deleteAssignmentAction from "./deleteAssignmentAction"
 import TextArea from "~/components/TextArea"
 
 interface Props {
@@ -26,7 +28,7 @@ interface Props {
 	}
 }
 
-const SettingsModal: React.FC<Props> = ({ open, setOpen, assignment }) => {
+export default function SettingsModal({ open, setOpen, assignment }: Props) {
 	const router = useRouter()
 
 	const [titleInput, setTitleInput] = useState(assignment.title)
@@ -79,8 +81,6 @@ const SettingsModal: React.FC<Props> = ({ open, setOpen, assignment }) => {
 			assignmentId: assignment.assignmentId,
 		})
 
-		router.refresh()
-
 		router.push(`/class/${assignment.courseId}`)
 	}
 
@@ -95,37 +95,42 @@ const SettingsModal: React.FC<Props> = ({ open, setOpen, assignment }) => {
 				className="relative h-full"
 			>
 				<div className="absolute left-0 right-0 top-0 bottom-0 flex flex-col space-y-2 overflow-y-scroll pb-[100px]">
-					<div className="ml-1 font-medium opacity-80">Title</div>
+					<Heading asChild size="medium" className="ml-1">
+						<Label htmlFor="title">Title</Label>
+					</Heading>
 
 					<TextInput
 						value={titleInput}
 						setValue={setTitleInput}
 						placeholder="Assignment title"
+						id="title"
 						autoComplete="off"
 						className="h-min py-2.5 pl-4 text-base"
 					/>
 
-					<div className="ml-1 font-medium opacity-80">
-						Description
-					</div>
+					<Heading asChild size="medium" className="ml-1">
+						<Label htmlFor="description">Description</Label>
+					</Heading>
 
 					<TextInput
 						value={descriptionInput}
 						setValue={setDescriptionInput}
 						placeholder="Description"
+						id="description"
 						autoComplete="off"
 						className="h-min py-2.5 pl-4 text-base"
 					/>
 
-					<div className="ml-1 font-medium opacity-80">
-						Instructions
-					</div>
+					<Heading asChild size="medium" className="ml-1">
+						<Label htmlFor="instructions">Instructions</Label>
+					</Heading>
 
 					<div>
 						<TextArea
 							value={instructionsInput}
 							setValue={setInstructionsInput}
 							placeholder="Instructions"
+							id="instructions"
 							autoComplete="off"
 							className="py-2.5 pl-4 text-base"
 						/>
@@ -136,7 +141,7 @@ const SettingsModal: React.FC<Props> = ({ open, setOpen, assignment }) => {
 							onClick={() => setConfirmingDeleteAssignment(true)}
 							type="button"
 							disabled={confirmingDeleteAssignment}
-							className="text-lg"
+							size="medium"
 						>
 							Delete assignment
 						</Button>
@@ -147,7 +152,7 @@ const SettingsModal: React.FC<Props> = ({ open, setOpen, assignment }) => {
 									onClick={onDeleteAssignment}
 									type="button"
 									loading={isDeletingAssignment}
-									className="text-lg"
+									size="medium"
 								>
 									Do you really want to delete this
 									assignment?
@@ -159,7 +164,7 @@ const SettingsModal: React.FC<Props> = ({ open, setOpen, assignment }) => {
 											setConfirmingDeleteAssignment(false)
 										}
 										type="button"
-										className="text-lg"
+										size="medium"
 									>
 										Actually, never mind
 									</Button>
@@ -170,11 +175,12 @@ const SettingsModal: React.FC<Props> = ({ open, setOpen, assignment }) => {
 				</div>
 
 				<div className="absolute bottom-0 left-0 right-0 z-50 flex space-x-3">
-					<Form.Submit asChild className="w-1/2">
+					<Form.Submit asChild>
 						<FancyButton
 							loading={isUpdatingAssignment}
 							disabled={updateDisabled}
-							className="h-20 text-3xl"
+							size="large"
+							className="w-1/2"
 						>
 							Done
 						</FancyButton>
@@ -183,7 +189,8 @@ const SettingsModal: React.FC<Props> = ({ open, setOpen, assignment }) => {
 					<Button
 						type="button"
 						onClick={() => setOpen(false)}
-						className="h-20 w-1/2 text-3xl"
+						size="large"
+						className="w-1/2"
 					>
 						Cancel
 					</Button>
@@ -192,5 +199,3 @@ const SettingsModal: React.FC<Props> = ({ open, setOpen, assignment }) => {
 		</Modal>
 	)
 }
-
-export default SettingsModal

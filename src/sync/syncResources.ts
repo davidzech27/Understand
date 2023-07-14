@@ -2,7 +2,11 @@ import Assignment from "~/data/Assignment"
 import Course from "~/data/Course"
 import GoogleAPI from "~/google/GoogleAPI"
 
-const syncResources = async ({ courseId }: { courseId: string }) => {
+export default async function syncResources({
+	courseId,
+}: {
+	courseId: string
+}) {
 	const googleAPIPromise = Course({ id: courseId })
 		.linkedRefreshToken()
 		.then((refreshToken) => {
@@ -436,5 +440,3 @@ const syncResources = async ({ courseId }: { courseId: string }) => {
 		assignmentIdsToSync,
 	}
 }
-
-export default syncResources

@@ -2,9 +2,12 @@ import Course from "~/data/Course"
 import User from "~/data/User"
 import GoogleAPI from "~/google/GoogleAPI"
 
-const syncRoster = async ({ courseId }: { courseId: string }) => {
+export default async function syncRoster({ courseId }: { courseId: string }) {
 	const [dbRoster, classroomRoster] = await Promise.all([
-		Course({ id: courseId }).roster(),
+		Promise.all([
+			Course({ id: courseId }).teachers(),
+			Course({ id: courseId }).students(),
+		]).then(([teachers, students]) => ({ teachers, students })),
 		Course({ id: courseId })
 			.linkedRefreshToken()
 			.then((refreshToken) => {
@@ -83,5 +86,3 @@ const syncRoster = async ({ courseId }: { courseId: string }) => {
 		}),
 	])
 }
-
-export default syncRoster

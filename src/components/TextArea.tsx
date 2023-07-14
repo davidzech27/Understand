@@ -8,7 +8,6 @@ interface Props extends TextareaProps {
 	value: string
 	setValue: (value: string) => void
 	onEnter?: () => void
-	autoComplete: string
 }
 
 const TextArea = forwardRef<HTMLTextAreaElement, Props>(

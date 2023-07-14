@@ -2,7 +2,7 @@ import { z } from "zod"
 
 import redirectURL from "./redirectURL"
 import scopes from "./scopes"
-import { env } from "~/env.mjs"
+import env from "env.mjs"
 
 const tokensSchema = z.object({
 	accessToken: z.string(),
@@ -11,7 +11,7 @@ const tokensSchema = z.object({
 	scopes: z.enum(scopes).array(),
 })
 
-export const getCredentialsFromCode = async (code: string) => {
+export async function getCredentialsFromCode(code: string) {
 	const tokens = (await (
 		await fetch("https://accounts.google.com/o/oauth2/token", {
 			method: "POST",
@@ -46,7 +46,7 @@ export const getCredentialsFromCode = async (code: string) => {
 	})
 }
 
-export const getCredentialsFromRefreshToken = async (refreshToken: string) => {
+export async function getCredentialsFromRefreshToken(refreshToken: string) {
 	const tokens = (await (
 		await fetch("https://accounts.google.com/o/oauth2/token", {
 			method: "POST",

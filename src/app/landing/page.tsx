@@ -5,7 +5,7 @@ import { Suspense } from "react"
 import { getAuthOrThrow } from "~/auth/jwt"
 import User from "~/data/User"
 import LandingForm from "./LandingForm"
-import colors from "~/colors.cjs"
+import GradientText from "~/components/GradientText"
 
 export const runtime = "edge"
 
@@ -14,7 +14,7 @@ export const metadata = {
 }
 
 // perhaps add extra content to fill awkward whitespace
-const LandingPage = async () => {
+export default async function LandingPage() {
 	const profilePromise = getAuthOrThrow({ cookies: cookies() })
 		.then(({ email }) => User({ email }).get())
 		.then((profile) => profile ?? notFound())
@@ -35,22 +35,14 @@ const LandingPage = async () => {
 				<div className="flex-1 py-5 px-6">
 					<div className="flex h-full flex-col items-center rounded-lg bg-white px-[16%] shadow-xl">
 						<div className="flex-[0.875]">
-							<span
-								style={{
-									background: `linear-gradient(45deg, ${colors.primary}, ${colors.secondary})`,
-									WebkitBackgroundClip: "text",
-									backgroundClip: "text",
-									color: "transparent",
-								}}
-								className="mt-[24%] flex text-5xl font-bold md:hidden"
-							>
-								Understand
-							</span>
+							<GradientText asChild>
+								<span className="mt-[24%] flex text-5xl font-bold md:hidden">
+									Understand
+								</span>
+							</GradientText>
 						</div>
 
-						<Suspense fallback={<LandingForm loading />}>
-							<LandingForm profilePromise={profilePromise} />
-						</Suspense>
+						<LandingForm profilePromise={profilePromise} />
 
 						<div className="flex-1" />
 					</div>
@@ -59,5 +51,3 @@ const LandingPage = async () => {
 		</>
 	)
 }
-
-export default LandingPage

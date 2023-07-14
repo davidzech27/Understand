@@ -7,7 +7,7 @@ import Avatar from "./Avatar"
 interface Props extends HTMLProps<HTMLLIElement> {
 	name: string
 	subname?: string
-	photoUrl?: string
+	photo?: string
 	url: string
 	selected?: boolean
 	disabled?: boolean
@@ -16,16 +16,7 @@ interface Props extends HTMLProps<HTMLLIElement> {
 
 const AttachmentItem = forwardRef<HTMLLIElement, Props>(
 	(
-		{
-			name,
-			subname,
-			photoUrl,
-			url,
-			selected,
-			disabled,
-			className,
-			...props
-		},
+		{ name, subname, photo, url, selected, disabled, className, ...props },
 		ref
 	) => {
 		const urlRef = useRef<HTMLAnchorElement>(null)
@@ -53,7 +44,7 @@ const AttachmentItem = forwardRef<HTMLLIElement, Props>(
 				className={cn("flex h-20 items-center space-x-3", className)}
 			>
 				<Avatar
-					src={photoUrl}
+					src={photo}
 					name={name}
 					fallbackColor="secondary"
 					className="h-12 w-12"

@@ -13,7 +13,7 @@ interface Props {
 	courseId: string
 }
 
-const MessageBoard: React.FC<Props> = ({ courseId }) => {
+export default function MessageBoard({ courseId }: Props) {
 	const [messageInput, setMessageInput] = useState("")
 
 	const {
@@ -55,7 +55,8 @@ const MessageBoard: React.FC<Props> = ({ courseId }) => {
 				<FancyButton
 					disabled={messageInput.length === 0}
 					loading={isPosting}
-					className="h-20 w-80 text-2xl"
+					size="medium"
+					className="h-20 w-80"
 				>
 					Post message
 				</FancyButton>
@@ -99,5 +100,3 @@ const MessageBoard: React.FC<Props> = ({ courseId }) => {
 		</div>
 	)
 }
-
-export default MessageBoard

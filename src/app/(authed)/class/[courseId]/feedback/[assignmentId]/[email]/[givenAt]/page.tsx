@@ -7,11 +7,11 @@ import { cookies } from "next/headers"
 import Feedback from "~/data/Feedback"
 import FeedbackComponent from "./Feedback"
 
-export const generateMetadata = async ({
+export async function generateMetadata({
 	params: { courseId, assignmentId, email },
 }: {
 	params: Params
-}) => {
+}) {
 	email = decodeURIComponent(email)
 
 	const [user, assignment] = await Promise.all([
@@ -33,11 +33,11 @@ interface Params {
 	givenAt: string
 }
 
-const FeedbackPage = async ({
+export default async function FeedbackPage({
 	params: { courseId, assignmentId, email, givenAt: givenAtString },
 }: {
 	params: Params
-}) => {
+}) {
 	email = decodeURIComponent(email)
 
 	const givenAt = new Date(Number(givenAtString))
@@ -112,5 +112,3 @@ const FeedbackPage = async ({
 		/>
 	)
 }
-
-export default FeedbackPage

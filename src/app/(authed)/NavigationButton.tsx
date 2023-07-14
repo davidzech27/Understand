@@ -11,7 +11,12 @@ interface Props {
 	href: string
 }
 
-const NavigationButton: React.FC<Props> = ({ text, subtext, photo, href }) => {
+export default function NavigationButton({
+	text,
+	subtext,
+	photo,
+	href,
+}: Props) {
 	const pathname = usePathname()
 
 	return (
@@ -39,5 +44,3 @@ const NavigationButton: React.FC<Props> = ({ text, subtext, photo, href }) => {
 		</Link>
 	)
 }
-
-export default NavigationButton

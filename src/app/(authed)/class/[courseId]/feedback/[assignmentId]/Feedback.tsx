@@ -25,7 +25,7 @@ import cn from "~/utils/cn"
 import registerFeedbackAction from "./registerFeedbackAction"
 import registerFollowUpAction from "./registerFollowUpAction"
 import registerInsightsAction from "./registerInsightsAction"
-import colors from "~/colors.cjs"
+import colors from "colors.cjs"
 import getInsights from "~/ai/getInsights"
 import formatDate from "~/utils/formatDate"
 import updateFeedbackSubmissionAction from "./updateFeedbackSubmissionAction"
@@ -81,7 +81,7 @@ const getDomIdOfSpecificFeedbackHighlight = ({
 	sentence: number
 }) => `${specificFeedbackHighlightDomIdPrefix}-${paragraph}-${sentence}`
 
-const Feedback: React.FC<Props> = ({
+function Feedback({
 	assignment,
 	feedbackHistory: feedbackHistoryProp,
 	email,
@@ -89,7 +89,7 @@ const Feedback: React.FC<Props> = ({
 	courseName,
 	role,
 	submissions,
-}) => {
+}: Props) {
 	const [feedbackHistory, setFeedbackHistory] = useState(feedbackHistoryProp)
 
 	const [selectedFeedbackGivenAt, setSelectedFeedbackGivenAt] =
@@ -712,7 +712,7 @@ const Feedback: React.FC<Props> = ({
 							}) => (
 								<AttachmentItem
 									name={title ?? ""}
-									photoUrl={thumbnailUrl}
+									photo={thumbnailUrl}
 									url={url}
 									key={id}
 									selected={selected}
@@ -724,7 +724,7 @@ const Feedback: React.FC<Props> = ({
 						<Button
 							onClick={onPickAttachment}
 							disabled={selectedAttachmentId === undefined}
-							className="h-20 text-3xl"
+							size="large"
 						>
 							Pick attachment
 						</Button>
@@ -835,7 +835,7 @@ const Feedback: React.FC<Props> = ({
 
 							<div className="flex-shrink-0">
 								{generating ? (
-									<Button disabled className="text-lg">
+									<Button disabled size="medium">
 										{specificFeedbackList.length > 0
 											? "Generating feedback..."
 											: "Analyzing work..."}
@@ -847,7 +847,7 @@ const Feedback: React.FC<Props> = ({
 												onClick={() =>
 													setModal("submission")
 												}
-												className="text-lg"
+												size="medium"
 											>
 												Import submission
 											</Button>
@@ -856,7 +856,7 @@ const Feedback: React.FC<Props> = ({
 										<Button
 											onClick={onGetFeedback}
 											disabled={submissionEmpty}
-											className="text-lg"
+											size="medium"
 										>
 											Get feedback
 										</Button>
@@ -868,7 +868,7 @@ const Feedback: React.FC<Props> = ({
 												onClick={() =>
 													setModal("submission")
 												}
-												className="text-lg"
+												size="medium"
 											>
 												Import submission
 											</Button>
@@ -876,7 +876,7 @@ const Feedback: React.FC<Props> = ({
 
 										<Button
 											onClick={onStartOver}
-											className="text-lg"
+											size="medium"
 										>
 											Start over
 										</Button>
@@ -1370,7 +1370,7 @@ const Submission = forwardRef<
 
 Submission.displayName = "Submission"
 
-const GeneralFeedback = ({
+function GeneralFeedback({
 	content,
 	generating,
 	followUps,
@@ -1390,7 +1390,7 @@ const GeneralFeedback = ({
 		) => "focus" | "hover" | undefined
 	) => void
 	submissionWidth: number
-}) => {
+}) {
 	const [followUpInput, setFollowUpInput] = useState("")
 
 	const inputRef = useRef<HTMLTextAreaElement>(null)
@@ -1539,7 +1539,7 @@ const GeneralFeedback = ({
 									onEnter={onGetFollowUp}
 									ref={inputRef}
 									autoComplete="off"
-									className="opacity-80"
+									className="text-xl opacity-80"
 								/>
 							</div>
 						</div>
@@ -1550,7 +1550,12 @@ const GeneralFeedback = ({
 	)
 }
 
-const SpecificFeedbackColumn: React.FC<{
+function SpecificFeedbackColumn({
+	feedbackList,
+	getSubmissionTextOffset,
+	onGetFollowUp,
+	onStateChange,
+}: {
 	feedbackList: {
 		paragraph: number
 		sentence: number
@@ -1572,12 +1577,7 @@ const SpecificFeedbackColumn: React.FC<{
 			prevState: "focus" | "hover" | undefined
 		) => "focus" | "hover" | undefined
 	}) => void
-}> = ({
-	feedbackList,
-	getSubmissionTextOffset,
-	onGetFollowUp,
-	onStateChange,
-}) => {
+}) {
 	feedbackList = feedbackList.sort(
 		(feedback1, feedback2) =>
 			feedback1.paragraph * 10 +
@@ -1685,7 +1685,14 @@ const SpecificFeedbackColumn: React.FC<{
 
 SpecificFeedbackColumn.displayName = "SpecificFeedbackColumn"
 
-const SpecificFeedbackItem: React.FC<{
+function SpecificFeedbackItem({
+	content,
+	generating,
+	followUps,
+	onGetFollowUp: onGetFollowUpProp,
+	state,
+	onStateChange,
+}: {
 	content: string
 	generating: boolean
 	followUps: string[]
@@ -1696,14 +1703,7 @@ const SpecificFeedbackItem: React.FC<{
 			prevState: "focus" | "hover" | undefined
 		) => "focus" | "hover" | undefined
 	) => void
-}> = ({
-	content,
-	generating,
-	followUps,
-	onGetFollowUp: onGetFollowUpProp,
-	state,
-	onStateChange,
-}) => {
+}) {
 	const [followUpInput, setFollowUpInput] = useState("")
 
 	// highlighting text isn't considered focusWithin so if state is focus and then text is highlighted state goes to undefined

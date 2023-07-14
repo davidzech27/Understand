@@ -1,10 +1,13 @@
 import { cookies } from "next/headers"
 import { notFound } from "next/navigation"
 
+import { getAuthOrThrow } from "~/auth/jwt"
 import Course from "~/data/Course"
 import User from "~/data/User"
-import { getAuthOrThrow } from "~/auth/jwt"
-import Roster from "./Roster"
+import Card from "~/components/Card"
+import SectionList from "~/components/SectionList"
+import UserItem from "~/components/UserItem"
+import Heading from "~/components/Heading"
 
 export const metadata = {
 	title: "People",
@@ -16,17 +19,71 @@ interface Params {
 	courseId: string
 }
 
-const PeoplePage = async ({ params: { courseId } }: { params: Params }) => {
-	const [role, roster] = await Promise.all([
+export default async function PeoplePage({
+	params: { courseId },
+}: {
+	params: Params
+}) {
+	const [role, teachers, students] = await Promise.all([
 		getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
 			User({ email }).courseRole({ id: courseId })
 		),
-		Course({ id: courseId }).roster(),
+		Course({ id: courseId }).teachers(),
+		Course({ id: courseId }).students(),
 	])
 
 	if (role === "none") notFound()
 
-	return <Roster courseId={courseId} role={role} roster={roster} />
+	return (
+		<Card className="flex-1 px-6 py-5">
+			<SectionList
+				sections={[
+					{
+						heading: "Teachers",
+						items: teachers,
+						renderItem: ({
+							item: { email, name, photo, signedUp },
+						}) => (
+							<UserItem
+								email={email}
+								name={name}
+								photo={photo}
+								note={
+									!signedUp ? "Not yet signed up" : undefined
+								}
+							/>
+						),
+					},
+					{
+						heading: "Students",
+						items: students,
+						renderItem: ({
+							item: { email, name, photo, signedUp },
+						}) => (
+							<UserItem
+								email={email}
+								name={name}
+								photo={photo}
+								href={
+									role === "teacher" && signedUp
+										? `/class/${courseId}/student/${email}`
+										: undefined
+								}
+								note={
+									!signedUp ? "Not yet signed up" : undefined
+								}
+								key={email}
+							/>
+						),
+						renderEmpty: () => (
+							<Heading size="large">
+								This class doesn&apos;t have any students yet
+							</Heading>
+						),
+					},
+				]}
+				headingSize="large"
+			/>
+		</Card>
+	)
 }
-
-export default PeoplePage

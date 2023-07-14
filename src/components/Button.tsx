@@ -9,19 +9,19 @@ interface Props
 		ButtonHTMLAttributes<HTMLButtonElement>,
 		HTMLButtonElement
 	> {
-	size?: "small" | "medium" | "large"
+	size: "small" | "medium" | "large"
 	loading?: boolean
 }
 
-const Button: React.FC<Props> = ({
+export default function Button({
 	children,
 	onClick,
-	size = "medium",
+	size,
 	loading,
 	disabled,
 	className,
 	...props
-}) => {
+}: Props) {
 	if (loading) disabled = true
 
 	return (
@@ -72,5 +72,3 @@ const Button: React.FC<Props> = ({
 		</div>
 	)
 }
-
-export default Button

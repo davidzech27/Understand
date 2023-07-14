@@ -1,16 +1,16 @@
 "use client"
-import { env } from "~/env.mjs"
+import env from "env.mjs"
 import redirectToCookieKey from "~/auth/redirectToCookieKey"
 import redirectURL from "./redirectURL"
 import { type Scope } from "./scopes"
 
-const getAuthenticationURL = ({
+export default function getAuthenticationURL({
 	scopes,
 	redirectTo,
 }: {
 	scopes: Scope[]
 	redirectTo: string
-}) => {
+}) {
 	if (redirectTo[0] === "/")
 		redirectTo = `${env.NEXT_PUBLIC_URL}${redirectTo}`
 
@@ -25,5 +25,3 @@ const getAuthenticationURL = ({
 		}&redirect_uri=${redirectURL}`
 	)
 }
-
-export default getAuthenticationURL

@@ -1,41 +1,49 @@
 import { notFound } from "next/navigation"
 import { cookies } from "next/headers"
 
-import colors from "~/colors.cjs"
+import { getAuthOrThrow } from "~/auth/jwt"
 import cn from "~/utils/cn"
 import ClassTabs from "./ClassTabs"
 import Card from "~/components/Card"
 import User from "~/data/User"
 import Course from "~/data/Course"
-import { getAuthOrThrow } from "~/auth/jwt"
+import GradientText from "~/components/GradientText"
 
 interface Params {
 	courseId: string
 }
 
-export const generateMetadata = async ({
+export async function generateMetadata({
 	params: { courseId },
 }: {
 	params: Params
-}) => {
+}) {
 	const name = (await Course({ id: courseId }).get())?.name
 
 	return {
-		template: `%s | ${name}`,
-		default: name,
+		title: {
+			template: `%s | ${name}`,
+			default: name ?? "",
+		},
 	}
 }
 
-const ClassLayout = async ({
+export default async function ClassLayout({
 	children,
 	params: { courseId },
 }: {
 	children: React.ReactNode
 	params: Params
-}) => {
-	const rosterPromise = Course({ id: courseId }).roster()
+}) {
+	const teacherEmailsPromise = Course({ id: courseId })
+		.teachers()
+		.then((teachers) => teachers.map(({ email }) => email))
 
-	const [course, role, anyIndexedResource] = await Promise.all([
+	const studentEmailsPromise = Course({ id: courseId })
+		.students()
+		.then((students) => students.map(({ email }) => email))
+
+	const [course, role, hasResources] = await Promise.all([
 		Course({ id: courseId }).get(),
 		getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
 			User({ email }).courseRole({ id: courseId })
@@ -49,23 +57,19 @@ const ClassLayout = async ({
 		<div className="-mr-2 flex h-full flex-col space-y-2.5 overflow-y-scroll">
 			<Card className="flex flex-col justify-between py-5 px-6">
 				<div className="group flex items-baseline justify-between">
-					<a
-						href={course.linkedUrl}
-						target="_blank"
-						style={{
-							background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`,
-							WebkitBackgroundClip: "text",
-							backgroundClip: "text",
-							color: "transparent",
-						}}
-						className={cn(
-							"pb-5 text-6xl font-semibold",
-							course.linkedUrl !== undefined &&
-								"peer transition-all duration-150 hover:opacity-80 peer-hover:opacity-80"
-						)}
-					>
-						{course.name}
-					</a>
+					<GradientText asChild>
+						<a
+							href={course.linkedUrl}
+							target="_blank"
+							className={cn(
+								"pb-5 text-6xl font-semibold",
+								course.linkedUrl !== undefined &&
+									"peer transition-all duration-150 hover:opacity-80 peer-hover:opacity-80"
+							)}
+						>
+							{course.name}
+						</a>
+					</GradientText>
 
 					{course.section && (
 						<a
@@ -84,14 +88,10 @@ const ClassLayout = async ({
 
 				<ClassTabs
 					course={course}
-					teacherEmailsPromise={rosterPromise.then((roster) =>
-						roster.teachers.map((teacher) => teacher.email)
-					)}
-					studentEmailsPromise={rosterPromise.then((roster) =>
-						roster.students.map((student) => student.email)
-					)}
+					teacherEmailsPromise={teacherEmailsPromise}
+					studentEmailsPromise={studentEmailsPromise}
 					role={role}
-					anyIndexedResource={anyIndexedResource}
+					hasResources={hasResources}
 				/>
 			</Card>
 
@@ -99,5 +99,3 @@ const ClassLayout = async ({
 		</div>
 	)
 }
-
-export default ClassLayout

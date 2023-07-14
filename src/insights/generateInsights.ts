@@ -1,6 +1,10 @@
 import callGenerate from "./callGenerate"
 
-const generateInsights = async ({ courseId }: { courseId: string }) => {
+export default async function generateInsights({
+	courseId,
+}: {
+	courseId: string
+}) {
 	await callGenerate({
 		name: "course",
 		courseId,
@@ -9,5 +13,3 @@ const generateInsights = async ({ courseId }: { courseId: string }) => {
 		)}`,
 	})
 }
-
-export default generateInsights

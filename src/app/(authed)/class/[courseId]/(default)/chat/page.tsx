@@ -17,7 +17,11 @@ interface Params {
 	courseId: string
 }
 //! fix keyboard usability and outlines
-const ChatPage = async ({ params: { courseId } }: { params: Params }) => {
+export default async function ChatPage({
+	params: { courseId },
+}: {
+	params: Params
+}) {
 	const [course, role] = await Promise.all([
 		Course({ id: courseId }).get(),
 		getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
@@ -33,5 +37,3 @@ const ChatPage = async ({ params: { courseId } }: { params: Params }) => {
 		</Card>
 	)
 }
-
-export default ChatPage

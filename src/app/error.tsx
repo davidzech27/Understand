@@ -1,6 +1,6 @@
 "use client"
 
-const Error = ({ error }: { error: Error }) => {
+export default function Error({ error }: { error: Error }) {
 	return (
 		<main className="flex h-screen w-screen flex-col bg-black">
 			<div className="flex-[0.875]" />
@@ -15,5 +15,3 @@ const Error = ({ error }: { error: Error }) => {
 		</main>
 	)
 }
-
-export default Error

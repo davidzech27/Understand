@@ -1,4 +1,4 @@
-const Loading = () => {
+export default function Loading() {
 	return (
 		<div className="flex h-screen w-full flex-col items-center bg-gradient-to-tr from-primary to-secondary">
 			<div className="flex-[0.875]" />
@@ -11,5 +11,3 @@ const Loading = () => {
 		</div>
 	)
 }
-
-export default Loading

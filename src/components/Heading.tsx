@@ -1,13 +1,23 @@
+import { Slot } from "@radix-ui/react-slot"
+
 import cn from "~/utils/cn"
 
 interface Props extends React.PropsWithChildren {
 	size: "small" | "medium" | "large"
+	asChild?: boolean
 	className?: string
 }
 
-const Heading: React.FC<Props> = ({ size = "medium", className, children }) => {
+export default function Heading({
+	size = "medium",
+	asChild,
+	className,
+	children,
+}: Props) {
+	const Component = asChild ? Slot : "div"
+
 	return (
-		<div
+		<Component
 			className={cn(
 				{
 					small: "text-sm font-medium opacity-60",
@@ -18,8 +28,6 @@ const Heading: React.FC<Props> = ({ size = "medium", className, children }) => {
 			)}
 		>
 			{children}
-		</div>
+		</Component>
 	)
 }
-
-export default Heading

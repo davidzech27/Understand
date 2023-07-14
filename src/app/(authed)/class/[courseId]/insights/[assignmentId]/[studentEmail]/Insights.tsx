@@ -18,7 +18,7 @@ interface Props {
 	submission: string
 }
 
-const Insights: React.FC<Props> = ({ assignment, insights, submission }) => {
+export default function Insights({ assignment, insights, submission }: Props) {
 	const [insightHovers, setInsightHovers] = useState<boolean[]>(
 		insights
 			.filter((insight) => insight.paragraphs[0] !== -1)
@@ -288,5 +288,3 @@ const Insights: React.FC<Props> = ({ assignment, insights, submission }) => {
 		</div>
 	)
 }
-
-export default Insights

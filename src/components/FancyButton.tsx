@@ -6,7 +6,7 @@ import {
 } from "react"
 
 import cn from "../utils/cn"
-import colors from "~/colors.cjs"
+import colors from "colors.cjs"
 import LoadingSpinner from "./LoadingSpinner"
 
 interface Props
@@ -14,21 +14,13 @@ interface Props
 		ButtonHTMLAttributes<HTMLButtonElement>,
 		HTMLButtonElement
 	> {
-	size?: "medium" | "large"
+	size: "medium" | "large"
 	loading?: boolean
 }
 
 const FancyButton = forwardRef<HTMLButtonElement, Props>(
 	(
-		{
-			children,
-			onClick,
-			size = "large",
-			loading,
-			disabled,
-			className,
-			...props
-		},
+		{ children, onClick, size, loading, disabled, className, ...props },
 		ref
 	) => {
 		if (loading) disabled = true

@@ -1,18 +1,23 @@
 import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
 
-import NavigationButton from "./NavigationButton"
 import { getAuthOrThrow } from "~/auth/jwt"
-import Card from "~/components/Card"
-import Avatar from "~/components/Avatar"
 import User from "~/data/User"
+import Card from "~/components/Card"
+import NavigationButton from "./NavigationButton"
+import Avatar from "~/components/Avatar"
+import Heading from "~/components/Heading"
 
-const SideBar = async () => {
+export default async function SideBar() {
 	const { email } = await getAuthOrThrow({ cookies: cookies() })
 
 	const user = User({ email })
 
-	const [profile, courses] = await Promise.all([user.get(), user.courses()])
+	const [profile, coursesTeaching, coursesEnrolled] = await Promise.all([
+		user.get(),
+		user.coursesTeaching(),
+		user.coursesEnrolled(),
+	])
 
 	if (!profile) redirect("/signIn")
 
@@ -33,15 +38,16 @@ const SideBar = async () => {
 			/>
 
 			<div className="mr-[-8px] overflow-y-scroll">
-				{courses.teaching.length > 0 || courses.enrolled.length > 0 ? (
+				{coursesTeaching.length > 0 || coursesEnrolled.length > 0 ? (
 					<>
-						{courses.teaching.length > 0 && (
+						{coursesTeaching.length > 0 && (
 							<>
-								<span className="my-1.5 ml-1.5 text-sm font-medium opacity-60">
+								<Heading size="small" className="my-1.5 ml-1.5">
 									Teaching
-								</span>
+								</Heading>
+
 								<div>
-									{courses.teaching.map((course) => (
+									{coursesTeaching.map((course) => (
 										<NavigationButton
 											text={course.name}
 											subtext={
@@ -63,13 +69,14 @@ const SideBar = async () => {
 							</>
 						)}
 
-						{courses.enrolled.length > 0 && (
+						{coursesEnrolled.length > 0 && (
 							<>
-								<span className="my-1.5 ml-1.5 text-sm font-medium opacity-60">
+								<Heading size="small" className="my-1.5 ml-1.5">
 									Enrolled
-								</span>
+								</Heading>
+
 								<div>
-									{courses.enrolled.map((course) => (
+									{coursesEnrolled.map((course) => (
 										<NavigationButton
 											text={course.name}
 											subtext={
@@ -107,5 +114,3 @@ const SideBar = async () => {
 		</Card>
 	)
 }
-
-export default SideBar

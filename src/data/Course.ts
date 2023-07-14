@@ -3,7 +3,6 @@ import { z } from "zod"
 
 import vdbPromise from "~/db/vdb"
 import getEmbedding from "~/ai/getEmbedding"
-
 import db from "~/db/db"
 import {
 	user,
@@ -16,7 +15,7 @@ import {
 	studentInsight,
 	assignmentInsight,
 } from "~/db/schema"
-import { insightsSchema } from "./Feedback"
+import { feedbackInsightsSchema } from "./Feedback"
 
 const resourceMetadataSchema = z.intersection(
 	z.object({
@@ -165,54 +164,53 @@ const Course = ({ id }: { id: string }) => ({
 			)[0]?.linkedRefreshToken ?? undefined
 		)
 	},
-	roster: async () => {
-		const [teachers, students] = await Promise.all([
-			db
-				.select({
-					email: teacherToCourse.teacherEmail,
-					name: user.name,
-					photo: user.photo,
-					linked: teacherToCourse.linked,
-				})
-				.from(teacherToCourse)
-				.leftJoin(user, eq(user.email, teacherToCourse.teacherEmail))
-				.where(eq(teacherToCourse.courseId, id)),
-			db
-				.select({
-					email: studentToCourse.studentEmail,
-					name: user.name,
-					photo: user.photo,
-					linked: studentToCourse.linked,
-				})
-				.from(studentToCourse)
-				.leftJoin(user, eq(user.email, studentToCourse.studentEmail))
-				.where(eq(studentToCourse.courseId, id)),
-		])
+	teachers: async () => {
+		const teachers = await db
+			.select({
+				email: teacherToCourse.teacherEmail,
+				name: user.name,
+				photo: user.photo,
+				linked: teacherToCourse.linked,
+			})
+			.from(teacherToCourse)
+			.leftJoin(user, eq(user.email, teacherToCourse.teacherEmail))
+			.where(eq(teacherToCourse.courseId, id))
 
-		return {
-			teachers: teachers.map((teacher) =>
-				teacher.name !== null
-					? {
-							signedUp: true as const,
-							email: teacher.email,
-							name: teacher.name,
-							photo: teacher.photo ?? undefined,
-							linked: teacher.linked ?? false,
-					  }
-					: { signedUp: false as const, email: teacher.email }
-			),
-			students: students.map((student) =>
-				student.name !== null
-					? {
-							signedUp: true as const,
-							email: student.email,
-							name: student.name,
-							photo: student.photo ?? undefined,
-							linked: student.linked ?? false,
-					  }
-					: { signedUp: false as const, email: student.email }
-			),
-		}
+		return teachers.map((teacher) =>
+			teacher.name !== null
+				? {
+						signedUp: true as const,
+						email: teacher.email,
+						name: teacher.name,
+						photo: teacher.photo ?? undefined,
+						linked: teacher.linked,
+				  }
+				: { signedUp: false as const, email: teacher.email }
+		)
+	},
+	students: async () => {
+		const students = await db
+			.select({
+				email: studentToCourse.studentEmail,
+				name: user.name,
+				photo: user.photo,
+				linked: studentToCourse.linked,
+			})
+			.from(studentToCourse)
+			.leftJoin(user, eq(user.email, studentToCourse.studentEmail))
+			.where(eq(studentToCourse.courseId, id))
+
+		return students.map((student) =>
+			student.name !== null
+				? {
+						signedUp: true as const,
+						email: student.email,
+						name: student.name,
+						photo: student.photo ?? undefined,
+						linked: student.linked,
+				  }
+				: { signedUp: false as const, email: student.email }
+		)
 	},
 	assignments: async () => {
 		const assignments = await db
@@ -304,7 +302,7 @@ const Course = ({ id }: { id: string }) => ({
 					: undefined,
 		}
 	},
-	unsyncedInsights: async () => {
+	unsyncedFeedbackInsights: async () => {
 		return (
 			await db
 				.select({
@@ -322,7 +320,7 @@ const Course = ({ id }: { id: string }) => ({
 				)
 		).map((row) => ({
 			...row,
-			insights: insightsSchema.parse(row.insights),
+			insights: feedbackInsightsSchema.parse(row.insights),
 		}))
 	},
 	createResource: async (resource: Resource) => {

@@ -1,4 +1,4 @@
-import { oauthCallbackHandler } from "~/auth/authEdgeRoute"
+import oauthCallbackHandler from "~/auth/oauthCallbackHandler"
 
 export const runtime = "edge"
 

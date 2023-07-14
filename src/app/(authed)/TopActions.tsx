@@ -4,7 +4,7 @@ import { Plus, ChevronDown, FilePlus2, UserPlus } from "lucide-react"
 import * as NavigationMenu from "@radix-ui/react-navigation-menu"
 import { usePathname } from "next/navigation"
 
-const TopActions = () => {
+export default function TopActions() {
 	const pathname = usePathname()
 
 	return (
@@ -71,5 +71,3 @@ const TopActions = () => {
 		</NavigationMenu.Root>
 	)
 }
-
-export default TopActions

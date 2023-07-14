@@ -5,7 +5,6 @@ import { Settings2 } from "lucide-react"
 import Button from "~/components/Button"
 import SettingsModal from "./SettingsModal"
 import LinkButton from "~/components/LinkButton"
-import { env } from "~/env.mjs"
 
 interface Props {
 	role: "teacher" | "student"
@@ -21,7 +20,7 @@ interface Props {
 	}
 }
 
-const AssignmentTabs: React.FC<Props> = ({ role, assignment }) => {
+export default function AssignmentTabs({ role, assignment }: Props) {
 	const [settingsModalOpen, setSettingsModalOpen] = useState(false)
 
 	const [feedbackLinkCopied, setFeedbackLinkCopied] = useState(false)
@@ -57,7 +56,7 @@ const AssignmentTabs: React.FC<Props> = ({ role, assignment }) => {
 
 						setFeedbackLinkCopied(true)
 					}}
-					className="text-base"
+					size="small"
 				>
 					{!feedbackLinkCopied
 						? "Copy student feedback link"
@@ -83,5 +82,3 @@ const AssignmentTabs: React.FC<Props> = ({ role, assignment }) => {
 		</div>
 	)
 }
-
-export default AssignmentTabs

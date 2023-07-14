@@ -1,4 +1,3 @@
-"use client"
 import * as Dialog from "@radix-ui/react-dialog"
 import { X } from "lucide-react"
 
@@ -10,7 +9,13 @@ interface Props {
 	footer?: React.ReactNode
 }
 
-const Modal: React.FC<Props> = ({ children, title, open, setOpen, footer }) => {
+export default function Modal({
+	children,
+	title,
+	open,
+	setOpen,
+	footer,
+}: Props) {
 	return (
 		<Dialog.Root open={open} onOpenChange={setOpen}>
 			<Dialog.Portal>
@@ -37,5 +42,3 @@ const Modal: React.FC<Props> = ({ children, title, open, setOpen, footer }) => {
 		</Dialog.Root>
 	)
 }
-
-export default Modal

@@ -8,20 +8,18 @@ interface Props<TItem> extends HTMLProps<HTMLUListElement> {
 	renderEmpty: () => React.ReactNode
 }
 
-const UnorderedList = <TItem,>({
+export default function UnorderedList<TItem>({
 	items,
 	renderItem,
 	renderEmpty,
 	className,
 	...props
-}: Props<TItem>) => {
+}: Props<TItem>) {
 	return items.length === 0 ? (
-		renderEmpty()
+		<>{renderEmpty() ?? null}</>
 	) : (
 		<ul {...props} className={cn("space-y-2.5", className)}>
 			{items.map(renderItem)}
 		</ul>
 	)
 }
-
-export default UnorderedList

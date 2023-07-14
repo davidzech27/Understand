@@ -1,12 +1,11 @@
 import { verifySignature } from "@upstash/qstash/nextjs"
-import { type NextApiHandler } from "next"
+import { type NextApiRequest, NextApiResponse } from "next"
 import { z } from "zod"
 
 import callSync from "./callSync"
 import syncRoster from "./syncRoster"
 import syncResources from "./syncResources"
 import syncAssignment from "./syncAssignment"
-import { env } from "~/env.mjs"
 
 const syncCallSchema = z.discriminatedUnion("name", [
 	z.object({
@@ -26,7 +25,7 @@ const syncCallSchema = z.discriminatedUnion("name", [
 
 export type SyncCall = z.infer<typeof syncCallSchema>
 
-const syncHandler: NextApiHandler = async (req, res) => {
+async function syncHandler(req: NextApiRequest, res: NextApiResponse) {
 	console.info("Sync API handler body: ", JSON.stringify(req.body))
 
 	const syncCall = syncCallSchema.parse(req.body)

@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server"
 import { z } from "zod"
-import { env } from "~/env.mjs"
+import env from "env.mjs"
 import { getAuth } from "~/auth/jwt"
 
 const textEncoder = new TextEncoder()
@@ -27,9 +27,9 @@ const requestSchema = z.object({
 	maxTokens: z.number().optional(),
 })
 
-export type OpenAIStreamRequest = z.infer<typeof requestSchema>
+export type OpenAIRequest = z.infer<typeof requestSchema>
 
-const openaiHandler = async (request: NextRequest) => {
+export default async function openaiHandler(request: NextRequest) {
 	if ((await getAuth({ cookies: request.cookies })) === undefined)
 		return new Response("Invalid authorization", { status: 401 })
 
@@ -152,5 +152,3 @@ const openaiHandler = async (request: NextRequest) => {
 		}
 	)
 }
-
-export default openaiHandler

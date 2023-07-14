@@ -4,31 +4,33 @@ import { useRouter } from "next/navigation"
 import { Settings2 } from "lucide-react"
 import { useZact } from "zact/client"
 import * as Form from "@radix-ui/react-form"
+import { Label } from "@radix-ui/react-form"
 
+import updateCourseAction from "./updateCourseAction"
+import deleteCourseAction from "./deleteCourseAction"
+import Heading from "~/components/Heading"
 import LinkButton from "~/components/LinkButton"
 import Button from "~/components/Button"
 import FancyButton from "~/components/FancyButton"
 import TextInput from "~/components/TextInput"
 import Modal from "~/components/Modal"
 import InputList from "~/components/InputList"
-import updateCourseAction from "./updateCourseAction"
-import deleteCourseAction from "./deleteCourseAction"
 
 interface Props {
 	course: { id: string; name: string; section?: string; linkedUrl?: string }
 	teacherEmailsPromise: Promise<string[]>
 	studentEmailsPromise: Promise<string[]>
 	role: "teacher" | "student"
-	anyIndexedResource: boolean
+	hasResources: boolean
 }
 
-const ClassTabs: React.FC<Props> = ({
+export default function ClassTab({
 	course,
 	teacherEmailsPromise,
 	studentEmailsPromise,
 	role,
-	anyIndexedResource,
-}) => {
+	hasResources,
+}: Props) {
 	const [settingsModalOpen, setSettingsModalOpen] = useState(false)
 
 	return (
@@ -44,7 +46,7 @@ const ClassTabs: React.FC<Props> = ({
 					People
 				</LinkButton>
 
-				{anyIndexedResource && (
+				{hasResources && (
 					<LinkButton href={`/class/${course.id}/chat`}>
 						Chat
 					</LinkButton>
@@ -156,8 +158,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 	const onDeleteCourse = async () => {
 		await deleteCourse({ id: course.id })
 
-		router.refresh()
-
 		router.push("/home")
 	}
 
@@ -172,32 +172,39 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 				className="relative h-full"
 			>
 				<div className="absolute top-0 bottom-0 left-0 right-0 flex flex-col space-y-2 overflow-y-scroll pb-[100px]">
-					<div className="ml-1 font-medium opacity-80">Name</div>
+					<Heading asChild size="medium" className="ml-1">
+						<Label htmlFor="name">Name</Label>
+					</Heading>
 
 					<TextInput
 						value={nameInput}
 						setValue={setNameInput}
 						placeholder="Class name"
-						autoComplete="off"
+						id="name"
 						className="h-min py-2.5 pl-4 text-base"
 					/>
 
-					<div className="ml-1 font-medium opacity-80">Section</div>
+					<Heading asChild size="medium" className="ml-1">
+						<Label htmlFor="section">Section</Label>
+					</Heading>
 
 					<TextInput
 						value={sectionInput}
 						setValue={setSectionInput}
 						placeholder="Class section"
-						autoComplete="off"
+						id="section"
 						className="h-min py-2.5 pl-4 text-base"
 					/>
 
-					<div className="ml-1 font-medium opacity-80">Students</div>
+					<Heading asChild size="medium" className="ml-1">
+						<Label htmlFor="students">Students</Label>
+					</Heading>
 
 					<InputList
 						values={studentEmailInputs}
 						setValues={setStudentEmailInputs}
 						singleWord
+						id="students"
 						placeholder="Student email"
 						autoComplete="off"
 						className="h-min"
@@ -205,7 +212,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 						buttonClassName="h-[46px] w-[46px]"
 					/>
 
-					<div className="ml-1 font-medium opacity-80">Teachers</div>
+					<Heading asChild size="medium" className="ml-1">
+						<Label htmlFor="teachers">Teachers</Label>
+					</Heading>
 
 					<InputList
 						values={teacherEmailInputs}
@@ -223,7 +232,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 							onClick={() => setConfirmingDeleteClass(true)}
 							disabled={confirmingDeleteClass}
 							type="button"
-							className="text-lg"
+							size="medium"
 						>
 							Delete class
 						</Button>
@@ -234,7 +243,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 									onClick={onDeleteCourse}
 									type="button"
 									loading={isDeletingCourse}
-									className="text-lg"
+									size="medium"
 								>
 									Do you really want to delete this class?
 								</Button>
@@ -245,7 +254,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 											setConfirmingDeleteClass(false)
 										}
 										type="button"
-										className="text-lg"
+										size="medium"
 									>
 										Actually, never mind
 									</Button>
@@ -260,7 +269,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 						<FancyButton
 							loading={isUpdatingCourse}
 							disabled={updateDisabled}
-							className="h-20 text-3xl"
+							size="large"
+							className="w-1/2"
 						>
 							Done
 						</FancyButton>
@@ -269,7 +279,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 					<Button
 						type="button"
 						onClick={() => setOpen(false)}
-						className="h-20 w-1/2 text-3xl"
+						size="large"
+						className="w-1/2"
 					>
 						Cancel
 					</Button>
@@ -278,5 +289,3 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 		</Modal>
 	)
 }
-
-export default ClassTabs

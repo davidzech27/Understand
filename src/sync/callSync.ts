@@ -1,11 +1,11 @@
-import { type SyncCall } from "./syncAPIRoute"
+import { type SyncCall } from "./syncHandler"
 import qstash from "~/qstash/qstash"
-import { env } from "~/env.mjs"
+import env from "env.mjs"
 
-const callSync = async ({
+export default async function callSync({
 	deduplicationId,
 	...body
-}: SyncCall & { deduplicationId?: string }) => {
+}: SyncCall & { deduplicationId?: string }) {
 	await qstash.publishJSON({
 		url: `${env.NEXT_PUBLIC_URL}/api/sync`,
 		retries: 3,
@@ -13,5 +13,3 @@ const callSync = async ({
 		deduplicationId,
 	})
 }
-
-export default callSync

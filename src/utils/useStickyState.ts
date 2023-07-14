@@ -6,10 +6,10 @@ import {
 	useRef,
 } from "react"
 
-const useStickyState = <S>(
+export default function useStickyState<S>(
 	defaultValue: S,
 	key: string
-): [S, Dispatch<SetStateAction<S>>] => {
+): [S, Dispatch<SetStateAction<S>>] {
 	const [value, setValue] = useState<S>(
 		typeof window !== "undefined"
 			? () => {
@@ -44,5 +44,3 @@ const useStickyState = <S>(
 
 	return [value, setValue]
 }
-
-export default useStickyState

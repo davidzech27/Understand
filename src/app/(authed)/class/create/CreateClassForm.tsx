@@ -1,9 +1,12 @@
 "use client"
-import * as Form from "@radix-ui/react-form"
 import { use, useState } from "react"
-import { useZact } from "zact/client"
+import { useRouter } from "next/navigation"
 import { X } from "lucide-react"
+import { Label } from "@radix-ui/react-label"
+import * as Form from "@radix-ui/react-form"
 
+import createCourseAction from "./createCourseAction"
+import getAuthenticationURL from "~/google/getAuthenticationURL"
 import Heading from "~/components/Heading"
 import TextInput from "~/components/TextInput"
 import Card from "~/components/Card"
@@ -11,12 +14,8 @@ import InputList from "~/components/InputList"
 import Button from "~/components/Button"
 import FancyButton from "~/components/FancyButton"
 import Modal from "~/components/Modal"
-import Avatar from "~/components/Avatar"
 import SelectList from "~/components/SelectList"
 import AttachmentItem from "~/components/AttachmentItem"
-import getAuthenticationURL from "~/google/getAuthenticationURL"
-import createCourseAction from "./createCourseAction"
-import { useRouter } from "next/navigation"
 
 interface Props {
 	coursesPromise: Promise<
@@ -43,19 +42,23 @@ interface Props {
 	emailPromise: Promise<string>
 }
 
-const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
+export default function CreateClassForm({
+	coursesPromise,
+	emailPromise,
+}: Props) {
 	const router = useRouter()
 
-	const { mutate: createCourse, isLoading: isCreatingCourse } =
-		useZact(createCourseAction)
+	const [creating, setCreating] = useState(false)
 
 	const onCreate = async () => {
+		setCreating(true)
+
 		const id =
 			linkedCourse?.id ??
 			new Date().valueOf().toString() +
 				Math.floor(Math.random() * 1_000_000).toString() // milliseconds after epoch appended by 6 random digits
 
-		await createCourse({
+		await createCourseAction({
 			id,
 			name: nameInput.trim(),
 			section: sectionInput.trim() || undefined,
@@ -74,8 +77,6 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 			),
 			linkedUrl: linkedCourse?.url,
 		})
-
-		router.refresh()
 
 		router.push(`/class/${id}`)
 	}
@@ -188,9 +189,9 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 
 	const [nameInput, setNameInput] = useState("")
 	const [sectionInput, setSectionInput] = useState("")
-	const [studentEmailInputs, setStudentEmailInputs] = useState<string[]>([""])
+	const [studentEmailInputs, setStudentEmailInputs] = useState([""])
 	const [additionalTeacherEmailInputs, setAdditionalTeacherEmailInputs] =
-		useState<string[]>([""])
+		useState([""])
 
 	return (
 		<>
@@ -205,7 +206,7 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 				<Card className="space-y-2 px-6 py-5 shadow-sm">
 					<div className="ml-1 font-medium opacity-80">Name</div>
 
-					<Form.Field asChild name="class-name">
+					<Form.Field asChild name="name">
 						<Form.Control asChild>
 							<TextInput
 								value={nameInput}
@@ -220,7 +221,7 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 
 					<div className="ml-1 font-medium opacity-80">Section</div>
 
-					<Form.Field asChild name="class-section">
+					<Form.Field asChild name="section">
 						<Form.Control asChild>
 							<TextInput
 								value={sectionInput}
@@ -234,29 +235,33 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 				</Card>
 
 				<Card className="flex-1 space-y-2 overflow-y-scroll px-6 py-5 shadow-sm">
-					<div className="ml-1 font-medium opacity-80">Students</div>
+					<Heading asChild size="medium" className="ml-1">
+						<Label htmlFor="studentEmailInputs">Students</Label>
+					</Heading>
 
 					<InputList
 						values={studentEmailInputs}
 						setValues={setStudentEmailInputs}
 						singleWord
 						placeholder="Student email"
-						autoComplete="off"
+						id="studentEmailInputs"
 						className="h-min"
 						textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)] h-min"
 						buttonClassName="h-[46px] w-[46px]"
 					/>
 
-					<div className="ml-1 font-medium opacity-80">
-						Additional teachers
-					</div>
+					<Heading asChild size="medium" className="ml-1">
+						<Label htmlFor="additionalTeacherEmailInputs">
+							Additional teachers
+						</Label>
+					</Heading>
 
 					<InputList
 						values={additionalTeacherEmailInputs}
 						setValues={setAdditionalTeacherEmailInputs}
 						singleWord
 						placeholder="Teacher email"
-						autoComplete="off"
+						id="additionalTeacherEmailInputs"
 						className="h-min"
 						textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)] h-min"
 						buttonClassName="h-[46px] w-[46px]"
@@ -264,37 +269,17 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 				</Card>
 
 				<Card className="flex flex-col space-y-2 py-5 px-6 shadow-sm">
-					<div className="ml-1 font-medium opacity-80">
-						Link class
-					</div>
+					<Heading asChild size="medium" className="ml-1">
+						<Label htmlFor="linkCourse">Link class</Label>
+					</Heading>
 
 					{linkedCourse ? (
-						<div className="relative flex h-20 w-full items-center space-x-3 rounded-md border-[0.75px] border-border px-6">
-							<Avatar
-								src={undefined}
+						<div className="relative">
+							<AttachmentItem
 								name={linkedCourse.name}
-								fallbackColor="secondary"
-								className="h-12 w-12"
+								subname={linkedCourse.section}
+								url={linkedCourse.url}
 							/>
-
-							<div className="flex flex-1 flex-col">
-								<div className="flex w-full justify-between">
-									<span className="font-medium opacity-80">
-										{linkedCourse.name}
-									</span>
-
-									<span className="relative top-[2px] text-sm opacity-60">
-										{linkedCourse.section}
-									</span>
-								</div>
-
-								<a
-									href={linkedCourse.url}
-									className="text-sm opacity-60 hover:underline"
-								>
-									{linkedCourse.url}
-								</a>
-							</div>
 
 							<button
 								type="button"
@@ -314,7 +299,8 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 
 								onLink()
 							}}
-							className="h-20 w-full text-3xl"
+							id="linkCourse"
+							size="large"
 						>
 							Link with Google Classroom class
 						</Button>
@@ -324,9 +310,9 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 				<Card className="flex space-x-3 py-5 px-6 shadow-sm">
 					<Form.Submit asChild>
 						<FancyButton
-							loading={isCreatingCourse}
+							loading={creating}
 							disabled={nameInput.length === 0}
-							className="h-20 text-3xl"
+							size="large"
 						>
 							Create
 						</FancyButton>
@@ -360,10 +346,7 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 						reauthenticate with Google.
 					</div>
 
-					<FancyButton
-						onClick={onReauthenticate}
-						className="h-20 text-3xl"
-					>
+					<FancyButton onClick={onReauthenticate} size="large">
 						Reauthenticate
 					</FancyButton>
 				</div>
@@ -386,7 +369,7 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 									name={name}
 									subname={section}
 									url={url}
-									photoUrl={undefined}
+									photo={undefined}
 									key={id}
 									selected={selected}
 								/>
@@ -426,7 +409,7 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 							onClick={onChooseClass}
 							loading={courseLoading}
 							disabled={selectedCourseId === undefined}
-							className="h-20 w-full text-3xl"
+							size="large"
 						>
 							Import class
 						</Button>
@@ -436,5 +419,3 @@ const CreateClassForm: React.FC<Props> = ({ coursesPromise, emailPromise }) => {
 		</>
 	)
 }
-
-export default CreateClassForm

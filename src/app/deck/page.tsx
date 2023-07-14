@@ -4,8 +4,6 @@ export const metadata = {
 	title: "Deck",
 }
 
-const DeckPage = () => {
+export default function DeckPage() {
 	return <Deck />
 }
-
-export default DeckPage

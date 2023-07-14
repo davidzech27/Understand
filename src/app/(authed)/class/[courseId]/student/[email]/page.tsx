@@ -13,11 +13,11 @@ interface Params {
 }
 
 // consider adding stream-like interface. may belong in other places as well
-const StudentPage = async ({
+export default async function StudentPage({
 	params: { courseId, email },
 }: {
 	params: Params
-}) => {
+}) {
 	email = decodeURIComponent(email)
 
 	const studentInsights = (
@@ -69,5 +69,3 @@ const StudentPage = async ({
 		</Card>
 	)
 }
-
-export default StudentPage

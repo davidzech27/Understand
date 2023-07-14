@@ -1,24 +1,24 @@
-import { and, eq } from "drizzle-orm"
-
-import db from "~/db/db"
 import User from "~/data/User"
 import getCompletion from "~/ai/getCompletion"
 import Feedback from "~/data/Feedback"
 
-const generateStudentInsights = async ({
+export default async function generateStudentInsights({
 	courseId,
 	studentEmail,
 }: {
 	courseId: string
 	studentEmail: string
-}) => {
-	const [previousStudentInsights, unsyncedInsights] = await Promise.all([
-		User({ email: studentEmail }).insights({ courseId }),
-		User({ email: studentEmail }).unsyncedInsights({ courseId }),
-	])
+}) {
+	const [previousStudentInsights, unsyncedFeedbackInsights] =
+		await Promise.all([
+			User({ email: studentEmail }).insights({ courseId }),
+			User({ email: studentEmail }).unsyncedFeedbackInsights({
+				courseId,
+			}),
+		])
 
 	const unsyncedAssignmentIdSet = new Set(
-		unsyncedInsights.map((insight) => insight.assignmentId)
+		unsyncedFeedbackInsights.map((insight) => insight.assignmentId)
 	)
 
 	const previousStudentInsightsWithoutUnsynced = previousStudentInsights
@@ -28,12 +28,12 @@ const generateStudentInsights = async ({
 				(source) => !unsyncedAssignmentIdSet.has(source.assignmentId) // consider removing student insight entirely if any of its sources are unsynced. however, then you'd have to fetch all the insights on these student insights, not just the unsynced ones
 			),
 		}))
-		.filter((insight) => insight.sources.length > 0)
+		.filter((insight) => insight.sources.length !== 0)
 
 	const concatenatedInsights = (
 		previousStudentInsightsWithoutUnsynced ?? []
 	).concat(
-		unsyncedInsights
+		unsyncedFeedbackInsights
 			.map((assignmentInsights) =>
 				assignmentInsights.insights.map((insight) => ({
 					type: insight.type,
@@ -142,7 +142,7 @@ Begin.`,
 		}))
 
 	await Promise.all([
-		...unsyncedInsights.map((insight) =>
+		...unsyncedFeedbackInsights.map((insight) =>
 			Feedback({
 				courseId,
 				assignmentId: insight.assignmentId,
@@ -156,5 +156,3 @@ Begin.`,
 		}),
 	])
 }
-
-export default generateStudentInsights

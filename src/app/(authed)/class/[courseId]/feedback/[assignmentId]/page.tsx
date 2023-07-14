@@ -9,11 +9,11 @@ import Feedback from "./Feedback"
 import GoogleAPI from "~/google/GoogleAPI"
 import FeedbackData from "~/data/Feedback"
 
-export const generateMetadata = async ({
+export async function generateMetadata({
 	params: { courseId, assignmentId },
 }: {
 	params: Params
-}) => {
+}) {
 	const assignment = await Assignment({ courseId, assignmentId }).get()
 
 	return {
@@ -28,11 +28,11 @@ interface Params {
 	assignmentId: string
 }
 
-const FeedbackPage = async ({
+export default async function FeedbackPage({
 	params: { courseId, assignmentId },
 }: {
 	params: Params
-}) => {
+}) {
 	const [[role, profile, submissions, feedback], assignment, course] =
 		await Promise.all([
 			getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
@@ -218,5 +218,3 @@ const FeedbackPage = async ({
 		/>
 	)
 }
-
-export default FeedbackPage

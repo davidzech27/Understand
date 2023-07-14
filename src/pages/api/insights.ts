@@ -1,4 +1,4 @@
-import insightsApiRoute from "~/insights/insightsAPIRoute"
+import insightsHandler from "~/insights/insightsHandler"
 
 export const config = {
 	api: {
@@ -6,4 +6,4 @@ export const config = {
 	},
 }
 
-export default insightsApiRoute
+export default insightsHandler

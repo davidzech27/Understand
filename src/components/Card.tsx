@@ -5,7 +5,7 @@ interface Props {
 	className: string
 }
 
-const Card: React.FC<Props> = ({ children, className }) => {
+export default function Card({ children, className }: Props) {
 	return (
 		<div
 			className={cn(
@@ -17,5 +17,3 @@ const Card: React.FC<Props> = ({ children, className }) => {
 		</div>
 	)
 }
-
-export default Card

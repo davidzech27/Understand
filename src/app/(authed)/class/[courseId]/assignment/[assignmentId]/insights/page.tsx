@@ -16,11 +16,11 @@ interface Params {
 	assignmentId: string
 }
 
-const AssignmentInsightsPage = async ({
+export default async function AssignmentInsightsPage({
 	params: { courseId, assignmentId },
 }: {
 	params: Params
-}) => {
+}) {
 	const assignmentInsights = (
 		await Assignment({
 			courseId,
@@ -88,5 +88,3 @@ const AssignmentInsightsPage = async ({
 		</Card>
 	)
 }
-
-export default AssignmentInsightsPage

@@ -3,7 +3,7 @@ import { useRef, useState } from "react"
 import { Send } from "lucide-react"
 
 import getSimilarResourcesAction from "./getSimilarResourcesAction"
-import fetchOpenAIStream from "~/ai/fetchOpenAIStream"
+import fetchOpenAI from "~/ai/fetchOpenAI"
 import TextArea from "~/components/TextArea"
 import cn from "~/utils/cn"
 
@@ -13,7 +13,7 @@ interface Props {
 	role: "teacher" | "student"
 }
 
-const Chat: React.FC<Props> = ({ courseId, courseName, role }) => {
+export default function Chat({ courseId, courseName, role }: Props) {
 	const [messageInput, setMessageInput] = useState("")
 
 	const [messages, setMessages] = useState<string[]>([])
@@ -41,7 +41,7 @@ const Chat: React.FC<Props> = ({ courseId, courseName, role }) => {
 			})
 		}, 10)
 
-		fetchOpenAIStream({
+		fetchOpenAI({
 			messages: [
 				{ role: "system", content: "You are helpful and descriptive." },
 				{
@@ -72,7 +72,7 @@ Respond with something that sounds like it could be content posted by the teache
 
 				console.info("Similar resources: ", similarResources)
 
-				fetchOpenAIStream({
+				fetchOpenAI({
 					messages: [
 						{
 							role: "system",
@@ -191,5 +191,3 @@ ${newMessages[0]}`,
 		</div>
 	)
 }
-
-export default Chat

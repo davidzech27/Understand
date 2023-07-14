@@ -3,7 +3,7 @@ import { cookies } from "next/headers"
 import { zact } from "zact/server"
 import { z } from "zod"
 
-import Feedback, { insightsSchema } from "~/data/Feedback"
+import Feedback, { feedbackInsightsSchema } from "~/data/Feedback"
 import User from "~/data/User"
 import { getAuthOrThrow } from "~/auth/jwt"
 
@@ -13,7 +13,7 @@ const registerInsightsAction = zact(
 		assignmentId: z.string(),
 		givenAt: z.date(),
 		submissionHTML: z.string(),
-		insights: insightsSchema,
+		insights: feedbackInsightsSchema,
 	})
 )(async ({ courseId, assignmentId, givenAt, submissionHTML, insights }) => {
 	const { email } = await getAuthOrThrow({ cookies: cookies() })

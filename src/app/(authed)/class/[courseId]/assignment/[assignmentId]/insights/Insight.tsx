@@ -23,7 +23,7 @@ interface Props {
 	}[]
 }
 
-const Insight: React.FC<Props> = ({ type, content, sources }) => {
+export default function Insight({ type, content, sources }: Props) {
 	const { hoverProps, isHovered } = useHover({})
 
 	const sourceListRef = useRef<HTMLDivElement>(null)
@@ -189,5 +189,3 @@ const SubmissionPreview: React.FC<SubmissionPreviewProps> = ({
 		</>
 	)
 }
-
-export default Insight

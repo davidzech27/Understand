@@ -1,11 +1,11 @@
-import { type GenerateCall } from "./insightsAPIRoute"
+import { type GenerateCall } from "./insightsHandler"
 import qstash from "~/qstash/qstash"
-import { env } from "~/env.mjs"
+import env from "env.mjs"
 
-const callGenerate = async ({
+export default async function callGenerate({
 	deduplicationId,
 	...body
-}: GenerateCall & { deduplicationId?: string }) => {
+}: GenerateCall & { deduplicationId?: string }) {
 	await qstash.publishJSON({
 		url: `${env.NEXT_PUBLIC_URL}/api/insights`,
 		retries: 3,
@@ -13,5 +13,3 @@ const callGenerate = async ({
 		deduplicationId,
 	})
 }
-
-export default callGenerate

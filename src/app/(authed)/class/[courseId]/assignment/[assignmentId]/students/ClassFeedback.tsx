@@ -1,5 +1,4 @@
 "use client"
-import Link from "next/link"
 
 import UnorderedList from "~/components/UnorderedList"
 import UserItem from "~/components/UserItem"
@@ -16,11 +15,11 @@ interface Props {
 	}[]
 }
 
-const ClassFeedback: React.FC<Props> = ({
+export default function ClassFeedback({
 	courseId,
 	assignmentId,
 	students,
-}) => {
+}: Props) {
 	return (
 		<UnorderedList
 			items={students}
@@ -82,5 +81,3 @@ const ClassFeedback: React.FC<Props> = ({
 		/>
 	)
 }
-
-export default ClassFeedback

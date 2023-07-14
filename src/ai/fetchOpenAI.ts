@@ -1,9 +1,9 @@
-import { type OpenAIStreamRequest } from "./openAIEdgeRoute"
+import { type OpenAIRequest } from "./openAIHandler"
 
 const textEncoder = new TextEncoder()
 const textDecoder = new TextDecoder()
 
-const fetchOpenAIStream = async ({
+export default async function fetchOpenAI({
 	messages,
 	model,
 	temperature,
@@ -12,10 +12,10 @@ const fetchOpenAIStream = async ({
 	maxTokens,
 	onContent,
 	onFinish,
-}: OpenAIStreamRequest & {
+}: OpenAIRequest & {
 	onContent: (content: string) => void
 	onFinish: (content: string) => void
-}) => {
+}) {
 	const response = await fetch("/api/openai", {
 		method: "POST",
 		body: textEncoder.encode(
@@ -52,5 +52,3 @@ const fetchOpenAIStream = async ({
 		console.error("This shouldn't happen")
 	}
 }
-
-export default fetchOpenAIStream

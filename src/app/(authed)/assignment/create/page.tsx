@@ -1,8 +1,8 @@
 import { cookies } from "next/headers"
 
-import CreateAssignmentForm from "./CreateAssignmentForm"
 import { getAuthOrThrow } from "~/auth/jwt"
 import User from "~/data/User"
+import CreateAssignmentForm from "./CreateAssignmentForm"
 
 export const metadata = {
 	title: "Create assignment",
@@ -10,14 +10,12 @@ export const metadata = {
 
 export const runtime = "edge"
 
-const AssignmentCreatePage = () => {
-	const coursesTeachingPromise = getAuthOrThrow({ cookies: cookies() })
-		.then(({ email }) => User({ email }).courses())
-		.then((courses) => courses.teaching)
+export default function AssignmentCreatePage() {
+	const coursesTeachingPromise = getAuthOrThrow({ cookies: cookies() }).then(
+		({ email }) => User({ email }).coursesTeaching()
+	)
 
 	return (
 		<CreateAssignmentForm coursesTeachingPromise={coursesTeachingPromise} />
 	)
 }
-
-export default AssignmentCreatePage

@@ -1,4 +1,3 @@
-"use client"
 import { Slot } from "@radix-ui/react-slot"
 
 import UnorderedList from "./UnorderedList"
@@ -23,7 +22,7 @@ interface Props<TItem extends { id: string }> {
 	className?: string
 }
 
-const SelectList = <TItem extends { id: string }>({
+export default function SelectList<TItem extends { id: string }>({
 	items,
 	renderItem,
 	renderEmpty,
@@ -31,7 +30,7 @@ const SelectList = <TItem extends { id: string }>({
 	selectionSet,
 	setSelectionSet,
 	className,
-}: Props<TItem>) => {
+}: Props<TItem>) {
 	const onAction = (itemId: string) => {
 		if (selectionType !== "none") {
 			setSelectionSet((selectionSet) => {
@@ -85,5 +84,3 @@ const SelectList = <TItem extends { id: string }>({
 		/>
 	)
 }
-
-export default SelectList

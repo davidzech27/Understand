@@ -1,4 +1,3 @@
-"use client"
 import { useEffect, useRef, useState } from "react"
 import { produce } from "immer"
 import { Plus } from "lucide-react"
@@ -11,26 +10,26 @@ interface Props {
 	setValues: (updater: string[] | ((values: string[]) => string[])) => void
 	singleWord?: boolean
 	placeholder?: string
+	autoComplete?: string
 	className?: string
 	textInputClassname?: string
 	buttonClassName?: string
 	id?: string
 	name?: string
-	autoComplete: string
 }
 
-const InputList: React.FC<Props> = ({
+export default function InputList({
 	values,
 	setValues,
 	singleWord = false,
 	placeholder,
+	autoComplete,
 	className,
 	textInputClassname,
 	buttonClassName,
 	id,
 	name,
-	autoComplete,
-}) => {
+}: Props) {
 	const wordsSplit = useRef(false)
 
 	useEffect(() => {
@@ -77,9 +76,9 @@ const InputList: React.FC<Props> = ({
 							})
 						)
 					}
+					autoComplete={autoComplete}
 					id={id}
 					name={name}
-					autoComplete={autoComplete}
 					onKeyDown={(e) => {
 						if (e.key === "Enter") {
 							e.preventDefault()
@@ -117,5 +116,3 @@ const InputList: React.FC<Props> = ({
 		</div>
 	)
 }
-
-export default InputList

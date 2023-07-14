@@ -1,10 +1,10 @@
 "use client"
-import { useEffect } from "react"
+import React, { useEffect } from "react"
 import { usePathname, useSearchParams } from "next/navigation"
 import posthog from "posthog-js"
 import { PostHogProvider } from "posthog-js/react"
 
-import { env } from "~/env.mjs"
+import env from "env.mjs"
 
 if (typeof window !== "undefined") {
 	posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
@@ -15,11 +15,7 @@ if (typeof window !== "undefined") {
 	})
 }
 
-interface Props {
-	children: React.ReactNode
-}
-
-const Providers: React.FC<Props> = ({ children }) => {
+export default function Providers({ children }: React.PropsWithChildren) {
 	const pathname = usePathname()
 	const searchParams = useSearchParams()
 
@@ -38,5 +34,3 @@ const Providers: React.FC<Props> = ({ children }) => {
 
 	return <PostHogProvider client={posthog}>{children}</PostHogProvider>
 }
-
-export default Providers

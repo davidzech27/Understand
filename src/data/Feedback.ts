@@ -4,7 +4,7 @@ import { z } from "zod"
 import db from "~/db/db"
 import { feedback, followUp } from "~/db/schema"
 
-export const insightsSchema = z
+export const feedbackInsightsSchema = z
 	.object({
 		type: z.enum(["strength", "weakness"]),
 		paragraphs: z.number().array(),
@@ -12,7 +12,7 @@ export const insightsSchema = z
 	})
 	.array()
 
-type Insights = z.infer<typeof insightsSchema>
+type FeedbackInsights = z.infer<typeof feedbackInsightsSchema>
 
 const Feedback = ({
 	courseId,
@@ -68,6 +68,78 @@ const Feedback = ({
 			submissionHTML: row.submissionHTML ?? "",
 			rawResponse: row.rawResponse,
 		}
+	},
+	update: async ({
+		submissionHTML,
+		insights,
+	}: {
+		submissionHTML?: string
+		insights?: FeedbackInsights
+	}) => {
+		await db
+			.update(feedback)
+			.set({
+				submissionHTML,
+				insights,
+			})
+			.where(
+				and(
+					eq(feedback.courseId, courseId),
+					eq(feedback.assignmentId, assignmentId),
+					eq(feedback.userEmail, userEmail),
+					eq(feedback.givenAt, givenAt)
+				)
+			)
+	},
+	delete: async () => {
+		await Promise.all([
+			db
+				.delete(feedback)
+				.where(
+					and(
+						eq(feedback.courseId, courseId),
+						eq(feedback.assignmentId, assignmentId),
+						eq(feedback.userEmail, userEmail),
+						eq(feedback.givenAt, givenAt)
+					)
+				),
+			db
+				.delete(followUp)
+				.where(
+					and(
+						eq(followUp.courseId, courseId),
+						eq(followUp.assignmentId, assignmentId),
+						eq(followUp.userEmail, userEmail),
+						eq(followUp.feedbackGivenAt, givenAt)
+					)
+				),
+		])
+	},
+	addFollowUp: async ({
+		paragraphNumber,
+		sentenceNumber,
+		query,
+		rawResponse,
+		metadata,
+	}: {
+		paragraphNumber: number | undefined
+		sentenceNumber: number | undefined
+		query: string
+		rawResponse: string
+		metadata: Record<string, unknown>
+	}) => {
+		await db.insert(followUp).values({
+			courseId,
+			assignmentId,
+			userEmail,
+			feedbackGivenAt: givenAt,
+			givenAt: new Date(),
+			paragraphNumber,
+			sentenceNumber,
+			query,
+			rawResponse,
+			metadata,
+		})
 	},
 	followUps: async () => {
 		const rows = await db
@@ -186,37 +258,19 @@ const Feedback = ({
 
 		return (
 			row && {
-				insights: insightsSchema.parse(row.insights),
+				insights: feedbackInsightsSchema.parse(row.insights),
 				submissionHTML: row.submissionHTML,
 			}
 		)
 	},
-	update: async ({
-		submissionHTML,
-		insights,
+	updateSynced: async ({
+		insights: oldInsights,
 	}: {
-		submissionHTML?: string
-		insights?: Insights
+		insights: FeedbackInsights
 	}) => {
-		await db
-			.update(feedback)
-			.set({
-				submissionHTML,
-				insights,
-			})
-			.where(
-				and(
-					eq(feedback.courseId, courseId),
-					eq(feedback.assignmentId, assignmentId),
-					eq(feedback.userEmail, userEmail),
-					eq(feedback.givenAt, givenAt)
-				)
-			)
-	},
-	updateSynced: async ({ insights: oldInsights }: { insights: Insights }) => {
 		await db.transaction(
 			async (tx) => {
-				const newInsights = insightsSchema.parse(
+				const newInsights = feedbackInsightsSchema.parse(
 					(
 						await tx
 							.select({ insights: feedback.insights })
@@ -252,56 +306,6 @@ const Feedback = ({
 				isolationLevel: "serializable",
 			}
 		)
-	},
-	delete: async () => {
-		await Promise.all([
-			db
-				.delete(feedback)
-				.where(
-					and(
-						eq(feedback.courseId, courseId),
-						eq(feedback.assignmentId, assignmentId),
-						eq(feedback.userEmail, userEmail),
-						eq(feedback.givenAt, givenAt)
-					)
-				),
-			db
-				.delete(followUp)
-				.where(
-					and(
-						eq(followUp.courseId, courseId),
-						eq(followUp.assignmentId, assignmentId),
-						eq(followUp.userEmail, userEmail),
-						eq(followUp.feedbackGivenAt, givenAt)
-					)
-				),
-		])
-	},
-	addFollowUp: async ({
-		paragraphNumber,
-		sentenceNumber,
-		query,
-		rawResponse,
-		metadata,
-	}: {
-		paragraphNumber: number | undefined
-		sentenceNumber: number | undefined
-		query: string
-		rawResponse: string
-		metadata: Record<string, unknown>
-	}) => {
-		await db.insert(followUp).values({
-			courseId,
-			assignmentId,
-			userEmail,
-			feedbackGivenAt: givenAt,
-			givenAt: new Date(),
-			paragraphNumber,
-			sentenceNumber,
-			query,
-			rawResponse,
-			metadata,
-		})
 	},
 })
 

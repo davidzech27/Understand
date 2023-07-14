@@ -16,7 +16,7 @@ interface Props {
 	}
 }
 
-const Instructions: React.FC<Props> = ({ assignment }) => {
+export default function Instructions({ assignment }: Props) {
 	const [settingsModalOpen, setSettingsModalOpen] = useState(false)
 
 	return (
@@ -36,5 +36,3 @@ const Instructions: React.FC<Props> = ({ assignment }) => {
 		</>
 	)
 }
-
-export default Instructions

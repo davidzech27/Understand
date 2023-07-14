@@ -11,13 +11,13 @@ interface Props {
 	className: string
 }
 
-const Avatar: React.FC<Props> = ({
+export default function Avatar({
 	src,
 	name,
 	fallbackColor,
 	border,
 	className,
-}) => {
+}: Props) {
 	const [isError, setIsError] = useState(false)
 
 	const fallback = name?.[0] ? (
@@ -60,5 +60,3 @@ const Avatar: React.FC<Props> = ({
 		<div className={className}>{fallback}</div>
 	)
 }
-
-export default Avatar

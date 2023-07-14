@@ -1,5 +1,5 @@
 import breakIntoSentences from "~/utils/breakIntoSentences"
-import fetchOpenAIStream from "./fetchOpenAIStream"
+import fetchOpenAI from "./fetchOpenAI"
 
 // old comments, may not be relevant anymore:
 // specific feedback needs to ask a question or make an insightful comment to guide the student to a deeper understanding of the subject matter.
@@ -10,7 +10,7 @@ import fetchOpenAIStream from "./fetchOpenAIStream"
 // currently feedback is too certain of itself and not varied. not very interesting feedback and doesn't go beyond the absolute surface level when providing reasoning.
 // needs to be more holistic. needs to understand that to improve one's writing, you must focus on elevating their strengths and reducing their weaknesses. don't suggest an improvement that has no bearing on the student's existing work.
 // perhaps being wrong isn't the worst thing, as it could train students to defend their essay. shouldn't be a feature though
-const getFeedback = ({
+export default async function getFeedback({
 	instructions,
 	submission,
 	studentName,
@@ -44,7 +44,7 @@ const getFeedback = ({
 		specificFeedback: string
 		generalFeedback: string
 	}) => void
-}) => {
+}) {
 	let lastParagraphNumber = undefined as number | undefined
 	let lastSentenceNumber = undefined as number | undefined
 
@@ -117,8 +117,8 @@ Begin.`,
 			presencePenalty: 0.5, // setting this and the one below made a huge difference. my theory is that it decreases the model's bias to take on a similar writing style to that of the prompt, increasing its likelihood to follow the instructions and not just attempt to match them in style. consider tweaking these further
 			frequencyPenalty: 0.5,
 		}
-
-	fetchOpenAIStream({
+	console.log(messages.map(({ content }) => content).join("\n\n\n\n"))
+	fetchOpenAI({
 		messages,
 		model,
 		temperature,
@@ -240,5 +240,3 @@ Begin.`,
 		},
 	})
 }
-
-export default getFeedback

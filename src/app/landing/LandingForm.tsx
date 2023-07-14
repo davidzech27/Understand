@@ -1,33 +1,38 @@
 "use client"
-import { useState, use } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import * as Form from "@radix-ui/react-form"
-import { useZact } from "zact/client"
 import { usePostHog } from "posthog-js/react"
 
+import updateNameAction from "./updateNameAction"
 import TextInput from "~/components/TextInput"
 import FancyButton from "~/components/FancyButton"
-import updateNameAction from "./updateNameAction"
 
-type Props =
-	| {
-			profilePromise: Promise<{
-				email: string
-				name: string
-				photo?: string
-			}>
-	  }
-	| { loading: true }
+interface Props {
+	profilePromise: Promise<{
+		email: string
+		name: string
+		photo?: string
+	}>
+}
 
-const LandingForm: React.FC<Props> = (props) => {
-	const loading = "loading" in props
+export default function LandingForm({ profilePromise }: Props) {
+	const [profile, setProfile] = useState<{
+		email: string
+		name: string
+		photo?: string
+	}>()
 
-	const profile = loading ? undefined : use(props.profilePromise)
+	useEffect(() => {
+		profilePromise.then((profile) => {
+			setProfile(profile)
+			setNameInput(profile.name)
+		})
+	}, [profilePromise])
 
 	const [nameInput, setNameInput] = useState(profile?.name ?? "")
 
-	const { mutate: updateName, isLoading: isUpdatingName } =
-		useZact(updateNameAction)
+	const [going, setGoing] = useState(false)
 
 	const router = useRouter()
 
@@ -36,6 +41,8 @@ const LandingForm: React.FC<Props> = (props) => {
 	const onGo = async () => {
 		if (!profile) return
 
+		setGoing(true)
+
 		posthog &&
 			posthog.identify(profile.email, {
 				email: profile.email,
@@ -43,11 +50,7 @@ const LandingForm: React.FC<Props> = (props) => {
 				photo: profile.photo,
 			})
 
-		await Promise.all([await updateName({ name: nameInput.trim() })])
-
-		localStorage.setItem("landed-2.0", "true")
-
-		router.refresh()
+		await updateNameAction({ name: nameInput.trim() })
 
 		router.push("/home")
 	}
@@ -72,10 +75,12 @@ const LandingForm: React.FC<Props> = (props) => {
 					asChild
 					className="my-8 flex h-12 flex-col space-y-4"
 				>
-					{loading ? (
+					{profile === undefined ? (
 						<TextInput
-							value=""
-							setValue={() => {}}
+							value={nameInput}
+							setValue={setNameInput}
+							placeholder=""
+							autoFocus
 							autoComplete="name"
 							className="text-lg"
 						/>
@@ -95,9 +100,9 @@ const LandingForm: React.FC<Props> = (props) => {
 			<Form.Submit asChild>
 				<div>
 					<FancyButton
-						disabled={!loading && nameInput.length === 0}
-						loading={isUpdatingName}
-						className="h-20 text-3xl"
+						size="large"
+						disabled={nameInput.length === 0}
+						loading={going}
 					>
 						Let&apos;s go
 					</FancyButton>
@@ -108,5 +113,3 @@ const LandingForm: React.FC<Props> = (props) => {
 		</Form.Root>
 	)
 }
-
-export default LandingForm

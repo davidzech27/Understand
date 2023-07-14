@@ -2,7 +2,7 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 
-const ReviewScroller = () => {
+export default function ReviewScroller() {
 	const [scrollerHovered, setScrollerHovered] = useState(false) // in the future use this to slow down scrolling. https://stackoverflow.com/questions/70263043/change-animation-duration-without-reset-on-framer-motion
 
 	return (
@@ -43,5 +43,3 @@ const ReviewScroller = () => {
 		</div>
 	)
 }
-
-export default ReviewScroller

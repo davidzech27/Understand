@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 
 import cn from "~/utils/cn"
 
-const Deck = () => {
+export default function Deck() {
 	const slides = [
 		<div key={0} className="w-full space-y-[2.870813397vw]">
 			<div className="text-[11.4832535885vw] font-semibold leading-none tracking-tight text-white">
@@ -126,8 +126,6 @@ const Deck = () => {
 		</div>
 	)
 }
-
-export default Deck
 
 // some spoken lines
 // and this is especially true at the beginning of the year

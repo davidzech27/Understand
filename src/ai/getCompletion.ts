@@ -1,6 +1,6 @@
-import { env } from "~/env.mjs"
+import env from "env.mjs"
 
-const getCompletion = async ({
+export default async function getCompletion({
 	messages,
 	model,
 	temperature,
@@ -18,7 +18,7 @@ const getCompletion = async ({
 	presencePenalty: number
 	frequencyPenalty: number
 	maxTokens?: number
-}) => {
+}) {
 	const response = (await (
 		await fetch("https://api.openai.com/v1/chat/completions", {
 			method: "POST",
@@ -45,5 +45,3 @@ const getCompletion = async ({
 
 	return response.choices[0].message.content
 }
-
-export default getCompletion

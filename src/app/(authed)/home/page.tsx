@@ -1,18 +1,11 @@
 import { cookies } from "next/headers"
-import { and, eq, gt, isNotNull, isNull, or } from "drizzle-orm"
-import Link from "next/link"
 
-import Card from "~/components/Card"
-import User from "~/data/User"
 import { getAuthOrThrow } from "~/auth/jwt"
-import db from "~/db/db"
-import {
-	course,
-	teacherToCourse,
-	studentToCourse,
-	assignment,
-} from "~/db/schema"
-import UpcomingAssignments from "./UpcomingAssignments"
+import User from "~/data/User"
+import Card from "~/components/Card"
+import UnorderedList from "~/components/UnorderedList"
+import AssignmentItem from "~/components/AssignmentItem"
+import Heading from "~/components/Heading"
 
 export const metadata = {
 	title: "Home",
@@ -20,7 +13,7 @@ export const metadata = {
 
 export const runtime = "edge"
 
-const HomePage = async () => {
+export default async function HomePage() {
 	const { email } = await getAuthOrThrow({ cookies: cookies() })
 
 	const { assignmentsTeaching, assignmentsEnrolled, isEnrolled, isTeaching } =
@@ -29,39 +22,77 @@ const HomePage = async () => {
 	return (
 		<Card className="flex h-full flex-col justify-between overflow-y-scroll border py-5 px-6 shadow-lg">
 			{!isTeaching && !isEnrolled ? (
-				<span className="opacity-60">
+				<Heading size="medium">
 					You&apos;re not teaching or enrolled in any classes. Either
 					ask a teacher for an invite or use the plus button in the
 					upper right corner to create one
-				</span>
+				</Heading>
 			) : (
 				<div className="flex flex-col space-y-2">
 					{isEnrolled ? (
 						<>
-							<div className="ml-1 text-lg font-medium opacity-60">
+							<Heading size="large" className="ml-1">
 								{!isTeaching
 									? "Upcoming assignments"
 									: "Upcoming assignments to do"}
-							</div>
+							</Heading>
 
-							<UpcomingAssignments
-								assignments={assignmentsEnrolled}
-								role="student"
+							<UnorderedList
+								items={assignmentsEnrolled}
+								renderItem={({
+									courseId,
+									assignmentId,
+									title,
+									dueAt,
+								}) => (
+									<AssignmentItem
+										title={title}
+										dueAt={dueAt}
+										href={`/class/${courseId}/feedback/${assignmentId}`}
+										key={assignmentId}
+									/>
+								)}
+								renderEmpty={() => (
+									<Heading size="large" className="ml-1">
+										This is where you&apos;ll see the
+										upcoming assignments for all the classes
+										you&apos;re in
+									</Heading>
+								)}
 							/>
 						</>
 					) : null}
 
 					{isTeaching ? (
 						<>
-							<div className="ml-1 text-lg font-medium opacity-60">
+							<Heading size="large" className="ml-1">
 								{!isEnrolled
 									? "Upcoming assignments"
 									: "Upcoming assignments to review"}
-							</div>
+							</Heading>
 
-							<UpcomingAssignments
-								assignments={assignmentsTeaching}
-								role="teacher"
+							<UnorderedList
+								items={assignmentsTeaching}
+								renderItem={({
+									courseId,
+									assignmentId,
+									title,
+									dueAt,
+								}) => (
+									<AssignmentItem
+										title={title}
+										dueAt={dueAt}
+										href={`/class/${courseId}/assignment/${assignmentId}`}
+										key={assignmentId}
+									/>
+								)}
+								renderEmpty={() => (
+									<Heading size="large" className="ml-1">
+										This is where you&apos;ll see the
+										upcoming assignments for all the classes
+										you&apos;re teaching
+									</Heading>
+								)}
 							/>
 						</>
 					) : null}
@@ -70,5 +101,3 @@ const HomePage = async () => {
 		</Card>
 	)
 }
-
-export default HomePage

@@ -1,4 +1,4 @@
-const formatDate = (date: Date) => {
+export default function formatDate(date: Date) {
 	const timeString = `${
 		(date.getHours() % 12) + (date.getHours() % 12 === 0 ? 12 : 0)
 	}:${date.getMinutes() < 10 ? "0" : ""}${date.getMinutes()} ${
@@ -13,5 +13,3 @@ const formatDate = (date: Date) => {
 			.join(" ")}, ${timeString}`
 	else return `${date.toLocaleDateString()}, ${timeString}`
 }
-
-export default formatDate

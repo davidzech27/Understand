@@ -3,10 +3,14 @@ import Link from "next/link"
 
 import SideBar from "./SideBar"
 import TopActions from "./TopActions"
-import colors from "~/colors.cjs"
 import Card from "~/components/Card"
+import GradientText from "~/components/GradientText"
 
-const AuthedLayout = ({ children }: { children: React.ReactNode }) => {
+export default function AuthedLayout({
+	children,
+}: {
+	children: React.ReactNode
+}) {
 	return (
 		<div className="flex h-screen flex-col space-y-2.5 px-3 py-2.5">
 			<nav className="flex h-8 items-center space-x-3">
@@ -15,17 +19,11 @@ const AuthedLayout = ({ children }: { children: React.ReactNode }) => {
 						href="/"
 						className="transition-opacity duration-150 hover:opacity-75"
 					>
-						<span
-							style={{
-								background: `linear-gradient(45deg, ${colors.primary}, ${colors.secondary})`,
-								WebkitBackgroundClip: "text",
-								backgroundClip: "text",
-								color: "transparent",
-							}}
-							className="cursor-pointer text-2xl font-semibold"
-						>
-							Understand
-						</span>
+						<GradientText asChild>
+							<span className="cursor-pointer text-2xl font-semibold">
+								Understand
+							</span>
+						</GradientText>
 					</Link>
 				</div>
 
@@ -52,5 +50,3 @@ const AuthedLayout = ({ children }: { children: React.ReactNode }) => {
 		</div>
 	)
 }
-
-export default AuthedLayout

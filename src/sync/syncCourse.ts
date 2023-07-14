@@ -1,6 +1,6 @@
 import callSync from "./callSync"
 
-const syncCourse = async ({ id }: { id: string }) => {
+export default async function syncCourse({ id }: { id: string }) {
 	await Promise.all([
 		callSync({
 			name: "roster",
@@ -18,5 +18,3 @@ const syncCourse = async ({ id }: { id: string }) => {
 		}),
 	])
 }
-
-export default syncCourse

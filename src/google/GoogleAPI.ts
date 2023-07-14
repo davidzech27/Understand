@@ -126,7 +126,11 @@ const studentSubmissionAttachmentSchema = z.discriminatedUnion("type", [
 	}),
 ])
 
-const GoogleAPI = async ({ refreshToken }: { refreshToken: string }) => {
+export default async function GoogleAPI({
+	refreshToken,
+}: {
+	refreshToken: string
+}) {
 	const accessToken = (await getCredentialsFromRefreshToken(refreshToken))
 		.accessToken
 
@@ -1052,5 +1056,3 @@ const GoogleAPI = async ({ refreshToken }: { refreshToken: string }) => {
 		},
 	}
 }
-
-export default GoogleAPI

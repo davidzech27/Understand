@@ -9,7 +9,7 @@ interface Props extends React.PropsWithChildren {
 	className?: string
 }
 
-const LinkButton: React.FC<Props> = ({ children, href, className }) => {
+export default function LinkButton({ children, href, className }: Props) {
 	const pathname = usePathname()
 
 	return (
@@ -28,5 +28,3 @@ const LinkButton: React.FC<Props> = ({ children, href, className }) => {
 		</Link>
 	)
 }
-
-export default LinkButton

@@ -20,11 +20,11 @@ interface Props {
 	cursor: number | undefined
 }
 
-const FeedbackHistory: React.FC<Props> = ({
+export default function FeedbackHistory({
 	courseId,
 	initialFeedbackHistory,
 	cursor: cursorProp,
-}) => {
+}: Props) {
 	const [feedbackHistory, setFeedbackHistory] = useState(
 		initialFeedbackHistory
 	)
@@ -95,27 +95,15 @@ const FeedbackHistory: React.FC<Props> = ({
 				)
 			)}
 
-			{
-				cursor && (
-					<Button
-						onClick={onLoadMore}
-						loading={isLoadingMore}
-						className="h-20 text-3xl"
-					>
-						Load more
-					</Button>
-				)
-				// <button
-				// 	onClick={onLoadMore}
-				// 	className="h-20 w-full rounded-md border-[0.75px] border-border transition duration-150 hover:bg-surface-hover"
-				// >
-				// 	<span className="text-3xl font-medium opacity-80">
-				// 		Load more
-				// 	</span>
-				// </button>
-			}
+			{cursor && (
+				<Button
+					onClick={onLoadMore}
+					loading={isLoadingMore}
+					size="large"
+				>
+					Load more
+				</Button>
+			)}
 		</>
 	)
 }
-
-export default FeedbackHistory

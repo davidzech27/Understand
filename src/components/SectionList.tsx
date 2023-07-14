@@ -20,11 +20,11 @@ interface Props<TItem> {
 	className?: string
 }
 
-const SectionList = <TItem,>({
+export default function SectionList<TItem>({
 	sections,
 	headingSize,
 	className,
-}: Props<TItem>) => {
+}: Props<TItem>) {
 	return (
 		<div className={className}>
 			{sections.map(
@@ -50,5 +50,3 @@ const SectionList = <TItem,>({
 		</div>
 	)
 }
-
-export default SectionList

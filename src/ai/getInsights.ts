@@ -1,6 +1,6 @@
-import fetchOpenAIStream from "./fetchOpenAIStream"
+import fetchOpenAI from "./fetchOpenAI"
 
-const getInsights = async ({
+export default async function getInsights({
 	instructions,
 	submission,
 	specificFeedback,
@@ -10,9 +10,9 @@ const getInsights = async ({
 	submission: string
 	specificFeedback: string
 	generalFeedback: string
-}) => {
+}) {
 	const completion = await new Promise<string>((res) =>
-		fetchOpenAIStream({
+		fetchOpenAI({
 			messages: [
 				{
 					role: "system",
@@ -90,5 +90,3 @@ Begin.`,
 		rawResponse: completion,
 	}
 }
-
-export default getInsights

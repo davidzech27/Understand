@@ -6,7 +6,6 @@ import cn from "../utils/cn"
 interface Props extends HTMLProps<HTMLInputElement> {
 	value: string
 	setValue: (value: string) => void
-	autoComplete: string
 }
 
 const TextInput = forwardRef<HTMLInputElement, Props>(

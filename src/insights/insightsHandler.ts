@@ -1,9 +1,7 @@
-import { and, eq } from "drizzle-orm"
 import { verifySignature } from "@upstash/qstash/nextjs"
-import { type NextApiHandler } from "next"
+import { type NextApiRequest, NextApiResponse } from "next"
 import { z } from "zod"
 
-import db from "~/db/db"
 import callGenerate from "./callGenerate"
 import generateStudentInsights from "./generateStudentInsights"
 import generateAssignmentInsights from "./generateAssignmentInsights"
@@ -28,22 +26,26 @@ const generateCallSchema = z.discriminatedUnion("name", [
 
 export type GenerateCall = z.infer<typeof generateCallSchema>
 
-const insightsHandler: NextApiHandler = async (req, res) => {
+async function insightsHandler(req: NextApiRequest, res: NextApiResponse) {
 	console.info("Insights API handler body: ", JSON.stringify(req.body))
 
 	const generateCall = generateCallSchema.parse(req.body)
 
 	if (generateCall.name === "course") {
-		const unsyncedInsights = await Course({
+		const unsyncedFeedbackInsights = await Course({
 			id: generateCall.courseId,
-		}).unsyncedInsights()
+		}).unsyncedFeedbackInsights()
 
 		const unsyncedAssignmentIds = [
-			...new Set(unsyncedInsights.map((insight) => insight.assignmentId)),
+			...new Set(
+				unsyncedFeedbackInsights.map((insight) => insight.assignmentId)
+			),
 		]
 
 		const unsyncedStudentEmails = [
-			...new Set(unsyncedInsights.map((insight) => insight.studentEmail)),
+			...new Set(
+				unsyncedFeedbackInsights.map((insight) => insight.studentEmail)
+			),
 		]
 
 		await Promise.all([

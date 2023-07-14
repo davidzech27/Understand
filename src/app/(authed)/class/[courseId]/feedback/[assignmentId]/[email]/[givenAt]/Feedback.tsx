@@ -14,7 +14,7 @@ import { useFocusWithin, useHover } from "react-aria"
 
 import breakIntoSentences from "~/utils/breakIntoSentences"
 import cn from "~/utils/cn"
-import colors from "~/colors.cjs"
+import colors from "colors.cjs"
 
 interface Props {
 	assignment: {
@@ -44,12 +44,12 @@ const getDomIdOfSpecificFeedbackHighlight = ({
 	sentence: number
 }) => `${specificFeedbackHighlightDomIdPrefix}-${paragraph}-${sentence}`
 
-const Feedback: React.FC<Props> = ({
+export default function Feedback({
 	assignment,
 	submissionHTML,
 	specificFeedbackList: specificFeedbackListProp,
 	generalFeedback,
-}) => {
+}: Props) {
 	const submissionRef = useRef<{
 		getText: () => string | undefined
 		getTextOffset: ({}: { paragraph: number }) => number
@@ -228,8 +228,6 @@ const Feedback: React.FC<Props> = ({
 		</div>
 	)
 }
-
-export default Feedback
 
 const Submission = forwardRef<
 	{
@@ -498,7 +496,7 @@ const Submission = forwardRef<
 
 Submission.displayName = "Submission"
 
-const GeneralFeedback = ({
+function GeneralFeedback({
 	content,
 	followUps,
 	submissionWidth,
@@ -506,7 +504,7 @@ const GeneralFeedback = ({
 	content: string
 	followUps: string[]
 	submissionWidth: number
-}) => {
+}) {
 	return (
 		content.length > 0 && (
 			<div className="absolute">
@@ -544,7 +542,11 @@ const GeneralFeedback = ({
 	)
 }
 
-const SpecificFeedbackColumn: React.FC<{
+function SpecificFeedbackColumn({
+	feedbackList,
+	getSubmissionTextOffset,
+	onHoverChange,
+}: {
 	feedbackList: {
 		paragraph: number
 		sentence: number
@@ -558,7 +560,7 @@ const SpecificFeedbackColumn: React.FC<{
 		sentence: number
 		update: ((prevHover: boolean) => boolean) | boolean
 	}) => void
-}> = ({ feedbackList, getSubmissionTextOffset, onHoverChange }) => {
+}) {
 	feedbackList = feedbackList.sort(
 		(feedback1, feedback2) =>
 			feedback1.paragraph * 10 +
@@ -644,14 +646,17 @@ const SpecificFeedbackColumn: React.FC<{
 	)
 }
 
-SpecificFeedbackColumn.displayName = "SpecificFeedbackColumn"
-
-const SpecificFeedbackItem: React.FC<{
+function SpecificFeedbackItem({
+	content,
+	followUps,
+	hover,
+	onHoverChange,
+}: {
 	content: string
 	followUps: string[]
 	hover: boolean
 	onHoverChange: (update: ((prevHover: boolean) => boolean) | boolean) => void
-}> = ({ content, followUps, hover, onHoverChange }) => {
+}) {
 	const { focusWithinProps } = useFocusWithin({
 		onFocusWithinChange: (isFocusWithin) =>
 			onHoverChange(isFocusWithin || isHovered),

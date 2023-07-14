@@ -1,36 +1,37 @@
-"use client"
 import * as Select from "@radix-ui/react-select"
 import { ChevronDown } from "lucide-react"
 
-interface Props<TItem extends { value: string }> {
+import Heading from "./Heading"
+
+interface Props<TItem> {
 	value?: string
 	setValue: (value: string) => void
 	displayValue: string
 	items: TItem[]
+	getItemValue: (item: TItem) => string
 	renderItem: (item: TItem) => React.ReactNode
 	id?: string
 	name?: string
 }
 
-export const Root = <TItem extends { value: string }>({
+export function Root<TItem>({
 	value,
 	setValue,
 	displayValue,
 	items,
+	getItemValue,
 	renderItem,
 	id,
 	name,
-}: Props<TItem>) => {
+}: Props<TItem>) {
 	return (
 		<Select.Root name={name} value={value} onValueChange={setValue}>
 			<Select.Trigger
 				id={id}
 				className="flex w-full cursor-pointer justify-between rounded-md border-[0.75px] border-border px-4 py-2.5 outline-none transition-all duration-150 data-[state=open]:bg-white"
 			>
-				<Select.Value aria-label={value} asChild>
-					<span className="font-medium opacity-80">
-						{displayValue}
-					</span>
+				<Select.Value asChild>
+					<Heading size="medium">{displayValue}</Heading>
 				</Select.Value>
 
 				<Select.Icon asChild>
@@ -46,8 +47,8 @@ export const Root = <TItem extends { value: string }>({
 					<Select.Viewport className="w-full rounded-md border-[0.75px] border-border bg-white">
 						{items.map((item) => (
 							<Select.Item
-								value={item.value}
-								key={item.value}
+								value={getItemValue(item)}
+								key={getItemValue(item)}
 								className="cursor-pointer border-t-[0.75px] border-border bg-surface opacity-80 outline-none transition-all duration-150 hover:bg-surface-hover data-[state=checked]:bg-surface-selected data-[state=checked]:hover:bg-surface-selected-hover"
 							>
 								{renderItem(item)}

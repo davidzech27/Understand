@@ -18,11 +18,11 @@ interface Params {
 	assignmentId: string
 }
 
-const AssignmentStudentsPage = async ({
+export default async function AssignmentStudentsPage({
 	params: { courseId, assignmentId },
 }: {
 	params: Params
-}) => {
+}) {
 	const [studentProfiles, studentEmailWithFeedbackSet] = await Promise.all([
 		db
 			.select({
@@ -62,5 +62,3 @@ const AssignmentStudentsPage = async ({
 		</Card>
 	)
 }
-
-export default AssignmentStudentsPage

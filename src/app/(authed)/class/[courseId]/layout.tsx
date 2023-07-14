@@ -1,9 +1,9 @@
 import { cookies } from "next/headers"
 import { notFound } from "next/navigation"
 
+import { getAuthOrThrow } from "~/auth/jwt"
 import syncCourse from "~/sync/syncCourse"
 import generateInsights from "~/insights/generateInsights"
-import { getAuthOrThrow } from "~/auth/jwt"
 import User from "~/data/User"
 import Course from "~/data/Course"
 
@@ -11,13 +11,13 @@ interface Params {
 	courseId: string
 }
 
-const CourseLayout = async ({
+export default async function CourseLayout({
 	children,
 	params,
 }: {
 	children: React.ReactNode
 	params: Params
-}) => {
+}) {
 	void getAuthOrThrow({ cookies: cookies() })
 		.then(({ email }) =>
 			Promise.all([
@@ -41,5 +41,3 @@ const CourseLayout = async ({
 
 	return children
 }
-
-export default CourseLayout

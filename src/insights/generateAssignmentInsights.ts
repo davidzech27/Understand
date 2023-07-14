@@ -1,24 +1,22 @@
-import { and, eq } from "drizzle-orm"
-
-import db from "~/db/db"
 import Assignment from "~/data/Assignment"
 import getCompletion from "~/ai/getCompletion"
 import Feedback from "~/data/Feedback"
 
-const generateAssignmentInsights = async ({
+export default async function generateAssignmentInsights({
 	courseId,
 	assignmentId,
 }: {
 	courseId: string
 	assignmentId: string
-}) => {
-	const [previousAssignmentInsights, unsyncedInsights] = await Promise.all([
-		Assignment({ courseId, assignmentId }).insights(),
-		Assignment({ courseId, assignmentId }).unsyncedInsights(),
-	])
+}) {
+	const [previousAssignmentInsights, unsyncedFeedbackInsights] =
+		await Promise.all([
+			Assignment({ courseId, assignmentId }).insights(),
+			Assignment({ courseId, assignmentId }).unsyncedFeedbackInsights(),
+		])
 
 	const unsyncedStudentEmailSet = new Set(
-		unsyncedInsights.map((insight) => insight.studentEmail)
+		unsyncedFeedbackInsights.map((insight) => insight.studentEmail)
 	)
 
 	const previousAssignmentInsightsWithoutUnsynced = previousAssignmentInsights
@@ -33,7 +31,7 @@ const generateAssignmentInsights = async ({
 	const concatenatedInsights = (
 		previousAssignmentInsightsWithoutUnsynced ?? []
 	).concat(
-		unsyncedInsights
+		unsyncedFeedbackInsights
 			.map((studentInsights) =>
 				studentInsights.insights.map((insight) => ({
 					type: insight.type,
@@ -141,7 +139,7 @@ Begin.`,
 		}))
 
 	await Promise.all([
-		...unsyncedInsights.map((insight) =>
+		...unsyncedFeedbackInsights.map((insight) =>
 			Feedback({
 				courseId,
 				assignmentId,
@@ -154,5 +152,3 @@ Begin.`,
 		}),
 	])
 }
-
-export default generateAssignmentInsights
