@@ -29,15 +29,16 @@ export default async function CourseLayout({
 		.then(([role, course]) => {
 			if (role === "none" || course === undefined) notFound()
 
-			if (course.linkedUrl !== undefined)
-				syncCourse({
-					id: params.courseId,
-				})
-
-			if (role === "teacher")
-				generateInsights({
-					courseId: params.courseId,
-				})
+			return Promise.all([
+				course.linkedUrl !== undefined &&
+					syncCourse({
+						id: params.courseId,
+					}),
+				role === "teacher" &&
+					generateInsights({
+						courseId: params.courseId,
+					}),
+			])
 		})
 
 	return children
