@@ -35,7 +35,7 @@ async function insightsHandler(req: NextApiRequest, res: NextApiResponse) {
 		const unsyncedFeedbackInsights = await Course({
 			id: generateCall.courseId,
 		}).unsyncedFeedbackInsights()
-		console.log(unsyncedFeedbackInsights)
+
 		const unsyncedAssignmentIds = [
 			...new Set(
 				unsyncedFeedbackInsights.map((insight) => insight.assignmentId)
@@ -47,8 +47,7 @@ async function insightsHandler(req: NextApiRequest, res: NextApiResponse) {
 				unsyncedFeedbackInsights.map((insight) => insight.studentEmail)
 			),
 		]
-		console.log(unsyncedAssignmentIds)
-		console.log(unsyncedStudentEmails)
+
 		await Promise.all([
 			...unsyncedAssignmentIds.map((assignmentId) =>
 				callGenerate({

@@ -18,7 +18,7 @@ export default async function CourseLayout({
 	children: React.ReactNode
 	params: Params
 }) {
-	//!
+	//! not sure if adding latency. look into if there's a NextJS app router waterfall
 	await getAuthOrThrow({ cookies: cookies() })
 		.then(({ email }) =>
 			Promise.all([
