@@ -18,7 +18,8 @@ export default async function CourseLayout({
 	children: React.ReactNode
 	params: Params
 }) {
-	void getAuthOrThrow({ cookies: cookies() })
+	//!
+	await getAuthOrThrow({ cookies: cookies() })
 		.then(({ email }) =>
 			Promise.all([
 				User({ email }).courseRole({ id: params.courseId }),
