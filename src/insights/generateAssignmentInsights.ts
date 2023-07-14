@@ -26,7 +26,7 @@ export default async function generateAssignmentInsights({
 				(source) => !unsyncedStudentEmailSet.has(source.studentEmail)
 			),
 		}))
-		.filter((insight) => insight.sources.length > 0)
+		.filter((insight) => insight.sources.length !== 0)
 
 	const concatenatedInsights = (
 		previousAssignmentInsightsWithoutUnsynced ?? []

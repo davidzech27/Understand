@@ -1,4 +1,3 @@
-"use client"
 import env from "env.mjs"
 import redirectToCookieKey from "~/auth/redirectToCookieKey"
 import redirectURL from "./redirectURL"
