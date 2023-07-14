@@ -318,6 +318,7 @@ const Course = ({ id }: { id: string }) => ({
 						isNotNull(feedback.insights)
 					)
 				)
+				.toSQL()
 		)
 		return (
 			await db
