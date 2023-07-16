@@ -74,7 +74,7 @@ export default function CreateAssignmentForm({
 						id="title"
 						autoFocus
 						autoComplete="off"
-						className="h-min py-2.5 pl-4 text-base"
+						className="py-2.5 pl-4 text-base"
 					/>
 
 					<Label>Description</Label>
@@ -85,7 +85,7 @@ export default function CreateAssignmentForm({
 						placeholder="Assignment description (optional)"
 						id="description"
 						autoComplete="off"
-						className="h-min py-2.5 pl-4 text-base"
+						className="py-2.5 pl-4 text-base"
 					/>
 				</Card>
 

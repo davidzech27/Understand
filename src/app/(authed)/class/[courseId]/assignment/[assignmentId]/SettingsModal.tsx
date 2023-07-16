@@ -101,7 +101,7 @@ export default function SettingsModal({ open, setOpen, assignment }: Props) {
 						placeholder="Assignment title"
 						id="title"
 						autoComplete="off"
-						className="h-min py-2.5 pl-4 text-base"
+						className="py-2.5 pl-4 text-base"
 					/>
 
 					<Label>Description</Label>
@@ -112,7 +112,7 @@ export default function SettingsModal({ open, setOpen, assignment }: Props) {
 						placeholder="Description"
 						id="description"
 						autoComplete="off"
-						className="h-min py-2.5 pl-4 text-base"
+						className="py-2.5 pl-4 text-base"
 					/>
 
 					<Label>Instructions</Label>

@@ -177,7 +177,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 						setValue={setNameInput}
 						placeholder="Class name"
 						id="name"
-						className="h-min py-2.5 pl-4 text-base"
+						className="py-2.5 pl-4 text-base"
 					/>
 
 					<Label>Section</Label>
@@ -187,7 +187,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 						setValue={setSectionInput}
 						placeholder="Class section"
 						id="section"
-						className="h-min py-2.5 pl-4 text-base"
+						className="py-2.5 pl-4 text-base"
 					/>
 
 					<Label>Students</Label>
@@ -199,8 +199,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 						id="students"
 						placeholder="Student email"
 						autoComplete="off"
-						className="h-min"
-						textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)] h-min"
+						textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)]"
 						buttonClassName="h-[46px] w-[46px]"
 					/>
 
@@ -213,8 +212,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 						placeholder="Teacher email"
 						id="teachers"
 						autoComplete="off"
-						className="h-min"
-						textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)] h-min"
+						textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)]"
 						buttonClassName="h-[46px] w-[46px]"
 					/>
 

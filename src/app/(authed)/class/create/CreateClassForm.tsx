@@ -212,7 +212,7 @@ export default function CreateClassForm({
 						id="name"
 						autoFocus
 						autoComplete="off"
-						className="h-min py-2.5 pl-4 text-base"
+						className="py-2.5 pl-4 text-base"
 					/>
 
 					<Label>Section</Label>
@@ -223,7 +223,7 @@ export default function CreateClassForm({
 						placeholder="Section (optional)"
 						id="section"
 						autoComplete="off"
-						className="h-min py-2.5 pl-4 text-base"
+						className="py-2.5 pl-4 text-base"
 					/>
 				</Card>
 
@@ -236,8 +236,7 @@ export default function CreateClassForm({
 						singleWord
 						placeholder="Student email"
 						id="students"
-						className="h-min"
-						textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)] h-min"
+						textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)]"
 						buttonClassName="h-[46px] w-[46px]"
 					/>
 
@@ -249,8 +248,7 @@ export default function CreateClassForm({
 						singleWord
 						placeholder="Teacher email"
 						id="additional-teachers"
-						className="h-min"
-						textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)] h-min"
+						textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)]"
 						buttonClassName="h-[46px] w-[46px]"
 					/>
 				</Card>
