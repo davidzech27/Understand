@@ -19,27 +19,31 @@ export default async function CourseLayout({
 	params: Params
 }) {
 	//! not sure if adding latency. look into if there's a NextJS app router waterfall
-	await getAuthOrThrow({ cookies: cookies() })
-		.then(({ email }) =>
-			Promise.all([
-				User({ email }).courseRole({ id: params.courseId }),
-				Course({ id: params.courseId }).get(),
-			])
-		)
-		.then(([role, course]) => {
-			if (role === "none" || course === undefined) notFound()
+	try {
+		await getAuthOrThrow({ cookies: cookies() })
+			.then(({ email }) =>
+				Promise.all([
+					User({ email }).courseRole({ id: params.courseId }),
+					Course({ id: params.courseId }).get(),
+				])
+			)
+			.then(([role, course]) => {
+				if (role === "none" || course === undefined) notFound()
 
-			return Promise.all([
-				course.linkedUrl !== undefined &&
-					syncCourse({
-						id: params.courseId,
-					}),
-				role === "teacher" &&
-					generateInsights({
-						courseId: params.courseId,
-					}),
-			])
-		})
+				return Promise.all([
+					course.linkedUrl !== undefined &&
+						syncCourse({
+							id: params.courseId,
+						}),
+					role === "teacher" &&
+						generateInsights({
+							courseId: params.courseId,
+						}),
+				])
+			})
+	} catch (error) {
+		console.error(error)
+	}
 
 	return children
 }

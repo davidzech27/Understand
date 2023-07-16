@@ -1546,7 +1546,7 @@ function GeneralFeedback({
 									onEnter={onGetFollowUp}
 									ref={inputRef}
 									autoComplete="off"
-									className="text-xl opacity-80"
+									className="py-2 px-3.5 text-lg opacity-80"
 								/>
 							</div>
 						</div>
@@ -1851,7 +1851,7 @@ function SpecificFeedbackItem({
 						onEnter={onGetFollowUp}
 						autoComplete="off"
 						ref={inputRef}
-						className="opacity-80"
+						className="py-2 px-3.5 text-lg opacity-80"
 					/>
 				</div>
 			</div>
