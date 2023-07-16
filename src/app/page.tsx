@@ -1,9 +1,6 @@
-import { cookies } from "next/headers"
-import Link from "next/link"
-
 import env from "env.mjs"
 import GradientText from "~/components/GradientText"
-import FancyButton from "~/components/FancyButton"
+import GetStartedButton from "./GetStartedButton"
 import ReviewScroller from "./ReviewScroller"
 
 export const metadata = {
@@ -13,22 +10,18 @@ export const metadata = {
 }
 
 export default async function IndexPage() {
-	const landed = cookies()
-		.getAll()
-		.some((cookie) => cookie.name.startsWith("ph"))
-
 	return (
 		<>
 			<main className="absolute top-0 bottom-0 left-0 right-0 flex flex-col overflow-y-scroll bg-white">
 				<div className="flex h-screen w-full items-center justify-center">
 					<div className="flex h-screen flex-[2.5] flex-col justify-center px-[16%]">
 						<GradientText asChild>
-							<h1 className="select-none py-2 text-[2.6rem] font-extrabold leading-[1.1] tracking-tight lg:whitespace-pre lg:text-[3.5rem] xl:text-[4.5rem] 2xl:text-[5.5rem]">
-								The future of education{"\n"}is personalized
+							<h1 className="select-none py-2 text-[2.75em] font-extrabold leading-[1.1] tracking-tight lg:whitespace-pre lg:text-[3.5rem] xl:text-[4.5rem] 2xl:text-[5.5rem]">
+								Meet your students{"\n"}where they are
 							</h1>
 						</GradientText>
 
-						<p className="mb-8 mt-2.5 w-full select-text text-base font-medium opacity-60 lg:w-3/4 lg:text-lg xl:text-xl">
+						<p className="mb-8 mt-2.5 w-full select-text text-lg font-medium opacity-60 lg:w-3/4 lg:text-xl">
 							Understand is an AI-powered educational platform
 							that gives you the tools and insights you need to
 							personalize your class to the needs of your
@@ -37,15 +30,7 @@ export default async function IndexPage() {
 
 						<div className="flex flex-col space-x-0 space-y-4 text-center sm:flex-row sm:items-center sm:space-y-0 sm:space-x-9">
 							<div className="h-16">
-								<Link
-									href={landed ? "/home" : "/signIn"}
-									passHref
-									legacyBehavior
-								>
-									<FancyButton size="medium">
-										Get started
-									</FancyButton>
-								</Link>
+								<GetStartedButton />
 							</div>
 
 							<GradientText asChild>
