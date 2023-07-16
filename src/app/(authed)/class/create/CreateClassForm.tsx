@@ -2,8 +2,6 @@
 import { use, useState } from "react"
 import { useRouter } from "next/navigation"
 import { X } from "lucide-react"
-import { Label } from "@radix-ui/react-label"
-import * as Form from "@radix-ui/react-form"
 
 import createCourseAction from "./createCourseAction"
 import getAuthenticationURL from "~/google/getAuthenticationURL"
@@ -11,6 +9,7 @@ import Heading from "~/components/Heading"
 import TextInput from "~/components/TextInput"
 import Card from "~/components/Card"
 import InputList from "~/components/InputList"
+import Label from "~/components/Label"
 import Button from "~/components/Button"
 import FancyButton from "~/components/FancyButton"
 import Modal from "~/components/Modal"
@@ -195,7 +194,7 @@ export default function CreateClassForm({
 
 	return (
 		<>
-			<Form.Root
+			<form
 				onSubmit={(e) => {
 					e.preventDefault()
 
@@ -204,64 +203,52 @@ export default function CreateClassForm({
 				className="flex h-full flex-col space-y-2.5"
 			>
 				<Card className="space-y-2 px-6 py-5 shadow-sm">
-					<div className="ml-1 font-medium opacity-80">Name</div>
+					<Label>Name</Label>
 
-					<Form.Field asChild name="name">
-						<Form.Control asChild>
-							<TextInput
-								value={nameInput}
-								setValue={setNameInput}
-								placeholder="Class name"
-								autoFocus
-								autoComplete="off"
-								className="h-min py-2.5 pl-4 text-base"
-							/>
-						</Form.Control>
-					</Form.Field>
+					<TextInput
+						value={nameInput}
+						setValue={setNameInput}
+						placeholder="Class name"
+						id="name"
+						autoFocus
+						autoComplete="off"
+						className="h-min py-2.5 pl-4 text-base"
+					/>
 
-					<div className="ml-1 font-medium opacity-80">Section</div>
+					<Label>Section</Label>
 
-					<Form.Field asChild name="section">
-						<Form.Control asChild>
-							<TextInput
-								value={sectionInput}
-								setValue={setSectionInput}
-								placeholder="Section (optional)"
-								autoComplete="off"
-								className="h-min py-2.5 pl-4 text-base"
-							/>
-						</Form.Control>
-					</Form.Field>
+					<TextInput
+						value={sectionInput}
+						setValue={setSectionInput}
+						placeholder="Section (optional)"
+						id="section"
+						autoComplete="off"
+						className="h-min py-2.5 pl-4 text-base"
+					/>
 				</Card>
 
 				<Card className="flex-1 space-y-2 overflow-y-scroll px-6 py-5 shadow-sm">
-					<Heading asChild size="medium" className="ml-1">
-						<Label htmlFor="studentEmailInputs">Students</Label>
-					</Heading>
+					<Label>Students</Label>
 
 					<InputList
 						values={studentEmailInputs}
 						setValues={setStudentEmailInputs}
 						singleWord
 						placeholder="Student email"
-						id="studentEmailInputs"
+						id="students"
 						className="h-min"
 						textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)] h-min"
 						buttonClassName="h-[46px] w-[46px]"
 					/>
 
-					<Heading asChild size="medium" className="ml-1">
-						<Label htmlFor="additionalTeacherEmailInputs">
-							Additional teachers
-						</Label>
-					</Heading>
+					<Label>Additional teachers</Label>
 
 					<InputList
 						values={additionalTeacherEmailInputs}
 						setValues={setAdditionalTeacherEmailInputs}
 						singleWord
 						placeholder="Teacher email"
-						id="additionalTeacherEmailInputs"
+						id="additional-teachers"
 						className="h-min"
 						textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)] h-min"
 						buttonClassName="h-[46px] w-[46px]"
@@ -269,9 +256,7 @@ export default function CreateClassForm({
 				</Card>
 
 				<Card className="flex flex-col space-y-2 py-5 px-6 shadow-sm">
-					<Heading asChild size="medium" className="ml-1">
-						<Label htmlFor="linkCourse">Link class</Label>
-					</Heading>
+					<Label>Link class</Label>
 
 					{linkedCourse ? (
 						<div className="relative">
@@ -299,7 +284,7 @@ export default function CreateClassForm({
 
 								onLink()
 							}}
-							id="linkCourse"
+							id="link-class"
 							size="large"
 						>
 							Link with Google Classroom class
@@ -308,17 +293,16 @@ export default function CreateClassForm({
 				</Card>
 
 				<Card className="flex space-x-3 py-5 px-6 shadow-sm">
-					<Form.Submit asChild>
-						<FancyButton
-							loading={creating}
-							disabled={nameInput.length === 0}
-							size="large"
-						>
-							Create
-						</FancyButton>
-					</Form.Submit>
+					<FancyButton
+						size="large"
+						type="submit"
+						loading={creating}
+						disabled={nameInput.length === 0}
+					>
+						Create
+					</FancyButton>
 				</Card>
-			</Form.Root>
+			</form>
 
 			<Modal
 				title="We need extra permission to access your Google account"

@@ -1,13 +1,11 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useZact } from "zact/client"
-import * as Form from "@radix-ui/react-form"
-import { Label } from "@radix-ui/react-form"
 
 import updateAssignmentAction from "./updateAssignmentAction"
 import deleteAssignmentAction from "./deleteAssignmentAction"
 import Button from "~/components/Button"
-import Heading from "~/components/Heading"
+import Label from "~/components/Label"
 import FancyButton from "~/components/FancyButton"
 import TextInput from "~/components/TextInput"
 import Modal from "~/components/Modal"
@@ -86,7 +84,7 @@ export default function SettingsModal({ open, setOpen, assignment }: Props) {
 
 	return (
 		<Modal open={open} setOpen={setOpen} title="Assignment settings">
-			<Form.Root
+			<form
 				onSubmit={(e) => {
 					e.preventDefault()
 
@@ -95,9 +93,7 @@ export default function SettingsModal({ open, setOpen, assignment }: Props) {
 				className="relative h-full"
 			>
 				<div className="absolute left-0 right-0 top-0 bottom-0 flex flex-col space-y-2 overflow-y-scroll pb-[100px]">
-					<Heading asChild size="medium" className="ml-1">
-						<Label htmlFor="title">Title</Label>
-					</Heading>
+					<Label>Title</Label>
 
 					<TextInput
 						value={titleInput}
@@ -108,9 +104,7 @@ export default function SettingsModal({ open, setOpen, assignment }: Props) {
 						className="h-min py-2.5 pl-4 text-base"
 					/>
 
-					<Heading asChild size="medium" className="ml-1">
-						<Label htmlFor="description">Description</Label>
-					</Heading>
+					<Label>Description</Label>
 
 					<TextInput
 						value={descriptionInput}
@@ -121,9 +115,7 @@ export default function SettingsModal({ open, setOpen, assignment }: Props) {
 						className="h-min py-2.5 pl-4 text-base"
 					/>
 
-					<Heading asChild size="medium" className="ml-1">
-						<Label htmlFor="instructions">Instructions</Label>
-					</Heading>
+					<Label>Instructions</Label>
 
 					<div>
 						<TextArea
@@ -138,10 +130,10 @@ export default function SettingsModal({ open, setOpen, assignment }: Props) {
 
 					<div className="flex space-x-3 pt-3">
 						<Button
+							size="medium"
 							onClick={() => setConfirmingDeleteAssignment(true)}
 							type="button"
 							disabled={confirmingDeleteAssignment}
-							size="medium"
 						>
 							Delete assignment
 						</Button>
@@ -149,10 +141,10 @@ export default function SettingsModal({ open, setOpen, assignment }: Props) {
 						{confirmingDeleteAssignment && (
 							<>
 								<Button
+									size="medium"
 									onClick={onDeleteAssignment}
 									type="button"
 									loading={isDeletingAssignment}
-									size="medium"
 								>
 									Do you really want to delete this
 									assignment?
@@ -160,11 +152,11 @@ export default function SettingsModal({ open, setOpen, assignment }: Props) {
 
 								{!isDeletingAssignment && (
 									<Button
+										size="medium"
 										onClick={() =>
 											setConfirmingDeleteAssignment(false)
 										}
 										type="button"
-										size="medium"
 									>
 										Actually, never mind
 									</Button>
@@ -175,27 +167,25 @@ export default function SettingsModal({ open, setOpen, assignment }: Props) {
 				</div>
 
 				<div className="absolute bottom-0 left-0 right-0 z-50 flex space-x-3">
-					<Form.Submit asChild>
-						<FancyButton
-							loading={isUpdatingAssignment}
-							disabled={updateDisabled}
-							size="large"
-							className="w-1/2"
-						>
-							Done
-						</FancyButton>
-					</Form.Submit>
+					<FancyButton
+						size="large"
+						loading={isUpdatingAssignment}
+						disabled={updateDisabled}
+						className="w-1/2"
+					>
+						Done
+					</FancyButton>
 
 					<Button
+						size="large"
 						type="button"
 						onClick={() => setOpen(false)}
-						size="large"
 						className="w-1/2"
 					>
 						Cancel
 					</Button>
 				</div>
-			</Form.Root>
+			</form>
 		</Modal>
 	)
 }

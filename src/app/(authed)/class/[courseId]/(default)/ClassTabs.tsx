@@ -3,12 +3,10 @@ import { useState, use } from "react"
 import { useRouter } from "next/navigation"
 import { Settings2 } from "lucide-react"
 import { useZact } from "zact/client"
-import * as Form from "@radix-ui/react-form"
-import { Label } from "@radix-ui/react-form"
 
 import updateCourseAction from "./updateCourseAction"
 import deleteCourseAction from "./deleteCourseAction"
-import Heading from "~/components/Heading"
+import Label from "~/components/Label"
 import LinkButton from "~/components/LinkButton"
 import Button from "~/components/Button"
 import FancyButton from "~/components/FancyButton"
@@ -163,7 +161,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
 	return (
 		<Modal open={open} setOpen={setOpen} title="Class settings">
-			<Form.Root
+			<form
 				onSubmit={(e) => {
 					e.preventDefault()
 
@@ -172,9 +170,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 				className="relative h-full"
 			>
 				<div className="absolute top-0 bottom-0 left-0 right-0 flex flex-col space-y-2 overflow-y-scroll pb-[100px]">
-					<Heading asChild size="medium" className="ml-1">
-						<Label htmlFor="name">Name</Label>
-					</Heading>
+					<Label>Name</Label>
 
 					<TextInput
 						value={nameInput}
@@ -184,9 +180,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 						className="h-min py-2.5 pl-4 text-base"
 					/>
 
-					<Heading asChild size="medium" className="ml-1">
-						<Label htmlFor="section">Section</Label>
-					</Heading>
+					<Label>Section</Label>
 
 					<TextInput
 						value={sectionInput}
@@ -196,9 +190,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 						className="h-min py-2.5 pl-4 text-base"
 					/>
 
-					<Heading asChild size="medium" className="ml-1">
-						<Label htmlFor="students">Students</Label>
-					</Heading>
+					<Label>Students</Label>
 
 					<InputList
 						values={studentEmailInputs}
@@ -212,15 +204,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 						buttonClassName="h-[46px] w-[46px]"
 					/>
 
-					<Heading asChild size="medium" className="ml-1">
-						<Label htmlFor="teachers">Teachers</Label>
-					</Heading>
+					<Label>Teachers</Label>
 
 					<InputList
 						values={teacherEmailInputs}
 						setValues={setTeacherEmailInputs}
 						singleWord
 						placeholder="Teacher email"
+						id="teachers"
 						autoComplete="off"
 						className="h-min"
 						textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)] h-min"
@@ -265,27 +256,26 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 				</div>
 
 				<div className="absolute bottom-0 left-0 right-0 z-50 flex space-x-3">
-					<Form.Submit asChild className="w-1/2">
-						<FancyButton
-							loading={isUpdatingCourse}
-							disabled={updateDisabled}
-							size="large"
-							className="w-1/2"
-						>
-							Done
-						</FancyButton>
-					</Form.Submit>
+					<FancyButton
+						size="large"
+						type="submit"
+						loading={isUpdatingCourse}
+						disabled={updateDisabled}
+						className="w-1/2"
+					>
+						Done
+					</FancyButton>
 
 					<Button
+						size="large"
 						type="button"
 						onClick={() => setOpen(false)}
-						size="large"
 						className="w-1/2"
 					>
 						Cancel
 					</Button>
 				</div>
-			</Form.Root>
+			</form>
 		</Modal>
 	)
 }

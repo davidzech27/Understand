@@ -1,7 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import * as Form from "@radix-ui/react-form"
 import { usePostHog } from "posthog-js/react"
 
 import updateNameAction from "./updateNameAction"
@@ -56,7 +55,7 @@ export default function LandingForm({ profilePromise }: Props) {
 	}
 
 	return (
-		<Form.Root
+		<form
 			onSubmit={(e) => {
 				e.preventDefault()
 
@@ -66,50 +65,47 @@ export default function LandingForm({ profilePromise }: Props) {
 		>
 			<div className="flex-[0.875]" />
 
-			<Form.Field className="w-full text-center" name="name">
-				<Form.Label className="text-3xl font-medium leading-none opacity-80">
-					What name would you like to go by?
-				</Form.Label>
-
-				<Form.Control
-					asChild
-					className="my-8 flex h-12 flex-col space-y-4"
+			<div className="w-full text-center">
+				<label
+					htmlFor="name"
+					className="text-3xl font-medium leading-none opacity-80"
 				>
-					{profile === undefined ? (
-						<TextInput
-							value={nameInput}
-							setValue={setNameInput}
-							placeholder=""
-							autoFocus
-							autoComplete="name"
-							className="text-lg"
-						/>
-					) : (
-						<TextInput
-							value={nameInput}
-							setValue={setNameInput}
-							placeholder="Your name"
-							autoFocus
-							autoComplete="name"
-							className="text-lg"
-						/>
-					)}
-				</Form.Control>
-			</Form.Field>
+					What name would you like to go by?
+				</label>
 
-			<Form.Submit asChild>
-				<div>
-					<FancyButton
-						size="large"
-						disabled={nameInput.length === 0}
-						loading={going}
-					>
-						Let&apos;s go
-					</FancyButton>
-				</div>
-			</Form.Submit>
+				{profile === undefined ? (
+					<TextInput
+						value={nameInput}
+						setValue={setNameInput}
+						placeholder=""
+						id="name"
+						autoFocus
+						autoComplete="name"
+						className="my-8 flex h-12 flex-col space-y-4 text-lg"
+					/>
+				) : (
+					<TextInput
+						value={nameInput}
+						setValue={setNameInput}
+						placeholder="Your name"
+						id="name"
+						autoFocus
+						autoComplete="name"
+						className="my-8 flex h-12 flex-col space-y-4 text-lg"
+					/>
+				)}
+			</div>
+
+			<FancyButton
+				size="large"
+				type="submit"
+				disabled={nameInput.length === 0}
+				loading={going}
+			>
+				Let&apos;s go
+			</FancyButton>
 
 			<div className="flex-1" />
-		</Form.Root>
+		</form>
 	)
 }

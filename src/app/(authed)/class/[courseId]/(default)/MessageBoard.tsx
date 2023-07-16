@@ -1,6 +1,5 @@
 "use client"
 import { useState } from "react"
-import * as Form from "@radix-ui/react-form"
 import { useZact } from "zact/client"
 
 import TextArea from "~/components/TextArea"
@@ -27,7 +26,7 @@ export default function MessageBoard({ courseId }: Props) {
 	}
 
 	return similarMessages === null ? (
-		<Form.Root
+		<form
 			onSubmit={(e) => {
 				e.preventDefault()
 
@@ -35,33 +34,28 @@ export default function MessageBoard({ courseId }: Props) {
 			}}
 			className="flex space-x-3"
 		>
-			<Form.Field asChild name="message-board-input">
-				<Form.Control asChild>
-					<TextArea
-						value={messageInput}
-						setValue={setMessageInput}
-						placeholder="Post a message to your class and see messages similar to it from your class"
-						style={{
-							height: messageInput.length === 0 ? 80 : "auto",
-						}}
-						autoFocus
-						autoComplete="off"
-						className="min-h-[80px] py-2 px-3"
-					/>
-				</Form.Control>
-			</Form.Field>
+			<TextArea
+				value={messageInput}
+				setValue={setMessageInput}
+				placeholder="Post a message to your class and see messages similar to it from your class"
+				style={{
+					height: messageInput.length === 0 ? 80 : "auto",
+				}}
+				autoFocus
+				autoComplete="off"
+				className="min-h-[80px] py-2 px-3"
+			/>
 
-			<Form.Submit asChild>
-				<FancyButton
-					disabled={messageInput.length === 0}
-					loading={isPosting}
-					size="medium"
-					className="h-20 w-80"
-				>
-					Post message
-				</FancyButton>
-			</Form.Submit>
-		</Form.Root>
+			<FancyButton
+				size="medium"
+				type="submit"
+				disabled={messageInput.length === 0}
+				loading={isPosting}
+				className="h-20 w-80"
+			>
+				Post message
+			</FancyButton>
+		</form>
 	) : (
 		<div className="flex flex-col space-y-3">
 			{similarMessages.length !== 0 ? (
