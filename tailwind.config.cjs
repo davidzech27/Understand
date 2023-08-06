@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const colors = require("./colors.cjs")
 
 /** @type {import('tailwindcss').Config} */
@@ -6,6 +7,9 @@ const config = {
 	theme: {
 		extend: {
 			colors,
+			gradientColorStopPositions: {
+				80: "80%",
+			},
 			keyframes: {
 				"scale-in": {
 					"0%": {
@@ -38,8 +42,7 @@ const config = {
 			},
 		},
 	},
-	// @ts-ignore
-	plugins: [require("tailwindcss-animate")],
+	plugins: [],
 }
 
 module.exports = config

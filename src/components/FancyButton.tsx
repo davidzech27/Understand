@@ -52,7 +52,7 @@ function FancyButton(
 		>
 			<span
 				className={cn(
-					"z-10 font-medium transition-all duration-150",
+					"z-10 font-semibold tracking-[0.010em] transition-all duration-150",
 					{
 						medium: "text-2xl",
 						large: "text-3xl",
@@ -69,8 +69,11 @@ function FancyButton(
 			</span>
 
 			<div
+				style={{
+					background: `linear-gradient(45deg, ${colors.primary}, ${colors.secondary} 100%)`,
+				}}
 				className={cn(
-					"absolute h-full w-full rounded-xl bg-gradient-to-tr from-primary to-secondary transition-all duration-150",
+					"absolute h-full w-full rounded-xl transition-all duration-150",
 					!loading &&
 						!disabled &&
 						"opacity-0 group-focus-within:opacity-100 group-hover:opacity-100",
@@ -81,7 +84,7 @@ function FancyButton(
 			<div
 				style={{
 					border: "4px solid transparent",
-					background: `linear-gradient(45deg, ${colors.primary}, ${colors.secondary}) border-box`,
+					background: `linear-gradient(45deg, ${colors.primary}, ${colors.secondary} 100%) border-box`,
 					WebkitMask:
 						"linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)",
 					WebkitMaskComposite: "xor",

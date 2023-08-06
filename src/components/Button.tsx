@@ -43,7 +43,7 @@ function Button(
 				disabled={disabled}
 				ref={ref}
 				className={cn(
-					"rounded-md bg-surface-selected px-6 py-2.5 font-medium outline-none transition-all duration-150",
+					"rounded-md bg-surface-selected px-6 py-2.5 font-semibold tracking-[0.010em] outline-none transition-all duration-150",
 					{
 						small: "text-base", // maybe add height for consistency
 						medium: "text-lg",

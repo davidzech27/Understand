@@ -14,11 +14,10 @@ export default function GradientText({ asChild, children, className }: Props) {
 	return (
 		<Component
 			style={{
-				background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`,
+				background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary} 100%)`,
 				WebkitBackgroundClip: "text",
 				backgroundClip: "text",
 				color: "transparent",
-				userSelect: "none",
 			}}
 			className={className}
 		>
