@@ -259,13 +259,15 @@ export default function FeedbackContent({
 								key={`${feedback.paragraph},${feedback.sentence}`}
 								style={{
 									top: (() => {
-										const yOffset = paragraphYOffsets.find(
+										let yOffset = paragraphYOffsets.find(
 											({ paragraph }) =>
 												paragraph === feedback.paragraph
 										)?.yOffset
 
+										if (yOffset !== undefined) yOffset += 10
+
 										const specificFeedbackColumn =
-											specificFeedbackColumnRefs[0]
+											specificFeedbackColumnRefs[1]
 												?.current
 
 										const previousCard =
@@ -280,17 +282,23 @@ export default function FeedbackContent({
 										)
 											return yOffset
 
-										return Math.max(
-											yOffset,
+										const alternativeYOffset =
 											parseInt(
 												previousCard
 													.computedStyleMap()
 													.get("top")
 													?.toString() ?? "0"
 											) +
-												(previousCard.firstElementChild
-													?.clientHeight ?? 0) +
-												10
+											(previousCard.firstElementChild
+												?.clientHeight ?? 0) +
+											10
+
+										if (isNaN(alternativeYOffset))
+											return yOffset
+
+										return Math.max(
+											yOffset,
+											alternativeYOffset
 										)
 									})(),
 									zIndex:
@@ -594,10 +602,12 @@ export default function FeedbackContent({
 								key={`${feedback.paragraph},${feedback.sentence}`}
 								style={{
 									top: (() => {
-										const yOffset = paragraphYOffsets.find(
+										let yOffset = paragraphYOffsets.find(
 											({ paragraph }) =>
 												paragraph === feedback.paragraph
 										)?.yOffset
+
+										if (yOffset !== undefined) yOffset += 10
 
 										const specificFeedbackColumn =
 											specificFeedbackColumnRefs[1]
@@ -615,17 +625,23 @@ export default function FeedbackContent({
 										)
 											return yOffset
 
-										return Math.max(
-											yOffset,
+										const alternativeYOffset =
 											parseInt(
 												previousCard
 													.computedStyleMap()
 													.get("top")
 													?.toString() ?? "0"
 											) +
-												(previousCard.firstElementChild
-													?.clientHeight ?? 0) +
-												10
+											(previousCard.firstElementChild
+												?.clientHeight ?? 0) +
+											10
+
+										if (isNaN(alternativeYOffset))
+											return yOffset
+
+										return Math.max(
+											yOffset,
+											alternativeYOffset
 										)
 									})(),
 									zIndex:

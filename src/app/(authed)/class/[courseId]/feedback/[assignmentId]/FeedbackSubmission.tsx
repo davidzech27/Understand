@@ -259,7 +259,7 @@ export default function FeedbackSubmission({
 
 		let currentYOffset = 0
 
-		for (const textElement of ref.current.querySelectorAll("p, div")) {
+		for (const textElement of ref.current.querySelectorAll("p, div, br")) {
 			if (
 				textElement.textContent?.indexOf(".") !== -1 &&
 				textElement.textContent?.indexOf(".") !==
@@ -273,12 +273,14 @@ export default function FeedbackSubmission({
 				})
 			}
 
-			const textElementStyle = window.getComputedStyle(textElement)
+			const computedStyle = window.getComputedStyle(textElement)
 
 			currentYOffset +=
-				textElement.clientHeight +
-				parseInt(textElementStyle.marginTop) +
-				parseInt(textElementStyle.marginBottom)
+				textElement.getBoundingClientRect().height +
+				parseFloat(computedStyle.paddingTop) +
+				parseFloat(computedStyle.paddingBottom) +
+				parseFloat(computedStyle.marginTop) +
+				parseFloat(computedStyle.marginBottom)
 		}
 
 		onChangeParagraphYOffsets(paragraphYOffsets)

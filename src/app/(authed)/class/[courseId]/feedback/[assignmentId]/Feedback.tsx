@@ -40,15 +40,37 @@ interface Props {
 	}[]
 }
 
-const htmlToText = (html: string) => {
-	const submissionDOM = new DOMParser().parseFromString(
-		html,
-		"text/html"
-	).body
+function removeTailwindFromHTML(html: string) {
+	const dom = new DOMParser().parseFromString(html, "text/html").body
+
+	const removeTailwindFromChildren = (element: Element) => {
+		element.removeAttribute("class")
+
+		element.setAttribute(
+			"style",
+			element
+				.getAttribute("style")
+				?.split(";")
+				.filter((style) => !style.includes("--tw"))
+				.join(";") ?? ""
+		)
+
+		for (const child of element.children) {
+			removeTailwindFromChildren(child)
+		}
+	}
+
+	removeTailwindFromChildren(dom)
+
+	return dom.outerHTML
+}
+
+function htmlToText(html: string) {
+	const dom = new DOMParser().parseFromString(html, "text/html").body
 
 	const lines: string[] = []
 
-	for (const element of submissionDOM.querySelectorAll("p, div")) {
+	for (const element of dom.querySelectorAll("p, div")) {
 		element.textContent && lines.push(element.textContent)
 	}
 
@@ -147,7 +169,7 @@ export default function Feedback({
 				courseId: assignment.courseId,
 				assignmentId: assignment.assignmentId,
 				givenAt: feedback.givenAt,
-				submissionHTML: feedback.submissionHTML,
+				submissionHTML: removeTailwindFromHTML(feedback.submissionHTML),
 			})
 	})
 
@@ -162,10 +184,10 @@ export default function Feedback({
 
 		setEditing(false)
 
-		const { submissionHTML } = feedback
+		const submissionHTML = removeTailwindFromHTML(feedback.submissionHTML)
 
 		const submissionText = htmlToText(submissionHTML)
-
+		console.log(submissionHTML)
 		getFeedback({
 			submission: submissionText,
 			instructions: assignment.instructions,
