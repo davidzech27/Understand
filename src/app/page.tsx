@@ -23,7 +23,7 @@ export default async function IndexPage() {
 
 						<p className="mb-8 mt-2.5 w-full select-text text-lg font-medium text-black/70 lg:w-3/4 lg:text-xl">
 							Understand provides students with instant, in-depth
-							feedback on their work that they can respond to and aggregates this feedback into nuanced and actionable insights for teachers. It's the right approach to AI in schools.
+							feedback on their work that they can respond to and aggregates this feedback into nuanced and actionable insights for teachers. It&apos;s the right approach to AI in schools.
 						</p>
 
 						<div className="flex flex-col space-x-0 space-y-4 text-center sm:flex-row sm:items-center sm:space-y-0 sm:space-x-9">
