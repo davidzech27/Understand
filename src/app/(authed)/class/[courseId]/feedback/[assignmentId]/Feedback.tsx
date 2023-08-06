@@ -187,7 +187,7 @@ export default function Feedback({
 		const submissionHTML = removeTailwindFromHTML(feedback.submissionHTML)
 
 		const submissionText = htmlToText(submissionHTML)
-		console.log(submissionHTML)
+
 		getFeedback({
 			submission: submissionText,
 			instructions: assignment.instructions,
