@@ -23,7 +23,9 @@ export const followUpSchema = z.object({
 			oldContent: z.string(),
 			newContent: z.string(),
 		})
-		.array(),
+		.array()
+		.optional()
+		.default([]),
 	aiMessage: z.string(),
 	sentAt: z.coerce.date(),
 })
