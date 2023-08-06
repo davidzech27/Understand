@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation"
+import { getAuthOrThrow } from "~/auth/jwt"
+import { cookies } from "next/headers"
 
 import User from "~/data/User"
 import Assignment from "~/data/Assignment"
-import Insights from "./Insights"
-import { getAuthOrThrow } from "~/auth/jwt"
-import { cookies } from "next/headers"
+import FeedbackInsights from "./FeedbackInsights"
 
 export async function generateMetadata({
 	params: { courseId, assignmentId, studentEmail },
@@ -38,12 +38,8 @@ export default async function InsightsPage({
 }) {
 	studentEmail = decodeURIComponent(studentEmail)
 
-	const [insights, submissionHTML, assignment, role] = await Promise.all([
+	const [lastFeedbackInsights, assignment, role] = await Promise.all([
 		User({ email: studentEmail }).lastFeedbackInsights({
-			courseId,
-			assignmentId,
-		}),
-		User({ email: studentEmail }).lastSubmissionHTML({
 			courseId,
 			assignmentId,
 		}),
@@ -54,18 +50,17 @@ export default async function InsightsPage({
 	])
 
 	if (
-		insights === undefined ||
-		submissionHTML === undefined ||
+		lastFeedbackInsights === undefined ||
 		assignment === undefined ||
 		role !== "teacher"
 	)
 		notFound()
 
 	return (
-		<Insights
+		<FeedbackInsights
 			assignment={assignment}
-			insights={insights}
-			submission={submissionHTML}
+			submissionHTML={lastFeedbackInsights.submissionHTML}
+			insights={lastFeedbackInsights.insights}
 		/>
 	)
 }

@@ -1,4 +1,4 @@
-import { desc, eq, and, lt, inArray, isNotNull } from "drizzle-orm"
+import { desc, eq, and, lt, inArray, isNotNull, isNull } from "drizzle-orm"
 import { z } from "zod"
 
 import vdbPromise from "~/db/vdb"
@@ -66,33 +66,38 @@ const getFormattedResourceText = (resource: Resource) =>
 			: ""
 	}Content: ${resource.text}`
 
+export type Course = Exclude<
+	Awaited<ReturnType<ReturnType<typeof Course>["get"]>>,
+	undefined
+>
+
 const Course = ({ id }: { id: string }) => ({
 	create: async ({
 		name,
 		section,
-		linkedUrl,
-		linkedRefreshToken,
+		syncedUrl,
+		syncedRefreshToken,
 	}: {
 		name: string
 		section: string | undefined
-		linkedUrl: string | undefined
-		linkedRefreshToken: string | undefined
+		syncedUrl: string | undefined
+		syncedRefreshToken: string | undefined
 	}) => {
 		await db.insert(course).values({
 			id,
 			name,
 			section,
-			linkedUrl,
-			linkedRefreshToken,
+			syncedUrl,
+			syncedRefreshToken,
 		})
 	},
 	get: async () => {
 		const row = (
 			await db
 				.select({
-					linkedUrl: course.linkedUrl, // I have no idea why but this query fails when linkedUrl is last column
 					name: course.name,
 					section: course.section,
+					syncedUrl: course.syncedUrl,
 				})
 				.from(course)
 				.where(eq(course.id, id))
@@ -104,31 +109,24 @@ const Course = ({ id }: { id: string }) => ({
 			id,
 			name: row.name,
 			section: row.section ?? undefined,
-			linkedUrl: row.linkedUrl ?? undefined,
+			syncedUrl: row.syncedUrl ?? undefined,
 		}
 	},
 	update: async ({
 		name,
 		section,
-		googleClassroomId,
-		linkedRefreshToken,
+		syncedRefreshToken,
 	}: {
 		name?: string
 		section?: string | null
-		googleClassroomId?: string
-		linkedRefreshToken?: string
+		syncedRefreshToken?: string
 	}) => {
 		await db
 			.update(course)
 			.set({
-				...(name !== undefined ? { name } : {}),
-				...(section !== undefined ? { section } : {}),
-				...(googleClassroomId !== undefined
-					? { googleClassroomId }
-					: {}),
-				...(linkedRefreshToken !== undefined
-					? { linkedRefreshToken }
-					: {}),
+				name,
+				section,
+				syncedRefreshToken,
 			})
 			.where(eq(course.id, id))
 	},
@@ -152,16 +150,16 @@ const Course = ({ id }: { id: string }) => ({
 				.where(eq(assignmentInsight.courseId, id)),
 		])
 	},
-	linkedRefreshToken: async () => {
+	syncedRefreshToken: async () => {
 		return (
 			(
 				await db
 					.select({
-						linkedRefreshToken: course.linkedRefreshToken,
+						syncedRefreshToken: course.syncedRefreshToken,
 					})
 					.from(course)
 					.where(eq(course.id, id))
-			)[0]?.linkedRefreshToken ?? undefined
+			)[0]?.syncedRefreshToken ?? undefined
 		)
 	},
 	teachers: async () => {
@@ -170,7 +168,7 @@ const Course = ({ id }: { id: string }) => ({
 				email: teacherToCourse.teacherEmail,
 				name: user.name,
 				photo: user.photo,
-				linked: teacherToCourse.linked,
+				syncedAt: teacherToCourse.syncedAt,
 			})
 			.from(teacherToCourse)
 			.leftJoin(user, eq(user.email, teacherToCourse.teacherEmail))
@@ -183,7 +181,7 @@ const Course = ({ id }: { id: string }) => ({
 						email: teacher.email,
 						name: teacher.name,
 						photo: teacher.photo ?? undefined,
-						linked: teacher.linked,
+						syncedAt: teacher.syncedAt ?? undefined,
 				  }
 				: { signedUp: false as const, email: teacher.email }
 		)
@@ -194,7 +192,7 @@ const Course = ({ id }: { id: string }) => ({
 				email: studentToCourse.studentEmail,
 				name: user.name,
 				photo: user.photo,
-				linked: studentToCourse.linked,
+				syncedAt: studentToCourse.syncedAt,
 			})
 			.from(studentToCourse)
 			.leftJoin(user, eq(user.email, studentToCourse.studentEmail))
@@ -207,14 +205,23 @@ const Course = ({ id }: { id: string }) => ({
 						email: student.email,
 						name: student.name,
 						photo: student.photo ?? undefined,
-						linked: student.linked,
+						syncedAt: student.syncedAt ?? undefined,
 				  }
 				: { signedUp: false as const, email: student.email }
 		)
 	},
 	assignments: async () => {
 		const assignments = await db
-			.select()
+			.select({
+				courseId: assignment.courseId,
+				assignmentId: assignment.assignmentId,
+				title: assignment.title,
+				description: assignment.description,
+				instructions: assignment.instructions,
+				dueAt: assignment.dueAt,
+				syncedUrl: assignment.syncedUrl,
+				syncedAt: assignment.syncedAt,
+			})
 			.from(assignment)
 			.where(eq(assignment.courseId, id))
 			.orderBy(desc(assignment.dueAt))
@@ -225,21 +232,9 @@ const Course = ({ id }: { id: string }) => ({
 			title: assignment.title,
 			description: assignment.description ?? undefined,
 			instructions: assignment.instructions ?? undefined,
-			context: assignment.context ?? undefined,
-			dueAt:
-				(assignment.dueAt &&
-					new Date(
-						Date.UTC(
-							assignment.dueAt.getFullYear(),
-							assignment.dueAt.getMonth(),
-							assignment.dueAt.getDate(),
-							assignment.dueAt.getHours(),
-							assignment.dueAt.getMinutes()
-						)
-					)) ??
-				undefined,
-			linkedUrl: assignment.linkedUrl ?? undefined,
-			instructionsLinked: assignment.instructionsLinked ?? false,
+			dueAt: assignment.dueAt ?? undefined,
+			syncedUrl: assignment.syncedUrl ?? undefined,
+			syncedAt: assignment.syncedAt ?? undefined,
 		}))
 	},
 	feedbackHistory: async ({
@@ -278,19 +273,8 @@ const Course = ({ id }: { id: string }) => ({
 						eq(assignment.assignmentId, feedback.assignmentId)
 					)
 				)
-		).map(({ givenAt, userPhoto, ...feedback }) => ({
+		).map(({ userPhoto, ...feedback }) => ({
 			...feedback,
-			givenAt: new Date(
-				Date.UTC(
-					givenAt.getFullYear(),
-					givenAt.getMonth(),
-					givenAt.getDate(),
-					givenAt.getHours(),
-					givenAt.getMinutes(),
-					givenAt.getSeconds(),
-					givenAt.getMilliseconds()
-				)
-			),
 			userPhoto: userPhoto ?? undefined,
 		}))
 
@@ -314,7 +298,7 @@ const Course = ({ id }: { id: string }) => ({
 				.where(
 					and(
 						eq(feedback.courseId, id),
-						eq(feedback.synced, false),
+						isNull(feedback.syncedInsightsAt),
 						isNotNull(feedback.insights)
 					)
 				)

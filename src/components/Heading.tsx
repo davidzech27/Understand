@@ -1,4 +1,4 @@
-import { forwardRef } from "react"
+import { forwardRef, type ForwardedRef } from "react"
 import { Slot } from "@radix-ui/react-slot"
 
 import cn from "~/utils/cn"
@@ -9,28 +9,27 @@ interface Props extends React.PropsWithChildren {
 	className?: string
 }
 
-const Heading = forwardRef<HTMLDivElement, Props>(
-	({ size = "medium", asChild, className, children }, ref) => {
-		const Component = asChild ? Slot : "div"
+function Heading(
+	{ size = "medium", asChild, className, children }: Props,
+	ref: ForwardedRef<HTMLDivElement>
+) {
+	const Component = asChild ? Slot : "div"
 
-		return (
-			<Component
-				ref={ref}
-				className={cn(
-					{
-						small: "text-sm font-medium opacity-60",
-						medium: "text-base font-medium opacity-80",
-						large: "text-lg font-medium opacity-60",
-					}[size],
-					className
-				)}
-			>
-				{children}
-			</Component>
-		)
-	}
-)
+	return (
+		<Component
+			ref={ref}
+			className={cn(
+				{
+					small: "text-sm font-medium opacity-60",
+					medium: "text-base font-medium opacity-80",
+					large: "text-lg font-medium opacity-60",
+				}[size],
+				className
+			)}
+		>
+			{children}
+		</Component>
+	)
+}
 
-Heading.displayName = "Heading"
-
-export default Heading
+export default forwardRef(Heading)

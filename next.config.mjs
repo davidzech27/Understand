@@ -1,3 +1,5 @@
+import nextBundleAnalyzer from "@next/bundle-analyzer"
+
 import "./env.mjs"
 
 /** @type {import("next").NextConfig} */
@@ -6,7 +8,6 @@ const config = {
 	experimental: {
 		serverActions: true,
 	},
-	productionBrowserSourceMaps: true,
 }
 
-export default config
+export default nextBundleAnalyzer({ enabled: false })(config)

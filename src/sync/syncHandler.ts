@@ -1,5 +1,5 @@
 import { verifySignature } from "@upstash/qstash/nextjs"
-import { type NextApiRequest, NextApiResponse } from "next"
+import { type NextApiRequest, type NextApiResponse } from "next"
 import { z } from "zod"
 
 import callSync from "./callSync"

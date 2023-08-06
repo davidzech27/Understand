@@ -25,7 +25,7 @@ export default async function oauthCallbackHandler(request: NextRequest) {
 
 	await User({ email }).create({ name, photo })
 
-	let redirectTo =
+	const redirectTo =
 		request.cookies.get(redirectToCookieKey)?.value ??
 		`${env.NEXT_PUBLIC_URL}/landing`
 
@@ -46,7 +46,7 @@ export default async function oauthCallbackHandler(request: NextRequest) {
 				Promise.all(
 					coursesTeaching.map(({ id }) =>
 						Course({ id }).update({
-							linkedRefreshToken: refreshToken,
+							syncedRefreshToken: refreshToken,
 						})
 					)
 				)

@@ -1,6 +1,6 @@
 "use client"
 import Link from "next/link"
-import { forwardRef } from "react"
+import { forwardRef, type ForwardedRef } from "react"
 
 import formatDate from "~/utils/formatDate"
 import ListItem from "./ListItem"
@@ -14,33 +14,30 @@ interface Props {
 	className?: string
 }
 
-const AssignmentItem = forwardRef<HTMLLIElement, Props>(
-	({ title, href, dueAt, selected, disabled, className }, ref) => {
-		return (
-			<ListItem
-				selected={selected}
-				disabled={disabled}
-				ref={ref}
-				className={className}
+function AssignmentItem(
+	{ title, href, dueAt, selected, disabled, className }: Props,
+	ref: ForwardedRef<HTMLLIElement>
+) {
+	return (
+		<ListItem
+			selected={selected}
+			disabled={disabled}
+			ref={ref}
+			className={className}
+		>
+			<Link
+				href={href}
+				prefetch={true}
+				className="flex h-20 items-center justify-between"
 			>
-				<Link
-					href={href}
-					prefetch={true}
-					className="flex h-20 items-center justify-between"
-				>
-					<span className="text-lg font-medium opacity-90">
-						{title}
-					</span>
+				<span className="text-lg font-medium opacity-90">{title}</span>
 
-					<span className="opacity-60">
-						{dueAt ? `Due ${formatDate(dueAt)}` : "No due date"}
-					</span>
-				</Link>
-			</ListItem>
-		)
-	}
-)
+				<span className="opacity-60">
+					{dueAt ? `Due ${formatDate(dueAt)}` : "No due date"}
+				</span>
+			</Link>
+		</ListItem>
+	)
+}
 
-AssignmentItem.displayName = "AssignmentItem"
-
-export default AssignmentItem
+export default forwardRef(AssignmentItem)

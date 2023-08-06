@@ -59,11 +59,12 @@ export default async function ClassLayout({
 				<div className="group flex items-baseline justify-between">
 					<GradientText asChild>
 						<a
-							href={course.linkedUrl}
+							href={course.syncedUrl}
 							target="_blank"
+							rel="noreferrer"
 							className={cn(
 								"pb-5 text-6xl font-semibold",
-								course.linkedUrl !== undefined &&
+								course.syncedUrl !== undefined &&
 									"peer transition-all duration-150 hover:opacity-80 peer-hover:opacity-80"
 							)}
 						>
@@ -73,11 +74,12 @@ export default async function ClassLayout({
 
 					{course.section && (
 						<a
-							href={course.linkedUrl}
+							href={course.syncedUrl}
 							target="_blank"
+							rel="noreferrer"
 							className={cn(
 								"relative bottom-[1px] mr-1 ml-3 flex-shrink-0 text-base font-medium leading-none opacity-60",
-								course.linkedUrl !== undefined &&
+								course.syncedUrl !== undefined &&
 									"peer transition-all duration-150 hover:opacity-50 peer-hover:opacity-50"
 							)}
 						>

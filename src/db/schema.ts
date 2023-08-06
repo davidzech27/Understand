@@ -1,8 +1,9 @@
+import { sql } from "drizzle-orm"
 import {
 	mysqlTable,
 	varchar,
 	primaryKey,
-	datetime,
+	timestamp,
 	int,
 	text,
 	json,
@@ -15,7 +16,10 @@ export const user = mysqlTable("user", {
 	email: varchar("email", { length: 100 }).primaryKey(),
 	name: varchar("name", { length: 100 }).notNull(),
 	photo: varchar("photo", { length: 2000 }),
-	superuser: boolean("superuser").default(false),
+	createdAt: timestamp("created_at")
+		.notNull()
+		.default(sql`CURRENT_TIMESTAMP`),
+	superuser: boolean("superuser").notNull().default(false),
 })
 
 export const teacherToCourse = mysqlTable(
@@ -23,7 +27,7 @@ export const teacherToCourse = mysqlTable(
 	{
 		teacherEmail: varchar("teacher_email", { length: 100 }).notNull(),
 		courseId: varchar("course_id", { length: 100 }).notNull(),
-		linked: boolean("linked").notNull(),
+		syncedAt: timestamp("synced_at").default(sql`NULL`),
 	},
 	(table) => ({
 		cpk: primaryKey(table.teacherEmail, table.courseId),
@@ -39,7 +43,7 @@ export const studentToCourse = mysqlTable(
 	{
 		studentEmail: varchar("student_email", { length: 100 }).notNull(),
 		courseId: varchar("course_id", { length: 100 }).notNull(),
-		linked: boolean("linked").notNull(),
+		syncedAt: timestamp("synced_at").default(sql`NULL`),
 	},
 	(table) => ({
 		cpk: primaryKey(table.studentEmail, table.courseId),
@@ -54,8 +58,8 @@ export const course = mysqlTable("course", {
 	id: varchar("id", { length: 100 }).primaryKey(),
 	name: text("name").notNull(),
 	section: text("section"),
-	linkedUrl: text("linked_url"),
-	linkedRefreshToken: text("linked_refresh_token"),
+	syncedUrl: text("synced_url"),
+	syncedRefreshToken: text("synced_refresh_token"),
 })
 
 export const assignment = mysqlTable(
@@ -66,10 +70,9 @@ export const assignment = mysqlTable(
 		title: text("title").notNull(),
 		description: text("description"),
 		instructions: text("instructions"),
-		context: text("context"),
-		dueAt: datetime("due_at"),
-		linkedUrl: text("linked_url"),
-		instructionsLinked: boolean("instructions_linked"),
+		dueAt: timestamp("due_at").default(sql`NULL`),
+		syncedUrl: text("synced_url"),
+		syncedAt: timestamp("synced_at").default(sql`NULL`),
 	},
 	(table) => ({
 		cpk: primaryKey(table.courseId, table.assignmentId),
@@ -82,12 +85,13 @@ export const feedback = mysqlTable(
 		courseId: varchar("course_id", { length: 100 }).notNull(),
 		assignmentId: varchar("assignment_id", { length: 100 }).notNull(),
 		userEmail: varchar("user_email", { length: 100 }).notNull(),
-		givenAt: datetime("given_at").notNull(),
+		givenAt: timestamp("given_at").notNull(),
 		submissionHTML: text("submission_html").notNull(),
+		unrevisedSubmissionHTML: text("unrevised_submission_html").notNull(),
+		list: json("list").notNull(),
 		rawResponse: text("raw_response").notNull(),
-		metadata: json("metadata").notNull(),
 		insights: json("insights"),
-		synced: boolean("synced").default(false),
+		syncedInsightsAt: timestamp("synced_insights_at").default(sql`NULL`),
 	},
 	(table) => ({
 		cpk: primaryKey(
@@ -98,36 +102,11 @@ export const feedback = mysqlTable(
 		),
 		idx: index("course_id_given_at_idx").on(table.courseId, table.givenAt),
 		courseIdStudentEmailSyncedIdx: index(
-			"course_id_user_email_synced_idx"
-		).on(table.courseId, table.userEmail, table.synced),
+			"course_id_user_email_synced_insights_at_idx"
+		).on(table.courseId, table.userEmail, table.syncedInsightsAt),
 		courseIdAssignmentIdSyncedIdx: index(
-			"course_id_assignment_id_synced_idx"
-		).on(table.courseId, table.assignmentId, table.synced),
-	})
-)
-
-export const followUp = mysqlTable(
-	"follow_up",
-	{
-		courseId: varchar("course_id", { length: 100 }).notNull(),
-		assignmentId: varchar("assignment_id", { length: 100 }).notNull(),
-		userEmail: varchar("user_email", { length: 100 }).notNull(),
-		feedbackGivenAt: datetime("feedback_given_at").notNull(),
-		givenAt: datetime("given_at").notNull(),
-		paragraphNumber: int("paragraph_number"),
-		sentenceNumber: int("sentence_number"),
-		query: text("query").notNull(),
-		rawResponse: text("raw_response").notNull(),
-		metadata: json("metadata").notNull(),
-	},
-	(table) => ({
-		cpk: primaryKey(
-			table.courseId,
-			table.assignmentId,
-			table.userEmail,
-			table.feedbackGivenAt,
-			table.givenAt
-		),
+			"course_id_assignment_id_synced_insights_at_idx"
+		).on(table.courseId, table.assignmentId, table.syncedInsightsAt),
 	})
 )
 
@@ -137,6 +116,9 @@ export const studentInsight = mysqlTable(
 		courseId: varchar("course_id", { length: 100 }).notNull(),
 		studentEmail: varchar("student_email", { length: 100 }).notNull(),
 		insights: json("insights").notNull(),
+		syncedAt: timestamp("synced_at")
+			.notNull()
+			.default(sql`CURRENT_TIMESTAMP`),
 	},
 	(table) => ({
 		cpk: primaryKey(table.courseId, table.studentEmail),
@@ -149,6 +131,9 @@ export const assignmentInsight = mysqlTable(
 		courseId: varchar("course_id", { length: 100 }).notNull(),
 		assignmentId: varchar("assignment_id", { length: 100 }).notNull(),
 		insights: json("insights").notNull(),
+		syncedAt: timestamp("synced_at")
+			.notNull()
+			.default(sql`CURRENT_TIMESTAMP`),
 	},
 	(table) => ({
 		cpk: primaryKey(table.courseId, table.assignmentId),

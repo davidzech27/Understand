@@ -11,10 +11,10 @@ const updateFeedbackSubmissionAction = zact(
 	z.object({
 		courseId: z.string(),
 		assignmentId: z.string(),
-		feedbackGivenAt: z.date(),
+		givenAt: z.date(),
 		submissionHTML: z.string(),
 	})
-)(async ({ courseId, assignmentId, feedbackGivenAt, submissionHTML }) => {
+)(async ({ courseId, assignmentId, givenAt, submissionHTML }) => {
 	const { email } = await getAuthOrThrow({ cookies: cookies() })
 
 	const role = await User({ email }).courseRole({ id: courseId })
@@ -28,7 +28,7 @@ const updateFeedbackSubmissionAction = zact(
 		courseId,
 		assignmentId,
 		userEmail: email,
-		givenAt: feedbackGivenAt,
+		givenAt,
 	}).update({
 		submissionHTML,
 	})

@@ -8,6 +8,7 @@ export const metadata = {
 
 export default function NotFoundPage() {
 	if (env.NODE_ENV === "production") {
+		// TODO - log not found
 	}
 
 	return (

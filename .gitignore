@@ -3,6 +3,7 @@
 /.next/
 next-env.d.ts
 /build
+analyze
 
 .DS_Store
 *.pem

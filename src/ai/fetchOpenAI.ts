@@ -35,19 +35,17 @@ export default async function fetchOpenAI({
 
 		let streamedContent = ""
 
-		while (true) {
-			const result = await reader.read()
+		let result = await reader.read()
 
-			if (!result.done) {
-				streamedContent += textDecoder.decode(result.value)
+		while (!result.done) {
+			streamedContent += textDecoder.decode(result.value)
 
-				onContent(streamedContent)
-			} else {
-				onFinish && onFinish(streamedContent)
+			onContent(streamedContent)
 
-				break
-			}
+			result = await reader.read()
 		}
+
+		onFinish && onFinish(streamedContent)
 	} else {
 		console.error("This shouldn't happen")
 	}

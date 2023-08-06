@@ -52,11 +52,12 @@ export default async function AssignmentLayout({
 				<div className="flex items-baseline justify-between">
 					<GradientText asChild>
 						<a
-							href={assignment.linkedUrl}
+							href={assignment.syncedUrl}
 							target="_blank"
+							rel="noreferrer"
 							className={cn(
 								"pb-5 text-6xl font-semibold",
-								assignment.linkedUrl !== undefined &&
+								assignment.syncedUrl !== undefined &&
 									"transition-all duration-150 hover:opacity-80"
 							)}
 						>
@@ -77,7 +78,7 @@ export default async function AssignmentLayout({
 					</p>
 				)}
 
-				<AssignmentTabs role={role} assignment={assignment} />
+				<AssignmentTabs assignment={assignment} />
 			</Card>
 
 			{children}

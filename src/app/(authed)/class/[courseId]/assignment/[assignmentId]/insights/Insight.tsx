@@ -23,7 +23,7 @@ interface Props {
 	}[]
 }
 
-export default function Insight({ type, content, sources }: Props) {
+export default function Insight({ content, sources }: Props) {
 	const { hoverProps, isHovered } = useHover({})
 
 	const sourceListRef = useRef<HTMLDivElement>(null)
@@ -70,11 +70,11 @@ interface SourceProps {
 	paragraphs: number[]
 }
 
-const Source: React.FC<SourceProps> = ({
+function Source({
 	student: studentPromise,
 	submission,
 	paragraphs,
-}) => {
+}: SourceProps) {
 	const student = use(studentPromise)
 
 	const courseId = usePathname()?.slice(1).split("/")[1] ?? ""
@@ -142,13 +142,13 @@ interface SubmissionPreviewProps {
 	studentEmail: string
 }
 
-const SubmissionPreview: React.FC<SubmissionPreviewProps> = ({
+function SubmissionPreview({
 	submission: submissionPromise,
 	paragraphs,
 	courseId,
 	assignmentId,
 	studentEmail,
-}) => {
+}: SubmissionPreviewProps) {
 	const submission = use(submissionPromise)
 
 	const submissionPortions = useMemo(() => {

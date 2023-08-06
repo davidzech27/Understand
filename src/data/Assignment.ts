@@ -1,4 +1,4 @@
-import { eq, and, isNotNull } from "drizzle-orm"
+import { eq, and, isNotNull, sql, isNull } from "drizzle-orm"
 import { z } from "zod"
 
 import db from "~/db/db"
@@ -21,6 +21,11 @@ const assignmentInsightsSchema = z
 
 type AssignmentInsights = z.infer<typeof assignmentInsightsSchema>
 
+export type Assignment = Exclude<
+	Awaited<ReturnType<ReturnType<typeof Assignment>["get"]>>,
+	undefined
+>
+
 const Assignment = ({
 	courseId,
 	assignmentId,
@@ -32,18 +37,14 @@ const Assignment = ({
 		title,
 		description,
 		instructions,
-		context,
 		dueAt,
-		linkedUrl,
-		instructionsLinked,
+		syncedUrl,
 	}: {
 		title: string
 		description: string | undefined
 		instructions: string | undefined
-		context: string | undefined
 		dueAt: Date | undefined
-		linkedUrl: string | undefined
-		instructionsLinked: boolean
+		syncedUrl: string | undefined
 	}) => {
 		await db
 			.insert(assignment)
@@ -53,21 +54,18 @@ const Assignment = ({
 				title,
 				description,
 				instructions,
-				context,
 				dueAt,
-				linkedUrl,
-				instructionsLinked,
+				syncedUrl,
+				syncedAt: syncedUrl !== undefined ? new Date() : undefined,
 			})
 			.onDuplicateKeyUpdate({
 				set: {
-					...(title !== undefined ? { title } : {}),
-					...(description !== undefined ? { description } : {}),
-					...(instructions !== undefined ? { instructions } : {}),
-					...(context !== undefined ? { context } : {}),
-					...(dueAt !== undefined ? { dueAt } : {}),
-					...(instructionsLinked !== undefined
-						? { instructionsLinked }
-						: {}),
+					title,
+					description: description ?? null,
+					instructions: instructions ?? null,
+					dueAt: dueAt ?? null,
+					syncedUrl: syncedUrl ?? null,
+					syncedAt: syncedUrl !== undefined ? new Date() : null,
 				},
 			})
 	},
@@ -78,10 +76,9 @@ const Assignment = ({
 					title: assignment.title,
 					description: assignment.description,
 					instructions: assignment.instructions,
-					context: assignment.context,
 					dueAt: assignment.dueAt,
-					linkedUrl: assignment.linkedUrl,
-					instructionsLinked: assignment.instructionsLinked,
+					syncedUrl: assignment.syncedUrl,
+					syncedAt: assignment.syncedAt,
 				})
 				.from(assignment)
 				.where(
@@ -100,49 +97,32 @@ const Assignment = ({
 			title: row.title,
 			description: row.description ?? undefined,
 			instructions: row.instructions ?? undefined,
-			context: row.context ?? undefined,
-			dueAt:
-				(row.dueAt &&
-					new Date(
-						Date.UTC(
-							row.dueAt.getFullYear(),
-							row.dueAt.getMonth(),
-							row.dueAt.getDate(),
-							row.dueAt.getHours(),
-							row.dueAt.getMinutes()
-						)
-					)) ??
-				undefined,
-			linkedUrl: row.linkedUrl ?? undefined,
-			instructionsLinked: row.instructionsLinked ?? false,
+			dueAt: row.dueAt ?? undefined,
+			syncedUrl: row.syncedUrl ?? undefined,
+			syncedAt: row.syncedAt ?? undefined,
 		}
 	},
 	update: async ({
 		title,
 		description,
 		instructions,
-		context,
 		dueAt,
-		instructionsLinked,
+		syncedAt,
 	}: {
 		title?: string
 		description?: string | null
 		instructions?: string
-		context?: string
 		dueAt?: Date | null
-		instructionsLinked?: boolean
+		syncedAt: Date | null
 	}) => {
 		await db
 			.update(assignment)
 			.set({
-				...(title !== undefined ? { title } : {}),
-				...(description !== undefined ? { description } : {}),
-				...(instructions !== undefined ? { instructions } : {}),
-				...(context !== undefined ? { context } : {}),
-				...(dueAt !== undefined ? { dueAt } : {}),
-				...(instructionsLinked !== undefined
-					? { instructionsLinked }
-					: {}),
+				title,
+				description,
+				instructions,
+				dueAt,
+				syncedAt,
 			})
 			.where(
 				and(
@@ -208,6 +188,7 @@ const Assignment = ({
 			.onDuplicateKeyUpdate({
 				set: {
 					insights,
+					syncedAt: sql`CURRENT_TIMESTAMP`,
 				},
 			})
 	},
@@ -240,7 +221,7 @@ const Assignment = ({
 				and(
 					eq(feedback.courseId, courseId),
 					eq(feedback.assignmentId, assignmentId),
-					eq(feedback.synced, false),
+					isNull(feedback.syncedInsightsAt),
 					isNotNull(feedback.insights)
 				)
 			)

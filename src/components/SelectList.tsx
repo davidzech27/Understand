@@ -17,7 +17,7 @@ interface Props<TItem extends { id: string }> {
 	selectionType: "multiple" | "single" | "none"
 	selectionSet: Set<string>
 	setSelectionSet: (
-		updater: Set<string> | ((selectionSet: Set<string>) => Set<string>)
+		value: Set<string> | ((prevSelectionSet: Set<string>) => Set<string>)
 	) => void
 	className?: string
 }

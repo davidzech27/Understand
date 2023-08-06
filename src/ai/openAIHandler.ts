@@ -77,73 +77,66 @@ export default async function openaiHandler(request: NextRequest) {
 					let previousIncompleteChunk: Uint8Array | undefined =
 						undefined
 
-					while (true) {
-						const result = await reader.read()
+					let result = await reader.read()
 
-						if (!result.done) {
-							let chunk = result.value
+					while (!result.done) {
+						let chunk = result.value
 
-							if (previousIncompleteChunk !== undefined) {
-								const newChunk = new Uint8Array(
-									previousIncompleteChunk.length +
-										chunk.length
-								)
-
-								newChunk.set(previousIncompleteChunk)
-
-								newChunk.set(
-									chunk,
-									previousIncompleteChunk.length
-								)
-
-								chunk = newChunk
-
-								previousIncompleteChunk = undefined
-							}
-
-							const parts = textDecoder
-								.decode(chunk)
-								.split("\n")
-								.filter((line) => line !== "")
-								.map((line) => line.replace(/^data: /, ""))
-
-							for (const part of parts) {
-								if (part !== "[DONE]") {
-									try {
-										const partParsed = JSON.parse(
-											part
-										) as any
-
-										if (
-											typeof partParsed.choices[0].delta
-												.content !== "string"
-										)
-											continue
-
-										const contentDelta = partParsed
-											.choices[0].delta.content as string
-
-										controller.enqueue(
-											textEncoder.encode(contentDelta)
-										)
-									} catch (error) {
-										previousIncompleteChunk = chunk
-									}
-								} else {
-									controller.close()
-
-									return
-								}
-							}
-						} else {
-							console.error(
-								"This also shouldn't happen, because controller should be close()ed before getting to end of stream. Result: " +
-									JSON.stringify(result, null, 4)
+						if (previousIncompleteChunk !== undefined) {
+							const newChunk = new Uint8Array(
+								previousIncompleteChunk.length + chunk.length
 							)
+
+							newChunk.set(previousIncompleteChunk)
+
+							newChunk.set(chunk, previousIncompleteChunk.length)
+
+							chunk = newChunk
+
+							previousIncompleteChunk = undefined
 						}
+
+						const parts = textDecoder
+							.decode(chunk)
+							.split("\n")
+							.filter((line) => line !== "")
+							.map((line) => line.replace(/^data: /, ""))
+
+						for (const part of parts) {
+							if (part !== "[DONE]") {
+								try {
+									const partParsed = JSON.parse(part) as {
+										choices?: {
+											delta?: { content?: unknown }
+										}[]
+									}
+
+									if (
+										typeof partParsed.choices?.[0]?.delta
+											?.content !== "string"
+									)
+										continue
+
+									const contentDelta =
+										partParsed.choices[0].delta.content
+
+									controller.enqueue(
+										textEncoder.encode(contentDelta)
+									)
+								} catch (error) {
+									previousIncompleteChunk = chunk
+								}
+							} else {
+								controller.close()
+
+								return
+							}
+						}
+
+						result = await reader.read()
 					}
 				} else {
-					console.error("This shouldn't happen")
+					console.error("OpenAI response should have body")
 				}
 			},
 		}),

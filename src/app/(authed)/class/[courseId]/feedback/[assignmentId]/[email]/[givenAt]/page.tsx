@@ -42,14 +42,9 @@ export default async function FeedbackPage({
 
 	const givenAt = new Date(Number(givenAtString))
 
-	const [feedback, followUps, assignment, role] = await Promise.all([
+	const [feedback, assignment, role] = await Promise.all([
 		Feedback({ courseId, assignmentId, userEmail: email, givenAt }).get(),
-		Feedback({
-			courseId,
-			assignmentId,
-			userEmail: email,
-			givenAt,
-		}).followUps(),
+
 		Assignment({ courseId, assignmentId }).get(),
 		getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
 			User({ email }).courseRole({ id: courseId })
@@ -59,56 +54,5 @@ export default async function FeedbackPage({
 	if (feedback === undefined || assignment === undefined || role === "none")
 		notFound()
 
-	const lines = feedback.rawResponse.split("\n")
-
-	const headerLineIndex = {
-		specificFeedback: lines.findIndex(
-			(line) => line.search(/^Specific Feedback:?\s*$/) !== -1
-		),
-		generalFeedback: lines.findIndex(
-			(line) => line.search(/^General Feedback:?\s*$/) !== -1
-		),
-	}
-
-	const specificFeedbackList = lines
-		.slice(
-			headerLineIndex.specificFeedback + 1,
-			headerLineIndex.generalFeedback
-		)
-		.join("\n")
-		.split("\n\n")
-		.map((feedback) => ({
-			paragraph: Number(
-				feedback.match(
-					/(?<=^(\d\.[ ])?\s*Paragraph( number)?[ ]?:? ?)\d+/g
-				)?.[0]
-			),
-			sentence: Number(
-				feedback.match(/(?<=\nSentence( number)?[ ]?:? ?)-?\d+/g)?.[0]
-			),
-			content: feedback.match(/(?<=\nFeedback[ ]?: ).+/g)?.[0] ?? "",
-		}))
-		.map((feedback) => ({
-			...feedback,
-			followUps:
-				followUps.specific.find(
-					(followUpList) =>
-						followUpList.paragraphNumber === feedback.paragraph &&
-						followUpList.sentenceNumber === feedback.sentence
-				)?.messages ?? [],
-		}))
-
-	const generalFeedback = {
-		content: lines.slice(headerLineIndex.generalFeedback + 1).join("\n"),
-		followUps: followUps.general,
-	}
-
-	return (
-		<FeedbackComponent
-			assignment={assignment}
-			submissionHTML={feedback.submissionHTML}
-			generalFeedback={generalFeedback}
-			specificFeedbackList={specificFeedbackList}
-		/>
-	)
+	return <FeedbackComponent assignment={assignment} feedback={feedback} />
 }

@@ -3,19 +3,19 @@ import { cookies } from "next/headers"
 import { zact } from "zact/server"
 import { z } from "zod"
 
-import Feedback from "~/data/Feedback"
-import User from "~/data/User"
 import { getAuthOrThrow } from "~/auth/jwt"
+import Feedback, { feedbackListSchema } from "~/data/Feedback"
+import User from "~/data/User"
 
 const registerFeedbackAction = zact(
 	z.object({
 		courseId: z.string(),
 		assignmentId: z.string(),
 		submissionHTML: z.string(),
+		list: feedbackListSchema,
 		rawResponse: z.string(),
-		metadata: z.record(z.unknown()),
 	})
-)(async ({ courseId, assignmentId, submissionHTML, rawResponse, metadata }) => {
+)(async ({ courseId, assignmentId, list, submissionHTML, rawResponse }) => {
 	const { email } = await getAuthOrThrow({ cookies: cookies() })
 
 	const role = await User({ email }).courseRole({ id: courseId })
@@ -32,8 +32,8 @@ const registerFeedbackAction = zact(
 		givenAt,
 	}).create({
 		submissionHTML,
+		list,
 		rawResponse,
-		metadata,
 	})
 
 	return {

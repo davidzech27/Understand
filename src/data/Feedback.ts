@@ -2,7 +2,7 @@ import { eq, and } from "drizzle-orm"
 import { z } from "zod"
 
 import db from "~/db/db"
-import { feedback, followUp } from "~/db/schema"
+import { feedback } from "~/db/schema"
 
 export const feedbackInsightsSchema = z
 	.object({
@@ -12,7 +12,39 @@ export const feedbackInsightsSchema = z
 	})
 	.array()
 
-type FeedbackInsights = z.infer<typeof feedbackInsightsSchema>
+export type FeedbackInsights = z.infer<typeof feedbackInsightsSchema>
+
+export const followUpSchema = z.object({
+	userMessage: z.string(),
+	revisions: z
+		.object({
+			paragraph: z.number(),
+			sentence: z.number(),
+			oldContent: z.string(),
+			newContent: z.string(),
+		})
+		.array(),
+	aiMessage: z.string(),
+	sentAt: z.coerce.date(),
+})
+
+type FollowUp = z.infer<typeof followUpSchema>
+
+export const feedbackListSchema = z
+	.object({
+		paragraph: z.number().optional(),
+		sentence: z.number().optional(),
+		content: z.string(),
+		followUps: followUpSchema.array(),
+	})
+	.array()
+
+type FeedbackList = z.infer<typeof feedbackListSchema>
+
+export type Feedback = Exclude<
+	Awaited<ReturnType<ReturnType<typeof Feedback>["get"]>>,
+	undefined
+>
 
 const Feedback = ({
 	courseId,
@@ -27,12 +59,12 @@ const Feedback = ({
 }) => ({
 	create: async ({
 		submissionHTML,
+		list,
 		rawResponse,
-		metadata,
 	}: {
 		submissionHTML: string
+		list: FeedbackList
 		rawResponse: string
-		metadata: Record<string, unknown>
 	}) => {
 		await db.insert(feedback).values({
 			courseId,
@@ -40,15 +72,19 @@ const Feedback = ({
 			userEmail,
 			givenAt,
 			submissionHTML,
+			unrevisedSubmissionHTML: submissionHTML,
+			list,
 			rawResponse,
-			metadata,
 		})
 	},
 	get: async () => {
 		const row = (
 			await db
 				.select({
+					givenAt: feedback.givenAt,
 					submissionHTML: feedback.submissionHTML,
+					unrevisedSubmissionHTML: feedback.unrevisedSubmissionHTML,
+					list: feedback.list,
 					rawResponse: feedback.rawResponse,
 				})
 				.from(feedback)
@@ -62,12 +98,15 @@ const Feedback = ({
 				)
 		)[0]
 
-		if (!row) return undefined
-
-		return {
-			submissionHTML: row.submissionHTML ?? "",
-			rawResponse: row.rawResponse,
-		}
+		return (
+			row && {
+				givenAt: row.givenAt,
+				submissionHTML: row.submissionHTML,
+				unrevisedSubmissionHTML: row.unrevisedSubmissionHTML,
+				list: feedbackListSchema.parse(row.list),
+				rawResponse: row.rawResponse,
+			}
+		)
 	},
 	update: async ({
 		submissionHTML,
@@ -92,151 +131,68 @@ const Feedback = ({
 			)
 	},
 	delete: async () => {
-		await Promise.all([
-			db
-				.delete(feedback)
-				.where(
-					and(
-						eq(feedback.courseId, courseId),
-						eq(feedback.assignmentId, assignmentId),
-						eq(feedback.userEmail, userEmail),
-						eq(feedback.givenAt, givenAt)
-					)
-				),
-			db
-				.delete(followUp)
-				.where(
-					and(
-						eq(followUp.courseId, courseId),
-						eq(followUp.assignmentId, assignmentId),
-						eq(followUp.userEmail, userEmail),
-						eq(followUp.feedbackGivenAt, givenAt)
-					)
-				),
-		])
-	},
-	addFollowUp: async ({
-		paragraphNumber,
-		sentenceNumber,
-		query,
-		rawResponse,
-		metadata,
-	}: {
-		paragraphNumber: number | undefined
-		sentenceNumber: number | undefined
-		query: string
-		rawResponse: string
-		metadata: Record<string, unknown>
-	}) => {
-		await db.insert(followUp).values({
-			courseId,
-			assignmentId,
-			userEmail,
-			feedbackGivenAt: givenAt,
-			givenAt: new Date(),
-			paragraphNumber,
-			sentenceNumber,
-			query,
-			rawResponse,
-			metadata,
-		})
-	},
-	followUps: async () => {
-		const rows = await db
-			.select({
-				givenAt: followUp.givenAt,
-				query: followUp.query,
-				rawResponse: followUp.rawResponse,
-				paragraphNumber: followUp.paragraphNumber,
-				sentenceNumber: followUp.sentenceNumber,
-			})
-			.from(followUp)
+		await db
+			.delete(feedback)
 			.where(
 				and(
-					eq(followUp.courseId, courseId),
-					eq(followUp.assignmentId, assignmentId),
-					eq(followUp.userEmail, userEmail),
-					eq(followUp.feedbackGivenAt, givenAt)
+					eq(feedback.courseId, courseId),
+					eq(feedback.assignmentId, assignmentId),
+					eq(feedback.userEmail, userEmail),
+					eq(feedback.givenAt, givenAt)
 				)
 			)
-
-		return {
-			specific: rows
-				.map((row) =>
-					row.paragraphNumber !== null && row.sentenceNumber !== null
-						? {
-								paragraphNumber: row.paragraphNumber,
-								sentenceNumber: row.sentenceNumber,
-								givenAt: row.givenAt,
-								query: row.query,
-								rawResponse: row.rawResponse,
-						  }
-						: undefined
+	},
+	addFollowUp: async ({
+		paragraph,
+		sentence,
+		followUp,
+	}: {
+		paragraph?: number
+		sentence?: number
+		followUp: FollowUp
+	}) => {
+		await db.transaction(
+			async (tx) => {
+				const feedbackList = feedbackListSchema.parse(
+					(
+						await db
+							.select({ list: feedback.list })
+							.from(feedback)
+							.where(
+								and(
+									eq(feedback.courseId, courseId),
+									eq(feedback.assignmentId, assignmentId),
+									eq(feedback.userEmail, userEmail),
+									eq(feedback.givenAt, givenAt)
+								)
+							)
+					)[0]?.list
 				)
-				.filter(Boolean)
-				.reduce(
-					(prev, cur) => {
-						const feedback = prev.find(
-							(feedback) =>
-								feedback.paragraphNumber ===
-									cur.paragraphNumber &&
-								feedback.sentenceNumber === cur.sentenceNumber
+
+				feedbackList
+					.find(
+						(feedback) =>
+							feedback.paragraph === paragraph &&
+							feedback.sentence === sentence
+					)
+					?.followUps.push(followUp)
+
+				await tx
+					.update(feedback)
+					.set({ list: feedbackList })
+					.where(
+						and(
+							eq(feedback.courseId, courseId),
+							eq(feedback.assignmentId, assignmentId),
+							eq(feedback.userEmail, userEmail),
+							eq(feedback.givenAt, givenAt)
 						)
-
-						const message = {
-							givenAt: cur.givenAt,
-							query: cur.query,
-							rawResponse: cur.rawResponse,
-						}
-
-						if (feedback === undefined) {
-							return [
-								...prev,
-								{
-									paragraphNumber: cur.paragraphNumber,
-									sentenceNumber: cur.sentenceNumber,
-									messages: [message],
-								},
-							]
-						} else {
-							feedback.messages.push(message)
-
-							return prev
-						}
-					},
-					[] as {
-						paragraphNumber: number
-						sentenceNumber: number
-						messages: {
-							givenAt: Date
-							query: string
-							rawResponse: string
-						}[]
-					}[]
-				)
-				.map((feedback) => ({
-					...feedback,
-					messages: feedback.messages
-						.sort(
-							(row1, row2) =>
-								row1.givenAt.valueOf() - row2.givenAt.valueOf()
-						)
-						.map((row) => [row.query, row.rawResponse])
-						.flat(),
-				})),
-			general: rows
-				.filter(
-					(row) =>
-						row.paragraphNumber === null &&
-						row.sentenceNumber === null
-				)
-				.sort(
-					(row1, row2) =>
-						row1.givenAt.valueOf() - row2.givenAt.valueOf()
-				)
-				.map((row) => [row.query, row.rawResponse])
-				.flat(),
-		}
+					)
+			},
+			{
+				isolationLevel: "serializable",
+			}
+		)
 	},
 	insights: async () => {
 		const row = (
@@ -258,8 +214,8 @@ const Feedback = ({
 
 		return (
 			row && {
-				insights: feedbackInsightsSchema.parse(row.insights),
 				submissionHTML: row.submissionHTML,
+				insights: feedbackInsightsSchema.parse(row.insights),
 			}
 		)
 	},
@@ -292,12 +248,13 @@ const Feedback = ({
 				) {
 					await tx
 						.update(feedback)
-						.set({ synced: true })
+						.set({ syncedInsightsAt: new Date() })
 						.where(
 							and(
 								eq(feedback.courseId, courseId),
 								eq(feedback.assignmentId, assignmentId),
-								eq(feedback.userEmail, userEmail)
+								eq(feedback.userEmail, userEmail),
+								eq(feedback.givenAt, givenAt)
 							)
 						)
 				}

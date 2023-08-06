@@ -2,6 +2,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useZact } from "zact/client"
 
+import { type Assignment } from "~/data/Assignment"
 import updateAssignmentAction from "./updateAssignmentAction"
 import deleteAssignmentAction from "./deleteAssignmentAction"
 import Button from "~/components/Button"
@@ -14,19 +15,14 @@ import TextArea from "~/components/TextArea"
 interface Props {
 	open: boolean
 	setOpen: (open: boolean) => void
-	assignment: {
-		courseId: string
-		assignmentId: string
-		title: string
-		description?: string
-		instructions?: string
-		instructionsLinked: boolean
-		context?: string
-		dueAt?: Date
-	}
+	assignment: Assignment
 }
 
-export default function SettingsModal({ open, setOpen, assignment }: Props) {
+export default function AssignmentSettingsModal({
+	open,
+	setOpen,
+	assignment,
+}: Props) {
 	const router = useRouter()
 
 	const [titleInput, setTitleInput] = useState(assignment.title)
@@ -59,9 +55,6 @@ export default function SettingsModal({ open, setOpen, assignment }: Props) {
 			title: titleInput.trim(),
 			description: descriptionInput.trim() || undefined,
 			instructions: instructionsInput.trim(),
-			instructionsLinked:
-				assignment.instructionsLinked &&
-				instructionsInput.trim() === assignment.instructions?.trim(),
 			dueAt: assignment.dueAt,
 		})
 

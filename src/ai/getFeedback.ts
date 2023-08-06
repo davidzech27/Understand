@@ -1,4 +1,4 @@
-import breakIntoSentences from "~/utils/breakIntoSentences"
+import splitSentences from "~/utils/splitSentences"
 import fetchOpenAI from "./fetchOpenAI"
 
 // old comments, may not be relevant anymore:
@@ -15,35 +15,23 @@ export default async function getFeedback({
 	submission,
 	studentName,
 	courseName,
-	onSpecificContent,
-	onGeneralContent,
+	onContent,
 	onFinish,
 }: {
 	instructions: string
 	submission: string
 	studentName: string
 	courseName: string
-	onSpecificContent: ({}: {
+	onContent: ({
+		content,
+		paragraph,
+		sentence,
+	}: {
 		content: string
-		paragraph: number
-		sentence: number
+		paragraph?: number
+		sentence?: number
 	}) => void
-	onGeneralContent: (content: string) => void
-	onFinish: ({}: {
-		model: string
-		temperature: number
-		presencePenalty: number
-		frequencyPenalty: number
-		messages: {
-			role: "user" | "system" | "assistant"
-			content: string
-		}[]
-		rawResponse: string
-		synopsis: string
-		commentary: string
-		specificFeedback: string
-		generalFeedback: string
-	}) => void
+	onFinish: ({ rawResponse }: { rawResponse: string }) => void
 }) {
 	let lastParagraphNumber = undefined as number | undefined
 	let lastSentenceNumber = undefined as number | undefined
@@ -80,11 +68,15 @@ Here is some extra information:
 <student-progress-sentence-counts>
 ${submission
 	.split(/(\n|\t)/)
-	.filter((line) => line.indexOf(".") !== line.lastIndexOf("."))
+	.filter(
+		(line) =>
+			line.indexOf(".") !== -1 &&
+			line.indexOf(".") !== line.lastIndexOf(".")
+	)
 	.map(
 		(paragraph, paragraphNumber) =>
 			`<paragraph-${paragraphNumber + 1}>${
-				breakIntoSentences(paragraph).length
+				splitSentences(paragraph).length
 			}</paragraph-${paragraphNumber + 1}>`
 	)
 	.join("\n")}
@@ -118,7 +110,7 @@ Begin.`,
 			frequencyPenalty: 0.25,
 		}
 
-	console.debug(messages.map(({ content }) => content).join("\n\n\n\n"))
+	console.info(messages.map(({ content }) => content).join("\n\n\n\n"))
 
 	fetchOpenAI({
 		messages,
@@ -132,12 +124,12 @@ Begin.`,
 			)
 
 			if (generalFeedbackHeaderIndex !== -1) {
-				onGeneralContent(
-					content.slice(
+				onContent({
+					content: content.slice(
 						content.indexOf("\n", generalFeedbackHeaderIndex + 1) +
 							1
-					)
-				)
+					),
+				})
 			} else if (content.search(/\nSpecific Feedback:?\n/) !== -1) {
 				const feedback = content
 					.match(/(?<=\nFeedback[ ]*:[ ]*).+/g)
@@ -182,7 +174,7 @@ Begin.`,
 							{ lastParagraphNumber, lastSentenceNumber }
 						)
 					} else {
-						onSpecificContent({
+						onContent({
 							content: feedback,
 							paragraph: lastParagraphNumber,
 							sentence: lastSentenceNumber,
@@ -192,52 +184,8 @@ Begin.`,
 			}
 		},
 		onFinish: (content) => {
-			const lines = content.split("\n")
-
-			const headerLineIndex = {
-				commentary: lines.findIndex(
-					(line) => line.search(/^Commentary:?\s*$/) !== -1
-				),
-				specificFeedback: lines.findIndex(
-					(line) => line.search(/^Specific Feedback:?\s*$/) !== -1
-				),
-				generalFeedback: lines.findIndex(
-					(line) => line.search(/^General Feedback:?\s*$/) !== -1
-				),
-			}
-
 			onFinish({
-				messages: messages.concat({
-					role: "user",
-					content,
-				}),
-				model,
-				temperature,
-				presencePenalty,
-				frequencyPenalty,
 				rawResponse: content,
-				synopsis: lines
-					.slice(1, headerLineIndex.commentary)
-					.join("\n")
-					.trim(),
-				commentary: lines
-					.slice(
-						headerLineIndex.commentary + 1,
-						headerLineIndex.specificFeedback
-					)
-					.join("\n")
-					.trim(),
-				specificFeedback: lines
-					.slice(
-						headerLineIndex.specificFeedback + 1,
-						headerLineIndex.generalFeedback
-					)
-					.join("\n")
-					.trim(),
-				generalFeedback: lines
-					.slice(headerLineIndex.generalFeedback + 1)
-					.join("\n")
-					.trim(),
 			})
 		},
 	})

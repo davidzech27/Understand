@@ -69,11 +69,11 @@ interface SourceProps {
 	paragraphs: number[]
 }
 
-const Source: React.FC<SourceProps> = ({
+function Source({
 	assignment: assignmentPromise,
 	submissionHTML,
 	paragraphs,
-}) => {
+}: SourceProps) {
 	const assignment = use(assignmentPromise)
 
 	const courseId = usePathname()?.slice(1).split("/")[1] ?? ""
@@ -136,13 +136,13 @@ interface SubmissionPreviewProps {
 	studentEmail: string
 }
 
-const SubmissionPreview: React.FC<SubmissionPreviewProps> = ({
+function SubmissionPreview({
 	submissionHTML: submissionHTMLPromise,
 	paragraphs,
 	courseId,
 	assignmentId,
 	studentEmail,
-}) => {
+}: SubmissionPreviewProps) {
 	const submissionHTML = use(submissionHTMLPromise)
 
 	const submissionPortions = useMemo(() => {

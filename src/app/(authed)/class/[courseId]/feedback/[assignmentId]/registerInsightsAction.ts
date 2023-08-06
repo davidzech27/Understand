@@ -12,10 +12,9 @@ const registerInsightsAction = zact(
 		courseId: z.string(),
 		assignmentId: z.string(),
 		givenAt: z.date(),
-		submissionHTML: z.string(),
 		insights: feedbackInsightsSchema,
 	})
-)(async ({ courseId, assignmentId, givenAt, submissionHTML, insights }) => {
+)(async ({ courseId, assignmentId, givenAt, insights }) => {
 	const { email } = await getAuthOrThrow({ cookies: cookies() })
 
 	const role = await User({ email }).courseRole({ id: courseId })
@@ -29,7 +28,6 @@ const registerInsightsAction = zact(
 		userEmail: email,
 		givenAt,
 	}).update({
-		submissionHTML,
 		insights,
 	})
 })

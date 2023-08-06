@@ -39,7 +39,7 @@ const updateCourseAction = zact(
 				User({ email }).addToCourse({
 					id,
 					role: "teacher",
-					linked: false,
+					synced: false,
 				})
 			),
 			removeTeacherEmails.map((email) =>
@@ -49,7 +49,7 @@ const updateCourseAction = zact(
 				User({ email }).addToCourse({
 					id,
 					role: "student",
-					linked: false,
+					synced: false,
 				})
 			),
 			removeStudentEmails.map((email) =>

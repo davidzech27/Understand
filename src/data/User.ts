@@ -1,4 +1,4 @@
-import { desc, and, eq, or, gt, isNull, isNotNull } from "drizzle-orm"
+import { desc, and, eq, or, gt, isNull, isNotNull, sql } from "drizzle-orm"
 import { z } from "zod"
 
 import db from "~/db/db"
@@ -11,7 +11,7 @@ import {
 	feedback,
 	assignment,
 } from "~/db/schema"
-import { feedbackInsightsSchema } from "./Feedback"
+import { feedbackListSchema, feedbackInsightsSchema } from "./Feedback"
 
 const studentInsightsSchema = z
 	.object({
@@ -27,6 +27,11 @@ const studentInsightsSchema = z
 	.array()
 
 type StudentInsights = z.infer<typeof studentInsightsSchema>
+
+export type User = Exclude<
+	Awaited<ReturnType<ReturnType<typeof User>["get"]>>,
+	undefined
+>
 
 const User = ({ email }: { email: string }) => ({
 	create: async ({
@@ -92,7 +97,7 @@ const User = ({ email }: { email: string }) => ({
 				id: course.id,
 				name: course.name,
 				section: course.section,
-				linkedUrl: course.linkedUrl,
+				syncedUrl: course.syncedUrl,
 			})
 			.from(teacherToCourse)
 			.innerJoin(course, eq(course.id, teacherToCourse.courseId))
@@ -101,7 +106,7 @@ const User = ({ email }: { email: string }) => ({
 		return teaching.map((course) => ({
 			...course,
 			section: course.section ?? undefined,
-			linkedUrl: course.linkedUrl ?? undefined,
+			linkedUrl: course.syncedUrl ?? undefined,
 		}))
 	},
 	coursesEnrolled: async () => {
@@ -110,7 +115,7 @@ const User = ({ email }: { email: string }) => ({
 				id: course.id,
 				name: course.name,
 				section: course.section,
-				linkedUrl: course.linkedUrl,
+				syncedUrl: course.syncedUrl,
 			})
 			.from(studentToCourse)
 			.innerJoin(course, eq(course.id, studentToCourse.courseId))
@@ -119,17 +124,17 @@ const User = ({ email }: { email: string }) => ({
 		return enrolled.map((course) => ({
 			...course,
 			section: course.section ?? undefined,
-			linkedUrl: course.linkedUrl ?? undefined,
+			syncedUrl: course.syncedUrl ?? undefined,
 		}))
 	},
 	addToCourse: async ({
 		id,
 		role,
-		linked,
+		synced,
 	}: {
 		id: string
 		role: "teacher" | "student"
-		linked: boolean
+		synced: boolean
 	}) => {
 		if (role === "teacher") {
 			await db
@@ -137,7 +142,7 @@ const User = ({ email }: { email: string }) => ({
 				.values({
 					teacherEmail: email,
 					courseId: id,
-					linked,
+					syncedAt: synced ? new Date() : undefined,
 				})
 				.onDuplicateKeyUpdate({ set: { teacherEmail: email } })
 		}
@@ -148,7 +153,7 @@ const User = ({ email }: { email: string }) => ({
 				.values({
 					studentEmail: email,
 					courseId: id,
-					linked,
+					syncedAt: synced ? new Date() : undefined,
 				})
 				.onDuplicateKeyUpdate({ set: { studentEmail: email } })
 		}
@@ -212,7 +217,7 @@ const User = ({ email }: { email: string }) => ({
 
 		return "none" as const
 	},
-	feedback: async ({
+	feedbackHistory: async ({
 		courseId,
 		assignmentId,
 	}: {
@@ -223,6 +228,10 @@ const User = ({ email }: { email: string }) => ({
 			await db
 				.select({
 					givenAt: feedback.givenAt,
+					submissionHTML: feedback.submissionHTML,
+					unrevisedSubmissionHTML: feedback.unrevisedSubmissionHTML,
+					list: feedback.list,
+					rawResponse: feedback.rawResponse,
 				})
 				.from(feedback)
 				.where(
@@ -232,19 +241,23 @@ const User = ({ email }: { email: string }) => ({
 						eq(feedback.userEmail, email)
 					)
 				)
-		).map(({ givenAt }) => ({
-			givenAt: new Date(
-				Date.UTC(
-					givenAt.getFullYear(),
-					givenAt.getMonth(),
-					givenAt.getDate(),
-					givenAt.getHours(),
-					givenAt.getMinutes(),
-					givenAt.getSeconds(),
-					givenAt.getMilliseconds()
-				)
-			),
-		}))
+		).map(
+			({
+				givenAt,
+				submissionHTML,
+				unrevisedSubmissionHTML,
+				list,
+				rawResponse,
+			}) => {
+				return {
+					givenAt: givenAt,
+					submissionHTML,
+					unrevisedSubmissionHTML,
+					list: feedbackListSchema.parse(list),
+					rawResponse,
+				}
+			}
+		)
 	},
 	upcomingAssignments: async () => {
 		const [
@@ -353,6 +366,7 @@ const User = ({ email }: { email: string }) => ({
 			.onDuplicateKeyUpdate({
 				set: {
 					insights,
+					syncedAt: sql`CURRENT_TIMESTAMP`,
 				},
 			})
 	},
@@ -380,6 +394,7 @@ const User = ({ email }: { email: string }) => ({
 	}) => {
 		const [row] = await db
 			.select({
+				submissionHTML: feedback.submissionHTML,
 				insights: feedback.insights,
 			})
 			.from(feedback)
@@ -393,31 +408,12 @@ const User = ({ email }: { email: string }) => ({
 			.orderBy(desc(feedback.givenAt))
 			.limit(1)
 
-		return row && feedbackInsightsSchema.parse(row.insights)
-	},
-	lastSubmissionHTML: async ({
-		courseId,
-		assignmentId,
-	}: {
-		courseId: string
-		assignmentId: string
-	}) => {
 		return (
-			await db
-				.select({
-					submissionHTML: feedback.submissionHTML,
-				})
-				.from(feedback)
-				.where(
-					and(
-						eq(feedback.courseId, courseId),
-						eq(feedback.assignmentId, assignmentId),
-						isNotNull(feedback.insights)
-					)
-				)
-				.orderBy(desc(feedback.givenAt))
-				.limit(1)
-		)[0]?.submissionHTML
+			row && {
+				submissionHTML: row.submissionHTML,
+				insights: feedbackInsightsSchema.parse(row.insights),
+			}
+		)
 	},
 	unsyncedFeedbackInsights: async ({ courseId }: { courseId: string }) => {
 		return (
@@ -432,7 +428,7 @@ const User = ({ email }: { email: string }) => ({
 					and(
 						eq(feedback.courseId, courseId),
 						eq(feedback.userEmail, email),
-						eq(feedback.synced, false),
+						isNull(feedback.syncedInsightsAt),
 						isNotNull(feedback.insights)
 					)
 				)

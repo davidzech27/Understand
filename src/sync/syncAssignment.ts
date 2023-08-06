@@ -14,7 +14,7 @@ export default async function syncAssignment({
 		(async () => {
 			const refreshToken = await Course({
 				id: courseId,
-			}).linkedRefreshToken()
+			}).syncedRefreshToken()
 
 			if (refreshToken === undefined)
 				throw new Error(
@@ -353,6 +353,7 @@ ${attachment.text}
 				assignmentId: assignment.id,
 			}).update({
 				instructions,
+				syncedAt: new Date(),
 			}),
 	])
 }

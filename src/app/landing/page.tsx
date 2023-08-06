@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation"
 import { cookies } from "next/headers"
-import { Suspense } from "react"
 
 import { getAuthOrThrow } from "~/auth/jwt"
 import User from "~/data/User"

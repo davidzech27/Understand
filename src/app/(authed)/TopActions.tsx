@@ -11,15 +11,18 @@ export default function TopActions() {
 		<NavigationMenu.Root delayDuration={0} className="relative">
 			<NavigationMenu.List>
 				<NavigationMenu.Item>
-					<NavigationMenu.Trigger asChild>
-						<button className="flex h-8 items-center space-x-[1px] rounded-md bg-background-raised  px-2 transition-all duration-150 hover:bg-background-raised-hover">
-							<Plus size={20} className="opacity-80" />
+					<NavigationMenu.Trigger
+						// not optimal
+						id="radix-:Rcmqcq:-trigger-radix-:R3cmqcq:"
+						aria-controls="radix-:Rcmqcq:-content-radix-:R3cmqcq:"
+						className="flex h-8 items-center space-x-[1px] rounded-md bg-background-raised px-2 transition-all duration-150 hover:bg-background-raised-hover"
+					>
+						<Plus size={20} className="opacity-80" />
 
-							<ChevronDown
-								size={20}
-								className="relative top-[1px] opacity-60"
-							/>
-						</button>
+						<ChevronDown
+							size={20}
+							className="relative top-[1px] opacity-60"
+						/>
 					</NavigationMenu.Trigger>
 
 					<NavigationMenu.Content className="flex flex-col space-y-1.5 p-3">

@@ -15,28 +15,28 @@ const createCourseAction = zact(
 		id: z.string(),
 		name: z.string().min(1),
 		section: z.string().min(1).optional(),
-		linkedAdditionalTeacherEmails: z.string().array(),
-		linkedStudentEmails: z.string().array(),
-		unlinkedAdditionalTeacherEmails: z.string().array(),
-		unlinkedStudentEmails: z.string().array(),
-		linkedUrl: z.string().url().optional(),
+		syncedAdditionalTeacherEmails: z.string().array(),
+		syncedStudentEmails: z.string().array(),
+		unsyncedAdditionalTeacherEmails: z.string().array(),
+		unsyncedStudentEmails: z.string().array(),
+		syncedUrl: z.string().url().optional(),
 	})
 )(
 	async ({
 		id,
 		name,
 		section,
-		linkedAdditionalTeacherEmails,
-		linkedStudentEmails,
-		unlinkedAdditionalTeacherEmails,
-		unlinkedStudentEmails,
-		linkedUrl,
+		syncedAdditionalTeacherEmails,
+		syncedStudentEmails,
+		unsyncedAdditionalTeacherEmails,
+		unsyncedStudentEmails,
+		syncedUrl,
 	}) => {
 		const { email, ...creatorAuth } = await getAuthOrThrow({
 			cookies: cookies(),
 		})
 
-		if (linkedUrl !== undefined) {
+		if (syncedUrl !== undefined) {
 			const googleAPI = await GoogleAPI({
 				refreshToken: creatorAuth.googleRefreshToken,
 			})
@@ -53,66 +53,66 @@ const createCourseAction = zact(
 			}
 		}
 
-		linkedAdditionalTeacherEmails =
-			linkedAdditionalTeacherEmails.filter(isEmailValid)
+		syncedAdditionalTeacherEmails =
+			syncedAdditionalTeacherEmails.filter(isEmailValid)
 
-		linkedStudentEmails = linkedStudentEmails.filter(isEmailValid)
+		syncedStudentEmails = syncedStudentEmails.filter(isEmailValid)
 
-		unlinkedAdditionalTeacherEmails =
-			unlinkedAdditionalTeacherEmails.filter(isEmailValid)
+		unsyncedAdditionalTeacherEmails =
+			unsyncedAdditionalTeacherEmails.filter(isEmailValid)
 
-		unlinkedStudentEmails = unlinkedStudentEmails.filter(isEmailValid)
+		unsyncedStudentEmails = unsyncedStudentEmails.filter(isEmailValid)
 
 		await Promise.all([
 			Course({ id }).create({
 				name,
 				section,
-				...(linkedUrl !== undefined
+				...(syncedUrl !== undefined
 					? {
-							linkedUrl,
-							linkedRefreshToken: creatorAuth.googleRefreshToken,
+							syncedUrl,
+							syncedRefreshToken: creatorAuth.googleRefreshToken,
 					  }
 					: {
-							linkedUrl: undefined,
-							linkedRefreshToken: undefined,
+							syncedUrl: undefined,
+							syncedRefreshToken: undefined,
 					  }),
 			}),
-			User({ email }).addToCourse({ id, role: "teacher", linked: false }),
-			...linkedAdditionalTeacherEmails.map(
+			User({ email }).addToCourse({ id, role: "teacher", synced: false }),
+			...syncedAdditionalTeacherEmails.map(
 				async (email) =>
 					await User({ email }).addToCourse({
 						id,
 						role: "teacher",
-						linked: true,
+						synced: true,
 					})
 			),
-			...linkedStudentEmails.map(
+			...syncedStudentEmails.map(
 				async (email) =>
 					await User({ email }).addToCourse({
 						id,
 						role: "student",
-						linked: true,
+						synced: true,
 					})
 			),
-			...unlinkedAdditionalTeacherEmails.map(
+			...unsyncedAdditionalTeacherEmails.map(
 				async (email) =>
 					await User({ email }).addToCourse({
 						id,
 						role: "teacher",
-						linked: false,
+						synced: false,
 					})
 			),
-			...unlinkedStudentEmails.map(
+			...unsyncedStudentEmails.map(
 				async (email) =>
 					await User({ email }).addToCourse({
 						id,
 						role: "student",
-						linked: false,
+						synced: false,
 					})
 			),
 		])
 
-		if (linkedUrl !== undefined) {
+		if (syncedUrl !== undefined) {
 			await syncCourse({ id })
 		}
 	}

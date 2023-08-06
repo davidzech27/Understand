@@ -2,25 +2,16 @@
 import { useState } from "react"
 import { Settings2 } from "lucide-react"
 
+import { type Assignment } from "~/data/Assignment"
 import Button from "~/components/Button"
-import SettingsModal from "./SettingsModal"
+import AssignmentSettingsModal from "./AssignmentSettingsModal"
 import LinkButton from "~/components/LinkButton"
 
 interface Props {
-	role: "teacher" | "student"
-	assignment: {
-		courseId: string
-		assignmentId: string
-		title: string
-		description?: string
-		instructions?: string
-		instructionsLinked: boolean
-		context?: string
-		dueAt?: Date
-	}
+	assignment: Assignment
 }
 
-export default function AssignmentTabs({ role, assignment }: Props) {
+export default function AssignmentTabs({ assignment }: Props) {
 	const [settingsModalOpen, setSettingsModalOpen] = useState(false)
 
 	const [feedbackLinkCopied, setFeedbackLinkCopied] = useState(false)
@@ -74,7 +65,7 @@ export default function AssignmentTabs({ role, assignment }: Props) {
 				/>
 			</div>
 
-			<SettingsModal
+			<AssignmentSettingsModal
 				open={settingsModalOpen}
 				setOpen={setSettingsModalOpen}
 				assignment={assignment}

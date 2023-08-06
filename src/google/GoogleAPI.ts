@@ -126,6 +126,8 @@ const studentSubmissionAttachmentSchema = z.discriminatedUnion("type", [
 	}),
 ])
 
+const utcToLocal = (utc: Date) => new Date(`${utc.toString()} UTC`)
+
 export default async function GoogleAPI({
 	refreshToken,
 }: {
@@ -169,7 +171,7 @@ export default async function GoogleAPI({
 				nextPageToken: string | undefined
 			}
 
-			let { courses, nextPageToken } = (await (
+			const response = (await (
 				await fetch(
 					`https://classroom.googleapis.com/v1/courses?teacherId=me&courseStates=ACTIVE${
 						includeArchived ? ",ARCHIVED" : ""
@@ -181,6 +183,10 @@ export default async function GoogleAPI({
 					}
 				)
 			).json()) as Response
+
+			const { courses } = response
+
+			let { nextPageToken } = response
 
 			while (nextPageToken !== undefined) {
 				const response = (await (
@@ -222,7 +228,7 @@ export default async function GoogleAPI({
 				nextPageToken: string | undefined
 			}
 
-			let { courses, nextPageToken } = (await (
+			const response = (await (
 				await fetch(
 					`https://classroom.googleapis.com/v1/courses?studentId=me&courseStates=ACTIVE${
 						includeArchived ? ",ARCHIVED" : ""
@@ -234,6 +240,10 @@ export default async function GoogleAPI({
 					}
 				)
 			).json()) as Response
+
+			const { courses } = response
+
+			let { nextPageToken } = response
 
 			while (nextPageToken !== undefined) {
 				const response = (await (
@@ -288,10 +298,7 @@ export default async function GoogleAPI({
 				nextPageToken: string | undefined
 			}
 
-			let [
-				{ teachers, nextPageToken: nextPageTokenTeachers },
-				{ students, nextPageToken: nextPageTokenStudents },
-			] = (await Promise.all([
+			const [responseTeachers, responseStudents] = (await Promise.all([
 				fetch(
 					`https://classroom.googleapis.com/v1/courses/${courseId}/teachers`,
 					{
@@ -310,8 +317,16 @@ export default async function GoogleAPI({
 				).then((response) => response.json()),
 			])) as [TeachersResponse, StudentsResponse]
 
+			const { teachers } = responseTeachers
+
+			let { nextPageToken: nextPageTokenTeachers } = responseTeachers
+
+			const { students } = responseStudents
+
+			let { nextPageToken: nextPageTokenStudents } = responseStudents
+
 			await Promise.all([
-				new Promise<void>(async (res) => {
+				(async () => {
 					while (nextPageTokenTeachers !== undefined) {
 						const response = (await fetch(
 							`https://classroom.googleapis.com/v1/courses/${courseId}/teachers?pageToken=${nextPageTokenTeachers}`,
@@ -328,10 +343,8 @@ export default async function GoogleAPI({
 
 						nextPageTokenTeachers = response.nextPageToken
 					}
-
-					res()
-				}),
-				new Promise<void>(async (res) => {
+				})(),
+				(async () => {
 					while (nextPageTokenStudents !== undefined) {
 						const response = (await fetch(
 							`https://classroom.googleapis.com/v1/courses/${courseId}/students?pageToken=${nextPageTokenStudents}`,
@@ -348,9 +361,7 @@ export default async function GoogleAPI({
 
 						nextPageTokenStudents = response.nextPageToken
 					}
-
-					res()
-				}),
+				})(),
 			])
 
 			return rosterSchema.parse({
@@ -423,7 +434,7 @@ export default async function GoogleAPI({
 				nextPageToken: string | undefined
 			}
 
-			let { courseWork, nextPageToken } = (await (
+			const response = (await (
 				await fetch(
 					`https://classroom.googleapis.com/v1/courses/${courseId}/courseWork?orderBy=updateTime%20asc`,
 					{
@@ -433,6 +444,10 @@ export default async function GoogleAPI({
 					}
 				)
 			).json()) as Response
+
+			const { courseWork } = response
+
+			let { nextPageToken } = response
 
 			while (nextPageToken !== undefined) {
 				const response = (await (
@@ -535,8 +550,8 @@ export default async function GoogleAPI({
 											dueTime &&
 											dueTime.hours &&
 											dueTime.minutes
-												? new Date(
-														Date.UTC(
+												? utcToLocal(
+														new Date(
 															dueDate.year,
 															dueDate.month - 1,
 															dueDate.day,
@@ -694,8 +709,8 @@ export default async function GoogleAPI({
 						dueTime &&
 						dueTime.hours &&
 						dueTime.minutes
-							? new Date(
-									Date.UTC(
+							? utcToLocal(
+									new Date(
 										dueDate.year,
 										dueDate.month - 1,
 										dueDate.day,
@@ -769,7 +784,7 @@ export default async function GoogleAPI({
 				nextPageToken: string | undefined
 			}
 
-			let { courseWorkMaterial, nextPageToken } = (await (
+			const response = (await (
 				await fetch(
 					`https://classroom.googleapis.com/v1/courses/${courseId}/courseWorkMaterials?orderBy=updateTime%20asc`,
 					{
@@ -779,6 +794,10 @@ export default async function GoogleAPI({
 					}
 				)
 			).json()) as Response
+
+			const { courseWorkMaterial } = response
+
+			let { nextPageToken } = response
 
 			while (nextPageToken !== undefined) {
 				const response = (await (
@@ -867,8 +886,8 @@ export default async function GoogleAPI({
 							dueTime &&
 							dueTime.hours &&
 							dueTime.minutes
-							? new Date(
-									Date.UTC(
+							? utcToLocal(
+									new Date(
 										dueDate.year,
 										dueDate.month - 1,
 										dueDate.day,
@@ -939,7 +958,7 @@ export default async function GoogleAPI({
 				nextPageToken: string | undefined
 			}
 
-			let { studentSubmissions, nextPageToken } = (await (
+			const response = (await (
 				await fetch(
 					`https://classroom.googleapis.com/v1/courses/${courseId}/courseWork/${assignmentId}/studentSubmissions${
 						email !== undefined ? `?userId=${email}` : ""
@@ -951,6 +970,10 @@ export default async function GoogleAPI({
 					}
 				)
 			).json()) as Response
+
+			const { studentSubmissions } = response
+
+			let { nextPageToken } = response
 
 			while (nextPageToken !== undefined) {
 				const response = (await (

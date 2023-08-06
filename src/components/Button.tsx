@@ -1,6 +1,7 @@
 "use client"
 import {
 	forwardRef,
+	type ForwardedRef,
 	type ButtonHTMLAttributes,
 	type DetailedHTMLProps,
 } from "react"
@@ -17,66 +18,60 @@ interface Props
 	loading?: boolean
 }
 
-const Button = forwardRef<HTMLButtonElement, Props>(
-	(
-		{ children, onClick, size, loading, disabled, className, ...props },
-		ref
-	) => {
-		if (loading) disabled = true
+function Button(
+	{ children, onClick, size, loading, disabled, className, ...props }: Props,
+	ref: ForwardedRef<HTMLButtonElement>
+) {
+	if (loading) disabled = true
 
-		return (
-			<div
+	return (
+		<div
+			className={cn(
+				"relative",
+				size === "large" && "h-20",
+				className
+					?.split(" ")
+					.filter(
+						(name) => name.startsWith("h-") || name.startsWith("w-")
+					)
+					.join(" ") ?? ""
+			)}
+		>
+			<button
+				{...props}
+				onClick={onClick}
+				disabled={disabled}
+				ref={ref}
 				className={cn(
-					"relative",
-					size === "large" && "h-20",
+					"rounded-md bg-surface-selected px-6 py-2.5 font-medium outline-none transition-all duration-150",
+					{
+						small: "text-base", // maybe add height for consistency
+						medium: "text-lg",
+						large: "text-3xl",
+					}[size],
+					disabled
+						? "opacity-40"
+						: "opacity-60 hover:bg-surface-selected-hover hover:opacity-80 focus-visible:bg-surface-selected-hover focus-visible:opacity-80",
+					"h-full w-full",
 					className
 						?.split(" ")
 						.filter(
 							(name) =>
-								name.startsWith("h-") || name.startsWith("w-")
+								!name.startsWith("h-") && !name.startsWith("w-")
 						)
 						.join(" ") ?? ""
 				)}
 			>
-				<button
-					{...props}
-					onClick={onClick}
-					disabled={disabled}
-					ref={ref}
-					className={cn(
-						"rounded-md bg-surface-selected px-6 py-2.5 font-medium outline-none transition-all duration-150",
-						{
-							small: "text-base", // maybe add height for consistency
-							medium: "text-lg",
-							large: "text-3xl",
-						}[size],
-						disabled
-							? "opacity-40"
-							: "opacity-60 hover:bg-surface-selected-hover hover:opacity-80 focus-visible:bg-surface-selected-hover focus-visible:opacity-80",
-						"h-full w-full",
-						className
-							?.split(" ")
-							.filter(
-								(name) =>
-									!name.startsWith("h-") &&
-									!name.startsWith("w-")
-							)
-							.join(" ") ?? ""
-					)}
-				>
-					{loading ? (
-						<LoadingSpinner className="mx-auto h-6 w-6 fill-black opacity-90" />
-					) : (
-						children
-					)}
-				</button>
+				{loading ? (
+					<LoadingSpinner className="mx-auto h-6 w-6 fill-black opacity-90" />
+				) : (
+					children
+				)}
+			</button>
 
-				<div className="absolute bottom-0 left-0 right-0 top-0 -z-10 rounded-md bg-white" />
-			</div>
-		)
-	}
-)
+			<div className="absolute bottom-0 left-0 right-0 top-0 -z-10 rounded-md bg-white" />
+		</div>
+	)
+}
 
-Button.displayName = "Button"
-
-export default Button
+export default forwardRef(Button)

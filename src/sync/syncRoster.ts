@@ -9,11 +9,11 @@ export default async function syncRoster({ courseId }: { courseId: string }) {
 			Course({ id: courseId }).students(),
 		]).then(([teachers, students]) => ({ teachers, students })),
 		Course({ id: courseId })
-			.linkedRefreshToken()
+			.syncedRefreshToken()
 			.then((refreshToken) => {
 				if (refreshToken === undefined)
 					throw new Error(
-						"Linked refresh token could not be found for course"
+						"Synced refresh token could not be found for course"
 					)
 
 				return GoogleAPI({ refreshToken })
@@ -25,8 +25,8 @@ export default async function syncRoster({ courseId }: { courseId: string }) {
 		dbRoster.teachers.map(({ email }) => email)
 	)
 
-	const dbLinkedTeacherEmails = dbRoster.teachers
-		.filter(({ linked }) => linked)
+	const dbSyncedTeacherEmails = dbRoster.teachers
+		.filter(({ syncedAt }) => syncedAt !== undefined)
 		.map(({ email }) => email)
 
 	const classroomTeacherEmailSet = new Set(
@@ -37,8 +37,8 @@ export default async function syncRoster({ courseId }: { courseId: string }) {
 		dbRoster.students.map(({ email }) => email)
 	)
 
-	const dbLinkedStudentEmails = dbRoster.students
-		.filter(({ linked }) => linked)
+	const dbSyncedStudentEmails = dbRoster.students
+		.filter(({ syncedAt }) => syncedAt !== undefined)
 		.map(({ email }) => email)
 
 	const classroomStudentEmailSet = new Set(
@@ -51,12 +51,12 @@ export default async function syncRoster({ courseId }: { courseId: string }) {
 				return User({ email }).addToCourse({
 					id: courseId,
 					role: "teacher",
-					linked: true,
+					synced: true,
 				})
 
 			return undefined
 		}),
-		...dbLinkedTeacherEmails.map((email) => {
+		...dbSyncedTeacherEmails.map((email) => {
 			if (!classroomTeacherEmailSet.has(email))
 				return User({ email }).removeFromCourse({
 					id: courseId,
@@ -70,12 +70,12 @@ export default async function syncRoster({ courseId }: { courseId: string }) {
 				return User({ email }).addToCourse({
 					id: courseId,
 					role: "student",
-					linked: true,
+					synced: true,
 				})
 
 			return undefined
 		}),
-		...dbLinkedStudentEmails.map((email) => {
+		...dbSyncedStudentEmails.map((email) => {
 			if (!classroomStudentEmailSet.has(email))
 				return User({ email }).removeFromCourse({
 					id: courseId,

@@ -37,10 +37,8 @@ const createAssignmentAction = zact(
 				title,
 				description,
 				instructions,
-				context: undefined,
 				dueAt,
-				linkedUrl: undefined,
-				instructionsLinked: false,
+				syncedUrl: undefined,
 			}),
 			Course({ id: courseId }).createResource({
 				instructionsForAssignmentId: assignmentId,

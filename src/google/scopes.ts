@@ -11,7 +11,7 @@ const scopes = [
 	"https://www.googleapis.com/auth/drive.readonly", // used to get the text of the assignments and attachments in a Google Classroom class or a student's Google Classroom assignment submission
 	"https://www.googleapis.com/auth/classroom.push-notifications", // used for Google Classroom syncing
 ] as const
-// https://www.googleapis.com/auth/classroom.student-submissions.students.readonly
+
 export default scopes
 
 export type Scope = {

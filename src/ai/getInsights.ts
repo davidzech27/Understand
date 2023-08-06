@@ -1,34 +1,55 @@
+import { type Feedback } from "~/data/Feedback"
 import fetchOpenAI from "./fetchOpenAI"
 
 export default async function getInsights({
-	instructions,
-	submission,
-	specificFeedback,
-	generalFeedback,
+	feedback,
+	assignmentInstructions,
+	submissionText,
 }: {
-	instructions: string
-	submission: string
-	specificFeedback: string
-	generalFeedback: string
+	feedback: Feedback
+	assignmentInstructions: string
+	submissionText: string
 }) {
-	const completion = await new Promise<string>((res) =>
-		fetchOpenAI({
-			messages: [
-				{
-					role: "system",
-					content:
-						"You are an uncommonly creative and nuanced teacher's assistant.",
-				},
-				{
-					role: "user",
-					content: `The following is a prompt for an assignment in a high school course:
+	const lines = feedback.rawResponse.split("\n")
+
+	const headerLineIndex = {
+		specificFeedback: lines.findIndex(
+			(line) => line.search(/^Specific Feedback:?\s*$/) !== -1
+		),
+		generalFeedback: lines.findIndex(
+			(line) => line.search(/^General Feedback:?\s*$/) !== -1
+		),
+	}
+
+	const specificFeedback = lines
+		.slice(
+			headerLineIndex.specificFeedback + 1,
+			headerLineIndex.generalFeedback
+		)
+		.join("\n")
+		.trim()
+
+	const generalFeedback = lines
+		.slice(headerLineIndex.generalFeedback + 1)
+		.join("\n")
+		.trim()
+
+	const messages = [
+		{
+			role: "system" as const,
+			content:
+				"You are an uncommonly creative and nuanced teacher's assistant.",
+		},
+		{
+			role: "user" as const,
+			content: `The following is a prompt for an assignment in a high school course:
 <assignment-prompt>
-${instructions}
+${assignmentInstructions}
 </assignment-prompt>
 
 The following is a high school student's progress on that assignment:
 <student-progress>
-${submission}
+${submissionText}
 </student-progress>
 
 The following is feedback provided to the student on specific segments of their work:
@@ -50,8 +71,12 @@ Paragraph number: {paragraph number(s) for every paragraph where strength/weakne
 Content: {a statement about the student's understanding of the subject. If it is a weakness, hypothesize as to what may have caused this weakness}
 
 Begin.`,
-				},
-			],
+		},
+	]
+
+	const completion = await new Promise<string>((res) =>
+		fetchOpenAI({
+			messages,
 			model: "gpt-4-0613",
 			presencePenalty: 0.5,
 			frequencyPenalty: 0.5,
@@ -59,6 +84,13 @@ Begin.`,
 			onContent: () => {},
 			onFinish: res,
 		})
+	)
+
+	console.info(
+		messages
+			.map(({ content }) => content)
+			.concat(completion)
+			.join("\n\n\n\n")
 	)
 
 	return {

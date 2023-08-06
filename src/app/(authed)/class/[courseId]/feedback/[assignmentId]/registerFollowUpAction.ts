@@ -3,8 +3,8 @@ import { cookies } from "next/headers"
 import { zact } from "zact/server"
 import { z } from "zod"
 
-import Feedback from "~/data/Feedback"
 import { getAuthOrThrow } from "~/auth/jwt"
+import Feedback, { followUpSchema } from "~/data/Feedback"
 import User from "~/data/User"
 
 const registerFollowUpAction = zact(
@@ -12,22 +12,18 @@ const registerFollowUpAction = zact(
 		courseId: z.string(),
 		assignmentId: z.string(),
 		feedbackGivenAt: z.date(),
-		paragraphNumber: z.union([z.number(), z.undefined()]),
-		sentenceNumber: z.union([z.number(), z.undefined()]),
-		query: z.string(),
-		rawResponse: z.string(),
-		metadata: z.record(z.unknown()),
+		paragraph: z.number().optional(),
+		sentence: z.number().optional(),
+		followUp: followUpSchema,
 	})
 )(
 	async ({
 		courseId,
 		assignmentId,
 		feedbackGivenAt,
-		paragraphNumber,
-		sentenceNumber,
-		query,
-		rawResponse,
-		metadata,
+		paragraph,
+		sentence,
+		followUp,
 	}) => {
 		const { email } = await getAuthOrThrow({ cookies: cookies() })
 
@@ -44,11 +40,9 @@ const registerFollowUpAction = zact(
 			userEmail: email,
 			givenAt: feedbackGivenAt,
 		}).addFollowUp({
-			paragraphNumber,
-			sentenceNumber,
-			query,
-			rawResponse,
-			metadata,
+			paragraph: paragraph,
+			sentence: sentence,
+			followUp,
 		})
 	}
 )

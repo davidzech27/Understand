@@ -37,8 +37,11 @@ export default async function AssignmentInsightsPage({
 			submission: User({
 				email: source.studentEmail,
 			})
-				.lastSubmissionHTML({ courseId, assignmentId })
-				.then((submissionHTML) => submissionHTML ?? ""),
+				.lastFeedbackInsights({ courseId, assignmentId })
+				.then(
+					(lastFeedbackInsights) =>
+						lastFeedbackInsights?.submissionHTML ?? ""
+				),
 			paragraphs: source.paragraphs,
 		})),
 	}))

@@ -1,4 +1,4 @@
-import { type HTMLProps, useRef, forwardRef } from "react"
+import { useRef, forwardRef, type HTMLProps, type ForwardedRef } from "react"
 
 import cn from "~/utils/cn"
 import ListItem from "./ListItem"
@@ -14,69 +14,71 @@ interface Props extends HTMLProps<HTMLLIElement> {
 	className?: string
 }
 
-const AttachmentItem = forwardRef<HTMLLIElement, Props>(
-	(
-		{ name, subname, photo, url, selected, disabled, className, ...props },
-		ref
-	) => {
-		const urlRef = useRef<HTMLAnchorElement>(null)
+function AttachmentItem(
+	{
+		name,
+		subname,
+		photo,
+		url,
+		selected,
+		disabled,
+		className,
+		...props
+	}: Props,
+	ref: ForwardedRef<HTMLLIElement>
+) {
+	const urlRef = useRef<HTMLAnchorElement>(null)
 
-		return (
-			<ListItem
-				{...props}
-				selected={selected}
-				disabled={disabled}
-				ref={(element) => {
-					urlRef.current &&
-						element &&
-						Number(urlRef.current.style.width.match(/\d+/g)?.[0]) >=
-							element.offsetWidth - 60 &&
-						(urlRef.current.style.width = `${
-							element.offsetWidth - 60
-						}px`)
+	return (
+		<ListItem
+			{...props}
+			selected={selected}
+			disabled={disabled}
+			ref={(element) => {
+				if (urlRef.current && element)
+					urlRef.current.style.width = `${
+						element.offsetWidth - 100
+					}px`
 
-					if (typeof ref === "function") {
-						ref(element)
-					} else if (ref !== null) {
-						ref.current = element
-					}
-				}}
-				className={cn("flex h-20 items-center space-x-3", className)}
-			>
-				<Avatar
-					src={photo}
-					name={name}
-					fallbackColor="secondary"
-					className="h-12 w-12"
-				/>
+				if (typeof ref === "function") {
+					ref(element)
+				} else if (ref !== null) {
+					ref.current = element
+				}
+			}}
+			className={cn("flex h-20 items-center space-x-3", className)}
+		>
+			<Avatar
+				src={photo}
+				name={name}
+				fallbackColor="secondary"
+				className="h-12 w-12 shrink-0"
+			/>
 
-				<div className="flex flex-1 flex-col">
-					<div className="flex w-full justify-between">
-						<span className="font-medium opacity-80">{name}</span>
+			<div className="flex flex-1 flex-col">
+				<div className="flex w-full justify-between">
+					<span className="font-medium opacity-80">{name}</span>
 
-						{subname && (
-							<span className="relative top-[2px] text-sm opacity-60">
-								{subname}
-							</span>
-						)}
-					</div>
-
-					<a
-						href={url}
-						onClick={(e) => e.stopPropagation()}
-						target="_blank"
-						rel="noreferrer"
-						ref={urlRef}
-						className="w-min overflow-hidden overflow-ellipsis whitespace-nowrap text-sm opacity-60 hover:underline"
-					>
-						{url}
-					</a>
+					{subname && (
+						<span className="relative top-[2px] text-sm opacity-60">
+							{subname}
+						</span>
+					)}
 				</div>
-			</ListItem>
-		)
-	}
-)
 
-AttachmentItem.displayName = "AttachmentItem"
+				<a
+					href={url}
+					onClick={(e) => e.stopPropagation()}
+					target="_blank"
+					rel="noreferrer"
+					ref={urlRef}
+					className="w-min overflow-hidden overflow-ellipsis whitespace-nowrap text-sm opacity-60 hover:underline"
+				>
+					{url}
+				</a>
+			</div>
+		</ListItem>
+	)
+}
 
-export default AttachmentItem
+export default forwardRef(AttachmentItem)

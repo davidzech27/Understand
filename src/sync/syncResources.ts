@@ -8,11 +8,11 @@ export default async function syncResources({
 	courseId: string
 }) {
 	const googleAPIPromise = Course({ id: courseId })
-		.linkedRefreshToken()
+		.syncedRefreshToken()
 		.then((refreshToken) => {
 			if (refreshToken === undefined)
 				throw new Error(
-					"Linked refresh token could not be found for course"
+					"Synced refresh token could not be found for course"
 				)
 
 			return GoogleAPI({ refreshToken })
@@ -33,11 +33,11 @@ export default async function syncResources({
 		),
 	])
 
-	const idToDBLinkedAssignmentMap = new Map(
+	const idToDBSyncedAssignmentMap = new Map(
 		dbAssignments
 			.map((assignment) =>
-				assignment.linkedUrl !== undefined
-					? { ...assignment, linkedUrl: assignment.linkedUrl }
+				assignment.syncedUrl !== undefined
+					? { ...assignment, syncedUrl: assignment.syncedUrl }
 					: undefined
 			)
 			.filter(Boolean)
@@ -83,13 +83,13 @@ export default async function syncResources({
 	let assignmentIdsToSync: string[] = []
 
 	await Promise.all([
-		// create all assignments and index attachments on them not in classroom, and update all linked assignments and resources
+		// create all assignments and index attachments on them not in classroom, and update all synced assignments and resources
 		...classroomAssignments.map(async (classroomAssignment) => {
-			const dbLinkedAssignment = idToDBLinkedAssignmentMap.get(
+			const dbSyncedAssignment = idToDBSyncedAssignmentMap.get(
 				classroomAssignment.id
 			)
 
-			if (dbLinkedAssignment === undefined) {
+			if (dbSyncedAssignment === undefined) {
 				await Promise.all([
 					Assignment({
 						courseId,
@@ -98,10 +98,8 @@ export default async function syncResources({
 						title: classroomAssignment.title,
 						description: classroomAssignment.description,
 						dueAt: classroomAssignment.dueAt,
-						linkedUrl: classroomAssignment.url,
+						syncedUrl: classroomAssignment.url,
 						instructions: undefined,
-						context: undefined,
-						instructionsLinked: true,
 					}),
 					...classroomAssignment.attachments
 						.map((attachment) =>
@@ -135,82 +133,96 @@ export default async function syncResources({
 				])
 
 				assignmentIdsToSync.push(classroomAssignment.id)
-
-				return
-			}
-
-			await Promise.all([
-				(async () => {
-					if (
-						dbLinkedAssignment.title !==
-							classroomAssignment.title ||
-						dbLinkedAssignment.description !==
-							classroomAssignment.description ||
-						dbLinkedAssignment.dueAt?.valueOf() !==
-							classroomAssignment.dueAt?.valueOf()
-					) {
-						await Assignment({
-							courseId,
-							assignmentId: classroomAssignment.id,
-						}).update({
-							...(dbLinkedAssignment.title !==
-							classroomAssignment.title
-								? {
-										title: classroomAssignment.title,
-								  }
-								: {}),
-							...(dbLinkedAssignment.description !==
-							classroomAssignment.description
-								? {
-										description:
-											classroomAssignment.description ??
-											null,
-								  }
-								: {}),
-							...(dbLinkedAssignment.dueAt !==
-							classroomAssignment.dueAt
-								? {
-										dueAt:
-											classroomAssignment.dueAt ?? null,
-								  }
-								: {}),
-						})
-
-						assignmentIdsToSync.push(classroomAssignment.id)
-					}
-				})(),
-				(async () => {
-					if (
-						dbLinkedAssignment.description !==
-							classroomAssignment.description &&
-						dbLinkedAssignment.instructionsLinked
-					) {
-						const instructionsOnAssignment = vdbResources.filter(
-							(resource) =>
-								resource.instructionsForAssignmentId ===
-								classroomAssignment.id
-						)
-
+			} else {
+				await Promise.all([
+					(async () => {
 						if (
-							instructionsOnAssignment.find(
-								(instructions) =>
-									!("driveId" in instructions) ||
-									instructions.driveId === undefined
-							) !== undefined
+							dbSyncedAssignment.syncedAt !== undefined &&
+							(dbSyncedAssignment.title !==
+								classroomAssignment.title ||
+								dbSyncedAssignment.description !==
+									classroomAssignment.description ||
+								dbSyncedAssignment.dueAt?.valueOf() !==
+									classroomAssignment.dueAt?.valueOf())
 						) {
-							const driveIdsOfInstructionsOnAssignment =
-								instructionsOnAssignment
-									.map((resource) =>
-										"driveId" in resource
-											? resource.driveId
-											: undefined
-									)
-									.filter(Boolean)
+							await Assignment({
+								courseId,
+								assignmentId: classroomAssignment.id,
+							}).update({
+								title:
+									dbSyncedAssignment.title !==
+									classroomAssignment.title
+										? classroomAssignment.title
+										: undefined,
 
-							if (classroomAssignment.description === undefined) {
-								return await Course({
+								description:
+									dbSyncedAssignment.description !==
+									classroomAssignment.description
+										? classroomAssignment.description ??
+										  null
+										: undefined,
+								dueAt:
+									dbSyncedAssignment.dueAt !==
+									classroomAssignment.dueAt
+										? classroomAssignment.dueAt ?? null
+										: undefined,
+								syncedAt: new Date(),
+							})
+
+							assignmentIdsToSync.push(classroomAssignment.id)
+						}
+					})(),
+					(async () => {
+						if (
+							dbSyncedAssignment.description !==
+							classroomAssignment.description
+						) {
+							const instructionsOnAssignment =
+								vdbResources.filter(
+									(resource) =>
+										resource.instructionsForAssignmentId ===
+										classroomAssignment.id
+								)
+
+							if (
+								instructionsOnAssignment.find(
+									(instructions) =>
+										!("driveId" in instructions) ||
+										instructions.driveId === undefined
+								) !== undefined
+							) {
+								const driveIdsOfInstructionsOnAssignment =
+									instructionsOnAssignment
+										.map((resource) =>
+											"driveId" in resource
+												? resource.driveId
+												: undefined
+										)
+										.filter(Boolean)
+
+								if (
+									classroomAssignment.description ===
+									undefined
+								) {
+									return await Course({
+										id: courseId,
+									}).deleteResources({
+										filter: {
+											instructionsForAssignmentId:
+												classroomAssignment.id,
+											driveId: {
+												$nin: driveIdsOfInstructionsOnAssignment,
+											},
+										},
+									})
+								}
+
+								await Course({
 									id: courseId,
-								}).deleteResources({
+								}).updateResources({
+									set: {
+										text: classroomAssignment.description,
+									},
 									filter: {
 										instructionsForAssignmentId:
 											classroomAssignment.id,
@@ -220,169 +232,148 @@ export default async function syncResources({
 									},
 								})
 							}
-
-							await Course({
-								id: courseId,
-							}).updateResources({
-								set: {
-									text: classroomAssignment.description,
-								},
-								filter: {
-									instructionsForAssignmentId:
-										classroomAssignment.id,
-									driveId: {
-										$nin: driveIdsOfInstructionsOnAssignment,
-									},
-								},
-							})
 						}
-					}
-				})(),
-				...classroomAssignment.attachments
-					.map((attachment) =>
-						attachment.type === "driveFile"
-							? attachment.driveFile
-							: undefined
-					)
-					.filter(Boolean)
-					.map(async (classroomDriveFile) => {
-						const vdbDriveFile = idToVDBDriveFileMap.get(
-							classroomDriveFile.id
+					})(),
+					...classroomAssignment.attachments
+						.map((attachment) =>
+							attachment.type === "driveFile"
+								? attachment.driveFile
+								: undefined
 						)
-
-						const classroomDriveFileText =
-							await new Promise<string>((res) =>
-								setTimeout(
-									async () =>
-										res(
-											await (
-												await googleAPIPromise
-											).driveFileText({
-												id: classroomDriveFile.id,
-											})
-										),
-									Math.random() * 1000 * 5
-								)
+						.filter(Boolean)
+						.map(async (classroomDriveFile) => {
+							const vdbDriveFile = idToVDBDriveFileMap.get(
+								classroomDriveFile.id
 							)
 
-						if (vdbDriveFile === undefined) {
-							await Course({ id: courseId }).createResource({
-								driveId: classroomDriveFile.id,
-								driveTitle: classroomDriveFile.title,
-								attachmentOnAssignmentId:
-									classroomAssignment.id,
-								text: classroomDriveFileText,
-							})
-
-							assignmentIdsToSync.push(classroomAssignment.id)
-
-							return
-						}
-
-						if (
-							vdbDriveFile.text.trim() !==
-								classroomDriveFileText.trim() ||
-							vdbDriveFile.driveTitle !== classroomDriveFile.title
-						) {
-							await Course({ id: courseId }).updateResources({
-								filter: {
-									driveId: classroomDriveFile.id,
-								},
-								set: {
-									text: classroomDriveFileText,
-									driveTitle: classroomDriveFile.title,
-								},
-							})
-
-							assignmentIdsToSync.push(classroomAssignment.id)
-
-							vdbDriveFile.instructionsForAssignmentId &&
-								assignmentIdsToSync.push(
-									vdbDriveFile.instructionsForAssignmentId
+							const classroomDriveFileText =
+								await new Promise<string>((res) =>
+									setTimeout(
+										async () =>
+											res(
+												await (
+													await googleAPIPromise
+												).driveFileText({
+													id: classroomDriveFile.id,
+												})
+											),
+										Math.random() * 1000 * 5
+									)
 								)
-						}
-					}),
-			])
+
+							if (vdbDriveFile === undefined) {
+								await Course({ id: courseId }).createResource({
+									driveId: classroomDriveFile.id,
+									driveTitle: classroomDriveFile.title,
+									attachmentOnAssignmentId:
+										classroomAssignment.id,
+									text: classroomDriveFileText,
+								})
+
+								assignmentIdsToSync.push(classroomAssignment.id)
+
+								return
+							}
+
+							if (
+								vdbDriveFile.text.trim() !==
+									classroomDriveFileText.trim() ||
+								vdbDriveFile.driveTitle !==
+									classroomDriveFile.title
+							) {
+								await Course({ id: courseId }).updateResources({
+									filter: {
+										driveId: classroomDriveFile.id,
+									},
+									set: {
+										text: classroomDriveFileText,
+										driveTitle: classroomDriveFile.title,
+									},
+								})
+
+								assignmentIdsToSync.push(classroomAssignment.id)
+
+								vdbDriveFile.instructionsForAssignmentId &&
+									assignmentIdsToSync.push(
+										vdbDriveFile.instructionsForAssignmentId
+									)
+							}
+						}),
+				])
+			}
 		}),
 		// create all resources not in classroom, and update all resources
-		...classroomMaterials.map(async (classroomMaterial) => {
-			await Promise.all(
-				classroomMaterials.map(
-					async (classroomMaterial) =>
-						await Promise.all(
-							classroomMaterial.attachments
-								.map((attachment) =>
-									attachment.type === "driveFile"
-										? attachment.driveFile
-										: undefined
-								)
-								.filter(Boolean)
-								.map(async (classroomDriveFile) => {
-									const vdbDriveFile =
-										idToVDBDriveFileMap.get(
-											classroomDriveFile.id
-										)
-
-									const classroomDriveFileText =
-										await new Promise<string>((res) =>
-											setTimeout(
-												async () =>
-													res(
-														await (
-															await googleAPIPromise
-														).driveFileText({
-															id: classroomDriveFile.id,
-														})
-													),
-												Math.random() * 1000 * 5
-											)
-										)
-
-									if (vdbDriveFile === undefined) {
-										return await Course({
-											id: courseId,
-										}).createResource({
-											driveId: classroomDriveFile.id,
-											driveTitle:
-												classroomDriveFile.title,
-											attachmentOnMaterialId:
-												classroomMaterial.id,
-											text: classroomDriveFileText,
-										})
-									}
-
-									if (
-										vdbDriveFile.text.trim() !==
-											classroomDriveFileText.trim() ||
-										vdbDriveFile.driveTitle !==
-											classroomDriveFile.title
-									) {
-										await Course({
-											id: courseId,
-										}).updateResources({
-											filter: {
-												driveId: classroomDriveFile.id,
-											},
-											set: {
-												text: classroomDriveFileText,
-												driveTitle:
-													classroomDriveFile.title,
-											},
-										})
-
-										vdbDriveFile.instructionsForAssignmentId &&
-											assignmentIdsToSync.push(
-												vdbDriveFile.instructionsForAssignmentId
-											)
-									}
-								})
+		...classroomMaterials.map(
+			async (classroomMaterial) =>
+				await Promise.all(
+					classroomMaterial.attachments
+						.map((attachment) =>
+							attachment.type === "driveFile"
+								? attachment.driveFile
+								: undefined
 						)
+						.filter(Boolean)
+						.map(async (classroomDriveFile) => {
+							const vdbDriveFile = idToVDBDriveFileMap.get(
+								classroomDriveFile.id
+							)
+
+							const classroomDriveFileText =
+								await new Promise<string>((res) =>
+									setTimeout(
+										async () =>
+											res(
+												await (
+													await googleAPIPromise
+												).driveFileText({
+													id: classroomDriveFile.id,
+												})
+											),
+										Math.random() * 1000 * 5
+									)
+								)
+
+							if (vdbDriveFile === undefined) {
+								return await Course({
+									id: courseId,
+								}).createResource({
+									driveId: classroomDriveFile.id,
+									driveTitle: classroomDriveFile.title,
+									attachmentOnMaterialId:
+										classroomMaterial.id,
+									text: classroomDriveFileText,
+								})
+							}
+
+							if (
+								vdbDriveFile.text.trim() !==
+									classroomDriveFileText.trim() ||
+								vdbDriveFile.driveTitle !==
+									classroomDriveFile.title
+							) {
+								await Course({
+									id: courseId,
+								}).updateResources({
+									filter: {
+										driveId: classroomDriveFile.id,
+									},
+									set: {
+										text: classroomDriveFileText,
+										driveTitle: classroomDriveFile.title,
+									},
+								})
+
+								vdbDriveFile.instructionsForAssignmentId &&
+									assignmentIdsToSync.push(
+										vdbDriveFile.instructionsForAssignmentId
+									)
+							}
+						})
 				)
-			)
-		}),
-		// delete all linked assignments not in classroom
+		),
+		// delete all synced assignments not in classroom
 		...dbAssignments
-			.filter(({ linkedUrl }) => linkedUrl !== undefined)
+			.filter(({ syncedUrl }) => syncedUrl !== undefined)
 			.map(async (dbAssignment) => {
 				const classroomAssignment = idToClassroomAssignmentMap.get(
 					dbAssignment.assignmentId
@@ -394,7 +385,7 @@ export default async function syncResources({
 						assignmentId: dbAssignment.assignmentId,
 					}).delete()
 			}),
-		// delete all linked resources not in classroom
+		// delete all synced resources not in classroom
 		...vdbResources
 			.map((resource) =>
 				"driveId" in resource
@@ -428,8 +419,11 @@ export default async function syncResources({
 		...new Set(
 			assignmentIdsToSync.filter(
 				(id) =>
-					idToDBLinkedAssignmentMap.get(id)?.instructionsLinked ??
-					true
+					!(
+						idToDBSyncedAssignmentMap.get(id) !== undefined &&
+						idToDBSyncedAssignmentMap.get(id)?.syncedAt ===
+							undefined
+					)
 			)
 		),
 	]

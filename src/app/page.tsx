@@ -37,6 +37,7 @@ export default async function IndexPage() {
 								<a
 									href={env.NEXT_PUBLIC_LEARN_MORE_URL}
 									target="_blank"
+									rel="noreferrer"
 									className="cursor-pointer select-none text-2xl font-semibold transition-opacity duration-150 hover:opacity-75"
 								>
 									Learn more

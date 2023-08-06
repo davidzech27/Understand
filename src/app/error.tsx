@@ -1,6 +1,9 @@
 "use client"
 
 export default function Error({ error }: { error: Error }) {
+	// TODO - potentially implement better error logging
+	console.error("Error: ", error)
+
 	return (
 		<main className="flex h-screen w-screen flex-col bg-black">
 			<div className="flex-[0.875]" />

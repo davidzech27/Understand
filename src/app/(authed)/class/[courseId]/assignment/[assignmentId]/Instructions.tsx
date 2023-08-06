@@ -1,19 +1,11 @@
 "use client"
 import { useState } from "react"
 
-import SettingsModal from "./SettingsModal"
+import { type Assignment } from "~/data/Assignment"
+import AssignmentSettingsModal from "./AssignmentSettingsModal"
 
 interface Props {
-	assignment: {
-		courseId: string
-		assignmentId: string
-		title: string
-		description?: string
-		instructions?: string
-		instructionsLinked: boolean
-		context?: string
-		dueAt?: Date
-	}
+	assignment: Assignment
 }
 
 export default function Instructions({ assignment }: Props) {
@@ -28,7 +20,7 @@ export default function Instructions({ assignment }: Props) {
 				{assignment.instructions}
 			</p>
 
-			<SettingsModal
+			<AssignmentSettingsModal
 				open={settingsModalOpen}
 				setOpen={setSettingsModalOpen}
 				assignment={assignment}

@@ -61,20 +61,20 @@ export default function CreateClassForm({
 			id,
 			name: nameInput.trim(),
 			section: sectionInput.trim() || undefined,
-			linkedAdditionalTeacherEmails:
+			syncedAdditionalTeacherEmails:
 				linkedCourse?.roster.additionalTeacherEmails ?? [],
-			linkedStudentEmails: linkedCourse?.roster.studentEmails ?? [],
-			unlinkedAdditionalTeacherEmails:
+			syncedStudentEmails: linkedCourse?.roster.studentEmails ?? [],
+			unsyncedAdditionalTeacherEmails:
 				additionalTeacherEmailInputs.filter(
 					(email) =>
 						!linkedCourse?.roster.additionalTeacherEmails.includes(
 							email
 						)
 				),
-			unlinkedStudentEmails: studentEmailInputs.filter(
+			unsyncedStudentEmails: studentEmailInputs.filter(
 				(email) => !linkedCourse?.roster.studentEmails.includes(email)
 			),
-			linkedUrl: linkedCourse?.url,
+			syncedUrl: linkedCourse?.url,
 		})
 
 		router.push(`/class/${id}`)
@@ -236,7 +236,8 @@ export default function CreateClassForm({
 						singleWord
 						placeholder="Student email"
 						id="students"
-						textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)]"
+						className="h-min"
+						textInputClassname="text-base w-[calc(33.333333%-27.333306px)]"
 						buttonClassName="h-[46px] w-[46px]"
 					/>
 
@@ -248,7 +249,8 @@ export default function CreateClassForm({
 						singleWord
 						placeholder="Teacher email"
 						id="additional-teachers"
-						textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)]"
+						className="h-min"
+						textInputClassname="text-base w-[calc(33.333333%-27.333306px)]"
 						buttonClassName="h-[46px] w-[46px]"
 					/>
 				</Card>
