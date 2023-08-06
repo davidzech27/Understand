@@ -2,7 +2,7 @@ import { eq, and, isNotNull, sql, isNull } from "drizzle-orm"
 import { z } from "zod"
 
 import db from "~/db/db"
-import { assignment, assignmentInsight, feedback, followUp } from "~/db/schema"
+import { assignment, assignmentInsight, feedback } from "~/db/schema"
 import { feedbackInsightsSchema } from "./Feedback"
 import Course from "./Course"
 
@@ -143,14 +143,6 @@ const Assignment = ({
 				),
 			db
 				.delete(feedback)
-				.where(
-					and(
-						eq(feedback.courseId, courseId),
-						eq(feedback.assignmentId, assignmentId)
-					)
-				),
-			db
-				.delete(followUp)
 				.where(
 					and(
 						eq(feedback.courseId, courseId),

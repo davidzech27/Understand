@@ -11,7 +11,6 @@ import {
 	teacherToCourse,
 	assignment,
 	feedback,
-	followUp,
 	studentInsight,
 	assignmentInsight,
 } from "~/db/schema"
@@ -137,7 +136,6 @@ const Course = ({ id }: { id: string }) => ({
 			db.delete(studentToCourse).where(eq(studentToCourse.courseId, id)),
 			db.delete(assignment).where(eq(assignment.courseId, id)),
 			db.delete(feedback).where(eq(feedback.courseId, id)),
-			db.delete(followUp).where(eq(followUp.courseId, id)),
 			vdbPromise.then((vdb) =>
 				vdb.delete1({
 					deleteAll: true,

@@ -4,7 +4,6 @@ import {
 	varchar,
 	primaryKey,
 	timestamp,
-	int,
 	text,
 	json,
 	uniqueIndex,
