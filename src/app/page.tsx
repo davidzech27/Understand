@@ -26,7 +26,7 @@ export default async function IndexPage() {
 							feedback on their work that they can respond to and aggregates this feedback into nuanced and actionable insights for teachers. It&apos;s the right approach to AI in schools.
 						</p>
 
-						<div className="flex flex-col space-x-0 space-y-4 text-center sm:flex-row sm:items-center sm:space-y-0 sm:space-x-9">
+						<div className="flex flex-col space-x-0 space-y-6 text-center sm:flex-row sm:items-center sm:space-y-0 sm:space-x-9">
 							<div className="h-16">
 								<SignInButton />
 							</div>
@@ -36,7 +36,7 @@ export default async function IndexPage() {
 									href={env.NEXT_PUBLIC_BOOK_MEETING_URL}
 									target="_blank"
 									rel="noreferrer"
-									className="cursor-pointer select-none text-2xl font-bold transition-opacity duration-150 hover:opacity-75"
+									className="cursor-pointer select-none text-2xl font-bold transition-opacity duration-150 hover:opacity-75 active:opacity-75 focus-visible:opacity-75"
 								>
 									Book a meeting
 								</a>
