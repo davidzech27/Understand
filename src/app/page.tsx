@@ -26,7 +26,7 @@ export default async function IndexPage() {
 							feedback on their work that they can respond to and aggregates this feedback into nuanced and actionable insights for teachers. It&apos;s the right approach to AI in schools.
 						</p>
 
-						<div className="flex flex-col space-x-0 space-y-6 text-center sm:flex-row sm:items-center sm:space-y-0 sm:space-x-9">
+						<div className="flex flex-col space-x-0 space-y-5 text-center sm:flex-row sm:items-center sm:space-y-0 sm:space-x-9">
 							<div className="h-16">
 								<SignInButton />
 							</div>
