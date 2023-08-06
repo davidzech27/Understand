@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { AnimatePresence } from "framer-motion"
 
 import cn from "~/utils/cn"
@@ -165,6 +165,12 @@ export default function FeedbackContent({
 		useRef<HTMLDivElement>(null),
 	]
 
+	const [showSpecificFeedback, setShowSpecificFeedback] = useState(false)
+
+	useEffect(() => {
+		setShowSpecificFeedback(true)
+	}, [])
+
 	return (
 		<div className="flex">
 			<div
@@ -304,7 +310,8 @@ export default function FeedbackContent({
 								}}
 								className={cn(
 									"absolute left-4 right-4 max-h-[400px]",
-									feedback.state !== undefined && "shadow-lg"
+									feedback.state !== undefined && "shadow-lg",
+									!showSpecificFeedback && "opacity-0"
 								)}
 							/>
 						))}
@@ -639,7 +646,8 @@ export default function FeedbackContent({
 								}}
 								className={cn(
 									"absolute left-4 right-4 max-h-[400px]",
-									feedback.state !== undefined && "shadow-lg"
+									feedback.state !== undefined && "shadow-lg",
+									!showSpecificFeedback && "opacity-0"
 								)}
 							/>
 						))}
