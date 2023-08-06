@@ -273,7 +273,12 @@ export default function FeedbackSubmission({
 				})
 			}
 
-			currentYOffset += textElement.clientHeight
+			const textElementStyle = window.getComputedStyle(textElement)
+
+			currentYOffset +=
+				textElement.clientHeight +
+				parseInt(textElementStyle.marginTop) +
+				parseInt(textElementStyle.marginBottom)
 		}
 
 		onChangeParagraphYOffsets(paragraphYOffsets)

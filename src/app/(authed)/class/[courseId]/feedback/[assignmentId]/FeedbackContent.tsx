@@ -165,12 +165,6 @@ export default function FeedbackContent({
 		useRef<HTMLDivElement>(null),
 	]
 
-	const [showSpecificFeedback, setShowSpecificFeedback] = useState(false)
-
-	useEffect(() => {
-		setShowSpecificFeedback(true)
-	}, [])
-
 	return (
 		<div className="flex">
 			<div
@@ -310,8 +304,7 @@ export default function FeedbackContent({
 								}}
 								className={cn(
 									"absolute left-4 right-4 max-h-[400px]",
-									feedback.state !== undefined && "shadow-lg",
-									!showSpecificFeedback && "opacity-0"
+									feedback.state !== undefined && "shadow-lg"
 								)}
 							/>
 						))}
@@ -646,8 +639,7 @@ export default function FeedbackContent({
 								}}
 								className={cn(
 									"absolute left-4 right-4 max-h-[400px]",
-									feedback.state !== undefined && "shadow-lg",
-									!showSpecificFeedback && "opacity-0"
+									feedback.state !== undefined && "shadow-lg"
 								)}
 							/>
 						))}
