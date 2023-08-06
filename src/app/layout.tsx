@@ -22,7 +22,7 @@ export default function RootLayout({
 			<html lang="en">
 				<head />
 
-				<body>
+				<body className="absolute bottom-0 top-0 left-0 right-0">
 					<Providers>{children}</Providers>
 				</body>
 			</html>
