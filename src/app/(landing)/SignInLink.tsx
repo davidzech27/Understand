@@ -2,9 +2,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 
-import FancyButton from "~/components/FancyButton"
-
-export default function SignInButton() {
+export default function SignInLink({ children }: React.PropsWithChildren) {
 	const [href, setHref] = useState<"/" | "/signIn" | "/home">("/")
 
 	useEffect(() => {
@@ -14,9 +12,7 @@ export default function SignInButton() {
 
 	return (
 		<Link href={href} passHref legacyBehavior>
-			<FancyButton size="medium" className="w-full md:w-fit">
-				Sign in
-			</FancyButton>
+			{children}
 		</Link>
 	)
 }

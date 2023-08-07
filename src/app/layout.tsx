@@ -7,7 +7,7 @@ export const metadata = {
 		default: "Understand",
 	},
 	description:
-		"The personalized educational content and student insight platform",
+		"We give students in-depth AI feedback on their work and aggregate this feedback into nuanced and actionable insights for teachers.",
 	referrer: "no-referrer",
 	metadataBase: new URL("https://understand.school"),
 }

@@ -15,7 +15,7 @@ interface Props
 		ButtonHTMLAttributes<HTMLButtonElement>,
 		HTMLButtonElement
 	> {
-	size: "medium" | "large"
+	size: "small" | "medium" | "large"
 	loading?: boolean
 }
 
@@ -44,6 +44,7 @@ function FancyButton(
 			className={cn(
 				"group relative flex items-center justify-center outline-none",
 				{
+					small: "px-8 py-2.5",
 					medium: "px-12 py-4",
 					large: "h-20 w-full",
 				}[size],
@@ -54,6 +55,7 @@ function FancyButton(
 				className={cn(
 					"z-10 font-semibold tracking-[0.010em] transition-all duration-150",
 					{
+						small: "text-base",
 						medium: "text-2xl",
 						large: "text-3xl",
 					}[size],
@@ -83,7 +85,9 @@ function FancyButton(
 
 			<div
 				style={{
-					border: "4px solid transparent",
+					border: `${
+						size !== "small" ? "4px" : "3px"
+					} solid transparent`,
 					background: `linear-gradient(45deg, ${colors.primary}, ${colors.secondary} 100%) border-box`,
 					WebkitMask:
 						"linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)",
@@ -91,7 +95,8 @@ function FancyButton(
 					maskComposite: "exclude",
 				}}
 				className={cn(
-					"absolute h-full w-full rounded-xl transition-all duration-150",
+					"absolute h-full w-full transition-all duration-150",
+					size !== "small" ? "rounded-xl" : "rounded-[10px]",
 					disabled && "opacity-0"
 				)}
 			/>
