@@ -150,26 +150,26 @@ Both teachers and students are empowered to
 							<img
 								src="/StudentFeedback.png"
 								alt="Screenshot of student feedback"
-								className="absolute -bottom-24 -right-8 z-10 rounded-xl border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016] transition-all duration-300 hover:shadow-xl"
+								className="absolute -bottom-24 -right-8 z-10 w-[432px] rounded-xl border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016] transition-all duration-300 hover:shadow-xl"
 							/>
 
 							<img
 								src="/TeacherInsights.png"
 								alt="Screenshot of student feedback"
-								className="absolute -top-32 -left-16 scale-[0.85] rounded-xl border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016] transition-all duration-300 hover:z-20 hover:shadow-xl"
+								className="absolute -top-32 -left-8 w-96 rounded-xl border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016] transition-all duration-300 hover:z-20 hover:shadow-xl"
 							/>
 						</div>
 					</div>
 				</div>
 
-				<div className="flex h-screen mobile:h-auto mobile:flex-col mobile:space-y-8">
+				<div className="flex mobile:flex-col mobile:space-y-8">
 					<div className="flex w-full flex-1 flex-col py-16 pl-28 sm-mobile:px-6 lg-mobile:px-8 mobile:py-0">
 						<GradientText className="mb-2 select-text text-2xl font-extrabold">
 							How it works
 						</GradientText>
 
-						<div className="flex h-full flex-col justify-between mobile:justify-start mobile:space-y-4">
-							<div className="">
+						<div className="flex h-full flex-col space-y-16 mobile:space-y-4">
+							<div>
 								<h2 className="select-text text-4xl font-extrabold leading-none tracking-tight text-black/80">
 									Teachers create assignments for their
 									classes
@@ -186,7 +186,7 @@ Both teachers and students are empowered to
 								</p>
 							</div>
 
-							<div className="">
+							<div>
 								<h2 className="select-text text-4xl font-extrabold leading-none tracking-tight text-black/80">
 									Students receive feedback on their work
 								</h2>
@@ -207,7 +207,7 @@ Both teachers and students are empowered to
 								</p>
 							</div>
 
-							<div className="">
+							<div>
 								<h2 className="select-text text-4xl font-extrabold leading-none tracking-tight text-black/80">
 									Feedback is aggregated into insights for
 									teachers
@@ -232,12 +232,12 @@ Both teachers and students are empowered to
 						</div>
 					</div>
 
-					<div className="flex h-full flex-[0.5] flex-col justify-between pt-8 mobile:justify-start mobile:space-y-6 mobile:pt-0">
+					<div className="flex h-full flex-[0.5] flex-col space-y-6 pt-10 mobile:pt-0">
 						<div className="">
 							<img
 								src="/ImportClass.png"
 								alt="Screenshot of importing a class in Understand"
-								className="mx-auto w-2/3 rounded-lg border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016]"
+								className="mx-auto w-72 rounded-lg border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016] mobile:w-2/3"
 							/>
 						</div>
 
@@ -245,7 +245,7 @@ Both teachers and students are empowered to
 							<img
 								src="/SmallStudentFeedback.png"
 								alt="Screenshot of replying to student feedback"
-								className="mx-auto w-5/6 rounded-lg border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016]"
+								className="mx-auto w-[360px] rounded-lg border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016] mobile:w-5/6"
 							/>
 						</div>
 
@@ -253,7 +253,7 @@ Both teachers and students are empowered to
 							<img
 								src="/TeacherInsights.png"
 								alt="Screenshot of teacher insights"
-								className="mx-auto w-11/12 rounded-lg border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016]"
+								className="mx-auto w-[400px] rounded-lg border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016] mobile:w-11/12"
 							/>
 						</div>
 					</div>
