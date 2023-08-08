@@ -246,7 +246,7 @@ Both teachers and students are empowered to
 				</div>
 
 				<div className="flex h-screen w-full flex-col justify-center px-28 sm-mobile:px-6 lg-mobile:px-8">
-					<h1 className="select-text text-[3.5rem] font-extrabold leading-tight tracking-tight text-black/80 lg-mobile:text-[2.5rem]">
+					<h1 className="select-text text-[3.5rem] font-extrabold leading-tight tracking-tight text-black/80 sm-mobile:text-[2rem] lg-mobile:text-[2.25rem]">
 						Empowering students to{" "}
 						<GradientText asChild>
 							<span className="select-text">
@@ -276,7 +276,7 @@ Both teachers and students are empowered to
 					>
 						<FancyButton
 							size="large"
-							className="mx-auto mt-12 w-96 mobile:w-full"
+							className="mx-auto mt-12 w-96 sm-mobile:mt-6 lg-mobile:mt-8 mobile:w-full"
 						>
 							Book a meeting
 						</FancyButton>
