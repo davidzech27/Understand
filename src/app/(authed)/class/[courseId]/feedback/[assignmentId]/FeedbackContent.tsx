@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import { AnimatePresence } from "framer-motion"
 
 import cn from "~/utils/cn"

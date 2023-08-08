@@ -148,13 +148,13 @@ Both teachers and students are empowered to
 					<div className="h-full flex-[0.5] mobile:hidden"></div>
 				</div>
 
-				<div className="flex h-screen">
-					<div className="flex w-full flex-1 flex-col py-16 pl-28 sm-mobile:px-6 lg-mobile:px-8">
+				<div className="flex h-screen mobile:h-auto mobile:flex-col mobile:space-y-8">
+					<div className="flex w-full flex-1 flex-col py-16 pl-28 sm-mobile:px-6 lg-mobile:px-8 mobile:py-0">
 						<GradientText className="mb-2 select-text text-2xl font-extrabold">
 							How it works
 						</GradientText>
 
-						<div className="flex h-full flex-col justify-between">
+						<div className="flex h-full flex-col justify-between mobile:justify-start mobile:space-y-4">
 							<div className="">
 								<h2 className="select-text text-4xl font-extrabold leading-none tracking-tight text-black/80">
 									Teachers create assignments for their
@@ -218,7 +218,7 @@ Both teachers and students are empowered to
 						</div>
 					</div>
 
-					<div className="flex h-full flex-[0.5] flex-col justify-between pt-8 mobile:hidden">
+					<div className="flex h-full flex-[0.5] flex-col justify-between pt-8 mobile:justify-start mobile:space-y-6 mobile:pt-0">
 						<div className="">
 							<img
 								src="/ImportClass.png"
@@ -245,8 +245,8 @@ Both teachers and students are empowered to
 					</div>
 				</div>
 
-				<div className="flex h-screen w-full flex-col justify-center px-28">
-					<h1 className="select-text text-[3.5rem] font-extrabold leading-tight tracking-tight text-black/80 sm-mobile:mx-6 lg-mobile:mx-8">
+				<div className="flex h-screen w-full flex-col justify-center px-28 sm-mobile:px-6 lg-mobile:px-8">
+					<h1 className="select-text text-[3.5rem] font-extrabold leading-tight tracking-tight text-black/80 lg-mobile:text-[2.5rem]">
 						Empowering students to{" "}
 						<GradientText asChild>
 							<span className="select-text">
@@ -276,7 +276,7 @@ Both teachers and students are empowered to
 					>
 						<FancyButton
 							size="large"
-							className="mx-auto mt-12 w-96"
+							className="mx-auto mt-12 w-96 mobile:w-full"
 						>
 							Book a meeting
 						</FancyButton>
@@ -288,7 +288,7 @@ Both teachers and students are empowered to
 				style={{
 					background: `linear-gradient(45deg, ${colors.primary}, ${colors.secondary} 100%) border-box`,
 				}}
-				className="flex justify-between p-8 backdrop-blur-xl mobile:flex-col mobile:justify-start"
+				className="flex justify-between p-8 backdrop-blur-xl"
 			>
 				<button
 					onClick={() =>
@@ -299,7 +299,7 @@ Both teachers and students are empowered to
 					Understand
 				</button>
 
-				<div className="flex items-center gap-4 mobile:flex-col">
+				<div className="flex items-center gap-4">
 					<a
 						href="https://linkedin.com/in/understandschool"
 						target="_blank"
