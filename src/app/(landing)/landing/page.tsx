@@ -5,7 +5,6 @@ import { getAuthOrThrow } from "~/auth/jwt"
 import User from "~/data/User"
 import colors from "colors.cjs"
 import LandingForm from "./LandingForm"
-import GradientText from "~/components/GradientText"
 
 export const runtime = "edge"
 

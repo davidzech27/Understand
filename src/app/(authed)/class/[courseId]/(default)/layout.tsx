@@ -2,12 +2,10 @@ import { notFound } from "next/navigation"
 import { cookies } from "next/headers"
 
 import { getAuthOrThrow } from "~/auth/jwt"
-import cn from "~/utils/cn"
 import ClassTabs from "./ClassTabs"
 import Card from "~/components/Card"
 import User from "~/data/User"
 import Course from "~/data/Course"
-import GradientText from "~/components/GradientText"
 
 interface Params {
 	courseId: string
