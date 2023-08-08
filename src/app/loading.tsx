@@ -3,7 +3,7 @@ export default function Loading() {
 		<div className="flex h-screen w-full flex-col items-center bg-gradient-to-tr from-primary to-secondary">
 			<div className="flex-[0.875]" />
 
-			<span className="w-fit cursor-default text-[10rem] font-semibold leading-none text-white">
+			<span className="w-fit text-[10rem] font-extrabold leading-none tracking-tight text-white sm-mobile:text-5xl lg-mobile:text-6xl">
 				Understand
 			</span>
 

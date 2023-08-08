@@ -3,6 +3,7 @@ import { cookies } from "next/headers"
 
 import { getAuthOrThrow } from "~/auth/jwt"
 import User from "~/data/User"
+import colors from "colors.cjs"
 import LandingForm from "./LandingForm"
 import GradientText from "~/components/GradientText"
 
@@ -19,34 +20,38 @@ export default async function LandingPage() {
 		.then((profile) => profile ?? notFound())
 
 	return (
-		<>
-			<main className="flex h-screen w-full justify-center bg-gradient-to-tr from-primary to-secondary">
-				<div className="hidden flex-[0.625] flex-col justify-center py-5 pl-6 md:flex">
-					<div className="flex-[0.875]" />
-
-					<h1 className="w-full text-center text-7xl font-bold leading-[1.05] tracking-tight text-white">
-						One more question before you get started.
-					</h1>
-
-					<div className="flex-1" />
+		<main
+			style={{
+				background: `linear-gradient(45deg, ${colors.primary} 25%, ${colors.secondary} 100%) border-box`,
+			}}
+			className="flex h-screen w-full p-6"
+		>
+			<div className="flex flex-1 flex-col">
+				<div className="mx-auto mb-5 hidden w-fit text-center text-4xl font-bold leading-none tracking-tight text-white mobile:flex">
+					Understand
 				</div>
 
-				<div className="flex-1 py-5 px-6">
-					<div className="flex h-full flex-col items-center rounded-lg bg-white px-[16%] shadow-xl">
-						<div className="flex-[0.875]">
-							<GradientText asChild>
-								<span className="mt-[24%] flex text-5xl font-bold md:hidden">
-									Understand
-								</span>
-							</GradientText>
-						</div>
+				<div className="flex h-full w-full flex-col rounded-lg border-[0.5px] border-border bg-white p-6 shadow-xl shadow-[#00000016]">
+					<div className="flex-[0.875] mobile:hidden" />
 
-						<LandingForm profilePromise={profilePromise} />
+					<LandingForm
+						profilePromise={profilePromise}
+						className="flex flex-1 flex-col space-y-12 mobile:justify-between mobile:space-y-0 mobile:pt-10"
+					/>
 
-						<div className="flex-1" />
-					</div>
+					<div className="flex-1 mobile:hidden" />
 				</div>
-			</main>
-		</>
+			</div>
+
+			<div className="flex flex-1 flex-col mobile:hidden">
+				<div className="flex-[0.875]" />
+
+				<div className="w-full text-center text-7xl font-extrabold leading-none tracking-tight text-white">
+					Understand
+				</div>
+
+				<div className="flex-1" />
+			</div>
+		</main>
 	)
 }

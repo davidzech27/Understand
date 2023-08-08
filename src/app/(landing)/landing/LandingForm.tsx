@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation"
 import { usePostHog } from "posthog-js/react"
 
 import updateNameAction from "./updateNameAction"
+import cn from "~/utils/cn"
 import useSignedIn from "~/utils/useSignedIn"
 import TextInput from "~/components/TextInput"
 import FancyButton from "~/components/FancyButton"
@@ -14,9 +15,10 @@ interface Props {
 		name: string
 		photo?: string
 	}>
+	className?: string
 }
 
-export default function LandingForm({ profilePromise }: Props) {
+export default function LandingForm({ profilePromise, className }: Props) {
 	const [profile, setProfile] = useState<{
 		email: string
 		name: string
@@ -66,40 +68,36 @@ export default function LandingForm({ profilePromise }: Props) {
 
 				onGo()
 			}}
-			className="flex flex-col"
+			className={cn("flex flex-col", className)}
 		>
-			<div className="flex-[0.875]" />
+			<label
+				htmlFor="name"
+				className="select-text text-center text-3xl font-semibold tracking-tight text-black/80 mobile:text-2xl"
+			>
+				Your name?
+			</label>
 
-			<div className="w-full text-center">
-				<label
-					htmlFor="name"
-					className="text-3xl font-medium leading-none opacity-80"
-				>
-					What name would you like to go by?
-				</label>
-
-				{profile === undefined ? (
-					<TextInput
-						value={nameInput}
-						setValue={setNameInput}
-						placeholder=""
-						id="name"
-						autoFocus
-						autoComplete="name"
-						className="my-8 flex h-12 flex-col space-y-4 text-lg"
-					/>
-				) : (
-					<TextInput
-						value={nameInput}
-						setValue={setNameInput}
-						placeholder="Your name"
-						id="name"
-						autoFocus
-						autoComplete="name"
-						className="my-8 flex h-12 flex-col space-y-4 text-lg"
-					/>
-				)}
-			</div>
+			{profile === undefined ? (
+				<TextInput
+					value={nameInput}
+					setValue={setNameInput}
+					placeholder=""
+					id="name"
+					autoFocus
+					autoComplete="name"
+					className="my-8 flex h-12 flex-col space-y-4 text-lg font-semibold"
+				/>
+			) : (
+				<TextInput
+					value={nameInput}
+					setValue={setNameInput}
+					placeholder="Your name"
+					id="name"
+					autoFocus
+					autoComplete="name"
+					className="my-8 flex h-12 flex-col space-y-4 text-lg font-semibold"
+				/>
+			)}
 
 			<FancyButton
 				size="large"
@@ -109,8 +107,6 @@ export default function LandingForm({ profilePromise }: Props) {
 			>
 				Let&apos;s go
 			</FancyButton>
-
-			<div className="flex-1" />
 		</form>
 	)
 }

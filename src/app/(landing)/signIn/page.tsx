@@ -1,8 +1,8 @@
 import Link from "next/link"
 
+import colors from "colors.cjs"
 import getAuthenticationURL from "~/google/getAuthenticationURL"
 import FancyButton from "~/components/FancyButton"
-import GradientText from "~/components/GradientText"
 
 export const metadata = {
 	title: "Sign in",
@@ -10,58 +10,57 @@ export const metadata = {
 
 export const runtime = "edge"
 
-// todo - add extra content to fill awkward whitespace. or perhaps make panel smaller, but this would make the gradient section too big
-
 export default function SignInPage() {
 	return (
-		<>
-			<main className="flex h-screen w-full justify-center bg-gradient-to-tr from-primary to-secondary">
-				<div className="hidden flex-[0.625] flex-col justify-center py-5 pl-6 md:flex">
-					<div className="flex-[0.875]" />
+		<main
+			style={{
+				background: `linear-gradient(45deg, ${colors.primary} 25%, ${colors.secondary} 100%) border-box`,
+			}}
+			className="flex h-screen w-full p-6"
+		>
+			<div className="flex flex-1 flex-col">
+				<div className="mx-auto mb-5 hidden w-fit text-center text-4xl font-bold leading-none tracking-tight text-white mobile:flex">
+					Understand
+				</div>
 
-					<h1 className="w-full text-center text-7xl font-bold leading-[1.05] tracking-tight text-white">
-						Welcome to Understand!
-						<br />
-						Let&apos;s get started.
+				<div className="flex h-full w-full flex-col space-y-12 rounded-lg border-[0.5px] border-border bg-white p-6 shadow-xl shadow-[#00000016] mobile:justify-between mobile:space-y-0 mobile:pt-10">
+					<div className="flex-[0.875] mobile:hidden" />
+
+					<h1 className="select-text text-center text-3xl font-semibold tracking-tight text-black/80 mobile:text-2xl">
+						Sign in with your school Google account
 					</h1>
 
-					<div className="flex-1" />
+					<Link
+						href={getAuthenticationURL({
+							scopes: [
+								"https://www.googleapis.com/auth/userinfo.email",
+								"https://www.googleapis.com/auth/userinfo.profile",
+							],
+							redirectTo: "/landing",
+						})}
+						passHref
+					>
+						<FancyButton
+							size="large"
+							className="sm-mobile:text-2xl"
+						>
+							Sign in with Google
+						</FancyButton>
+					</Link>
+
+					<div className="flex-1 mobile:hidden" />
+				</div>
+			</div>
+
+			<div className="flex flex-1 flex-col mobile:hidden">
+				<div className="flex-[0.875]" />
+
+				<div className="w-full text-center text-7xl font-extrabold leading-none tracking-tight text-white">
+					Understand
 				</div>
 
-				<div className="flex-1 py-5 px-6">
-					<div className="flex h-full w-full flex-col items-center rounded-lg bg-white px-[16%] shadow-xl">
-						<div className="flex flex-[0.875]">
-							<GradientText asChild>
-								<span className="mt-[24%] flex text-5xl font-bold md:hidden">
-									Understand
-								</span>
-							</GradientText>
-						</div>
-
-						<div className="flex flex-col justify-between">
-							<h1 className="mb-8 text-center text-3xl font-medium opacity-80">
-								Sign in with your school Google account
-							</h1>
-
-							<Link
-								href={getAuthenticationURL({
-									scopes: [
-										"https://www.googleapis.com/auth/userinfo.email",
-										"https://www.googleapis.com/auth/userinfo.profile",
-									],
-									redirectTo: "/landing",
-								})}
-								passHref
-								legacyBehavior
-							>
-								<FancyButton size="large">Sign in</FancyButton>
-							</Link>
-						</div>
-
-						<div className="flex-1" />
-					</div>
-				</div>
-			</main>
-		</>
+				<div className="flex-1" />
+			</div>
+		</main>
 	)
 }

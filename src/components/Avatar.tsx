@@ -23,10 +23,7 @@ export default function Avatar({
 	const fallback = name?.[0] ? (
 		<div
 			ref={(div) => {
-				div &&
-					(div.style.fontSize = `${
-						div.offsetHeight * 0.55555555555
-					}px`)
+				div && (div.style.fontSize = `${div.offsetHeight * 0.55}px`)
 			}}
 			className={cn(
 				"flex h-full w-full items-center justify-center rounded-full font-semibold text-white",
