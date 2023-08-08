@@ -9,9 +9,8 @@ const config = {
 			colors,
 			screens: {
 				"sm-mobile": { max: "375px" },
-				"lg-mobile": { min: "376px", max: "480px" },
-				mobile: { max: "480px" },
-				tablet: { min: "481px", max: "1024px" },
+				"lg-mobile": { min: "376px", max: "1024px" },
+				mobile: { max: "1024px" },
 				desktop: { min: "1440px" },
 			},
 			keyframes: {

@@ -43,7 +43,7 @@ interactive AI feedback and nuanced insights
 Empowering students to resolve issues in their own work and teachers to pinpoint where their students struggle, unprecendented levels of differentiation are made possible.
 
 
-
+vision features
 
 
 empower both teachers and students to find out what students are struggling with and excelling in, as early and as frequently as they want
@@ -145,7 +145,21 @@ Both teachers and students are empowered to
 						</div>
 					</div>
 
-					<div className="h-full flex-[0.5] mobile:hidden"></div>
+					<div className="flex h-full flex-[0.5] items-center justify-center px-16 mobile:hidden">
+						<div className="relative h-80 w-full">
+							<img
+								src="/StudentFeedback.png"
+								alt="Screenshot of student feedback"
+								className="absolute -bottom-24 -right-8 z-10 rounded-xl border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016] transition-all duration-300 hover:shadow-xl"
+							/>
+
+							<img
+								src="/TeacherInsights.png"
+								alt="Screenshot of student feedback"
+								className="absolute -top-32 -left-16 scale-[0.85] rounded-xl border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016] transition-all duration-300 hover:z-20 hover:shadow-xl"
+							/>
+						</div>
+					</div>
 				</div>
 
 				<div className="flex h-screen mobile:h-auto mobile:flex-col mobile:space-y-8">
@@ -229,8 +243,8 @@ Both teachers and students are empowered to
 
 						<div className="">
 							<img
-								src="/StudentFeedback.png"
-								alt="Screenshot of reply to student feedback"
+								src="/SmallStudentFeedback.png"
+								alt="Screenshot of replying to student feedback"
 								className="mx-auto w-5/6 rounded-lg border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016]"
 							/>
 						</div>
@@ -273,10 +287,11 @@ Both teachers and students are empowered to
 						href={env.NEXT_PUBLIC_BOOK_MEETING_URL}
 						target="_blank"
 						rel="noreferrer"
+						className="mx-auto h-fit w-fit"
 					>
 						<FancyButton
 							size="large"
-							className="mx-auto mt-12 w-96 sm-mobile:mt-6 lg-mobile:mt-8 mobile:w-full"
+							className="mt-12 w-96 sm-mobile:mt-6 lg-mobile:mt-8 mobile:w-full"
 						>
 							Book a meeting
 						</FancyButton>

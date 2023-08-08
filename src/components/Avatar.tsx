@@ -29,7 +29,7 @@ export default function Avatar({
 					}px`)
 			}}
 			className={cn(
-				"flex h-full w-full items-center justify-center rounded-full font-medium text-white",
+				"flex h-full w-full items-center justify-center rounded-full font-semibold text-white",
 				fallbackColor === "primary" ? "bg-primary" : "bg-secondary"
 			)}
 		>
