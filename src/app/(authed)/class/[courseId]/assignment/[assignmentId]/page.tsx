@@ -1,11 +1,15 @@
 import { cookies } from "next/headers"
 import { notFound } from "next/navigation"
 
+import { getAuthOrThrow } from "~/auth/jwt"
 import Assignment from "~/data/Assignment"
 import User from "~/data/User"
-import { getAuthOrThrow } from "~/auth/jwt"
+import cn from "~/utils/cn"
+import formatDate from "~/utils/formatDate"
+import Heading from "~/components/Heading"
+import GradientText from "~/components/GradientText"
 import Card from "~/components/Card"
-import Instructions from "./Instructions"
+import AssignmentField from "./AssignmentField"
 
 export const metadata = {
 	title: "Overview",
@@ -34,20 +38,57 @@ export default async function AssignmentPage({
 
 	return (
 		<Card className="flex h-full flex-col overflow-y-scroll py-5 px-6">
+			<div className="flex items-center justify-between">
+				<GradientText asChild>
+					<a
+						href={assignment.syncedUrl}
+						target="_blank"
+						rel="noreferrer"
+						className={cn(
+							"pb-5 text-6xl font-extrabold tracking-tight",
+							assignment.syncedUrl !== undefined &&
+								"transition-all duration-150 hover:opacity-80"
+						)}
+					>
+						{assignment.title}
+					</a>
+				</GradientText>
+
+				<span className="relative bottom-1 mr-3 ml-6 flex-shrink-0 select-text text-base font-semibold leading-none text-black/70">
+					{assignment.dueAt
+						? `Due ${formatDate(assignment.dueAt)}`
+						: "No due date"}
+				</span>
+			</div>
+
+			{assignment.description !== undefined && (
+				<>
+					<Heading size="large" className="ml-1 mb-2">
+						Description
+					</Heading>
+
+					<AssignmentField assignment={assignment} className="mb-2.5">
+						{assignment.description}
+					</AssignmentField>
+				</>
+			)}
+
 			{assignment.instructions !== undefined ? (
 				<>
-					<div className="ml-1 mb-2 text-lg font-medium opacity-60">
+					<Heading size="large" className="ml-1 mb-2">
 						Instructions
-					</div>
+					</Heading>
 
-					<Instructions assignment={assignment} />
+					<AssignmentField assignment={assignment}>
+						{assignment.instructions}
+					</AssignmentField>
 				</>
 			) : (
-				<div className="text-lg font-medium opacity-60">
+				<Heading size="large">
 					Instructions for this assignment couldn&apos;t be found on
 					Google Classroom. Use the settings button above and to the
 					right to set them manually.
-				</div>
+				</Heading>
 			)}
 		</Card>
 	)

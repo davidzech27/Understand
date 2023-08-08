@@ -2,13 +2,10 @@ import { notFound } from "next/navigation"
 import { cookies } from "next/headers"
 
 import { getAuthOrThrow } from "~/auth/jwt"
-import cn from "~/utils/cn"
-import formatDate from "~/utils/formatDate"
 import Assignment from "~/data/Assignment"
 import User from "~/data/User"
 import Card from "~/components/Card"
 import AssignmentTabs from "./AssignmentTabs"
-import GradientText from "~/components/GradientText"
 
 export async function generateMetadata({
 	params: { courseId, assignmentId },
@@ -48,36 +45,7 @@ export default async function AssignmentLayout({
 
 	return (
 		<div className="-mr-2 flex h-full flex-col space-y-2.5 overflow-y-scroll">
-			<Card className="flex flex-col py-5 px-6">
-				<div className="flex items-baseline justify-between">
-					<GradientText asChild>
-						<a
-							href={assignment.syncedUrl}
-							target="_blank"
-							rel="noreferrer"
-							className={cn(
-								"pb-5 text-6xl font-semibold",
-								assignment.syncedUrl !== undefined &&
-									"transition-all duration-150 hover:opacity-80"
-							)}
-						>
-							{assignment.title}
-						</a>
-					</GradientText>
-
-					<span className="relative bottom-[1px] mr-3 ml-6 flex-shrink-0 text-lg font-medium leading-none opacity-60">
-						{assignment.dueAt
-							? `Due ${formatDate(assignment.dueAt)}`
-							: "No due date"}
-					</span>
-				</div>
-
-				{assignment.description !== undefined && (
-					<p className="select-text px-1 pb-4 text-sm opacity-80">
-						{assignment.description}
-					</p>
-				)}
-
+			<Card className="py-3 px-4">
 				<AssignmentTabs assignment={assignment} />
 			</Card>
 

@@ -20,9 +20,9 @@ function Heading(
 			ref={ref}
 			className={cn(
 				{
-					small: "text-sm font-medium opacity-60",
-					medium: "text-base font-medium opacity-80",
-					large: "text-lg font-medium opacity-60",
+					small: "text-sm font-semibold opacity-70",
+					medium: "text-base font-semibold opacity-70",
+					large: "text-lg font-semibold opacity-70",
 				}[size],
 				className
 			)}

@@ -1,11 +1,14 @@
 import { cookies } from "next/headers"
+import { notFound } from "next/navigation"
 
-import Card from "~/components/Card"
-import User from "~/data/User"
 import { getAuthOrThrow } from "~/auth/jwt"
-import FeedbackHistory from "./FeedbackHistory"
-import MessageBoard from "./MessageBoard"
 import Course from "~/data/Course"
+import User from "~/data/User"
+import FeedbackHistory from "./FeedbackHistory"
+import cn from "~/utils/cn"
+import MessageBoard from "./MessageBoard"
+import Card from "~/components/Card"
+import GradientText from "~/components/GradientText"
 
 export const runtime = "edge"
 
@@ -20,7 +23,12 @@ export default async function ClassPage({
 }) {
 	const { email } = await getAuthOrThrow({ cookies: cookies() })
 
-	const role = await User({ email }).courseRole({ id: courseId })
+	const [course, role] = await Promise.all([
+		Course({ id: courseId }).get(),
+		User({ email }).courseRole({ id: courseId }),
+	])
+
+	if (course === undefined) notFound()
 
 	if (role === "teacher") {
 		const { feedbackHistory, cursor } = await Course({
@@ -30,20 +38,53 @@ export default async function ClassPage({
 		})
 
 		return (
-			<Card className="flex flex-1 flex-col space-y-2 py-5 px-6">
-				{feedbackHistory.length !== 0 ? (
-					<FeedbackHistory
-						courseId={courseId}
-						initialFeedbackHistory={feedbackHistory}
-						cursor={cursor}
-					/>
-				) : (
-					<div className="text-lg font-medium opacity-60">
-						When your students get feedback on their work,
-						it&apos;ll show up here
-					</div>
-				)}
-			</Card>
+			<>
+				<Card className="px-6 py-5">
+					<a
+						href={course.syncedUrl}
+						target="_blank"
+						rel="noreferrer"
+						className="group flex items-center justify-between"
+					>
+						<GradientText
+							className={cn(
+								"text-6xl font-extrabold leading-none tracking-tight",
+								course.syncedUrl !== undefined &&
+									"transition-all duration-150 group-hover:opacity-80 peer-active:opacity-80"
+							)}
+						>
+							{course.name}
+						</GradientText>
+
+						{course.section && (
+							<div
+								className={cn(
+									"relative top-1 mr-1 ml-3 flex-shrink-0 text-base font-semibold leading-none text-black/70",
+									course.syncedUrl !== undefined &&
+										"transition-all duration-150 group-hover:opacity-50 group-active:opacity-50"
+								)}
+							>
+								{course.section}
+							</div>
+						)}
+					</a>
+				</Card>
+
+				<Card className="flex flex-1 flex-col space-y-2 py-5 px-6">
+					{feedbackHistory.length !== 0 ? (
+						<FeedbackHistory
+							courseId={courseId}
+							initialFeedbackHistory={feedbackHistory}
+							cursor={cursor}
+						/>
+					) : (
+						<div className="text-lg font-medium opacity-60">
+							When your students get feedback on their work,
+							it&apos;ll show up here
+						</div>
+					)}
+				</Card>
+			</>
 		)
 	} else if (role === "student") {
 		return (

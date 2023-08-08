@@ -55,39 +55,7 @@ export default async function ClassLayout({
 
 	return (
 		<div className="-mr-2 flex h-full flex-col space-y-2.5 overflow-y-scroll">
-			<Card className="flex flex-col justify-between py-5 px-6">
-				<div className="group flex items-baseline justify-between">
-					<GradientText asChild>
-						<a
-							href={course.syncedUrl}
-							target="_blank"
-							rel="noreferrer"
-							className={cn(
-								"pb-5 text-6xl font-semibold",
-								course.syncedUrl !== undefined &&
-									"peer transition-all duration-150 hover:opacity-80 peer-hover:opacity-80"
-							)}
-						>
-							{course.name}
-						</a>
-					</GradientText>
-
-					{course.section && (
-						<a
-							href={course.syncedUrl}
-							target="_blank"
-							rel="noreferrer"
-							className={cn(
-								"relative bottom-[1px] mr-1 ml-3 flex-shrink-0 text-base font-medium leading-none opacity-60",
-								course.syncedUrl !== undefined &&
-									"peer transition-all duration-150 hover:opacity-50 peer-hover:opacity-50"
-							)}
-						>
-							{course.section}
-						</a>
-					)}
-				</div>
-
+			<Card className="flex flex-col justify-between py-3 px-4">
 				<ClassTabs
 					course={course}
 					teacherEmailsPromise={teacherEmailsPromise}
