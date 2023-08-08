@@ -25,7 +25,7 @@ export default function Avatar({
 			ref={(div) => {
 				div &&
 					(div.style.fontSize = `${
-						div.offsetHeight * 0.51555555555
+						div.offsetHeight * 0.55555555555
 					}px`)
 			}}
 			className={cn(
