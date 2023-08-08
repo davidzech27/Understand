@@ -232,7 +232,7 @@ Both teachers and students are empowered to
 						</div>
 					</div>
 
-					<div className="flex h-full flex-[0.5] flex-col space-y-6 pt-10 mobile:pt-0">
+					<div className="flex h-full flex-[0.5] flex-col space-y-6 pt-9 mobile:pt-0">
 						<div className="">
 							<img
 								src="/ImportClass.png"
