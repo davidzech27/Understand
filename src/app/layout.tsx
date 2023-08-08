@@ -1,5 +1,6 @@
 import "./global.css"
 import Providers from "./providers"
+import { getSignedIn } from "~/utils/getSignedIn"
 
 export const metadata = {
 	title: {
@@ -22,8 +23,8 @@ export default function RootLayout({
 			<html lang="en">
 				<head />
 
-				<body>
-					<Providers>{children}</Providers>
+				<body className="absolute bottom-0 top-0 left-0 right-0">
+					<Providers signedIn={getSignedIn()}>{children}</Providers>
 				</body>
 			</html>
 		</>

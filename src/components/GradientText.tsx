@@ -1,4 +1,5 @@
 "use client"
+import { forwardRef } from "react"
 import { Slot } from "@radix-ui/react-slot"
 
 import colors from "colors.cjs"
@@ -8,7 +9,10 @@ interface Props extends React.PropsWithChildren {
 	className?: string
 }
 
-export default function GradientText({ asChild, children, className }: Props) {
+export default forwardRef<HTMLDivElement, Props>(function GradientText(
+	{ asChild, children, className },
+	ref
+) {
 	const Component = asChild ? Slot : "div"
 
 	return (
@@ -19,9 +23,10 @@ export default function GradientText({ asChild, children, className }: Props) {
 				backgroundClip: "text",
 				color: "transparent",
 			}}
+			ref={ref}
 			className={className}
 		>
 			{children}
 		</Component>
 	)
-}
+})

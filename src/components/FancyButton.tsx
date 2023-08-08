@@ -55,7 +55,7 @@ function FancyButton(
 				className={cn(
 					"z-10 font-semibold tracking-[0.010em] transition-all duration-150",
 					{
-						small: "text-base",
+						small: "text-lg",
 						medium: "text-2xl",
 						large: "text-3xl",
 					}[size],

@@ -1,10 +1,15 @@
 "use client"
-import React, { useEffect } from "react"
+import { useEffect } from "react"
 import { usePathname, useSearchParams } from "next/navigation"
 import posthog from "posthog-js"
 import { PostHogProvider } from "posthog-js/react"
 
 import env from "env.mjs"
+import { SignedInProvider, setSignedIn } from "~/utils/useSignedIn"
+
+interface Props extends React.PropsWithChildren {
+	signedIn: boolean
+}
 
 if (typeof window !== "undefined") {
 	posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
@@ -15,7 +20,7 @@ if (typeof window !== "undefined") {
 	})
 }
 
-export default function Providers({ children }: React.PropsWithChildren) {
+export default function Providers({ signedIn, children }: Props) {
 	const pathname = usePathname()
 	const searchParams = useSearchParams()
 
@@ -32,5 +37,11 @@ export default function Providers({ children }: React.PropsWithChildren) {
 		}
 	}, [pathname, searchParams])
 
-	return <PostHogProvider client={posthog}>{children}</PostHogProvider>
+	return (
+		<PostHogProvider client={posthog}>
+			<SignedInProvider value={{ signedIn, setSignedIn }}>
+				{children}
+			</SignedInProvider>
+		</PostHogProvider>
+	)
 }

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation"
 import { usePostHog } from "posthog-js/react"
 
 import updateNameAction from "./updateNameAction"
+import useSignedIn from "~/utils/useSignedIn"
 import TextInput from "~/components/TextInput"
 import FancyButton from "~/components/FancyButton"
 
@@ -31,6 +32,8 @@ export default function LandingForm({ profilePromise }: Props) {
 
 	const [nameInput, setNameInput] = useState(profile?.name ?? "")
 
+	const { setSignedIn } = useSignedIn()
+
 	const [going, setGoing] = useState(false)
 
 	const router = useRouter()
@@ -48,6 +51,8 @@ export default function LandingForm({ profilePromise }: Props) {
 				name: nameInput.trim(),
 				photo: profile.photo,
 			})
+
+		setSignedIn(true)
 
 		await updateNameAction({ name: nameInput.trim() })
 
