@@ -287,7 +287,7 @@ Both teachers and students are empowered to
 						href={env.NEXT_PUBLIC_BOOK_MEETING_URL}
 						target="_blank"
 						rel="noreferrer"
-						className="mx-auto h-fit w-fit"
+						className="mx-auto h-fit w-fit mobile:w-full"
 					>
 						<FancyButton
 							size="large"
