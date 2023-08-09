@@ -237,7 +237,7 @@ Both teachers and students are empowered to
 							<img
 								src="/ImportClass.png"
 								alt="Screenshot of importing a class in Understand"
-								className="mx-auto w-72 origin-top-right rounded-lg border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016] duration-[400ms] ease-out hover:scale-110 active:scale-110 mobile:w-2/3"
+								className="mx-auto w-72 origin-top-right rounded-lg border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016] duration-[400ms] ease-out hover:scale-110 active:scale-110 mobile:w-2/3 mobile:origin-top"
 							/>
 						</div>
 
@@ -245,7 +245,7 @@ Both teachers and students are empowered to
 							<img
 								src="/SmallStudentFeedback.png"
 								alt="Screenshot of replying to student feedback"
-								className="mx-auto w-[360px] origin-right rounded-lg border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016] duration-[400ms] ease-out hover:scale-105 active:scale-105 mobile:w-5/6"
+								className="mx-auto w-[360px] origin-right rounded-lg border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016] duration-[400ms] ease-out hover:scale-105 active:scale-105 mobile:w-5/6 mobile:origin-center"
 							/>
 						</div>
 
@@ -253,7 +253,7 @@ Both teachers and students are empowered to
 							<img
 								src="/TeacherInsights.png"
 								alt="Screenshot of teacher insights"
-								className="mx-auto w-[400px] origin-bottom-right rounded-lg border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016] duration-[400ms] ease-out hover:scale-105 active:scale-105 mobile:w-11/12"
+								className="mx-auto w-[400px] origin-bottom-right rounded-lg border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016] duration-[400ms] ease-out hover:scale-105 active:scale-105 mobile:w-11/12 mobile:origin-bottom"
 							/>
 						</div>
 					</div>
