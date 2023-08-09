@@ -150,13 +150,13 @@ Both teachers and students are empowered to
 							<img
 								src="/StudentFeedback.png"
 								alt="Screenshot of student feedback"
-								className="absolute -bottom-24 -right-8 z-10 w-[432px] rounded-xl border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016] transition-all duration-300 hover:shadow-xl"
+								className="absolute -bottom-24 -right-8 z-10 w-[432px] origin-bottom-right rounded-xl border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016] transition-all duration-[400ms] ease-out hover:scale-125 hover:shadow-xl active:scale-125"
 							/>
 
 							<img
 								src="/TeacherInsights.png"
 								alt="Screenshot of student feedback"
-								className="absolute -top-32 -left-8 w-96 rounded-xl border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016] transition-all duration-300 hover:z-20 hover:shadow-xl"
+								className="absolute -top-32 -left-8 w-96 origin-top-left rounded-xl border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016] transition-all duration-[400ms] ease-out hover:z-20 hover:scale-125 hover:shadow-xl active:scale-125"
 							/>
 						</div>
 					</div>
@@ -237,7 +237,7 @@ Both teachers and students are empowered to
 							<img
 								src="/ImportClass.png"
 								alt="Screenshot of importing a class in Understand"
-								className="mx-auto w-72 rounded-lg border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016] mobile:w-2/3"
+								className="mx-auto w-72 origin-top-right rounded-lg border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016] duration-[400ms] ease-out hover:scale-110 active:scale-110 mobile:w-2/3"
 							/>
 						</div>
 
@@ -245,7 +245,7 @@ Both teachers and students are empowered to
 							<img
 								src="/SmallStudentFeedback.png"
 								alt="Screenshot of replying to student feedback"
-								className="mx-auto w-[360px] rounded-lg border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016] mobile:w-5/6"
+								className="mx-auto w-[360px] origin-right rounded-lg border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016] duration-[400ms] ease-out hover:scale-105 active:scale-105 mobile:w-5/6"
 							/>
 						</div>
 
@@ -253,13 +253,13 @@ Both teachers and students are empowered to
 							<img
 								src="/TeacherInsights.png"
 								alt="Screenshot of teacher insights"
-								className="mx-auto w-[400px] rounded-lg border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016] mobile:w-11/12"
+								className="mx-auto w-[400px] origin-bottom-right rounded-lg border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016] duration-[400ms] ease-out hover:scale-105 active:scale-105 mobile:w-11/12"
 							/>
 						</div>
 					</div>
 				</div>
 
-				<div className="flex h-screen w-full flex-col justify-center px-28 sm-mobile:px-6 lg-mobile:px-8">
+				<div className="flex h-screen w-full flex-col justify-center px-28 sm-mobile:px-6 lg-mobile:px-8 mobile:h-auto mobile:py-12">
 					<h1 className="select-text text-[3.5rem] font-extrabold leading-tight tracking-tight text-black/80 sm-mobile:text-[2rem] lg-mobile:text-[2.25rem]">
 						Empowering students to{" "}
 						<GradientText asChild>
