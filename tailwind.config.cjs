@@ -34,14 +34,6 @@ const config = {
 						transform: "scale(0.95)",
 					},
 				},
-				"highlight-fade-in": {
-					"0%": {
-						backgroundColor: "#00000000",
-					},
-					"100%": {
-						backgroundColor: colors["surface-selected-hover"],
-					},
-				},
 			},
 		},
 	},

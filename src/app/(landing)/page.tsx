@@ -316,7 +316,7 @@ Both teachers and students are empowered to
 
 				<div className="flex items-center gap-4">
 					<a
-						href="https://linkedin.com/in/understandschool"
+						href="https://www.linkedin.com/company/understandschool"
 						target="_blank"
 						rel="noreferrer"
 					>
