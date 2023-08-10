@@ -30,6 +30,39 @@ export default async function ClassPage({
 
 	if (course === undefined) notFound()
 
+	const courseHeader = (
+		<Card className="px-6 py-5">
+			<a
+				href={course.syncedUrl}
+				target="_blank"
+				rel="noreferrer"
+				className="group flex items-center justify-between"
+			>
+				<GradientText
+					className={cn(
+						"text-6xl font-extrabold leading-none tracking-tight",
+						course.syncedUrl !== undefined &&
+							"transition-all duration-150 group-hover:opacity-80 peer-active:opacity-80"
+					)}
+				>
+					{course.name}
+				</GradientText>
+
+				{course.section && (
+					<div
+						className={cn(
+							"relative top-1 mr-1 ml-3 flex-shrink-0 text-base font-semibold leading-none text-black/70",
+							course.syncedUrl !== undefined &&
+								"transition-all duration-150 group-hover:opacity-50 group-active:opacity-50"
+						)}
+					>
+						{course.section}
+					</div>
+				)}
+			</a>
+		</Card>
+	)
+
 	if (role === "teacher") {
 		const { feedbackHistory, cursor } = await Course({
 			id: courseId,
@@ -39,36 +72,7 @@ export default async function ClassPage({
 
 		return (
 			<>
-				<Card className="px-6 py-5">
-					<a
-						href={course.syncedUrl}
-						target="_blank"
-						rel="noreferrer"
-						className="group flex items-center justify-between"
-					>
-						<GradientText
-							className={cn(
-								"text-6xl font-extrabold leading-none tracking-tight",
-								course.syncedUrl !== undefined &&
-									"transition-all duration-150 group-hover:opacity-80 peer-active:opacity-80"
-							)}
-						>
-							{course.name}
-						</GradientText>
-
-						{course.section && (
-							<div
-								className={cn(
-									"relative top-1 mr-1 ml-3 flex-shrink-0 text-base font-semibold leading-none text-black/70",
-									course.syncedUrl !== undefined &&
-										"transition-all duration-150 group-hover:opacity-50 group-active:opacity-50"
-								)}
-							>
-								{course.section}
-							</div>
-						)}
-					</a>
-				</Card>
+				{courseHeader}
 
 				<Card className="flex flex-1 flex-col space-y-2 py-5 px-6">
 					{feedbackHistory.length !== 0 ? (
@@ -88,9 +92,13 @@ export default async function ClassPage({
 		)
 	} else if (role === "student") {
 		return (
-			<Card className="flex flex-1 flex-col py-5 px-6">
-				<MessageBoard courseId={courseId} />
-			</Card>
+			<>
+				{courseHeader}
+
+				<Card className="flex flex-1 flex-col py-5 px-6">
+					<MessageBoard courseId={courseId} />
+				</Card>
+			</>
 		)
 	}
 }
