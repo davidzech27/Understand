@@ -175,14 +175,15 @@ Both teachers and students are empowered to
 									classes
 								</h2>
 
-								<p className="mt-4 ml-0.5 select-text text-base font-medium text-black/70">
+								<p className="mt-4 ml-0.5 select-text text-lg font-medium text-black/70 mobile:text-base">
 									Teachers add assignments to Understand
 									either manually or automatically via a sync
-									with a Google Classroom class. This enables
-									Understand to account for instructions on
-									assignments in the feedback it provides, as
-									well as other Understand features like
-									StudentGPT and insights.
+									with a Google Classroom class. Understand
+									will use assignments&apos; instructions,
+									along with any goals or state standards the
+									teacher chooses, to customize the feedback
+									provided to students and the insights
+									derived from this feedback.
 								</p>
 							</div>
 
@@ -191,19 +192,17 @@ Both teachers and students are empowered to
 									Students receive feedback on their work
 								</h2>
 
-								<p className="mt-4 ml-0.5 select-text text-base font-medium text-black/70">
+								<p className="mt-4 ml-0.5 select-text text-lg font-medium text-black/70 mobile:text-base">
 									Understand provides students with in-depth,
 									interactive AI feedback on their work
-									whenever they want it, accounting for the
-									assignment&apos;s instructions along with
-									any goals or state standards the teacher
-									chooses. The student can respond to this
-									feedback with any question or comments they
-									may have, or if they want Understand to
-									provide them feedback on a revision
-									they&apos;ve made. All responses are
-									tailored to the individual student&apos;s
-									writing style and proficiency.
+									whenever they want it. Students can respond
+									to feedback provided if they have any
+									questions or comments, or if they want
+									Understand to provide them feedback on a
+									revision they&apos;ve made. All responses
+									are tailored to the individual
+									student&apos;s writing style and
+									proficiency.
 								</p>
 							</div>
 
@@ -213,26 +212,23 @@ Both teachers and students are empowered to
 									teachers
 								</h2>
 
-								<p className="mt-4 ml-0.5 select-text text-base font-medium text-black/70">
+								<p className="mt-4 ml-0.5 select-text text-lg font-medium text-black/70 mobile:text-base">
 									The feedback students receive is aggregated
 									into nuanced and actionable insights for
-									teachers to differentiate their instruction
-									accordingly. Assignment insights show the
+									teachers. Assignment insights display the
 									strengths and weaknesses of a class on a
 									particular assignment and which students
-									have them, and student insights show the
+									have them, and student insights display the
 									strengths and weaknesses of a particular
 									student and which assignments they&apos;re
 									present in. All insights are paired with
 									examples of them in students&apos; work.
-									Insights also reference any goals or state
-									standards chosen by the teacher.
 								</p>
 							</div>
 						</div>
 					</div>
 
-					<div className="flex h-full flex-[0.5] flex-col space-y-6 pt-9 mobile:pt-0">
+					<div className="flex h-full flex-[0.5] flex-col space-y-6 pt-14 mobile:pt-0">
 						<div className="">
 							<img
 								src="/ImportClass.png"
