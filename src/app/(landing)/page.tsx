@@ -268,11 +268,8 @@ Both teachers and students are empowered to
 						<GradientText asChild>
 							<span className="select-text">as they arise</span>
 						</GradientText>
-						, unprecedented levels of{" "}
-						<GradientText asChild>
-							<span className="select-text">differentiation</span>
-						</GradientText>{" "}
-						are made possible with{" "}
+						, unprecedented levels of differentiation are made
+						possible with{" "}
 						<GradientText asChild>
 							<span className="select-text">Understand</span>
 						</GradientText>
