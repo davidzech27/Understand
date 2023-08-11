@@ -15,7 +15,8 @@ import { feedbackListSchema, feedbackInsightsSchema } from "./Feedback"
 
 const studentInsightsSchema = z
 	.object({
-		type: z.string(),
+		title: z.string().optional().default(""),
+		type: z.enum(["strength", "weakness"]),
 		content: z.string(),
 		sources: z
 			.object({

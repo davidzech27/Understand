@@ -8,6 +8,7 @@ import Course from "./Course"
 
 const assignmentInsightsSchema = z
 	.object({
+		title: z.string().optional().default(""),
 		type: z.enum(["strength", "weakness"]),
 		content: z.string(),
 		sources: z

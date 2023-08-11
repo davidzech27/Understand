@@ -2,6 +2,7 @@ import Card from "~/components/Card"
 import User from "~/data/User"
 import Insight from "./Insight"
 import Assignment from "~/data/Assignment"
+import Heading from "~/components/Heading"
 
 export const runtime = "edge"
 
@@ -49,25 +50,69 @@ export default async function StudentPage({
 		})),
 	}))
 
+	const strengths = (studentInsights ?? []).filter(
+		(insight) => insight.type === "strength"
+	)
+
+	const weaknesses = (studentInsights ?? []).filter(
+		(insight) => insight.type === "weakness"
+	)
+
+	const totalAssignmentsPromise = Promise.all(
+		studentInsights
+			?.map(({ sources }) => sources.map(({ assignment }) => assignment))
+			.flat() ?? []
+	).then(
+		(assignments) =>
+			new Set(assignments.map(({ assignmentId }) => assignmentId)).size
+	)
+
 	return (
-		<Card className="flex h-full flex-col space-y-2 px-6 pt-5 pb-80">
+		<Card className="flex flex-col space-y-2 px-6 pt-5 pb-80">
 			{studentInsights === undefined || studentInsights.length === 0 ? (
 				<span className="text-lg font-medium opacity-60">
 					No data for student
 				</span>
 			) : (
-				studentInsights.map((insight) => (
-					<>
-						<div className="ml-1 text-lg font-medium opacity-60">
-							{insight.type}
-						</div>
+				<>
+					<div className="flex justify-between px-1">
+						<Heading size="large">Strengths</Heading>
 
-						<Insight
-							content={insight.content}
-							sources={insight.sources}
-						/>
-					</>
-				))
+						<Heading size="large">{strengths.length}</Heading>
+					</div>
+
+					<ul className="flex flex-col space-y-2.5">
+						{strengths.map((strength, index) => (
+							<li key={index}>
+								<Insight
+									{...strength}
+									totalAssignmentsPromise={
+										totalAssignmentsPromise
+									}
+								/>
+							</li>
+						))}
+					</ul>
+
+					<div className="flex justify-between px-1">
+						<Heading size="large">Weaknesses</Heading>
+
+						<Heading size="large">{weaknesses.length}</Heading>
+					</div>
+
+					<ul className="flex flex-col space-y-2.5">
+						{weaknesses.map((weakness, index) => (
+							<div key={index}>
+								<Insight
+									{...weakness}
+									totalAssignmentsPromise={
+										totalAssignmentsPromise
+									}
+								/>
+							</div>
+						))}
+					</ul>
+				</>
 			)}
 		</Card>
 	)

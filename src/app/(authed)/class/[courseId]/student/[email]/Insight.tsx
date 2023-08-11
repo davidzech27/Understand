@@ -1,15 +1,19 @@
 "use client"
-import { Suspense, use, useRef, useMemo } from "react"
+import { Suspense, use, useRef, useMemo, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useHover } from "react-aria"
 import * as ScrollArea from "@radix-ui/react-scroll-area"
+import { ChevronDown } from "lucide-react"
 import { parse } from "node-html-parser"
 
 import formatDate from "~/utils/formatDate"
 import cn from "~/utils/cn"
+import Heading from "~/components/Heading"
+import Await from "~/utils/Await"
 
 interface Props {
+	title: string
 	content: string
 	sources: {
 		assignment: Promise<{
@@ -20,22 +24,87 @@ interface Props {
 		submissionHTML: Promise<string>
 		paragraphs: number[]
 	}[]
+	totalAssignmentsPromise: Promise<number>
 }
 
-export default function Insight({ content, sources }: Props) {
-	const { hoverProps, isHovered } = useHover({})
+export default function Insight({
+	title,
+	content,
+	sources,
+	totalAssignmentsPromise,
+}: Props) {
+	const [expanded, setExpanded] = useState(false)
 
 	const sourceListRef = useRef<HTMLDivElement>(null)
 
 	return (
-		<div {...hoverProps}>
-			<div className="block select-text rounded-md border-[0.75px] border-border bg-surface px-6 py-4 transition-all duration-150 hover:bg-surface-hover focus-visible:outline-border">
-				{content}
+		<div className="relative">
+			<div
+				onClick={() => setExpanded((prevExpanded) => !prevExpanded)}
+				data-expanded={expanded}
+				className="group cursor-pointer rounded-md border-[0.75px] border-border bg-surface px-6 py-5 transition-all duration-150 hover:bg-surface-hover focus-visible:outline-border"
+			>
+				<div className="flex justify-between">
+					<Heading size="medium" className="select-text leading-none">
+						{title}
+					</Heading>
+
+					<ChevronDown
+						size={24}
+						className="opacity-70 transition duration-300 group-data-[expanded=true]:rotate-180"
+					/>
+				</div>
+
+				<p className="mt-0.5 mb-3.5 select-text">{content}</p>
+
+				<Suspense fallback={<div className="h-[36px]" />}>
+					<Await promise={totalAssignmentsPromise}>
+						{(totalAssignments) => (
+							<div className="flex">
+								<div
+									style={{
+										flex: sources.length,
+									}}
+									className="flex flex-col space-y-1.5"
+								>
+									<div
+										className={cn(
+											"h-2.5 rounded-l-md bg-primary opacity-80",
+											totalAssignments -
+												sources.length ===
+												0 && "rounded-r-md"
+										)}
+									/>
+
+									<Heading size="small" className="px-1">
+										Here: {sources.length}
+									</Heading>
+								</div>
+
+								<div
+									style={{
+										flex: totalAssignments - sources.length,
+									}}
+									className="flex flex-col space-y-1.5"
+								>
+									<div className="h-2.5 rounded-r-md bg-secondary opacity-80" />
+
+									{totalAssignments - sources.length > 0 ? (
+										<Heading size="small" className="px-1">
+											Everything else:{" "}
+											{totalAssignments - sources.length}
+										</Heading>
+									) : null}
+								</div>
+							</div>
+						)}
+					</Await>
+				</Suspense>
 			</div>
 
 			<div
 				style={
-					isHovered
+					expanded
 						? {
 								marginTop: 10,
 								maxHeight: 1000,
@@ -43,8 +112,8 @@ export default function Insight({ content, sources }: Props) {
 						: { maxHeight: 0 }
 				}
 				className={cn(
-					"overflow-y-hidden rounded-md border-border bg-surface shadow-lg shadow-[#00000012] transition-all duration-150",
-					isHovered && "border-x-[0.75px] border-b-[0.75px]"
+					"absolute right-0 left-0 z-10 overflow-y-hidden rounded-md border-border bg-surface shadow-lg shadow-[#00000012] transition-all duration-150",
+					expanded && "border-x-[0.75px] border-b-[0.75px]"
 				)}
 			>
 				<div ref={sourceListRef}>

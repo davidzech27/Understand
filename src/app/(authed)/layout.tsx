@@ -13,7 +13,7 @@ export default function AuthedLayout({
 }) {
 	return (
 		<div className="flex h-screen flex-col space-y-2.5 px-3 py-2.5">
-			<nav className="flex h-8 items-center space-x-3">
+			<nav className="relative flex h-8 items-center space-x-3">
 				<div className="flex w-72 justify-center">
 					<Link
 						href="/"
@@ -27,10 +27,12 @@ export default function AuthedLayout({
 					</Link>
 				</div>
 
+				{/* <div className="absolute left-0 right-0 bottom-0 top-0 flex justify-center">
+					<div>{}</div>
+				</div> */}
+
 				<div className="flex flex-1 justify-end">
 					<TopActions />
-
-					<div className="w-[2px]"></div>
 				</div>
 			</nav>
 

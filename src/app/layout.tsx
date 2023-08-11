@@ -23,7 +23,10 @@ export default function RootLayout({
 			<html lang="en">
 				<head />
 
-				<body className="absolute bottom-0 top-0 left-0 right-0">
+				<body
+					className="absolute bottom-0 top-0 left-0 right-0"
+					style={{ margin: 0 }} // keep this
+				>
 					<Providers signedIn={getSignedIn()}>{children}</Providers>
 				</body>
 			</html>

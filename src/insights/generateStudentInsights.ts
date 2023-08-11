@@ -1,6 +1,7 @@
 import User from "~/data/User"
 import getCompletion from "~/ai/getCompletion"
 import Feedback from "~/data/Feedback"
+import Course from "~/data/Course"
 
 export default async function generateStudentInsights({
 	courseId,
@@ -9,13 +10,27 @@ export default async function generateStudentInsights({
 	courseId: string
 	studentEmail: string
 }) {
-	const [previousStudentInsights, unsyncedFeedbackInsights] =
-		await Promise.all([
-			User({ email: studentEmail }).insights({ courseId }),
-			User({ email: studentEmail }).unsyncedFeedbackInsights({
-				courseId,
-			}),
-		])
+	const [
+		previousStudentInsights,
+		unsyncedFeedbackInsights,
+		student,
+		assignments,
+	] = await Promise.all([
+		User({ email: studentEmail }).insights({ courseId }),
+		User({ email: studentEmail }).unsyncedFeedbackInsights({
+			courseId,
+		}),
+		User({ email: studentEmail }).get(),
+		Course({ id: courseId }).assignments(),
+	])
+
+	if (student === undefined) {
+		console.error("Student could not be found", {
+			studentEmail,
+		})
+
+		return
+	}
 
 	const unsyncedAssignmentIdSet = new Set(
 		unsyncedFeedbackInsights.map((insight) => insight.assignmentId)
@@ -31,9 +46,15 @@ export default async function generateStudentInsights({
 		.filter((insight) => insight.sources.length !== 0)
 
 	const concatenatedInsights = (
-		previousStudentInsightsWithoutUnsynced ?? []
+		previousStudentInsightsWithoutUnsynced?.map(
+			({ type, content, sources }) => ({ type, content, sources })
+		) ?? []
 	).concat(
 		unsyncedFeedbackInsights
+			.sort(
+				(feedback1, feedback2) =>
+					feedback1.givenAt.valueOf() - feedback2.givenAt.valueOf()
+			)
 			.map((assignmentInsights) =>
 				assignmentInsights.insights.map((insight) => ({
 					type: insight.type,
@@ -49,6 +70,10 @@ export default async function generateStudentInsights({
 			.flat()
 	)
 
+	const assignmentIdToTitleMap = new Map(
+		assignments.map(({ assignmentId, title }) => [assignmentId, title])
+	)
+
 	const mergedInsightsPromptMessages = [
 		{
 			role: "system" as const,
@@ -56,19 +81,29 @@ export default async function generateStudentInsights({
 		},
 		{
 			role: "user" as const,
-			content: `The following is a list of insights regarding the strengths/weaknesses of a student across various assignments:${
-				concatenatedInsights
-					?.map(
-						(insight, index) =>
-							`\n\n${index + 1}. ${insight.content}`
-					)
-					.join("") ?? ""
-			}
+			content: `The following are strengths and weaknesses of a student named ${
+				student.name
+			} across various assignments:
 
-Some of the above insights may be similar in meaning. Rewrite them while expressing them in the context of the student's understanding of the class in general, while keeping every detail. Use the following format:
-Title: {a title}
-Content: {the rewritten insight}
-Sources: {the number(s) corresponding the original insight(s) that formed this insight, using a comma-separated list if necessary}
+${concatenatedInsights
+	?.map(
+		(insight, index) => `Number: ${index + 1}
+Type: ${insight.type}
+Assignment titles: ${insight.sources
+			.map(({ assignmentId }) => assignmentIdToTitleMap.get(assignmentId))
+			.filter(Boolean)
+			.join(", ")}
+Content: ${insight.content}`
+	)
+	.join("\n\n")}
+
+Given that these are in chronological order and may express ${
+				student.name
+			}'s progress over time, rewrite the above strengths and weaknesses, combining ones that are identical or nearly identical, using the following format:
+Title: {short title}
+Type: {strength / weakness}
+Content: {insight content}
+Sources: {number corresponding the original strength / weakness that formed this insight, using a comma-separated list if there are multiple}
 
 Begin.`,
 		},
@@ -92,7 +127,8 @@ Begin.`,
 	const mergedInsights = mergedInsightsCompletion
 		.split("\n\n")
 		.map((insight) => ({
-			type: insight.match(/(?<=^Title:[ ]).+/g)?.[0],
+			title: insight.match(/(?<=^Title:[ ]).+/g)?.[0],
+			type: insight.match(/(?<=\nType:[ ]).+/g)?.[0].toLowerCase(),
 			content: insight.match(/(?<=\nContent:[ ]).+/g)?.[0],
 			sources: insight
 				.match(/(?<=\nSources:[ ]).+/g)?.[0]
@@ -100,11 +136,13 @@ Begin.`,
 				.map(Number),
 		}))
 		.map((insight) =>
-			insight.type && insight.content && insight.sources?.length
+			insight.title &&
+			insight.content &&
+			(insight.type === "strength" || insight.type === "weakness") &&
+			insight.sources?.length
 				? {
-						type:
-							insight.type[0] +
-							insight.type.slice(1).toLowerCase(),
+						title: insight.title,
+						type: insight.type as "strength" | "weakness",
 						content: insight.content,
 						sources: insight.sources,
 				  }
@@ -112,6 +150,7 @@ Begin.`,
 		)
 		.filter(Boolean)
 		.map((insight) => ({
+			title: insight.title,
 			type: insight.type,
 			content: insight.content,
 			sources: Object.entries(

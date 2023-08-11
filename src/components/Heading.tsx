@@ -19,10 +19,11 @@ function Heading(
 		<Component
 			ref={ref}
 			className={cn(
+				"font-semibold leading-none text-black/70",
 				{
-					small: "text-sm font-semibold opacity-70",
-					medium: "text-base font-semibold opacity-70",
-					large: "text-lg font-semibold opacity-70",
+					small: "text-sm",
+					medium: "text-base",
+					large: "text-lg",
 				}[size],
 				className
 			)}

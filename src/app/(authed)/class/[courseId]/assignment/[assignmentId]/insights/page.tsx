@@ -2,6 +2,7 @@ import Assignment from "~/data/Assignment"
 import User from "~/data/User"
 import Card from "~/components/Card"
 import Insight from "./Insight"
+import Heading from "~/components/Heading"
 
 export const metadata = {
 	title: "Insights",
@@ -54,8 +55,14 @@ export default async function AssignmentInsightsPage({
 		(insight) => insight.type === "weakness"
 	)
 
+	const totalStudentsPromise = Promise.all(
+		assignmentInsights
+			?.map(({ sources }) => sources.map(({ student }) => student))
+			.flat() ?? []
+	).then((students) => new Set(students.map(({ email }) => email)).size)
+
 	return (
-		<Card className="flex h-full flex-col space-y-2 px-6 pt-5 pb-80">
+		<Card className="flex flex-col space-y-2 px-6 pt-5 pb-80">
 			{assignmentInsights === undefined ||
 			assignmentInsights.length === 0 ? (
 				<span className="text-lg font-medium opacity-60">
@@ -63,26 +70,36 @@ export default async function AssignmentInsightsPage({
 				</span>
 			) : (
 				<>
-					<div className="ml-1 text-lg font-medium opacity-60">
-						Strengths
+					<div className="flex justify-between px-1">
+						<Heading size="large">Strengths</Heading>
+
+						<Heading size="large">{strengths.length}</Heading>
 					</div>
 
 					<ul className="flex flex-col space-y-2.5">
 						{strengths.map((strength, index) => (
 							<li key={index}>
-								<Insight {...strength} />
+								<Insight
+									{...strength}
+									totalStudentsPromise={totalStudentsPromise}
+								/>
 							</li>
 						))}
 					</ul>
 
-					<div className="ml-1 text-lg font-medium opacity-60">
-						Weaknesses
+					<div className="flex justify-between px-1">
+						<Heading size="large">Weaknesses</Heading>
+
+						<Heading size="large">{weaknesses.length}</Heading>
 					</div>
 
 					<ul className="flex flex-col space-y-2.5">
 						{weaknesses.map((weakness, index) => (
 							<div key={index}>
-								<Insight {...weakness} />
+								<Insight
+									{...weakness}
+									totalStudentsPromise={totalStudentsPromise}
+								/>
 							</div>
 						))}
 					</ul>
