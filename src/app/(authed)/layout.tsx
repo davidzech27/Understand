@@ -20,7 +20,7 @@ export default function AuthedLayout({
 						className="transition-opacity duration-150 hover:opacity-75"
 					>
 						<GradientText asChild>
-							<span className="cursor-pointer text-2xl font-semibold">
+							<span className="cursor-pointer text-2xl font-extrabold tracking-tight text-white transition duration-200 hover:opacity-75 focus-visible:opacity-75 active:opacity-75">
 								Understand
 							</span>
 						</GradientText>
