@@ -75,5 +75,15 @@ We may collect, or receive via student input other data not explicitly outlined 
 By using our Service, you acknowledge and agree to the terms of this Privacy Policy. If you do not consent to any part of this Privacy Policy, please refrain from using our Service.`
 
 export default function PrivacyPolicyPage() {
-	return <main className="whitespace-pre">{privacyPolicyContent}</main>
+	return (
+		<main className="p-28 sm-mobile:p-6 lg-mobile:p-8">
+			<h1 className="mb-4 select-text text-5xl font-extrabold leading-none tracking-tight text-black/80">
+				Privacy Policy
+			</h1>
+
+			<p className="select-text whitespace-pre-wrap text-lg text-black/70">
+				{privacyPolicyContent}
+			</p>
+		</main>
+	)
 }
