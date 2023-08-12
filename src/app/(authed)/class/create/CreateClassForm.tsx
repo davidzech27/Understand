@@ -202,95 +202,97 @@ export default function CreateClassForm({
 				}}
 				className="flex h-full flex-col space-y-2.5"
 			>
-				<Card className="space-y-2 px-6 py-5 shadow-sm">
-					<Label>Name</Label>
+				<div className="flex h-full flex-col space-y-2.5 overflow-y-auto">
+					<Card className="flex flex-col space-y-2 py-5 px-6 shadow-sm">
+						<Label>Link class</Label>
 
-					<TextInput
-						value={nameInput}
-						setValue={setNameInput}
-						placeholder="Class name"
-						id="name"
-						autoFocus
-						autoComplete="off"
-						className="py-2.5 pl-4 text-base"
-					/>
-
-					<Label>Section</Label>
-
-					<TextInput
-						value={sectionInput}
-						setValue={setSectionInput}
-						placeholder="Section (optional)"
-						id="section"
-						autoComplete="off"
-						className="py-2.5 pl-4 text-base"
-					/>
-				</Card>
-
-				<Card className="flex-1 space-y-2 overflow-y-scroll px-6 py-5 shadow-sm">
-					<Label>Students</Label>
-
-					<InputList
-						values={studentEmailInputs}
-						setValues={setStudentEmailInputs}
-						singleWord
-						placeholder="Student email"
-						id="students"
-						className="h-min"
-						textInputClassname="text-base w-[calc(33.333333%-27.333306px)]"
-						buttonClassName="h-[46px] w-[46px]"
-					/>
-
-					<Label>Additional teachers</Label>
-
-					<InputList
-						values={additionalTeacherEmailInputs}
-						setValues={setAdditionalTeacherEmailInputs}
-						singleWord
-						placeholder="Teacher email"
-						id="additional-teachers"
-						className="h-min"
-						textInputClassname="text-base w-[calc(33.333333%-27.333306px)]"
-						buttonClassName="h-[46px] w-[46px]"
-					/>
-				</Card>
-
-				<Card className="flex flex-col space-y-2 py-5 px-6 shadow-sm">
-					<Label>Link class</Label>
-
-					{linkedCourse ? (
-						<div className="relative">
-							<AttachmentItem
-								name={linkedCourse.name}
-								subname={linkedCourse.section}
-								url={linkedCourse.url}
-							/>
-
-							<button
-								type="button"
-								onClick={onUnlink}
-								className="group absolute -top-1.5 -right-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full border-[0.75px] border-border bg-surface-selected transition-all duration-150 hover:bg-surface-selected-hover"
-							>
-								<X
-									size={14}
-									className="text-black opacity-40 transition-all duration-150 group-hover:opacity-60"
+						{linkedCourse ? (
+							<div className="relative">
+								<AttachmentItem
+									name={linkedCourse.name}
+									subname={linkedCourse.section}
+									url={linkedCourse.url}
 								/>
-							</button>
-						</div>
-					) : (
-						<Button
-							onClick={(e) => {
-								e.preventDefault()
 
-								onLink()
-							}}
-							id="link-class"
-							size="large"
-						>
-							Link with Google Classroom class
-						</Button>
-					)}
-				</Card>
+								<button
+									type="button"
+									onClick={onUnlink}
+									className="group absolute -top-1.5 -right-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full border-[0.75px] border-border bg-surface-selected transition-all duration-150 hover:bg-surface-selected-hover"
+								>
+									<X
+										size={14}
+										className="text-black opacity-40 transition-all duration-150 group-hover:opacity-60"
+									/>
+								</button>
+							</div>
+						) : (
+							<Button
+								onClick={(e) => {
+									e.preventDefault()
+
+									onLink()
+								}}
+								id="link-class"
+								size="large"
+							>
+								Link with Google Classroom class
+							</Button>
+						)}
+					</Card>
+
+					<Card className="space-y-2 px-6 py-5 shadow-sm">
+						<Label>Name</Label>
+
+						<TextInput
+							value={nameInput}
+							setValue={setNameInput}
+							placeholder="Class name"
+							id="name"
+							autoFocus
+							autoComplete="off"
+							className="py-2.5 pl-4 text-base"
+						/>
+
+						<Label>Section</Label>
+
+						<TextInput
+							value={sectionInput}
+							setValue={setSectionInput}
+							placeholder="Section (optional)"
+							id="section"
+							autoComplete="off"
+							className="py-2.5 pl-4 text-base"
+						/>
+					</Card>
+
+					<Card className="flex-1 space-y-2 px-6 py-5 shadow-sm">
+						<Label>Students</Label>
+
+						<InputList
+							values={studentEmailInputs}
+							setValues={setStudentEmailInputs}
+							singleWord
+							placeholder="Student email"
+							id="students"
+							className="h-min"
+							textInputClassname="text-base w-[calc(33.333333%-27.333306px)]"
+							buttonClassName="h-[46px] w-[46px]"
+						/>
+
+						<Label>Additional teachers</Label>
+
+						<InputList
+							values={additionalTeacherEmailInputs}
+							setValues={setAdditionalTeacherEmailInputs}
+							singleWord
+							placeholder="Teacher email"
+							id="additional-teachers"
+							className="h-min"
+							textInputClassname="text-base w-[calc(33.333333%-27.333306px)]"
+							buttonClassName="h-[46px] w-[46px]"
+						/>
+					</Card>
+				</div>
 
 				<Card className="flex space-x-3 py-5 px-6 shadow-sm">
 					<FancyButton

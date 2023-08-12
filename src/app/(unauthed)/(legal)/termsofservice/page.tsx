@@ -407,7 +407,7 @@ export default function TermsOfServicePage() {
 				Terms of Service
 			</h1>
 
-			<h1 className="mb-4 select-text text-3xl font-medium leading-none tracking-tight text-black/80">
+			<h1 className="mb-4 select-text text-2xl font-medium leading-none tracking-tight text-black/80">
 				Last updated August 12, 2023
 			</h1>
 

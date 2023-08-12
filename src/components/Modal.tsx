@@ -19,9 +19,9 @@ export default function Modal({
 	return (
 		<Dialog.Root open={open} onOpenChange={setOpen}>
 			<Dialog.Portal>
-				<Dialog.Overlay className="fixed inset-0 z-50 bg-[#00000060] fade-in fade-out duration-150" />
+				<Dialog.Overlay className="fixed inset-0 z-50 bg-[#00000060] duration-150" />
 
-				<Dialog.Content className="fixed left-0 top-0 z-50 flex h-3/5 w-2/3 translate-x-1/4 translate-y-1/3 flex-col justify-between rounded-md bg-white fade-in fade-out duration-150">
+				<Dialog.Content className="fixed left-[12.5vw] top-[16.6667vh] z-50 flex h-2/3 w-3/4 flex-col justify-between rounded-md bg-white">
 					<div className="mx-6 mt-6 flex items-center justify-between">
 						<Dialog.Title className="mb-0.5 text-2xl font-medium leading-none opacity-80">
 							{title}
