@@ -1,3 +1,4 @@
+"use client"
 import Link from "next/link"
 
 import env from "env.mjs"
@@ -6,7 +7,7 @@ import useSignedIn from "~/utils/useSignedIn"
 import GradientText from "~/components/GradientText"
 import FancyButton from "~/components/FancyButton"
 
-export default function TopBar() {
+export default function Header() {
 	const { signedIn } = useSignedIn()
 
 	return (
@@ -35,7 +36,7 @@ export default function TopBar() {
 					</div>
 				</GradientText>
 
-				<div className="flex h-full items-center space-x-6 mobile:space-x-4">
+				<nav className="flex h-full items-center space-x-6 mobile:space-x-4">
 					{!signedIn ? (
 						<Link href="/signIn" passHref>
 							<GradientText className="cursor-pointer text-xl font-bold transition hover:opacity-75 focus-visible:opacity-75 active:opacity-75 mobile:text-lg">
@@ -78,7 +79,7 @@ export default function TopBar() {
 							</FancyButton>
 						</Link>
 					)}
-				</div>
+				</nav>
 			</header>
 		</>
 	)
