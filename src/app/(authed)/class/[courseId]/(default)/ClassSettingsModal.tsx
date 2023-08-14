@@ -139,7 +139,7 @@ export default function ClassSettingsModal({
 						id="students"
 						placeholder="Student email"
 						autoComplete="off"
-						textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)]"
+						textInputClassname="h-min py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)]"
 						buttonClassName="h-[46px] w-[46px]"
 					/>
 
@@ -152,7 +152,7 @@ export default function ClassSettingsModal({
 						placeholder="Teacher email"
 						id="teachers"
 						autoComplete="off"
-						textInputClassname="py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)]"
+						textInputClassname="h-min py-2.5 pl-4 text-base w-[calc(33.333333%-27.333306px)]"
 						buttonClassName="h-[46px] w-[46px]"
 					/>
 
