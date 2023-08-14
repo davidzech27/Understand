@@ -1,6 +1,7 @@
 import { Suspense } from "react"
 import Link from "next/link"
 
+import ToggleSideBar from "./ToggleSideBar"
 import SideBar from "./SideBar"
 import TopActions from "./TopActions"
 import Card from "~/components/Card"
@@ -13,8 +14,12 @@ export default function AuthedLayout({
 }) {
 	return (
 		<div className="flex h-screen flex-col space-y-2.5 px-3 py-2.5">
-			<nav className="relative flex h-8 items-center space-x-3">
-				<div className="flex w-72 justify-center">
+			<div className="relative flex justify-center">
+				<div className="absolute left-0 top-0 bottom-0">
+					<ToggleSideBar />
+				</div>
+
+				<div className="flex">
 					<Link
 						href="/"
 						className="transition-opacity duration-150 hover:opacity-75"
@@ -27,21 +32,15 @@ export default function AuthedLayout({
 					</Link>
 				</div>
 
-				{/* <div className="absolute left-0 right-0 bottom-0 top-0 flex justify-center">
-					<div>{}</div>
-				</div> */}
-
-				<div className="flex flex-1 justify-end">
+				<div className="absolute top-0 bottom-0 right-0">
 					<TopActions />
 				</div>
-			</nav>
+			</div>
 
-			<div className="flex h-[calc(100vh-62px)] space-x-3">
-				<nav className="w-72">
-					<SideBar />
-				</nav>
+			<div className="relative flex flex-1 space-x-3">
+				<SideBar />
 
-				<main className="w-[calc(100vw-324px)]">
+				<main className="flex-1">
 					<Suspense
 						fallback={<Card className="h-full w-full">{null}</Card>}
 					>

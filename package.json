@@ -28,6 +28,7 @@
 		"google-auth-library": "^8.8.0",
 		"immer": "^10.0.1",
 		"jose": "^4.13.1",
+		"jotai": "^2.3.1",
 		"lucide-react": "^0.214.0",
 		"next": "^13.4.13",
 		"next-build-id": "^3.0.0",
