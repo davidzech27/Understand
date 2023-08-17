@@ -10,7 +10,7 @@
 		"dbpush": "drizzle-kit push:mysql --config=./src/db/drizzle.config.ts"
 	},
 	"dependencies": {
-		"@next/bundle-analyzer": "^13.4.13",
+		"@next/bundle-analyzer": "^13.4.17",
 		"@pinecone-database/pinecone": "^0.1.6",
 		"@planetscale/database": "^1.6.0",
 		"@radix-ui/react-dialog": "^1.0.3",
@@ -30,7 +30,7 @@
 		"jose": "^4.13.1",
 		"jotai": "^2.3.1",
 		"lucide-react": "^0.214.0",
-		"next": "^13.4.13",
+		"next": "^13.4.17",
 		"next-build-id": "^3.0.0",
 		"node-html-parser": "^6.1.5",
 		"react": "^18.2.0",
@@ -44,7 +44,7 @@
 		"zod": "^3.20.6"
 	},
 	"devDependencies": {
-		"@next/eslint-plugin-next": "^13.4.13",
+		"@next/eslint-plugin-next": "^13.4.17",
 		"@total-typescript/ts-reset": "^0.4.2",
 		"@types/eslint": "^8.44.0",
 		"@types/node": "^18.14.0",
@@ -58,7 +58,7 @@
 		"drizzle-kit": "^0.19.3",
 		"encoding": "^0.1.13",
 		"eslint": "^8.45.0",
-		"eslint-config-next": "^13.4.13",
+		"eslint-config-next": "^13.4.17",
 		"eslint-config-prettier": "^8.8.0",
 		"eslint-plugin-react": "^7.33.0",
 		"eslint-plugin-react-hooks": "^0.0.0-experimental-587ae49d7-20230720",
