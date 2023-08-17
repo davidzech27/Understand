@@ -1,7 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { usePostHog } from "posthog-js/react"
 
 import updateNameAction from "./updateNameAction"
 import cn from "~/utils/cn"
@@ -40,19 +39,10 @@ export default function LandingForm({ profilePromise, className }: Props) {
 
 	const router = useRouter()
 
-	const posthog = usePostHog()
-
 	const onGo = async () => {
 		if (!profile) return
 
 		setGoing(true)
-
-		posthog &&
-			posthog.identify(profile.email, {
-				email: profile.email,
-				name: nameInput.trim(),
-				photo: profile.photo,
-			})
 
 		setSignedIn(true)
 

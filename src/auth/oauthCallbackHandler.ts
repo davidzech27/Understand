@@ -40,17 +40,37 @@ export default async function oauthCallbackHandler(request: NextRequest) {
 				googleScopes: scopes,
 			},
 		}),
-		User({ email })
-			.coursesTeaching()
-			.then((coursesTeaching) =>
-				Promise.all(
-					coursesTeaching.map(({ id }) =>
-						Course({ id }).update({
-							syncedRefreshToken: refreshToken,
-						})
+
+		scopes.includes(
+			"https://www.googleapis.com/auth/classroom.courses.readonly"
+		) &&
+			scopes.includes(
+				"https://www.googleapis.com/auth/classroom.rosters.readonly"
+			) &&
+			scopes.includes(
+				"https://www.googleapis.com/auth/classroom.profile.emails"
+			) &&
+			scopes.includes(
+				"https://www.googleapis.com/auth/classroom.profile.photos"
+			) &&
+			scopes.includes(
+				"https://www.googleapis.com/auth/classroom.student-submissions.students.readonly"
+			) &&
+			scopes.includes(
+				"https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly"
+			) &&
+			scopes.includes("https://www.googleapis.com/auth/drive.readonly") &&
+			User({ email })
+				.coursesTeaching()
+				.then((coursesTeaching) =>
+					Promise.all(
+						coursesTeaching.map(({ id }) =>
+							Course({ id }).update({
+								syncedRefreshToken: refreshToken,
+							})
+						)
 					)
-				)
-			),
+				),
 	])
 
 	return response

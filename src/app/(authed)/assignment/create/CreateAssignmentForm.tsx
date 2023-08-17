@@ -81,7 +81,7 @@ export default function CreateAssignmentForm({
 
 						<Label>Description</Label>
 
-						<TextInput
+						<TextArea
 							value={descriptionInput}
 							setValue={setDescriptionInput}
 							placeholder="Assignment description (optional)"

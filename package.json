@@ -33,7 +33,6 @@
 		"next": "^13.4.13",
 		"next-build-id": "^3.0.0",
 		"node-html-parser": "^6.1.5",
-		"posthog-js": "^1.68.1",
 		"react": "^18.2.0",
 		"react-aria": "^3.24.0",
 		"react-day-picker": "^8.7.1",

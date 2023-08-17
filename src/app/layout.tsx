@@ -7,7 +7,8 @@ export const metadata = {
 		template: "%s | Understand",
 		default: "Understand",
 	},
-	description: "Empowering students to resolve issues in their own work and teachers to pinpoint their students' strengths and weaknesses as they arise, unprecedented levels of differentiation are made possible with Understand.",
+	description:
+		"Empowering students to resolve issues in their own work and teachers to pinpoint their students' strengths and weaknesses as they arise, unprecedented levels of differentiation are made possible with Understand.",
 	referrer: "no-referrer",
 	metadataBase: new URL("https://understand.school"),
 }

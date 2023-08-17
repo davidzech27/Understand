@@ -40,7 +40,7 @@ export default async function ClassPage({
 			>
 				<GradientText
 					className={cn(
-						"text-6xl font-extrabold leading-none tracking-tight",
+						"text-6xl font-extrabold leading-none tracking-tight mobile:text-2xl",
 						course.syncedUrl !== undefined &&
 							"transition-all duration-150 group-hover:opacity-80 peer-active:opacity-80"
 					)}
@@ -51,7 +51,7 @@ export default async function ClassPage({
 				{course.section && (
 					<div
 						className={cn(
-							"relative top-1 mr-1 ml-3 flex-shrink-0 text-base font-semibold leading-none text-black/70",
+							"relative top-1 mr-1 ml-3 flex-shrink-0 text-base font-semibold leading-none text-black/70 mobile:mr-0 mobile:text-sm",
 							course.syncedUrl !== undefined &&
 								"transition-all duration-150 group-hover:opacity-50 group-active:opacity-50"
 						)}

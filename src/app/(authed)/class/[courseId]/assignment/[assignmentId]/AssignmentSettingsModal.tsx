@@ -99,14 +99,16 @@ export default function AssignmentSettingsModal({
 
 					<Label>Description</Label>
 
-					<TextInput
-						value={descriptionInput}
-						setValue={setDescriptionInput}
-						placeholder="Description"
-						id="description"
-						autoComplete="off"
-						className="py-2.5 pl-4 text-base"
-					/>
+					<div>
+						<TextArea
+							value={descriptionInput}
+							setValue={setDescriptionInput}
+							placeholder="Description"
+							id="description"
+							autoComplete="off"
+							className="py-2.5 pl-4 text-base"
+						/>
+					</div>
 
 					<Label>Instructions</Label>
 
