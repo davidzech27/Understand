@@ -53,7 +53,7 @@ function FancyButton(
 		>
 			<span
 				className={cn(
-					"z-10 font-semibold tracking-[0.010em] transition-all duration-150",
+					"z-10 whitespace-pre font-semibold tracking-[0.010em] transition-all duration-150",
 					{
 						small: "text-lg",
 						medium: "text-2xl",

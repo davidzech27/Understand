@@ -1,6 +1,8 @@
 import * as Dialog from "@radix-ui/react-dialog"
 import { X } from "lucide-react"
 
+import Heading from "./Heading"
+
 interface Props {
 	children: React.ReactNode
 	title: string
@@ -23,8 +25,10 @@ export default function Modal({
 
 				<Dialog.Content className="fixed left-[12.5vw] top-[16.6667vh] z-50 flex h-2/3 w-3/4 flex-col justify-between rounded-md bg-white">
 					<div className="mx-6 mt-6 flex items-center justify-between">
-						<Dialog.Title className="mb-0.5 text-2xl font-medium leading-none opacity-80">
-							{title}
+						<Dialog.Title asChild>
+							<Heading size="2xLarge" className="mb-0.5">
+								{title}
+							</Heading>
 						</Dialog.Title>
 
 						<Dialog.Close asChild>

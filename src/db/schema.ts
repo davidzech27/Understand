@@ -89,6 +89,7 @@ export const feedback = mysqlTable(
 		unrevisedSubmissionHTML: text("unrevised_submission_html").notNull(),
 		list: json("list").notNull(),
 		rawResponse: text("raw_response").notNull(),
+		shared: boolean("shared").notNull().default(false),
 		insights: json("insights"),
 		syncedInsightsAt: timestamp("synced_insights_at").default(sql`NULL`),
 	},

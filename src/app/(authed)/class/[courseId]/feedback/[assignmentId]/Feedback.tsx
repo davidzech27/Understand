@@ -19,6 +19,7 @@ import getFeedback from "~/ai/getFeedback"
 import getFollowup from "~/ai/getFollowup"
 import getInsights from "~/ai/getInsights"
 import LinkedSubmissionModal from "./LinkedSubmissionModal"
+import ShareModal from "./ShareModal"
 import FeedbackHistory from "./FeedbackHistory"
 import FeedbackHeader from "./FeedbackHeader"
 import FeedbackContent from "./FeedbackContent"
@@ -131,16 +132,19 @@ export default function Feedback({
 			state: FeedbackState
 		}[]
 		rawResponse?: string
+		shared: boolean
 	}>({
 		submissionHTML: "",
 		unrevisedSubmissionHTML: "",
 		list: [],
+		shared: false,
 	})
 
 	const feedbackRef = useRef<typeof feedback>({
 		submissionHTML: "",
 		unrevisedSubmissionHTML: "",
 		list: [],
+		shared: false,
 	})
 
 	useEffect(() => {
@@ -265,11 +269,18 @@ export default function Feedback({
 		})
 	}
 
+	const [shareModalOpen, setShareModalOpen] = useState(false)
+
+	const onShare = () => {
+		setShareModalOpen(true)
+	}
+
 	const onStartOver = () => {
 		setFeedback({
 			submissionHTML: "",
 			unrevisedSubmissionHTML: "",
 			list: [],
+			shared: false,
 		})
 
 		setEditing(true)
@@ -476,11 +487,29 @@ export default function Feedback({
 				onPick={onPickLinkedSubmission}
 			/>
 
+			{feedback.givenAt !== undefined && (
+				<ShareModal
+					open={shareModalOpen}
+					setOpen={setShareModalOpen}
+					shared={feedback.shared}
+					onChangeShared={(shared) => {
+						setFeedback((prevFeedback) => ({
+							...prevFeedback,
+							shared,
+						}))
+					}}
+					courseId={assignment.courseId}
+					assignmentId={assignment.assignmentId}
+					email={email}
+					feedbackGivenAt={feedback.givenAt}
+				/>
+			)}
+
 			<div className="relative h-full overflow-y-auto overflow-x-hidden rounded-md border border-border bg-white pt-16 shadow-lg shadow-[#00000016]">
 				<div className="flex">
 					<div className="min-w-[192px] flex-[0.75]" />
 
-					<div className="w-[704px]">
+					<div className="basis-[704px]">
 						<div className="min-h-12 flex flex-col">
 							{feedbackHistory.length !== 0 && (
 								<>
@@ -499,7 +528,6 @@ export default function Feedback({
 												: undefined
 										}
 										onSelectFeedback={onSelectFeedback}
-										email={email}
 									/>
 
 									<div className="h-4" />
@@ -517,7 +545,7 @@ export default function Feedback({
 												: "Generating feedback..."}
 										</Button>
 									) : feedback.givenAt === undefined ? (
-										<div className="flex space-x-1.5">
+										<>
 											{linkedSubmissions.length > 0 && (
 												<Button
 													onClick={() =>
@@ -541,9 +569,9 @@ export default function Feedback({
 											>
 												Get feedback
 											</Button>
-										</div>
+										</>
 									) : (
-										<div className="flex space-x-1.5">
+										<>
 											{linkedSubmissions.length > 0 && (
 												<Button
 													onClick={() =>
@@ -556,6 +584,13 @@ export default function Feedback({
 													Import submission
 												</Button>
 											)}
+
+											<Button
+												onClick={onShare}
+												size="medium"
+											>
+												Share
+											</Button>
 
 											<Button
 												onClick={onStartOver}
@@ -579,7 +614,7 @@ export default function Feedback({
 													Done
 												</Button>
 											)}
-										</div>
+										</>
 									)
 								}
 							/>

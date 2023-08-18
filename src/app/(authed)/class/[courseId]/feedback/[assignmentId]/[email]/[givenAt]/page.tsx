@@ -34,24 +34,38 @@ interface Params {
 }
 
 export default async function FeedbackPage({
-	params: { courseId, assignmentId, email, givenAt: givenAtString },
+	params: {
+		courseId,
+		assignmentId,
+		email: feedbackEmail,
+		givenAt: givenAtString,
+	},
 }: {
 	params: Params
 }) {
-	email = decodeURIComponent(email)
+	feedbackEmail = decodeURIComponent(feedbackEmail)
 
 	const givenAt = new Date(Number(givenAtString))
 
-	const [feedback, assignment, role] = await Promise.all([
-		Feedback({ courseId, assignmentId, userEmail: email, givenAt }).get(),
-
+	const [feedback, assignment, [email, role]] = await Promise.all([
+		Feedback({
+			courseId,
+			assignmentId,
+			userEmail: feedbackEmail,
+			givenAt,
+		}).get(),
 		Assignment({ courseId, assignmentId }).get(),
 		getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
-			User({ email }).courseRole({ id: courseId })
+			Promise.all([email, User({ email }).courseRole({ id: courseId })])
 		),
 	])
 
-	if (feedback === undefined || assignment === undefined || role === "none")
+	if (
+		feedback === undefined ||
+		assignment === undefined ||
+		role === "none" ||
+		(!feedback.shared && role !== "teacher" && email !== feedbackEmail)
+	)
 		notFound()
 
 	return <FeedbackComponent assignment={assignment} feedback={feedback} />

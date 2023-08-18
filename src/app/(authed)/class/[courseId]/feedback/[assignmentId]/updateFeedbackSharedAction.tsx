@@ -3,24 +3,24 @@ import { cookies } from "next/headers"
 import { zact } from "zact/server"
 import { z } from "zod"
 
-import Feedback, { feedbackInsightsSchema } from "~/data/Feedback"
+import Feedback from "~/data/Feedback"
 import User from "~/data/User"
 import { getAuthOrThrow } from "~/auth/jwt"
 
-const registerInsightsAction = zact(
+const updateFeedbackSharedAction = zact(
 	z.object({
 		courseId: z.string(),
 		assignmentId: z.string(),
 		givenAt: z.date(),
-		insights: feedbackInsightsSchema,
+		shared: z.boolean(),
 	})
-)(async ({ courseId, assignmentId, givenAt, insights }) => {
+)(async ({ courseId, assignmentId, givenAt, shared }) => {
 	const { email } = await getAuthOrThrow({ cookies: cookies() })
 
 	const role = await User({ email }).courseRole({ id: courseId })
 
-	if (role !== "student")
-		throw new Error("User must be student of class to register insights")
+	if (role === "none")
+		throw new Error("User must be in class to update feedback shared")
 
 	await Feedback({
 		courseId,
@@ -28,8 +28,8 @@ const registerInsightsAction = zact(
 		userEmail: email,
 		givenAt,
 	}).update({
-		insights,
+		shared,
 	})
 })
 
-export default registerInsightsAction
+export default updateFeedbackSharedAction

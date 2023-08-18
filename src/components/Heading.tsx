@@ -4,7 +4,7 @@ import { Slot } from "@radix-ui/react-slot"
 import cn from "~/utils/cn"
 
 interface Props extends React.PropsWithChildren {
-	size: "small" | "medium" | "large"
+	size: "small" | "medium" | "large" | "xLarge" | "2xLarge"
 	asChild?: boolean
 	className?: string
 }
@@ -24,6 +24,8 @@ function Heading(
 					small: "text-sm",
 					medium: "text-base",
 					large: "text-lg",
+					xLarge: "text-xl",
+					"2xLarge": "text-2xl",
 				}[size],
 				className
 			)}

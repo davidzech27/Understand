@@ -233,6 +233,7 @@ const User = ({ email }: { email: string }) => ({
 					unrevisedSubmissionHTML: feedback.unrevisedSubmissionHTML,
 					list: feedback.list,
 					rawResponse: feedback.rawResponse,
+					shared: feedback.shared,
 				})
 				.from(feedback)
 				.where(
@@ -249,6 +250,7 @@ const User = ({ email }: { email: string }) => ({
 				unrevisedSubmissionHTML,
 				list,
 				rawResponse,
+				shared,
 			}) => {
 				return {
 					givenAt: givenAt,
@@ -256,6 +258,7 @@ const User = ({ email }: { email: string }) => ({
 					unrevisedSubmissionHTML,
 					list: feedbackListSchema.parse(list),
 					rawResponse,
+					shared,
 				}
 			}
 		)

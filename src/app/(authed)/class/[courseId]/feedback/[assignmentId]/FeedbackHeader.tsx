@@ -13,9 +13,9 @@ export default function FeedbackHeader({ assignment, buttons }: Props) {
 					{assignment.title}
 				</div>
 
-				<div className="flex-1" />
-
-				<div className="flex-shrink-0 gap-1.5">{buttons}</div>
+				<div className="-mb-2 flex max-w-[75%] items-end gap-1.5 overflow-x-scroll">
+					{buttons}
+				</div>
 			</div>
 
 			{assignment.description !== undefined && (

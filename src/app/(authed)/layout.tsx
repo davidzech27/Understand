@@ -25,7 +25,7 @@ export default function AuthedLayout({
 						className="transition-opacity duration-150 hover:opacity-75"
 					>
 						<GradientText asChild>
-							<span className="cursor-pointer text-2xl font-extrabold tracking-tight text-white transition duration-200 hover:opacity-75 focus-visible:opacity-75 active:opacity-75">
+							<span className="relative top-[2px] cursor-pointer text-2xl font-extrabold leading-none tracking-tight text-white transition duration-200 hover:opacity-75 focus-visible:opacity-75 active:opacity-75">
 								Understand
 							</span>
 						</GradientText>
@@ -40,7 +40,7 @@ export default function AuthedLayout({
 			<div className="relative flex flex-1 space-x-3">
 				<SideBar />
 
-				<main className="flex-1">
+				<main className="h-[calc(100vh-56px)] flex-1">
 					<Suspense
 						fallback={<Card className="h-full w-full">{null}</Card>}
 					>

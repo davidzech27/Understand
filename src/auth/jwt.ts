@@ -80,7 +80,7 @@ export async function setAuth({
 		name: authorizationCookieKey,
 		value: authorization,
 		httpOnly: true,
-		sameSite: "lax",
+		sameSite: true,
 		expires: new Date().valueOf() + 1000 * 60 * 60 * 24 * 400,
 		secure: env.NODE_ENV === "production",
 	})

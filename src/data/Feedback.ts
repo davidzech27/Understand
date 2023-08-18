@@ -88,6 +88,7 @@ const Feedback = ({
 					unrevisedSubmissionHTML: feedback.unrevisedSubmissionHTML,
 					list: feedback.list,
 					rawResponse: feedback.rawResponse,
+					shared: feedback.shared,
 				})
 				.from(feedback)
 				.where(
@@ -107,20 +108,24 @@ const Feedback = ({
 				unrevisedSubmissionHTML: row.unrevisedSubmissionHTML,
 				list: feedbackListSchema.parse(row.list),
 				rawResponse: row.rawResponse,
+				shared: row.shared,
 			}
 		)
 	},
 	update: async ({
 		submissionHTML,
+		shared,
 		insights,
 	}: {
 		submissionHTML?: string
+		shared?: boolean
 		insights?: FeedbackInsights
 	}) => {
 		await db
 			.update(feedback)
 			.set({
 				submissionHTML,
+				shared,
 				insights,
 			})
 			.where(

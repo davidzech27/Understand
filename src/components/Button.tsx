@@ -28,7 +28,7 @@ function Button(
 		<div
 			className={cn(
 				"relative",
-				size === "large" && "h-20",
+				size === "large" && "h-20 w-full",
 				className
 					?.split(" ")
 					.filter(
@@ -43,7 +43,7 @@ function Button(
 				disabled={disabled}
 				ref={ref}
 				className={cn(
-					"rounded-md bg-surface-selected px-6 py-2.5 font-semibold tracking-[0.010em] outline-none transition-all duration-150",
+					"whitespace-pre rounded-md bg-surface-selected px-6 py-2.5 font-semibold tracking-[0.010em] outline-none transition-all duration-150",
 					{
 						small: "text-base", // maybe add height for consistency
 						medium: "text-lg",

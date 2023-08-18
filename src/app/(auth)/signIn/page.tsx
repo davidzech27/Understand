@@ -27,7 +27,9 @@ export default function SignInPage() {
 					<div className="flex-[0.875] mobile:hidden" />
 
 					<h1 className="select-text text-center text-3xl font-semibold tracking-tight text-black/80 mobile:text-2xl">
-						Sign in with your school Google account
+						Sign in with your Google account. Use your school Google
+						account if Understand has been approved by your district
+						(it probably hasn&apos;t yet).
 					</h1>
 
 					<Link

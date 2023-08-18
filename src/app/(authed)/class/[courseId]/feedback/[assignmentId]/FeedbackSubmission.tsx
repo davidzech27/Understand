@@ -6,6 +6,7 @@ import {
 	type CSSProperties,
 } from "react"
 import { renderToStaticMarkup } from "react-dom/server"
+import DOMPurify from "dompurify"
 
 import splitSentences from "~/utils/splitSentences"
 import colors from "colors.cjs"
@@ -362,7 +363,7 @@ export default function FeedbackSubmission({
 
 	useEffect(() => {
 		if (ref.current !== null && ref.current.innerHTML !== htmlProp) {
-			ref.current.innerHTML = htmlProp
+			ref.current.innerHTML = DOMPurify.sanitize(htmlProp)
 
 			rerender({})
 
@@ -380,7 +381,7 @@ export default function FeedbackSubmission({
 				contentEditable={editing}
 				autoFocus
 				ref={ref}
-				className="min-h-[60vh] outline-none"
+				className="outline-none"
 			/>
 
 			{ref.current === null || ref.current.innerHTML === "" ? (
