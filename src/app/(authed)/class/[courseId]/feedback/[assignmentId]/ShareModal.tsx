@@ -1,6 +1,5 @@
 import { useState } from "react"
 
-import { type Feedback } from "~/data/Feedback"
 import updateFeedbackSharedAction from "./updateFeedbackSharedAction"
 import Modal from "~/components/Modal"
 import Button from "~/components/Button"

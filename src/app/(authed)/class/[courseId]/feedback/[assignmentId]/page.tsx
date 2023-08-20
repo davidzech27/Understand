@@ -33,7 +33,7 @@ export default async function FeedbackPage({
 	params: Params
 }) {
 	const [
-		[role, profile, linkedSubmissions, feedbackHistory],
+		[role, user, linkedSubmissions, feedbackHistory],
 		assignment,
 		course,
 	] = await Promise.all([
@@ -83,7 +83,7 @@ export default async function FeedbackPage({
 
 	if (
 		role === "none" ||
-		profile === undefined ||
+		user === undefined ||
 		assignment === undefined ||
 		course === undefined ||
 		assignment.instructions === undefined
@@ -92,14 +92,13 @@ export default async function FeedbackPage({
 
 	return (
 		<Feedback
+			course={course}
 			assignment={{
 				...assignment,
 				instructions: assignment.instructions,
 			}}
+			user={user}
 			feedbackHistory={feedbackHistory}
-			email={profile.email}
-			profileName={profile.name}
-			courseName={course.name}
 			role={role}
 			linkedSubmissions={linkedSubmissions}
 		/>

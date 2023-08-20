@@ -25,7 +25,7 @@ export default function FeedbackHistory({
 
 	return (
 		<div ref={scrollerRef} className="overflow-x-auto">
-			<ul className="flex w-max space-x-1.5">
+			<ul className="flex w-max gap-1.5">
 				{feedbackHistory.map((feedback, index) => (
 					<ListItem
 						onClick={() => onSelectFeedback(feedback)}

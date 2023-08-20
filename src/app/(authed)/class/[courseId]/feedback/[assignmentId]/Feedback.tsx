@@ -9,6 +9,8 @@ import { produce } from "immer"
 
 import { type Feedback } from "~/data/Feedback"
 import { type Assignment } from "~/data/Assignment"
+import { type Course } from "~/data/Course"
+import { type User } from "~/data/User"
 import registerFeedbackAction from "./registerFeedbackAction"
 import registerFollowUpAction from "./registerFollowUpAction"
 import registerInsightsAction from "./registerInsightsAction"
@@ -26,12 +28,11 @@ import FeedbackContent from "./FeedbackContent"
 import Button from "~/components/Button"
 
 interface Props {
+	course: Course
 	assignment: Assignment & { instructions: string }
-	feedbackHistory: Feedback[]
-	email: string
-	profileName: string
-	courseName: string
+	user: User
 	role: "teacher" | "student"
+	feedbackHistory: Feedback[]
 	linkedSubmissions: {
 		id: string
 		title?: string
@@ -79,12 +80,11 @@ function htmlToText(html: string) {
 }
 
 export default function Feedback({
+	course,
 	assignment,
-	feedbackHistory: initialFeedbackHistory,
-	email,
-	profileName,
-	courseName,
+	user,
 	role,
+	feedbackHistory: initialFeedbackHistory,
 	linkedSubmissions,
 }: Props) {
 	const [feedbackHistory, setFeedbackHistory] = useState(
@@ -193,10 +193,11 @@ export default function Feedback({
 		const submissionText = htmlToText(submissionHTML)
 
 		getFeedback({
-			submission: submissionText,
-			instructions: assignment.instructions,
-			studentName: profileName,
-			courseName,
+			courseName: course.name,
+			assignmentTitle: assignment.title,
+			assignmentInstructions: assignment.instructions,
+			studentName: user.name,
+			submissionText,
 			onContent: ({ content, paragraph, sentence }) => {
 				setFeedback(
 					produce((feedback) => {
@@ -500,7 +501,7 @@ export default function Feedback({
 					}}
 					courseId={assignment.courseId}
 					assignmentId={assignment.assignmentId}
-					email={email}
+					email={user.email}
 					feedbackGivenAt={feedback.givenAt}
 				/>
 			)}
@@ -509,7 +510,7 @@ export default function Feedback({
 				<div className="flex">
 					<div className="min-w-[192px] flex-[0.75]" />
 
-					<div className="basis-[704px]">
+					<div className="max-w-[704px] basis-[704px]">
 						<div className="min-h-12 flex flex-col">
 							{feedbackHistory.length !== 0 && (
 								<>
