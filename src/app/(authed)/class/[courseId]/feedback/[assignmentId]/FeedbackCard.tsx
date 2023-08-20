@@ -187,7 +187,7 @@ export default function FeedbackCard({
 							}}
 							autoComplete="off"
 							ref={inputRef}
-							className="py-1.5 px-3 text-base opacity-80"
+							className="py-1.5 px-3 text-base text-black/80"
 						/>
 					</div>
 				</div>

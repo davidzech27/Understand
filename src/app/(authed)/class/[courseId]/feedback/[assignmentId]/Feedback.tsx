@@ -193,7 +193,6 @@ export default function Feedback({
 		const submissionText = htmlToText(submissionHTML)
 
 		getFeedback({
-			courseName: course.name,
 			assignmentTitle: assignment.title,
 			assignmentInstructions: assignment.instructions,
 			studentName: user.name,

@@ -1,10 +1,9 @@
 import { NextRequest } from "next/server"
 import { z } from "zod"
+import { OpenAIStream, StreamingTextResponse } from "ai"
+
 import env from "env.mjs"
 import { getAuth } from "~/auth/jwt"
-
-const textEncoder = new TextEncoder()
-const textDecoder = new TextDecoder()
 
 const requestSchema = z.object({
 	messages: z
@@ -68,80 +67,7 @@ export default async function openaiHandler(request: NextRequest) {
 		}
 	)
 
-	return new Response(
-		new ReadableStream({
-			start: async (controller) => {
-				if (openaiResponse.body) {
-					const reader = openaiResponse.body.getReader()
+	const stream = OpenAIStream(response)
 
-					let previousIncompleteChunk: Uint8Array | undefined =
-						undefined
-
-					let result = await reader.read()
-
-					while (!result.done) {
-						let chunk = result.value
-
-						if (previousIncompleteChunk !== undefined) {
-							const newChunk = new Uint8Array(
-								previousIncompleteChunk.length + chunk.length
-							)
-
-							newChunk.set(previousIncompleteChunk)
-
-							newChunk.set(chunk, previousIncompleteChunk.length)
-
-							chunk = newChunk
-
-							previousIncompleteChunk = undefined
-						}
-
-						const parts = textDecoder
-							.decode(chunk)
-							.split("\n")
-							.filter((line) => line !== "")
-							.map((line) => line.replace(/^data: /, ""))
-
-						for (const part of parts) {
-							if (part !== "[DONE]") {
-								try {
-									const partParsed = JSON.parse(part) as {
-										choices?: {
-											delta?: { content?: unknown }
-										}[]
-									}
-
-									if (
-										typeof partParsed.choices?.[0]?.delta
-											?.content !== "string"
-									)
-										continue
-
-									const contentDelta =
-										partParsed.choices[0].delta.content
-
-									controller.enqueue(
-										textEncoder.encode(contentDelta)
-									)
-								} catch (error) {
-									previousIncompleteChunk = chunk
-								}
-							} else {
-								controller.close()
-
-								return
-							}
-						}
-
-						result = await reader.read()
-					}
-				} else {
-					console.error("OpenAI response should have body")
-				}
-			},
-		}),
-		{
-			headers: { "Content-Type": "text/plain; charset=utf-8" },
-		}
-	)
+	return new StreamingTextResponse(stream)
 }
