@@ -9,7 +9,6 @@ import { produce } from "immer"
 
 import { type Feedback } from "~/data/Feedback"
 import { type Assignment } from "~/data/Assignment"
-import { type Course } from "~/data/Course"
 import { type User } from "~/data/User"
 import registerFeedbackAction from "./registerFeedbackAction"
 import registerFollowUpAction from "./registerFollowUpAction"
@@ -28,7 +27,6 @@ import FeedbackContent from "./FeedbackContent"
 import Button from "~/components/Button"
 
 interface Props {
-	course: Course
 	assignment: Assignment & { instructions: string }
 	user: User
 	role: "teacher" | "student"
@@ -80,7 +78,6 @@ function htmlToText(html: string) {
 }
 
 export default function Feedback({
-	course,
 	assignment,
 	user,
 	role,

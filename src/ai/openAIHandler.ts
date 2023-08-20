@@ -67,7 +67,7 @@ export default async function openaiHandler(request: NextRequest) {
 		}
 	)
 
-	const stream = OpenAIStream(response)
+	const openaiStream = OpenAIStream(openaiResponse)
 
-	return new StreamingTextResponse(stream)
+	return new StreamingTextResponse(openaiStream)
 }

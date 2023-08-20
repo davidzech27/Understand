@@ -92,7 +92,6 @@ export default async function FeedbackPage({
 
 	return (
 		<Feedback
-			course={course}
 			assignment={{
 				...assignment,
 				instructions: assignment.instructions,
