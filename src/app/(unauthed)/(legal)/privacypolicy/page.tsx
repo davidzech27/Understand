@@ -1,3 +1,5 @@
+export const runtime = "edge"
+
 const privacyPolicyContent = `Compliance with Student Privacy Laws
 We are dedicated to upholding the importance of adhering to relevant federal student privacy laws, such as FERPA and COPPA. If you believe that we have not complied with these laws, please get in touch with us at support@understand.school.
 
