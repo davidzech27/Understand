@@ -1,15 +1,17 @@
 "use client"
+import { Menu } from "lucide-react"
+
 import useSideBarOpen from "./useSideBarOpen"
 
-export default function SideBarToggle({ children }: React.PropsWithChildren) {
-	const { sideBarOpen } = useSideBarOpen()
+export default function SideBarToggle() {
+	const { toggleSideBarOpen } = useSideBarOpen()
 
 	return (
 		<div
-			data-open={sideBarOpen}
-			className="transition-all duration-150 data-[open=false]:mr-[-300px] data-[open=false]:translate-x-[-288px] data-[open=false]:opacity-0 mobile:mr-[-12px] mobile:data-[open=false]:mr-[-12px]"
+			onClick={toggleSideBarOpen}
+			className="flex cursor-pointer items-center rounded-md p-1 transition duration-150 hover:bg-background-raised-hover"
 		>
-			{children}
+			<Menu size={24} className="text-black opacity-70" />
 		</div>
 	)
 }
