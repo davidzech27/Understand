@@ -25,52 +25,30 @@ function Button(
 	if (loading) disabled = true
 
 	return (
-		<div
+		<button
+			{...props}
+			onClick={onClick}
+			disabled={disabled}
+			ref={ref}
 			className={cn(
-				"relative",
-				size === "large" && "h-20 w-full",
+				"whitespace-pre rounded-md bg-surface-selected font-semibold tracking-[0.010em] text-black/70 outline-none transition-all duration-150",
+				{
+					small: "px-6 py-2.5 text-base",
+					medium: "px-6 py-2.5 text-lg",
+					large: "h-20 w-full text-3xl",
+				}[size],
+				disabled
+					? "opacity-50"
+					: "hover:bg-surface-selected-hover focus-visible:bg-surface-selected-hover active:bg-surface-selected-hover",
 				className
-					?.split(" ")
-					.filter(
-						(name) => name.startsWith("h-") || name.startsWith("w-")
-					)
-					.join(" ") ?? ""
 			)}
 		>
-			<button
-				{...props}
-				onClick={onClick}
-				disabled={disabled}
-				ref={ref}
-				className={cn(
-					"whitespace-pre rounded-md bg-surface-selected px-6 py-2.5 font-semibold tracking-[0.010em] outline-none transition-all duration-150",
-					{
-						small: "text-base", // maybe add height for consistency
-						medium: "text-lg",
-						large: "text-3xl",
-					}[size],
-					disabled
-						? "opacity-40"
-						: "opacity-60 hover:bg-surface-selected-hover hover:opacity-80 focus-visible:bg-surface-selected-hover focus-visible:opacity-80",
-					"h-full w-full",
-					className
-						?.split(" ")
-						.filter(
-							(name) =>
-								!name.startsWith("h-") && !name.startsWith("w-")
-						)
-						.join(" ") ?? ""
-				)}
-			>
-				{loading ? (
-					<LoadingSpinner className="mx-auto h-6 w-6 fill-black opacity-90" />
-				) : (
-					children
-				)}
-			</button>
-
-			<div className="absolute bottom-0 left-0 right-0 top-0 -z-10 rounded-md bg-white" />
-		</div>
+			{loading ? (
+				<LoadingSpinner className="mx-auto h-6 w-6 fill-black opacity-90" />
+			) : (
+				children
+			)}
+		</button>
 	)
 }
 
