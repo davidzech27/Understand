@@ -3,11 +3,10 @@ import { cookies } from "next/headers"
 import { zact } from "zact/server"
 import { z } from "zod"
 
-import Course from "~/data/Course"
 import User from "~/data/User"
 import { getAuthOrThrow } from "~/auth/jwt"
 
-const getFeedbackHistoryAction = zact(
+const getStudentFeedbackStreamAction = zact(
 	z.object({
 		courseId: z.string(),
 		limit: z.number(),
@@ -19,9 +18,11 @@ const getFeedbackHistoryAction = zact(
 	const role = await User({ email }).courseRole({ id: courseId })
 
 	if (role !== "teacher")
-		throw new Error("Must be teacher of course to get feedback history")
+		throw new Error(
+			"Must be teacher of course to get student feedback stream"
+		)
 
-	return await Course({ id: courseId }).feedbackHistory({ limit, cursor })
+	return await User({ email }).feedbackStream({ courseId, limit, cursor })
 })
 
-export default getFeedbackHistoryAction
+export default getStudentFeedbackStreamAction

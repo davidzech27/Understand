@@ -4,11 +4,12 @@ import { notFound } from "next/navigation"
 import { getAuthOrThrow } from "~/auth/jwt"
 import Course from "~/data/Course"
 import User from "~/data/User"
-import FeedbackHistory from "./FeedbackHistory"
+import FeedbackStream from "./FeedbackStream"
 import cn from "~/utils/cn"
 import MessageBoard from "./MessageBoard"
 import Card from "~/components/Card"
 import GradientText from "~/components/GradientText"
+import Heading from "~/components/Heading"
 
 export const runtime = "edge"
 
@@ -64,9 +65,9 @@ export default async function ClassPage({
 	)
 
 	if (role === "teacher") {
-		const { feedbackHistory, cursor } = await Course({
+		const { feedbackStream, cursor } = await Course({
 			id: courseId,
-		}).feedbackHistory({
+		}).feedbackStream({
 			limit: 20,
 		})
 
@@ -75,17 +76,17 @@ export default async function ClassPage({
 				{courseHeader}
 
 				<Card className="flex flex-1 flex-col space-y-2 py-5 px-6">
-					{feedbackHistory.length !== 0 ? (
-						<FeedbackHistory
+					{feedbackStream.length !== 0 ? (
+						<FeedbackStream
 							courseId={courseId}
-							initialFeedbackHistory={feedbackHistory}
+							initialFeedbackStream={feedbackStream}
 							cursor={cursor}
 						/>
 					) : (
-						<div className="text-lg font-medium opacity-60">
+						<Heading size="large">
 							When your students get feedback on their work,
 							it&apos;ll show up here
-						</div>
+						</Heading>
 					)}
 				</Card>
 			</>

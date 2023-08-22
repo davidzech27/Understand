@@ -4,30 +4,27 @@ import Link from "next/link"
 
 import formatDate from "~/utils/formatDate"
 import Avatar from "~/components/Avatar"
-import getFeedbackHistoryAction from "./getFeedbackHistoryAction"
+import getStudentFeedbackStreamAction from "./getStudentFeedbackStreamAction"
 import Button from "~/components/Button"
 
 interface Props {
+	studentEmail: string
 	courseId: string
-	initialFeedbackHistory: {
+	initialFeedbackStream: {
 		assignmentId: string
 		assignmentTitle: string
-		userEmail: string
-		userName: string
-		userPhoto: string | undefined
 		givenAt: Date
 	}[]
 	cursor: number | undefined
 }
 
-export default function FeedbackHistory({
+export default function StudentFeedbackStream({
+	studentEmail,
 	courseId,
-	initialFeedbackHistory,
+	initialFeedbackStream,
 	cursor: cursorProp,
 }: Props) {
-	const [feedbackHistory, setFeedbackHistory] = useState(
-		initialFeedbackHistory
-	)
+	const [feedbackStream, setFeedbackStream] = useState(initialFeedbackStream)
 
 	const [cursor, setCursor] = useState(cursorProp)
 
@@ -36,54 +33,40 @@ export default function FeedbackHistory({
 	const onLoadMore = () => {
 		if (cursor !== undefined)
 			loadMore(() => {
-				getFeedbackHistoryAction({ courseId, limit: 20, cursor }).then(
-					({ feedbackHistory, cursor }) => {
-						setFeedbackHistory((previousFeedbackHistory) => [
-							...previousFeedbackHistory,
-							...feedbackHistory,
-						])
+				getStudentFeedbackStreamAction({
+					courseId,
+					limit: 20,
+					cursor,
+				}).then(({ feedbackStream, cursor }) => {
+					setFeedbackStream((previousFeedbackStream) => [
+						...previousFeedbackStream,
+						...feedbackStream,
+					])
 
-						setCursor(cursor)
-					}
-				)
+					setCursor(cursor)
+				})
 			})
 	}
 
 	return (
 		<>
-			{feedbackHistory.map(
-				(
-					{
-						userName,
-						userEmail,
-						userPhoto,
-						assignmentId,
-						assignmentTitle,
-						givenAt,
-					},
-					index
-				) => (
+			{feedbackStream.map(
+				({ assignmentId, assignmentTitle, givenAt }, index) => (
 					<Link
 						key={index}
-						href={`/class/${courseId}/feedback/${assignmentId}/${userEmail}/${givenAt.valueOf()}`}
+						href={`/class/${courseId}/feedback/${assignmentId}/${studentEmail}/${givenAt.valueOf()}`}
 					>
 						<div className="flex h-20 select-text items-center justify-between rounded-md border-[0.75px] border-border pl-6 pr-8 transition duration-150 hover:bg-surface-hover">
 							<div className="flex items-center">
 								<Avatar
-									src={userPhoto}
-									name={userName}
+									src={undefined}
+									name={assignmentTitle}
 									fallbackColor="primary"
 									className="h-11 w-11 rounded-full"
 								/>
 
-								<div className="ml-3 flex flex-col">
-									<span className="mb-[2px] font-medium leading-none opacity-90">
-										{userName}
-									</span>
-
-									<span className="text-sm opacity-60">
-										{assignmentTitle}
-									</span>
+								<div className="ml-3 flex flex-col font-medium leading-none opacity-90">
+									{assignmentTitle}
 								</div>
 							</div>
 

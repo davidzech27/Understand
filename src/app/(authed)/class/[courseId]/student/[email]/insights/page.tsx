@@ -13,8 +13,11 @@ interface Params {
 	email: string
 }
 
-// consider adding stream-like interface. may belong in other places as well
-export default async function StudentPage({
+export const metadata = {
+	title: "Insights",
+}
+
+export default async function StudentInsightsPage({
 	params: { courseId, email },
 }: {
 	params: Params

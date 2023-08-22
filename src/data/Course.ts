@@ -235,14 +235,14 @@ const Course = ({ id }: { id: string }) => ({
 			syncedAt: assignment.syncedAt ?? undefined,
 		}))
 	},
-	feedbackHistory: async ({
+	feedbackStream: async ({
 		limit,
 		cursor,
 	}: {
 		limit: number
 		cursor?: number
 	}) => {
-		const feedbackHistory = (
+		const feedbackStream = (
 			await db
 				.select({
 					assignmentId: assignment.assignmentId,
@@ -277,10 +277,10 @@ const Course = ({ id }: { id: string }) => ({
 		}))
 
 		return {
-			feedbackHistory,
+			feedbackStream,
 			cursor:
-				feedbackHistory.length === limit
-					? feedbackHistory.at(-1)?.givenAt.valueOf()
+				feedbackStream.length === limit
+					? feedbackStream.at(-1)?.givenAt.valueOf()
 					: undefined,
 		}
 	},

@@ -39,8 +39,9 @@ export default function ClassFeedback({
 							email={email}
 							name={name}
 							photo={photo}
-							key={email}
+							note="Not yet received feedback"
 							disabled
+							key={email}
 						/>
 					)
 				}

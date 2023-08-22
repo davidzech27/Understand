@@ -17,10 +17,10 @@ export default function LinkButton({ children, href, className }: Props) {
 			href={href}
 			prefetch={true}
 			className={cn(
-				"rounded-md px-6 py-2.5 text-center text-lg font-medium transition-all duration-150",
+				"whitespace-pre rounded-md px-6 py-2.5 text-center text-lg font-semibold tracking-[0.010em] text-black/70 transition-all duration-150",
 				pathname === href
-					? "bg-surface-selected opacity-80 focus-within:bg-surface-selected-hover hover:bg-surface-selected-hover"
-					: "opacity-60 hover:bg-surface-hover hover:opacity-80 focus-visible:bg-surface-hover focus-visible:opacity-80",
+					? "bg-surface-selected-hover"
+					: "bg-surface-selected hover:bg-surface-selected-hover focus-visible:bg-surface-selected-hover active:bg-surface-selected-hover",
 				className
 			)}
 		>

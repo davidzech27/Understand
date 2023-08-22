@@ -46,7 +46,7 @@ export default async function FeedbackPage({
 	feedbackEmail = decodeURIComponent(feedbackEmail)
 
 	const givenAt = new Date(Number(givenAtString))
-
+	console.log({ givenAt: givenAt.valueOf() })
 	const [feedback, assignment, [email, role]] = await Promise.all([
 		Feedback({
 			courseId,

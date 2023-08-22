@@ -1,4 +1,4 @@
-import { desc, and, eq, or, gt, isNull, isNotNull, sql } from "drizzle-orm"
+import { desc, and, eq, or, gt, isNull, isNotNull, sql, lt } from "drizzle-orm"
 import { z } from "zod"
 
 import db from "~/db/db"
@@ -218,51 +218,6 @@ const User = ({ email }: { email: string }) => ({
 
 		return "none" as const
 	},
-	feedbackHistory: async ({
-		courseId,
-		assignmentId,
-	}: {
-		courseId: string
-		assignmentId: string
-	}) => {
-		return (
-			await db
-				.select({
-					givenAt: feedback.givenAt,
-					submissionHTML: feedback.submissionHTML,
-					unrevisedSubmissionHTML: feedback.unrevisedSubmissionHTML,
-					list: feedback.list,
-					rawResponse: feedback.rawResponse,
-					shared: feedback.shared,
-				})
-				.from(feedback)
-				.where(
-					and(
-						eq(feedback.courseId, courseId),
-						eq(feedback.assignmentId, assignmentId),
-						eq(feedback.userEmail, email)
-					)
-				)
-		).map(
-			({
-				givenAt,
-				submissionHTML,
-				unrevisedSubmissionHTML,
-				list,
-				rawResponse,
-				shared,
-			}) => {
-				return {
-					givenAt: givenAt,
-					submissionHTML,
-					unrevisedSubmissionHTML,
-					list: feedbackListSchema.parse(list),
-					rawResponse,
-					shared,
-				}
-			}
-		)
-	},
 	upcomingAssignments: async () => {
 		const [
 			{ assignmentsTeaching, isTeaching },
@@ -351,6 +306,94 @@ const User = ({ email }: { email: string }) => ({
 			assignmentsEnrolled,
 			isTeaching,
 			isEnrolled,
+		}
+	},
+	feedbackHistory: async ({
+		courseId,
+		assignmentId,
+	}: {
+		courseId: string
+		assignmentId: string
+	}) => {
+		return (
+			await db
+				.select({
+					givenAt: feedback.givenAt,
+					submissionHTML: feedback.submissionHTML,
+					unrevisedSubmissionHTML: feedback.unrevisedSubmissionHTML,
+					list: feedback.list,
+					rawResponse: feedback.rawResponse,
+					shared: feedback.shared,
+				})
+				.from(feedback)
+				.where(
+					and(
+						eq(feedback.courseId, courseId),
+						eq(feedback.assignmentId, assignmentId),
+						eq(feedback.userEmail, email)
+					)
+				)
+		).map(
+			({
+				givenAt,
+				submissionHTML,
+				unrevisedSubmissionHTML,
+				list,
+				rawResponse,
+				shared,
+			}) => {
+				return {
+					givenAt: givenAt,
+					submissionHTML,
+					unrevisedSubmissionHTML,
+					list: feedbackListSchema.parse(list),
+					rawResponse,
+					shared,
+				}
+			}
+		)
+	},
+	feedbackStream: async ({
+		courseId,
+		limit,
+		cursor,
+	}: {
+		courseId: string
+		limit: number
+		cursor?: number
+	}) => {
+		const feedbackStream = await db
+			.select({
+				assignmentId: assignment.assignmentId,
+				assignmentTitle: assignment.title,
+				givenAt: feedback.givenAt,
+			})
+			.from(feedback)
+			.where(
+				cursor === undefined
+					? eq(feedback.courseId, courseId)
+					: and(
+							eq(feedback.courseId, courseId),
+							lt(feedback.givenAt, new Date(cursor))
+					  )
+			)
+			.orderBy(desc(feedback.givenAt))
+			.limit(limit)
+			.innerJoin(user, eq(user.email, feedback.userEmail))
+			.innerJoin(
+				assignment,
+				and(
+					eq(assignment.courseId, courseId),
+					eq(assignment.assignmentId, feedback.assignmentId)
+				)
+			)
+
+		return {
+			feedbackStream,
+			cursor:
+				feedbackStream.length === limit
+					? feedbackStream.at(-1)?.givenAt.valueOf()
+					: undefined,
 		}
 	},
 	upsertInsights: async ({

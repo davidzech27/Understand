@@ -6,6 +6,7 @@ import Card from "~/components/Card"
 import User from "~/data/User"
 import Avatar from "~/components/Avatar"
 import GradientText from "~/components/GradientText"
+import LinkButton from "~/components/LinkButton"
 
 interface Params {
 	courseId: string
@@ -49,6 +50,22 @@ export default async function StudentLayout({
 
 	return (
 		<div className="-mr-2 flex h-full flex-col space-y-2.5 overflow-y-scroll">
+			<Card className="flex flex-col justify-between py-3 px-4">
+				<div className="flex space-x-1.5">
+					<LinkButton
+						href={`/class/${courseId}/student/${email}/insights`}
+					>
+						Insights
+					</LinkButton>
+
+					<LinkButton
+						href={`/class/${courseId}/student/${email}/feedback`}
+					>
+						Feedback
+					</LinkButton>
+				</div>
+			</Card>
+
 			<Card className="flex items-center py-5 px-6">
 				<Avatar
 					src={student.photo}
@@ -59,12 +76,12 @@ export default async function StudentLayout({
 
 				<div className="ml-5 flex flex-col">
 					<GradientText asChild>
-						<span className="mb-[1px] pb-1 text-3xl font-semibold leading-none opacity-90">
+						<span className="select-text pb-2 text-4xl font-extrabold leading-none tracking-tight opacity-90 mobile:text-2xl">
 							{student.name}
 						</span>
 					</GradientText>
 
-					<span className="-mt-0.5 text-lg opacity-60">
+					<span className="select-text text-base font-semibold leading-none text-black/70 mobile:mr-0 mobile:text-sm">
 						{student.email}
 					</span>
 				</div>

@@ -51,6 +51,8 @@ export default async function PeoplePage({
 								note={
 									!signedUp ? "Not yet signed up" : undefined
 								}
+								disabled
+								key={email}
 							/>
 						),
 					},
@@ -66,12 +68,13 @@ export default async function PeoplePage({
 								photo={photo}
 								href={
 									role === "teacher" && signedUp
-										? `/class/${courseId}/student/${email}`
+										? `/class/${courseId}/student/${email}/insights`
 										: undefined
 								}
 								note={
 									!signedUp ? "Not yet signed up" : undefined
 								}
+								disabled={role !== "teacher"}
 								key={email}
 							/>
 						),
