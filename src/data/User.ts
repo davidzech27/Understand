@@ -371,9 +371,13 @@ const User = ({ email }: { email: string }) => ({
 			.from(feedback)
 			.where(
 				cursor === undefined
-					? eq(feedback.courseId, courseId)
+					? and(
+							eq(feedback.courseId, courseId),
+							eq(feedback.userEmail, email)
+					  )
 					: and(
 							eq(feedback.courseId, courseId),
+							eq(feedback.userEmail, email),
 							lt(feedback.givenAt, new Date(cursor))
 					  )
 			)
