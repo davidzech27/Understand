@@ -38,12 +38,12 @@ export default function AuthedLayout({
 				</div>
 			</div>
 
-			<div className="relative flex h-[calc(100%-42px)] space-x-3 mobile:space-x-0">
+			<div className="relative flex h-[calc(100%-32px-10px)] space-x-3 mobile:space-x-0">
 				<SideBarContainer>
 					<SideBar />
 				</SideBarContainer>
 
-				<main className="w-[calc(100%-300px)] mobile:w-full">
+				<main className="flex-1">
 					<Suspense
 						fallback={<Card className="h-full w-full">{null}</Card>}
 					>

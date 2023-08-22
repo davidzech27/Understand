@@ -9,7 +9,7 @@ export default function SideBarContainer({
 	return (
 		<div
 			data-open={sideBarOpen}
-			className="h-full w-72 transition-all duration-150 data-[open=false]:mr-[-300px] data-[open=false]:opacity-0 mobile:absolute mobile:inset-0 mobile:z-10 mobile:w-full mobile:data-[open=false]:translate-x-[-100vw]"
+			className="h-full w-72 shrink-0 transition-all duration-150 data-[open=false]:mr-[-300px] data-[open=false]:opacity-0 mobile:absolute mobile:inset-0 mobile:z-10 mobile:w-full mobile:data-[open=false]:translate-x-[-100vw]"
 		>
 			{children}
 		</div>
