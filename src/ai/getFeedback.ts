@@ -173,6 +173,8 @@ Begin.`,
 			}
 		},
 		onFinish: (content) => {
+			console.log(content)
+
 			onFinish({
 				rawResponse: content,
 			})
