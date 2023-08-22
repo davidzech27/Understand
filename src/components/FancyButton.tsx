@@ -35,7 +35,7 @@ function FancyButton(
 				background: `linear-gradient(45deg, ${colors.primary}, ${colors.secondary} 100%)`,
 			}}
 			className={cn(
-				"flex justify-center whitespace-pre font-semibold tracking-[0.010em] text-white outline-none transition-all duration-150 hover:opacity-80 focus-visible:opacity-80 active:opacity-80",
+				"flex items-center justify-center whitespace-pre font-semibold tracking-[0.010em] text-white outline-none transition-all duration-150 hover:opacity-80 focus-visible:opacity-80 active:opacity-80",
 				{
 					small: "rounded-[10px] px-8 py-2.5 text-lg",
 					medium: "rounded-xl px-12 py-4 text-2xl",
