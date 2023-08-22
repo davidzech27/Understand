@@ -1,5 +1,7 @@
 import env from "env.mjs"
 
+export const runtime = "edge"
+
 export const metadata = {
 	title: "Link not found | Understand",
 	description:

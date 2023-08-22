@@ -1,5 +1,7 @@
 import Deck from "./Deck"
 
+export const runtime = "edge"
+
 export const metadata = {
 	title: "Deck",
 }
