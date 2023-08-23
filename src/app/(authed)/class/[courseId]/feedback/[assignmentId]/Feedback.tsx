@@ -25,6 +25,7 @@ import FeedbackHistory from "./FeedbackHistory"
 import FeedbackHeader from "./FeedbackHeader"
 import FeedbackContent from "./FeedbackContent"
 import Button from "~/components/Button"
+import Card from "~/components/Card"
 
 interface Props {
 	assignment: Assignment & { instructions: string }
@@ -502,157 +503,169 @@ export default function Feedback({
 				/>
 			)}
 
-			<div className="relative h-full overflow-y-auto overflow-x-hidden rounded-md border border-border bg-white pt-16 shadow-lg shadow-[#00000016]">
-				<div className="flex">
-					<div className="min-w-[192px] flex-[0.75]" />
+			<Card className="relative h-full bg-white pt-16">
+				<div className="h-full w-full overflow-x-hidden overflow-y-scroll">
+					<div className="flex">
+						<div className="min-w-[192px] flex-[0.75]" />
 
-					<div className="max-w-[704px] basis-[704px]">
-						<div className="min-h-12 flex flex-col">
-							{feedbackHistory.length !== 0 && (
-								<>
-									<FeedbackHistory
-										feedbackHistory={feedbackHistory}
-										selectedFeedback={
-											feedback.givenAt !== undefined &&
-											feedback.rawResponse
-												? {
-														...feedback,
-														givenAt:
-															feedback.givenAt,
-														rawResponse:
-															feedback.rawResponse,
-												  }
-												: undefined
-										}
-										onSelectFeedback={onSelectFeedback}
-									/>
+						<div className="max-w-[704px] basis-[704px]">
+							<div className="min-h-12 flex flex-col">
+								{feedbackHistory.length !== 0 && (
+									<>
+										<FeedbackHistory
+											feedbackHistory={feedbackHistory}
+											selectedFeedback={
+												feedback.givenAt !==
+													undefined &&
+												feedback.rawResponse
+													? {
+															...feedback,
+															givenAt:
+																feedback.givenAt,
+															rawResponse:
+																feedback.rawResponse,
+													  }
+													: undefined
+											}
+											onSelectFeedback={onSelectFeedback}
+										/>
 
-									<div className="h-4" />
-								</>
-							)}
+										<div className="h-4" />
+									</>
+								)}
 
-							<FeedbackHeader
-								assignment={assignment}
-								buttons={
-									generating ? (
-										<Button disabled size="medium">
-											{feedback === undefined ||
-											feedback.list.length === 0
-												? "Analyzing work..."
-												: "Generating feedback..."}
-										</Button>
-									) : feedback.givenAt === undefined ? (
-										<>
-											{linkedSubmissions.length > 0 && (
+								<FeedbackHeader
+									assignment={assignment}
+									buttons={
+										generating ? (
+											<Button disabled size="medium">
+												{feedback === undefined ||
+												feedback.list.length === 0
+													? "Analyzing work..."
+													: "Generating feedback..."}
+											</Button>
+										) : feedback.givenAt === undefined ? (
+											<>
+												{linkedSubmissions.length >
+													0 && (
+													<Button
+														onClick={() =>
+															setLinkedSubmissionModalOpen(
+																true
+															)
+														}
+														size="medium"
+													>
+														Import submission
+													</Button>
+												)}
+
 												<Button
-													onClick={() =>
-														setLinkedSubmissionModalOpen(
-															true
-														)
+													onClick={onGetFeedback}
+													disabled={
+														feedback.submissionHTML ===
+														""
 													}
 													size="medium"
 												>
-													Import submission
+													Get feedback
 												</Button>
-											)}
+											</>
+										) : (
+											<>
+												{linkedSubmissions.length >
+													0 && (
+													<Button
+														onClick={() =>
+															setLinkedSubmissionModalOpen(
+																true
+															)
+														}
+														size="medium"
+													>
+														Import submission
+													</Button>
+												)}
 
-											<Button
-												onClick={onGetFeedback}
-												disabled={
-													feedback.submissionHTML ===
-													""
-												}
-												size="medium"
-											>
-												Get feedback
-											</Button>
-										</>
-									) : (
-										<>
-											{linkedSubmissions.length > 0 && (
 												<Button
-													onClick={() =>
-														setLinkedSubmissionModalOpen(
-															true
-														)
-													}
+													onClick={onShare}
 													size="medium"
 												>
-													Import submission
+													Share
 												</Button>
-											)}
 
-											<Button
-												onClick={onShare}
-												size="medium"
-											>
-												Share
-											</Button>
-
-											<Button
-												onClick={onStartOver}
-												size="medium"
-											>
-												Start over
-											</Button>
-
-											{!editing ? (
 												<Button
-													onClick={onRevise}
+													onClick={onStartOver}
 													size="medium"
 												>
-													Revise
+													Start over
 												</Button>
-											) : (
-												<Button
-													onClick={onDone}
-													size="medium"
-												>
-													Done
-												</Button>
-											)}
-										</>
-									)
-								}
-							/>
+
+												{!editing ? (
+													<Button
+														onClick={onRevise}
+														size="medium"
+													>
+														Revise
+													</Button>
+												) : (
+													<Button
+														onClick={onDone}
+														size="medium"
+													>
+														Done
+													</Button>
+												)}
+											</>
+										)
+									}
+								/>
+							</div>
+
+							<hr className="mt-2 mb-3" />
 						</div>
 
-						<hr className="mt-2 mb-3" />
+						<div className="min-w-[192px] flex-1" />
 					</div>
 
-					<div className="min-w-[192px] flex-1" />
+					<FeedbackContent
+						submissionHTML={feedback.submissionHTML}
+						onChangeSubmissionHTML={(submissionHTML) =>
+							setFeedback((feedback) => ({
+								...feedback,
+								submissionHTML,
+							}))
+						}
+						feedbackList={feedback.list}
+						editing={editing}
+						generating={generating}
+						onGetFollowUp={onGetFollowUp}
+						onChangeFeedbackState={({
+							paragraph,
+							sentence,
+							state,
+						}) =>
+							setFeedback(
+								produce((prevFeedback) => {
+									if (prevFeedback === undefined) return
+
+									const changedFeedback =
+										prevFeedback.list.find(
+											(feedbackItem) =>
+												feedbackItem.paragraph ===
+													paragraph &&
+												feedbackItem.sentence ===
+													sentence
+										)
+
+									if (changedFeedback)
+										changedFeedback.state = state
+								})
+							)
+						}
+					/>
 				</div>
-
-				<FeedbackContent
-					submissionHTML={feedback.submissionHTML}
-					onChangeSubmissionHTML={(submissionHTML) =>
-						setFeedback((feedback) => ({
-							...feedback,
-							submissionHTML,
-						}))
-					}
-					feedbackList={feedback.list}
-					editing={editing}
-					generating={generating}
-					onGetFollowUp={onGetFollowUp}
-					onChangeFeedbackState={({ paragraph, sentence, state }) =>
-						setFeedback(
-							produce((prevFeedback) => {
-								if (prevFeedback === undefined) return
-
-								const changedFeedback = prevFeedback.list.find(
-									(feedbackItem) =>
-										feedbackItem.paragraph === paragraph &&
-										feedbackItem.sentence === sentence
-								)
-
-								if (changedFeedback)
-									changedFeedback.state = state
-							})
-						)
-					}
-				/>
-			</div>
+			</Card>
 		</>
 	)
 }

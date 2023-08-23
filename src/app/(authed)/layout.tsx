@@ -2,7 +2,7 @@ import { Suspense } from "react"
 import Link from "next/link"
 
 import SideBarToggle from "./SideBarToggle"
-import SideBarContainer from "./SideBarContainer"
+import SideBarLayoutContainer from "./SideBarLayoutContainer"
 import SideBar from "./SideBar"
 import TopActions from "./TopActions"
 import Card from "~/components/Card"
@@ -38,19 +38,17 @@ export default function AuthedLayout({
 				</div>
 			</div>
 
-			<div className="relative flex h-[calc(100%-32px-10px)] space-x-3 mobile:space-x-0">
-				<SideBarContainer>
-					<SideBar />
-				</SideBarContainer>
-
-				<main className="flex-1">
+			<SideBarLayoutContainer
+				sideBar={<SideBar />}
+				main={
 					<Suspense
 						fallback={<Card className="h-full w-full">{null}</Card>}
 					>
 						{children}
 					</Suspense>
-				</main>
-			</div>
+				}
+				className="h-[calc(100%-32px-10px)]"
+			/>
 		</div>
 	)
 }

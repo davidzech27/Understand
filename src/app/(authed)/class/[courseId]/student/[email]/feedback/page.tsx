@@ -2,6 +2,7 @@ import { notFound } from "next/navigation"
 
 import Card from "~/components/Card"
 import User from "~/data/User"
+import Heading from "~/components/Heading"
 import StudentFeedbackStream from "./StudentFeedbackStream"
 
 export const runtime = "edge"
@@ -44,10 +45,10 @@ export default async function StudentFeedbackPage({
 					cursor={cursor}
 				/>
 			) : (
-				<div className="text-lg font-medium opacity-60">
+				<Heading size="large">
 					When {user.name} gets feedback on their work, it&apos;ll
 					show up here
-				</div>
+				</Heading>
 			)}
 		</Card>
 	)
