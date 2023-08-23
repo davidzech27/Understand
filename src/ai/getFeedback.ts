@@ -1,6 +1,8 @@
 import splitSentences from "~/utils/splitSentences"
 import fetchOpenAI from "./fetchOpenAI"
 
+// need to make sure that reasoning doesn't provide limited view of student's work, otherwise will skew feedback
+
 // old comments, may not be relevant anymore:
 // specific feedback needs to ask a question or make an insightful comment to guide ${studentName} to a deeper understanding of the subject matter.
 // it also needs to reference other parts of ${studentName}'s work so that no part of it is ignored
@@ -49,7 +51,7 @@ export default async function getFeedback({
 				{
 					role: "user" as "system" | "user" | "assistant",
 
-					content: `A high school student named ${studentName} was assigned an assignment titled "${assignmentTitle}". The following is information about the assignment and ${studentName}'s work on it:
+					content: `A high school student named ${studentName} is working on assignment titled "${assignmentTitle}". The following is information about the assignment and ${studentName}'s work on it:
 
 Assignment prompt: """${assignmentInstructions}"""
 ${studentName}'s work: """${submissionText}"""
@@ -73,16 +75,16 @@ ${submissionText
 	)
 	.join("\n")}
 
-You'll serve as a tutor for ${studentName}, providing them with holistic and in-depth feedback on their work, guiding them to improve their ability to express their ideas effectively and to a deeper understanding of critical thinking. The process by which you will accomplish this will consist of four steps:
+You'll serve as a tutor for ${studentName}, providing them with holistic and in-depth feedback on their work that serves to guide them to improve their ability to express their ideas effectively and to a deeper understanding of critical thinking. The process by which you will accomplish this will consist of four steps:
 
 Synopsis
-Construct a very thorough synopsis of ${studentName}'s work.
+Construct a fine-grained summary of ${studentName}'s work and its stylistic choices.
 
 Commentary
-Identify one area where ${studentName} demonstrates their strengths or unique character as a writer and then the three areas where they could most improve their communication or depth of thought. For each area of commentary, ask the question that ${studentName} would most likely have about the commentary, then answer it with direct references to their work.
+Identify one area where ${studentName} demonstrates their strengths or unique character as a writer and then the three areas where they could most improve their communication or depth of thought. For each commentary about a potential improvement, ask a question that ${studentName} would have, then respond to it with numerous direct references to their work.
 
 Specific Feedback
-Provide many areas of feedback pertaining to the segments of ${studentName}'s work that your commentary most applies to. In each area of feedback, frequently reference ${studentName}'s work and provide in-depth reasoning in order to best help them understand how to improve their work. Do not prescribe any particular solution to ${studentName}; instead, cleverly ask them a question or make an insightful comment to lead them in the right direction. Unless required by the assignment prompt, do not suggest that ${studentName} alter their stylistic writing choices or increase the scope of their work. Each area of specific feedback should use the following format:
+Provide many areas of feedback pertaining to the segments of ${studentName}'s work that your commentary most applies to. In each area of feedback, frequently reference ${studentName}'s work and provide in-depth reasoning in order to best help them understand how to improve their work. Also frequently reference other similar paragraphs in ${studentName}'s work to ensure that every relevant paragraph is addressed. Do not prescribe any particular solution to ${studentName}; instead, cleverly ask them a question or make an insightful comment to lead them in the right direction. Unless required by the assignment prompt, do not suggest that ${studentName} alter their stylistic writing choices or increase the scope of their work. Each area of specific feedback should use the following format:
 Paragraph number: {paragraph number of the segment of ${studentName}'s work pertaining to the feedback}
 Sentence number: {sentence number of the segment of ${studentName}'s work pertaining to the feedback, or -1 if the feedback applies to the entire paragraph}
 Feedback: {the feedback to ${studentName}}
