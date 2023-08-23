@@ -5,7 +5,9 @@ export default function getFollowUp({
 	paragraph,
 	sentence,
 	feedback,
+	assignmentTitle,
 	assignmentInstructions,
+	studentName,
 	unrevisedSubmissionText,
 	onContent,
 	onFinish,
@@ -13,7 +15,9 @@ export default function getFollowUp({
 	paragraph: number | undefined
 	sentence: number | undefined
 	feedback: Feedback
+	assignmentTitle: string
 	assignmentInstructions: string
+	studentName: string
 	unrevisedSubmissionText: string
 	onContent: (content: string) => void
 	onFinish: ({ rawResponse }: { rawResponse: string }) => void
@@ -26,42 +30,19 @@ export default function getFollowUp({
 
 	if (followUpFeedback === undefined) return
 
-	const lines = feedback.rawResponse.split("\n")
+	const feedbackLines = feedback.rawResponse.split("\n")
 
-	const headerLineIndex = {
-		commentary: lines.findIndex(
-			(line) => line.search(/^Commentary:?\s*$/) !== -1
-		),
-		specificFeedback: lines.findIndex(
-			(line) => line.search(/^Specific Feedback:?\s*$/) !== -1
-		),
-		generalFeedback: lines.findIndex(
-			(line) => line.search(/^General Feedback:?\s*$/) !== -1
-		),
-	}
+	const specificFeedbackHeaderLineIndex = feedbackLines.findIndex((line) =>
+		line.toLowerCase().startsWith("specific feedback")
+	)
 
-	const synopsis = lines
-		.slice(1, headerLineIndex.commentary)
+	const analysisString = feedbackLines
+		.slice(0, specificFeedbackHeaderLineIndex)
 		.join("\n")
-		.trim()
 
-	const commentary = lines
-		.slice(headerLineIndex.commentary + 1, headerLineIndex.specificFeedback)
+	const feedbackString = feedbackLines
+		.slice(specificFeedbackHeaderLineIndex)
 		.join("\n")
-		.trim()
-
-	const specificFeedback = lines
-		.slice(
-			headerLineIndex.specificFeedback + 1,
-			headerLineIndex.generalFeedback
-		)
-		.join("\n")
-		.trim()
-
-	const generalFeedback = lines
-		.slice(headerLineIndex.generalFeedback + 1)
-		.join("\n")
-		.trim()
 
 	const { messages, model, temperature, presencePenalty, frequencyPenalty } =
 		{
@@ -73,38 +54,16 @@ export default function getFollowUp({
 				},
 				{
 					role: "user" as "user" | "system" | "assistant",
-					content: `The following is a prompt for an assignment in a high school course:
-<assignment-prompt>
-${assignmentInstructions}
-</assignment-prompt>
+					content: `You have just given a high school student named ${studentName} feedback on an assignment titled "${assignmentTitle}". The following is information about the assignment, ${studentName}'s work, your analysis of ${studentName}'s work, and your feedback on it:
 
-The following is a high school student's progress on that assignment:
-<student-progress>
-${unrevisedSubmissionText}
-</student-progress>
+Assignment prompt: """${assignmentInstructions}"""
+${studentName}'s work: """${unrevisedSubmissionText}"""
+Analysis: """${analysisString}"""
+Feedback: """${feedbackString}"""
 
-You have just analyzed this student's work and given them feedback on it:
-<analysis>
-Synopsis: ${synopsis}
+${studentName} responded to the following part of your feedback: """${followUpFeedback.content}"""
 
-Commentary:
-${commentary}
-</analysis>
-
-<feedback-on-specific-parts-of-work>
-${specificFeedback}
-</feedback-on-specific-parts-of-work>
-
-<feedback-on-entire-work>
-${generalFeedback}
-</feedback-on-entire-work>
-
-The student responded to the following part of your feedback.
-<part-of-feedback>
-${followUpFeedback.content}
-</part-of-feedback>
-
-You will respond to the student in a way that helps them understand the subject matter at a deeper, more nuanced level. Make use of the Socratic method to lead the student in the right direction. Generalize to larger contexts outside the class in interesting ways, or walk the student through a concrete example of a mental process they could take to improve their work. Never give any ideas or content away to the student. Prioritize unconventional advice, and avoid platitudes. Frequently reference the student's work. Be conversational but very concise.
+You will respond to ${studentName} in a way that helps them understand the subject matter at a deeper, more nuanced level, while frequently referencing their work. Do not prescribe any particular solutions to ${studentName}; instead, make use of the Socratic method to lead ${studentName} in the right direction, generalize to the real world in interesting ways, or walk ${studentName} through an interesting example of a mental process they could take to improve their work. Prioritize unconventional advice, and avoid platitudes. Be conversational but very succinct.
 
 Now, here they are.`,
 				},
@@ -112,7 +71,7 @@ Now, here they are.`,
 					.map((followUp) => [
 						followUp.revisions[0] !== undefined && {
 							role: "system" as const,
-							content: `The student has made ${
+							content: `${studentName} has made ${
 								followUp.revisions.length === 1
 									? "a revision"
 									: "revisions"
@@ -123,17 +82,17 @@ ${followUp.revisions
 		(revision) =>
 			`${
 				paragraph === undefined
-					? `<paragraph-number>${revision.paragraph}</paragraph-number>\n`
+					? `Paragraph number: ${revision.paragraph}\n`
 					: ""
-			}<sentence-number>${revision.sentence}</sentence-number>
+			}Sentence number: ${revision.sentence}
 ${
 	revision.oldContent !== "" && revision.newContent !== ""
-		? `<old-content>${revision.oldContent}</old-content>
-<new-content>${revision.newContent}</new-content>`
+		? `Old content: """${revision.oldContent}"""
+New content: """${revision.newContent}"""`
 		: revision.oldContent !== ""
-		? `<removed-content>${revision.oldContent}</removed-content>`
+		? `Removed content: """${revision.oldContent}"""`
 		: revision.newContent !== ""
-		? `<added-content>${revision.newContent}</added-content>`
+		? `Added content: """${revision.newContent}"""`
 		: ""
 }`
 	)
