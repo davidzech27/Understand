@@ -250,8 +250,10 @@ export default function Feedback({
 				if (role === "student") {
 					const { insights } = await getInsights({
 						feedback: newFeedback,
-						submissionText,
+						assignmentTitle: assignment.title,
 						assignmentInstructions: assignment.instructions,
+						studentName: user.name,
+						submissionText,
 					})
 
 					feedback = feedbackRef.current
@@ -435,7 +437,9 @@ export default function Feedback({
 			paragraph,
 			sentence,
 			feedback: newFeedback,
+			assignmentTitle: assignment.title,
 			assignmentInstructions: assignment.instructions,
+			studentName: user.name,
 			unrevisedSubmissionText,
 			onContent: (content) =>
 				setFeedback(

@@ -3,36 +3,26 @@ import fetchOpenAI from "./fetchOpenAI"
 
 export default async function getInsights({
 	feedback,
+	assignmentTitle,
 	assignmentInstructions,
+	studentName,
 	submissionText,
 }: {
 	feedback: Feedback
+	assignmentTitle: string
 	assignmentInstructions: string
+	studentName: string
 	submissionText: string
 }) {
-	const lines = feedback.rawResponse.split("\n")
+	const feedbackLines = feedback.rawResponse.split("\n")
 
-	const headerLineIndex = {
-		specificFeedback: lines.findIndex(
-			(line) => line.search(/^Specific Feedback:?\s*$/) !== -1
-		),
-		generalFeedback: lines.findIndex(
-			(line) => line.search(/^General Feedback:?\s*$/) !== -1
-		),
-	}
+	const specificFeedbackHeaderLineIndex = feedbackLines.findIndex((line) =>
+		line.toLowerCase().startsWith("specific feedback")
+	)
 
-	const specificFeedback = lines
-		.slice(
-			headerLineIndex.specificFeedback + 1,
-			headerLineIndex.generalFeedback
-		)
+	const feedbackString = feedbackLines
+		.slice(specificFeedbackHeaderLineIndex)
 		.join("\n")
-		.trim()
-
-	const generalFeedback = lines
-		.slice(headerLineIndex.generalFeedback + 1)
-		.join("\n")
-		.trim()
 
 	const messages = [
 		{
@@ -42,28 +32,11 @@ export default async function getInsights({
 		},
 		{
 			role: "user" as const,
-			content: `The following is a prompt for an assignment in a high school course:
-<assignment-prompt>
-${assignmentInstructions}
-</assignment-prompt>
+			content: `A high school student named ${studentName} received feedback on an assignment titled "${assignmentTitle}". The following is information about the assignment, ${studentName}'s work, and the feedback on it:
 
-The following is a high school student's progress on that assignment:
-<student-progress>
-${submissionText}
-</student-progress>
-
-The following is feedback provided to the student on specific segments of their work:
-<specific-feedback>
-${specificFeedback
-	.split("\n")
-	.filter((line) => !line.startsWith("Sentence number: "))
-	.join("\n")}
-</specific-feedback>
-
-The following is feedback provided to the student on their entire work:
-<general-feedback>
-${generalFeedback}
-</general-feedback>
+Assignment prompt: """${assignmentInstructions}"""
+${studentName}'s work: """${submissionText}"""
+Feedback: """${feedbackString}"""
 
 Provide the student's teacher with a few statements about the student's understanding of the subject using the following format:
 Type: {strength / weakness}
@@ -78,8 +51,8 @@ Begin.`,
 		fetchOpenAI({
 			messages,
 			model: "gpt-4-0613",
-			presencePenalty: 0.5,
-			frequencyPenalty: 0.5,
+			presencePenalty: 0.25,
+			frequencyPenalty: 0.25,
 			temperature: 0,
 			onContent: () => {},
 			onFinish: res,

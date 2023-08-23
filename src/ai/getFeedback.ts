@@ -51,7 +51,7 @@ export default async function getFeedback({
 				{
 					role: "user" as "system" | "user" | "assistant",
 
-					content: `A high school student named ${studentName} is working on assignment titled "${assignmentTitle}". The following is information about the assignment and ${studentName}'s work on it:
+					content: `A high school student named ${studentName} is working on an assignment titled "${assignmentTitle}". The following is information about the assignment and ${studentName}'s work on it:
 
 Assignment prompt: """${assignmentInstructions}"""
 ${studentName}'s work: """${submissionText}"""
