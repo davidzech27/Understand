@@ -1,5 +1,7 @@
 import { z } from "zod"
 
+import env from "env.mjs"
+
 const responseSchema = z.number()
 
 const textEncoder = new TextEncoder()
@@ -16,7 +18,7 @@ export default async function countTokens(
 ) {
 	return responseSchema.parse(
 		await (
-			await fetch("/countTokens", {
+			await fetch(`${env.NEXT_PUBLIC_URL}/countTokens`, {
 				body: textEncoder.encode(JSON.stringify(arg)),
 			})
 		).json()
