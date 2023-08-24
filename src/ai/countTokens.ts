@@ -7,7 +7,7 @@ export async function initializeWASM() {
 }
 
 export default function countTokens(
-	arg: (
+	arg:
 		| { text: string }
 		| {
 				messages: {
@@ -15,9 +15,6 @@ export default function countTokens(
 					content: string
 				}[]
 		  }
-	) & {
-		model: "gpt-4-0613" | "gpt-3.5-turbo-0613" | "gpt-3.5-turbo-16k-0613"
-	}
 ) {
 	const encoding = new Tiktoken(
 		model.bpe_ranks,
@@ -28,7 +25,7 @@ export default function countTokens(
 	if ("text" in arg) {
 		const tokens = encoding.encode(arg.text)
 
-		// encoding.free()
+		encoding.free()
 
 		return tokens.length
 	}
@@ -44,7 +41,7 @@ ${content}
 
 	const tokens = encoding.encode(chatML)
 
-	// encoding.free()
+	encoding.free()
 
 	return tokens.length
 }

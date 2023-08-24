@@ -33,7 +33,7 @@ const requestSchema = z.object({
 export type OpenAIRequest = z.infer<typeof requestSchema>
 
 export default async function openaiHandler(request: NextRequest) {
-	const initializeWASMPromise = initializeWASM()
+	await initializeWASM()
 
 	const auth = await getAuth({ cookies: request.cookies })
 
@@ -76,9 +76,7 @@ export default async function openaiHandler(request: NextRequest) {
 		}
 	)
 
-	await initializeWASMPromise
-
-	const promptTokens = countTokens({ messages, model })
+	const promptTokens = countTokens({ messages })
 
 	let completionTokens = 0
 
