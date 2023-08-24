@@ -53,7 +53,7 @@ export default function Chat({ courseId, courseName, role }: Props) {
 ${newMessages}`
 							: `${newMessages.join("\n\n")}
 
-Respond with something that sounds like it could be content posted by the teacher in the Google Classroom for a class named ${courseName} that would answer the final question in the above conversation.`,
+Respond with something that sounds like it could be content posted by the teacher in the Google Classroom for a class named ${courseName} that would answer the final question in the above conversation, or "N/A" if not applicable.`,
 				},
 			],
 			model: "gpt-3.5-turbo-0613",
@@ -66,27 +66,87 @@ Respond with something that sounds like it could be content posted by the teache
 			onFinish: async (content) => {
 				console.info("Predicted similar resources: ", content)
 
-				const similarResources = await getSimilarResourcesAction({
-					courseId,
-					similarText: content,
-				})
+				if (content === "N/A") {
+					fetchOpenAI({
+						messages: [
+							{
+								role: "system",
+								content:
+									"You are helpful, conversational, and engaging.",
+							},
+							{
+								role: "user",
+								content: `Respond to the ${role} in the conversation that follows. It is absolutely imperative that you do not assist in plagiarism or anything that may resemble it. Here's the ${role}'s first message:
 
-				console.info("Similar resources: ", similarResources)
+${newMessages[0]}`,
+							},
+							...newMessages.slice(1).map((message, index) => ({
+								role:
+									index % 2 === 0
+										? ("assistant" as const)
+										: ("user" as const),
+								content: message,
+							})),
+						],
+						model: "gpt-3.5-turbo-16k-0613",
+						temperature: 0,
+						presencePenalty: 0.25,
+						frequencyPenalty: 0.25,
+						reason: "chat",
+						onContent: (content) => {
+							setMessages((messages) => {
+								if (messages.length % 2 === 0) {
+									return [
+										...messages.slice(
+											0,
+											messages.length - 1
+										),
+										content,
+									]
+								} else {
+									return [...messages, content]
+								}
+							})
 
-				fetchOpenAI({
-					messages: [
-						{
-							role: "system",
-							content:
-								"You are helpful, conversational, and engaging.",
+							if (
+								scrollerRef.current !== null &&
+								Math.abs(
+									scrollerRef.current.scrollHeight -
+										scrollerRef.current.scrollTop -
+										scrollerRef.current.clientHeight
+								) < 50
+							) {
+								scrollerRef.current?.scroll({
+									top: scrollerRef.current.scrollHeight,
+								})
+							}
 						},
-						{
-							role: "user",
-							content: `The date is ${new Date()
-								.toDateString()
-								.split(" ")
-								.slice(1)
-								.join(" ")}.
+						onFinish: () => {
+							setGenerating(false)
+						},
+					})
+				} else {
+					const similarResources = await getSimilarResourcesAction({
+						courseId,
+						similarText: content,
+					})
+
+					console.info("Similar resources: ", similarResources)
+
+					fetchOpenAI({
+						messages: [
+							{
+								role: "system",
+								content:
+									"You are helpful, conversational, and engaging.",
+							},
+							{
+								role: "user",
+								content: `The date is ${new Date()
+									.toDateString()
+									.split(" ")
+									.slice(1)
+									.join(" ")}.
 
 Here's some relevant content from the Google Classroom of a course named ${courseName}:
 
@@ -94,52 +154,56 @@ ${similarResources
 	.map((resource, index) => `${index + 1}. ${resource}`)
 	.join("\n\n")}
 
-Using this information, respond to the ${role} in that class in the conversation that follows. Reference details about specific assignments and documents, covering all their subtleties, while also weaving in your own insights about them. If you can't find information on a particular topic, be transparent about it and ask for more context to aid you in your search for relevant assignments and documents. It is absolutely imperative that you do not assist in plagiarism, and refuse to plagiarize any work for the ${role}. Here's the ${role}'s first message:
+Using this information, respond to the ${role} in that class in the conversation that follows. Reference details about specific assignments and documents, covering all their subtleties, while also weaving in your own insights about them. If you can't find information on a particular topic, be transparent about it and ask for more context to aid you in your search for relevant assignments and documents. It is absolutely imperative that you do not assist in plagiarism or anything that may resemble it. Here's the ${role}'s first message:
 
 ${newMessages[0]}`,
-						},
-						...newMessages.slice(1).map((message, index) => ({
-							role:
-								index % 2 === 0
-									? ("assistant" as const)
-									: ("user" as const),
-							content: message,
-						})),
-					],
-					model: "gpt-3.5-turbo-16k-0613",
-					temperature: 0,
-					presencePenalty: 0.25,
-					frequencyPenalty: 0.25,
-					reason: "chat",
-					onContent: (content) => {
-						setMessages((messages) => {
-							if (messages.length % 2 === 0) {
-								return [
-									...messages.slice(0, messages.length - 1),
-									content,
-								]
-							} else {
-								return [...messages, content]
-							}
-						})
-
-						if (
-							scrollerRef.current !== null &&
-							Math.abs(
-								scrollerRef.current.scrollHeight -
-									scrollerRef.current.scrollTop -
-									scrollerRef.current.clientHeight
-							) < 50
-						) {
-							scrollerRef.current?.scroll({
-								top: scrollerRef.current.scrollHeight,
+							},
+							...newMessages.slice(1).map((message, index) => ({
+								role:
+									index % 2 === 0
+										? ("assistant" as const)
+										: ("user" as const),
+								content: message,
+							})),
+						],
+						model: "gpt-3.5-turbo-16k-0613",
+						temperature: 0,
+						presencePenalty: 0.25,
+						frequencyPenalty: 0.25,
+						reason: "chat",
+						onContent: (content) => {
+							setMessages((messages) => {
+								if (messages.length % 2 === 0) {
+									return [
+										...messages.slice(
+											0,
+											messages.length - 1
+										),
+										content,
+									]
+								} else {
+									return [...messages, content]
+								}
 							})
-						}
-					},
-					onFinish: () => {
-						setGenerating(false)
-					},
-				})
+
+							if (
+								scrollerRef.current !== null &&
+								Math.abs(
+									scrollerRef.current.scrollHeight -
+										scrollerRef.current.scrollTop -
+										scrollerRef.current.clientHeight
+								) < 50
+							) {
+								scrollerRef.current?.scroll({
+									top: scrollerRef.current.scrollHeight,
+								})
+							}
+						},
+						onFinish: () => {
+							setGenerating(false)
+						},
+					})
+				}
 			},
 		})
 	}
