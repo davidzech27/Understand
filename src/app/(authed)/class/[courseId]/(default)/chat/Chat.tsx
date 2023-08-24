@@ -48,7 +48,7 @@ export default function Chat({ courseId, courseName, role }: Props) {
 					role: "user",
 					content:
 						messages.length === 1
-							? `Respond with something that sounds like it could be content posted by the teacher in the Google Classroom for a class named ${courseName} that would answer the following question:
+							? `Respond with something that sounds like it could be content posted by the teacher in the Google Classroom for a class named ${courseName} that would answer the following question, or "N/A" if not applicable.:
 
 ${newMessages}`
 							: `${newMessages.join("\n\n")}
