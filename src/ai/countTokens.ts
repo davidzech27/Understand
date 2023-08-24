@@ -28,7 +28,7 @@ export default function countTokens(
 	if ("text" in arg) {
 		const tokens = encoding.encode(arg.text)
 
-		encoding.free()
+		// encoding.free()
 
 		return tokens.length
 	}
@@ -44,7 +44,7 @@ ${content}
 
 	const tokens = encoding.encode(chatML)
 
-	encoding.free()
+	// encoding.free()
 
 	return tokens.length
 }
