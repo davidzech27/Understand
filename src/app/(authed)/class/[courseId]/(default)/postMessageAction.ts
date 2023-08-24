@@ -25,7 +25,11 @@ const postMessageAction = zact(
 		)
 
 	const [similarMessages, { sentAt: postedSentAt }] = await Promise.all([
-		Course({ id: courseId }).getSimilarMessages({ content, limit }),
+		Course({ id: courseId }).getSimilarMessages({
+			content,
+			limit,
+			userEmail: email,
+		}),
 		Course({ id: courseId }).createMessage({ fromEmail: email, content }),
 	])
 

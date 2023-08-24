@@ -61,6 +61,7 @@ Respond with something that sounds like it could be content posted by the teache
 			presencePenalty: 0,
 			temperature: 0,
 			maxTokens: 100,
+			reason: "chat",
 			onContent: () => {},
 			onFinish: async (content) => {
 				console.info("Predicted similar resources: ", content)
@@ -107,8 +108,9 @@ ${newMessages[0]}`,
 					],
 					model: "gpt-3.5-turbo-16k-0613",
 					temperature: 0,
-					presencePenalty: 0.0,
-					frequencyPenalty: 0.0,
+					presencePenalty: 0.25,
+					frequencyPenalty: 0.25,
+					reason: "chat",
 					onContent: (content) => {
 						setMessages((messages) => {
 							if (messages.length % 2 === 0) {

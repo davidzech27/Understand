@@ -4,6 +4,9 @@ import { OpenAIStream, StreamingTextResponse } from "ai"
 
 import env from "env.mjs"
 import { getAuth } from "~/auth/jwt"
+import countTokens, { initializeWASM } from "./countTokens"
+import tokenCost from "./tokenCost"
+import User from "~/data/User"
 
 const requestSchema = z.object({
 	messages: z
@@ -24,12 +27,17 @@ const requestSchema = z.object({
 	presencePenalty: z.number().min(-2).max(2),
 	frequencyPenalty: z.number().min(-2).max(2),
 	maxTokens: z.number().optional(),
+	reason: z.enum(["feedback", "followUp", "insights", "chat"]),
 })
 
 export type OpenAIRequest = z.infer<typeof requestSchema>
 
 export default async function openaiHandler(request: NextRequest) {
-	if ((await getAuth({ cookies: request.cookies })) === undefined)
+	const initializeWASMPromise = initializeWASM()
+
+	const auth = await getAuth({ cookies: request.cookies })
+
+	if (auth === undefined)
 		return new Response("Invalid authorization", { status: 401 })
 
 	const requestParsed = requestSchema.safeParse(await request.json())
@@ -45,6 +53,7 @@ export default async function openaiHandler(request: NextRequest) {
 		presencePenalty,
 		frequencyPenalty,
 		maxTokens,
+		reason,
 	} = requestParsed.data
 
 	const openaiResponse = await fetch(
@@ -67,7 +76,24 @@ export default async function openaiHandler(request: NextRequest) {
 		}
 	)
 
-	const openaiStream = OpenAIStream(openaiResponse)
+	await initializeWASMPromise
+
+	const promptTokens = countTokens({ messages, model })
+
+	let completionTokens = 0
+
+	const openaiStream = OpenAIStream(openaiResponse, {
+		onToken: () => {
+			completionTokens++
+		},
+		onFinal: async () => {
+			await User({ email: auth.email }).increaseCost({
+				[reason]:
+					tokenCost.prompt[model] * promptTokens +
+					tokenCost.completion[model] * completionTokens,
+			})
+		},
+	})
 
 	return new StreamingTextResponse(openaiStream)
 }

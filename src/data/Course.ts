@@ -1,4 +1,4 @@
-import { desc, eq, and, lt, inArray, isNotNull, isNull } from "drizzle-orm"
+import { desc, eq, and, lt, inArray, isNotNull, isNull, sql } from "drizzle-orm"
 import { z } from "zod"
 
 import vdbPromise from "~/db/vdb"
@@ -15,6 +15,7 @@ import {
 	assignmentInsight,
 } from "~/db/schema"
 import { feedbackInsightsSchema } from "./Feedback"
+import User from "./User"
 
 const resourceMetadataSchema = z.intersection(
 	z.object({
@@ -308,34 +309,39 @@ const Course = ({ id }: { id: string }) => ({
 	createResource: async (resource: Resource) => {
 		const namespace = `resource:${id}`
 
+		const { embedding, cost } = await getEmbedding(
+			getFormattedResourceText(resource)
+		)
+
 		const vdb = await vdbPromise
 
-		vdb.upsert({
-			upsertRequest: {
-				vectors: [
-					{
-						id: `resource:${id}:${
-							"driveId" in resource
-								? "drive"
-								: "instructionsForAssignmentId" in resource
-								? "description" // outdated, because now non-synced resources are indexed as well
-								: ""
-						}:${
-							"driveId" in resource
-								? resource.driveId
-								: "instructionsForAssignmentId" in resource
-								? resource.instructionsForAssignmentId
-								: ""
-						}`,
-						values: await getEmbedding(
-							getFormattedResourceText(resource)
-						),
-						metadata: resource,
-					},
-				],
-				namespace,
-			},
-		})
+		await Promise.all([
+			vdb.upsert({
+				upsertRequest: {
+					vectors: [
+						{
+							id: `resource:${id}:${
+								"driveId" in resource
+									? "drive"
+									: "instructionsForAssignmentId" in resource
+									? "description" // outdated, because now non-synced resources are indexed as well
+									: ""
+							}:${
+								"driveId" in resource
+									? resource.driveId
+									: "instructionsForAssignmentId" in resource
+									? resource.instructionsForAssignmentId
+									: ""
+							}`,
+							values: embedding,
+							metadata: resource,
+						},
+					],
+					namespace,
+				},
+			}),
+			Course({ id }).increaseCost({ sync: cost }),
+		])
 	},
 	getResources: async ({ filter }: { filter: object }) => {
 		const namespace = `resource:${id}`
@@ -363,31 +369,37 @@ const Course = ({ id }: { id: string }) => ({
 		similarText,
 		filter,
 		topK,
+		userEmail,
 	}: {
 		similarText: string
 		filter: object
 		topK: number
+		userEmail?: string
 	}) => {
 		const namespace = `resource:${id}`
 
+		const { embedding, cost } = await getEmbedding(similarText)
+
 		const vdb = await vdbPromise
 
-		return (
-			(
-				await vdb.query({
-					queryRequest: {
-						vector: await getEmbedding(similarText),
-						filter:
-							Object.keys(filter).length === 0
-								? undefined
-								: filter,
-						topK,
-						includeMetadata: true,
-						namespace,
-					},
-				})
-			).matches ?? []
-		).map((match) => resourceMetadataSchema.parse(match.metadata))
+		const [{ matches }] = await Promise.all([
+			vdb.query({
+				queryRequest: {
+					vector: embedding,
+					filter:
+						Object.keys(filter).length === 0 ? undefined : filter,
+					topK,
+					includeMetadata: true,
+					namespace,
+				},
+			}),
+			userEmail &&
+				User({ email: userEmail }).increaseCost({ messageBoard: cost }),
+		])
+
+		return (matches ?? []).map((match) =>
+			resourceMetadataSchema.parse(match.metadata)
+		)
 	},
 	updateResources: async ({
 		set,
@@ -398,13 +410,13 @@ const Course = ({ id }: { id: string }) => ({
 	}) => {
 		const namespace = `resource:${id}`
 
-		const [vdb, values] = await Promise.all([
+		const [vdb, embeddingResponse] = await Promise.all([
 			vdbPromise,
 			set.text !== undefined ? await getEmbedding(set.text) : undefined,
 		])
 
-		await Promise.all(
-			(
+		await Promise.all([
+			...(
 				(
 					await vdb.query({
 						queryRequest: {
@@ -422,13 +434,17 @@ const Course = ({ id }: { id: string }) => ({
 				vdb.update({
 					updateRequest: {
 						id,
-						...(values !== undefined ? { values } : {}),
+						...(embeddingResponse !== undefined
+							? { values: embeddingResponse.embedding }
+							: {}),
 						setMetadata: set,
 						namespace,
 					},
 				})
-			)
-		)
+			),
+			embeddingResponse &&
+				Course({ id }).increaseCost({ sync: embeddingResponse.cost }),
+		])
 	},
 	deleteResources: async ({ filter }: { filter: object }) => {
 		const namespace = `resource:${id}`
@@ -487,27 +503,30 @@ const Course = ({ id }: { id: string }) => ({
 
 		const sentAt = new Date()
 
-		const [vdb, values] = await Promise.all([
+		const [vdb, { embedding, cost }] = await Promise.all([
 			vdbPromise,
 			getEmbedding(content),
 		])
 
-		await vdb.upsert({
-			upsertRequest: {
-				vectors: [
-					{
-						id: `message:${id}:${fromEmail}:${sentAt.valueOf()}`,
-						values,
-						metadata: {
-							fromEmail,
-							content,
-							sentAt: sentAt.valueOf(),
+		await Promise.all([
+			vdb.upsert({
+				upsertRequest: {
+					vectors: [
+						{
+							id: `message:${id}:${fromEmail}:${sentAt.valueOf()}`,
+							values: embedding,
+							metadata: {
+								fromEmail,
+								content,
+								sentAt: sentAt.valueOf(),
+							},
 						},
-					},
-				],
-				namespace,
-			},
-		})
+					],
+					namespace,
+				},
+			}),
+			User({ email: fromEmail }).increaseCost({ messageBoard: cost }),
+		])
 
 		return {
 			sentAt,
@@ -517,17 +536,27 @@ const Course = ({ id }: { id: string }) => ({
 	getSimilarMessages: async ({
 		content,
 		limit,
+		userEmail,
 	}: {
 		content: string
 		limit: number
+		userEmail?: string
 	}) => {
 		const namespace = `message:${id}`
+
+		const { embedding, cost } = await getEmbedding(content)
+
+		const increaseCostPromise =
+			userEmail &&
+			User({ email: userEmail }).increaseCost({
+				messageBoard: cost,
+			})
 
 		const vdb = await vdbPromise
 
 		const { matches } = await vdb.query({
 			queryRequest: {
-				vector: await getEmbedding(content),
+				vector: embedding,
 				topK: limit,
 				includeMetadata: true,
 				namespace,
@@ -573,6 +602,8 @@ const Course = ({ id }: { id: string }) => ({
 			])
 		)
 
+		await increaseCostPromise
+
 		return messages
 			.map(({ fromEmail, content, sentAt }) => ({
 				from: {
@@ -599,6 +630,16 @@ const Course = ({ id }: { id: string }) => ({
 		await vdb.delete1({
 			ids: [`message:${id}:${fromEmail}:${sentAt.valueOf()}`],
 		})
+	},
+	increaseCost: async (cost: { sync?: number; insights?: number }) => {
+		await db
+			.update(course)
+			.set({
+				syncCost: cost.sync && sql`sync_cost + ${cost.sync}`,
+				insightsCost:
+					cost.insights && sql`insights_cost + ${cost.insights}`,
+			})
+			.where(eq(course.id, id))
 	},
 })
 

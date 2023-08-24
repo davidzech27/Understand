@@ -124,6 +124,7 @@ New content: """${revision.newContent}"""`
 		temperature,
 		presencePenalty,
 		frequencyPenalty,
+		reason: "followUp",
 		onContent,
 		onFinish: (content) => {
 			onFinish({

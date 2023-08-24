@@ -1,4 +1,5 @@
 import env from "env.mjs"
+import tokenCost from "./tokenCost"
 
 export default async function getCompletion({
 	messages,
@@ -36,12 +37,20 @@ export default async function getCompletion({
 			}),
 		})
 	).json()) as
-		| { choices: [{ message: { content: string } }] }
+		| {
+				choices: [{ message: { content: string } }]
+				usage: { prompt_tokens: number; completion_tokens: number }
+		  }
 		| { error: { message: string } }
 
 	if ("error" in response) {
 		throw new Error(`OpenAI error: ${response.error.message}`)
 	}
 
-	return response.choices[0].message.content
+	return {
+		completion: response.choices[0].message.content,
+		cost:
+			tokenCost.prompt[model] * response.usage.prompt_tokens +
+			tokenCost.completion[model] * response.usage.completion_tokens,
+	}
 }

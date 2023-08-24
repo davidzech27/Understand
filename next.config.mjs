@@ -8,6 +8,14 @@ const config = {
 	experimental: {
 		serverActions: true,
 	},
+	webpack: (config) => {
+		config.experiments = {
+			asyncWebAssembly: true,
+			layers: true,
+		}
+
+		return config
+	},
 }
 
 export default nextBundleAnalyzer({ enabled: false })(config)

@@ -108,7 +108,7 @@ Begin.`,
 		},
 	]
 
-	const mergedInsightsCompletion = await getCompletion({
+	const { completion: mergedInsightsCompletion, cost } = await getCompletion({
 		messages: mergedInsightsPromptMessages,
 		model: "gpt-4-0613",
 		temperature: 0,
@@ -190,6 +190,9 @@ Begin.`,
 		),
 		Assignment({ courseId, assignmentId }).upsertInsights({
 			insights: mergedInsights,
+		}),
+		Course({ id: courseId }).increaseCost({
+			insights: cost,
 		}),
 	])
 }

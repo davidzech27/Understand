@@ -54,6 +54,7 @@ Begin.`,
 			presencePenalty: 0.25,
 			frequencyPenalty: 0.25,
 			temperature: 0,
+			reason: "insights",
 			onContent: () => {},
 			onFinish: res,
 		})

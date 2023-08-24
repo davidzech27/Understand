@@ -10,6 +10,7 @@ export default async function fetchOpenAI({
 	presencePenalty,
 	frequencyPenalty,
 	maxTokens,
+	reason,
 	onContent,
 	onFinish,
 }: OpenAIRequest & {
@@ -26,6 +27,7 @@ export default async function fetchOpenAI({
 				presencePenalty,
 				frequencyPenalty,
 				maxTokens,
+				reason,
 			})
 		),
 	})

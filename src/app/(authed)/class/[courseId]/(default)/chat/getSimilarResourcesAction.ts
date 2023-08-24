@@ -23,6 +23,7 @@ const getSimilarResourcesAction = zact(
 		similarText,
 		topK: 10,
 		filter: {},
+		userEmail: email,
 	})
 
 	const similarResourcesUnfiltered = (

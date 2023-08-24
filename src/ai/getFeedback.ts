@@ -109,6 +109,7 @@ Begin.`,
 		temperature,
 		presencePenalty,
 		frequencyPenalty,
+		reason: "feedback",
 		onContent: (content) => {
 			const generalFeedbackHeaderIndex = content.search(
 				/\nGeneral Feedback:?\n+.+/

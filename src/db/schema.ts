@@ -9,6 +9,7 @@ import {
 	uniqueIndex,
 	boolean,
 	index,
+	double,
 } from "drizzle-orm/mysql-core"
 
 export const user = mysqlTable("user", {
@@ -19,6 +20,11 @@ export const user = mysqlTable("user", {
 		.notNull()
 		.default(sql`CURRENT_TIMESTAMP`),
 	superuser: boolean("superuser").notNull().default(false),
+	feedbackCost: double("feedback_cost").notNull().default(0),
+	followUpCost: double("follow_up_cost").notNull().default(0),
+	insightsCost: double("insights_cost").notNull().default(0),
+	chatCost: double("chat_cost").notNull().default(0),
+	messageBoardCost: double("message_board_cost").notNull().default(0),
 })
 
 export const teacherToCourse = mysqlTable(
@@ -59,6 +65,8 @@ export const course = mysqlTable("course", {
 	section: text("section"),
 	syncedUrl: text("synced_url"),
 	syncedRefreshToken: text("synced_refresh_token"),
+	syncCost: double("sync_cost").notNull().default(0),
+	insightsCost: double("insights_cost").notNull().default(0),
 })
 
 export const assignment = mysqlTable(

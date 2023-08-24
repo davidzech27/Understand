@@ -74,6 +74,8 @@ export default async function syncAssignment({
 		text: string
 	}[] = []
 
+	let totalCost = 0
+
 	if (assignment.attachments.length !== 0) {
 		const internalAttachmentMessages = [
 			{
@@ -114,7 +116,7 @@ ${attachment.text}
 			},
 		]
 
-		const response = await getCompletion({
+		const { completion, cost } = await getCompletion({
 			messages: internalAttachmentMessages,
 			model: "gpt-3.5-turbo-0613",
 			temperature: 0,
@@ -122,17 +124,19 @@ ${attachment.text}
 			frequencyPenalty: 0,
 		})
 
+		totalCost += cost
+
 		console.info("Sync", {
 			courseId,
 			assignmentId,
 			assignmentTitle: assignment.title,
 			internalAttachmentMessages: internalAttachmentMessages.concat({
 				role: "assistant",
-				content: response,
+				content: completion,
 			}),
 		})
 
-		const indexes = response
+		const indexes = completion
 			.replaceAll(/\s/g, "")
 			.toLowerCase()
 			.split(",")
@@ -164,28 +168,31 @@ ${attachment.text}
 			},
 		]
 
-		const predictedInstructions = await getCompletion({
-			messages: instructionPredictionMessages,
-			model: "gpt-3.5-turbo-0613",
-			temperature: 0,
-			presencePenalty: 0,
-			frequencyPenalty: 0,
-			maxTokens: 100,
-		})
+		const { completion: predictedInstructionsCompletion, cost } =
+			await getCompletion({
+				messages: instructionPredictionMessages,
+				model: "gpt-3.5-turbo-0613",
+				temperature: 0,
+				presencePenalty: 0,
+				frequencyPenalty: 0,
+				maxTokens: 100,
+			})
+
+		totalCost += cost
 
 		console.info("Sync", {
 			courseId,
 			assignmentId,
 			assignmentTitle: assignment.title,
 			instructionPredictionMessages: instructionPredictionMessages.concat(
-				{ role: "assistant", content: predictedInstructions }
+				{ role: "assistant", content: predictedInstructionsCompletion }
 			),
 		})
 
 		const attachmentCandidates = await Course({
 			id: courseId,
 		}).searchResources({
-			similarText: predictedInstructions,
+			similarText: predictedInstructionsCompletion,
 			filter: {},
 			topK: 15,
 		})
@@ -260,7 +267,7 @@ ${attachment.text}
 				},
 			]
 
-			const response = await getCompletion({
+			const { completion, cost } = await getCompletion({
 				messages: externalAttachmentMessages,
 				model: "gpt-3.5-turbo-0613",
 				temperature: 0,
@@ -268,17 +275,19 @@ ${attachment.text}
 				frequencyPenalty: 0,
 			})
 
+			totalCost += cost
+
 			console.info("Sync", {
 				courseId,
 				assignmentId,
 				assignmentTitle: assignment.title,
 				externalAttachmentMessages: externalAttachmentMessages.concat({
 					role: "assistant",
-					content: response,
+					content: completion,
 				}),
 			})
 
-			const indexes = response
+			const indexes = completion
 				.replaceAll(/\s/g, "")
 				.toLowerCase()
 				.split(",")
@@ -355,5 +364,6 @@ ${attachment.text}
 				instructions,
 				syncedAt: new Date(),
 			}),
+		Course({ id: courseId }).increaseCost({ sync: totalCost }),
 	])
 }

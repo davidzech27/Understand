@@ -488,6 +488,29 @@ const User = ({ email }: { email: string }) => ({
 			insights: feedbackInsightsSchema.parse(row.insights),
 		}))
 	},
+	increaseCost: async (cost: {
+		feedback?: number
+		followUp?: number
+		insights?: number
+		chat?: number
+		messageBoard?: number
+	}) => {
+		await db
+			.update(user)
+			.set({
+				feedbackCost:
+					cost.feedback && sql`feedback_cost + ${cost.feedback}`,
+				followUpCost:
+					cost.followUp && sql`follow_up_cost + ${cost.followUp}`,
+				insightsCost:
+					cost.insights && sql`insights_cost + ${cost.insights}`,
+				chatCost: cost.chat && sql`chat_cost + ${cost.chat}`,
+				messageBoardCost:
+					cost.messageBoard &&
+					sql`message_board_cost + ${cost.messageBoard}`,
+			})
+			.where(eq(user.email, email))
+	},
 })
 
 export default User
