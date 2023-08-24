@@ -1,10 +1,10 @@
-import { NextRequest } from "next/server"
+import { type NextRequest } from "next/server"
 import { z } from "zod"
 import { OpenAIStream, StreamingTextResponse } from "ai"
 
 import env from "env.mjs"
 import { getAuth } from "~/auth/jwt"
-import countTokens, { initializeWASM } from "./countTokens"
+import countTokens from "./countTokens"
 import tokenCost from "./tokenCost"
 import User from "~/data/User"
 
@@ -33,8 +33,6 @@ const requestSchema = z.object({
 export type OpenAIRequest = z.infer<typeof requestSchema>
 
 export default async function openaiHandler(request: NextRequest) {
-	// const initializeWASMPromise = initializeWASM()
-
 	const auth = await getAuth({ cookies: request.cookies })
 
 	if (auth === undefined)
@@ -76,9 +74,7 @@ export default async function openaiHandler(request: NextRequest) {
 		}
 	)
 
-	// await initializeWASMPromise
-
-	const promptTokens = 0 //countTokens({ messages })
+	const promptTokensPromise = countTokens({ messages })
 
 	let completionTokens = 0
 
@@ -87,6 +83,8 @@ export default async function openaiHandler(request: NextRequest) {
 			completionTokens++
 		},
 		onFinal: async () => {
+			const promptTokens = await promptTokensPromise
+
 			await User({ email: auth.email }).increaseCost({
 				[reason]:
 					tokenCost.prompt[model] * promptTokens +

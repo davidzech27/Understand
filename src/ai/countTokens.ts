@@ -1,12 +1,10 @@
-import wasm from "tiktoken/lite/tiktoken_bg.wasm?module"
-import model from "tiktoken/encoders/cl100k_base.json"
-import { init, Tiktoken } from "tiktoken/lite/init"
+import { z } from "zod"
 
-export async function initializeWASM() {
-	await init((imports) => WebAssembly.instantiate(wasm, imports))
-}
+const responseSchema = z.number()
 
-export default function countTokens(
+const textEncoder = new TextEncoder()
+
+export default async function countTokens(
 	arg:
 		| { text: string }
 		| {
@@ -16,32 +14,11 @@ export default function countTokens(
 				}[]
 		  }
 ) {
-	const encoding = new Tiktoken(
-		model.bpe_ranks,
-		model.special_tokens,
-		model.pat_str
+	return responseSchema.parse(
+		await (
+			await fetch("/countTokens", {
+				body: textEncoder.encode(JSON.stringify(arg)),
+			})
+		).json()
 	)
-
-	if ("text" in arg) {
-		const tokens = encoding.encode(arg.text)
-
-		encoding.free()
-
-		return tokens.length
-	}
-
-	const chatML = arg.messages
-		.map(
-			({ role, content }) => `<|im_start|>${role}
-${content}
-<|im_end|>`
-		)
-		.join("\n")
-		.concat("\n<|im_start|>assistant")
-
-	const tokens = encoding.encode(chatML)
-
-	encoding.free()
-
-	return tokens.length
 }
