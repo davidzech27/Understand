@@ -10,17 +10,12 @@ export default async function generateAssignmentInsights({
 	courseId: string
 	assignmentId: string
 }) {
-	const [
-		previousAssignmentInsights,
-		unsyncedFeedbackInsights,
-		assignment,
-		students,
-	] = await Promise.all([
-		Assignment({ courseId, assignmentId }).insights(),
-		Assignment({ courseId, assignmentId }).unsyncedFeedbackInsights(),
-		Assignment({ courseId, assignmentId }).get(),
-		Course({ id: courseId }).students(),
-	])
+	const [previousAssignmentInsights, unsyncedFeedbackInsights, assignment] =
+		await Promise.all([
+			Assignment({ courseId, assignmentId }).insights(),
+			Assignment({ courseId, assignmentId }).unsyncedFeedbackInsights(),
+			Assignment({ courseId, assignmentId }).get(),
+		])
 
 	if (assignment === undefined) {
 		console.error("Assignment could not be found", {
@@ -65,16 +60,6 @@ export default async function generateAssignmentInsights({
 			.flat()
 	)
 
-	const studentEmailToNameMap = new Map(
-		students
-			.map((student) => {
-				if (!student.signedUp) return undefined
-
-				return [student.email, student.name] as const
-			})
-			.filter(Boolean)
-	)
-
 	const mergedInsightsPromptMessages = [
 		{
 			role: "system" as const,
@@ -90,9 +75,8 @@ ${concatenatedInsights
 	?.map(
 		(insight, index) => `Number: ${index + 1}
 Type: ${insight.type}
-Students: ${insight.sources
-			.map(({ studentEmail }) => studentEmailToNameMap.get(studentEmail))
-			.filter(Boolean)
+Student emails: ${insight.sources
+			.map(({ studentEmail }) => studentEmail)
 			.join(", ")}
 Content: ${insight.content}`
 	)
