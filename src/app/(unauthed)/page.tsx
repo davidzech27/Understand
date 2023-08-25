@@ -76,9 +76,9 @@ Both teachers and students are empowered to
 */}
 						<p className="mr-36 mb-8 mt-4 select-text text-xl font-medium text-black/70 mobile:mr-0 mobile:text-lg">
 							Understand provides students with instant, in-depth
-							feedback on their work that they can respond to, and
-							aggregates this feedback into nuanced and actionable
-							insights for teachers.
+							feedback on their writing that they can respond to,
+							and aggregates this feedback into nuanced and
+							actionable insights for teachers.
 						</p>
 
 						<div className="flex items-center gap-9 mobile:flex-col mobile:gap-5">
