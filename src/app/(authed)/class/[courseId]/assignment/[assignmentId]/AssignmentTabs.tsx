@@ -6,6 +6,7 @@ import { type Assignment } from "~/data/Assignment"
 import Button from "~/components/Button"
 import AssignmentSettingsModal from "./AssignmentSettingsModal"
 import LinkButton from "~/components/LinkButton"
+import Link from "next/link"
 
 interface Props {
 	assignment: Assignment
@@ -40,11 +41,12 @@ export default function AssignmentTabs({ assignment }: Props) {
 
 			{assignment.instructions !== undefined && (
 				<>
-					<LinkButton
+					<Link
 						href={`/class/${assignment.courseId}/feedback/${assignment.assignmentId}`}
+						className="whitespace-pre rounded-md bg-surface-selected px-6 py-2.5 text-base font-semibold tracking-[0.010em] text-black/70 outline-none transition-all duration-150"
 					>
 						Go to student feedback
-					</LinkButton>
+					</Link>
 
 					<Button
 						onClick={() => {
