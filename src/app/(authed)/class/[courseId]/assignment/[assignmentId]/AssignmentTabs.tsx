@@ -39,20 +39,28 @@ export default function AssignmentTabs({ assignment }: Props) {
 			<div className="flex-1" />
 
 			{assignment.instructions !== undefined && (
-				<Button
-					onClick={() => {
-						navigator.clipboard.writeText(
-							`${window.location.protocol}//${window.location.host}/class/${assignment.courseId}/feedback/${assignment.assignmentId}`
-						)
+				<>
+					<LinkButton
+						href={`/class/${assignment.courseId}/feedback/${assignment.assignmentId}`}
+					>
+						Go to student feedback
+					</LinkButton>
 
-						setFeedbackLinkCopied(true)
-					}}
-					size="small"
-				>
-					{!feedbackLinkCopied
-						? "Copy student feedback link"
-						: "Student feedback link copied"}
-				</Button>
+					<Button
+						onClick={() => {
+							navigator.clipboard.writeText(
+								`${window.location.protocol}//${window.location.host}/class/${assignment.courseId}/feedback/${assignment.assignmentId}`
+							)
+
+							setFeedbackLinkCopied(true)
+						}}
+						size="small"
+					>
+						{!feedbackLinkCopied
+							? "Copy student feedback link"
+							: "Student feedback link copied"}
+					</Button>
+				</>
 			)}
 
 			<div
