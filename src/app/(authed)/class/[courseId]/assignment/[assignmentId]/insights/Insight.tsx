@@ -153,7 +153,7 @@ function Source({
 
 	return (
 		<div {...hoverProps}>
-			<Link href={`/class/${courseId}/student/${student.email}`}>
+			<Link href={`/class/${courseId}/student/${student.email}/insights`}>
 				<div className="flex items-center space-x-3 border-t-[0.75px] border-border px-6 py-4 transition-all duration-150 hover:bg-surface-hover">
 					<Avatar
 						src={student.photo}

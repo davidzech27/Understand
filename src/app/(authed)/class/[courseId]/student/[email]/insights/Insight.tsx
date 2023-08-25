@@ -154,7 +154,7 @@ function Source({
 	return (
 		<div {...hoverProps}>
 			<Link
-				href={`/class/${courseId}/assignment/${assignment.assignmentId}`}
+				href={`/class/${courseId}/assignment/${assignment.assignmentId}/insights`}
 			>
 				<div className="flex cursor-pointer justify-between border-t-[0.75px] border-border px-6 py-4 transition-all duration-150 hover:bg-surface-hover">
 					<span className="text-lg font-medium opacity-90">
