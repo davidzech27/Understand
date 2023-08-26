@@ -20,7 +20,8 @@ export default function SignInPage() {
 					Understand
 				</div>
 
-				<div className="flex h-full w-full flex-col space-y-12 rounded-lg border-[0.5px] border-border bg-white px-6 py-0 shadow-xl shadow-[#00000016] mobile:justify-between mobile:space-y-0 mobile:py-6 mobile:pt-10">
+				{/* switch to space-y-12 when we get more space */}
+				<div className="flex h-full w-full flex-col space-y-8 rounded-lg border-[0.5px] border-border bg-white px-6 py-0 shadow-xl shadow-[#00000016] mobile:justify-between mobile:space-y-0 mobile:py-6 mobile:pt-10">
 					<div className="flex-[0.875] mobile:hidden" />
 
 					<h1 className="select-text text-center text-2xl font-semibold tracking-tight text-black/80 mobile:text-xl">

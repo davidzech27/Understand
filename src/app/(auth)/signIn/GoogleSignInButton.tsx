@@ -26,7 +26,7 @@ export default function GoogleSignInButton({ className }: Props) {
 				redirectTo: "/landing",
 			})}
 			className={cn(
-				"flex h-20 items-center gap-12 rounded-lg border border-border bg-white pl-[22px] pr-8 transition duration-150 hover:bg-surface-hover focus-visible:bg-surface-hover active:bg-surface-hover",
+				"flex h-20 items-center gap-12 rounded-lg border border-border bg-white pl-[22px] pr-8 transition duration-150 hover:bg-surface-hover focus-visible:bg-surface-hover active:bg-surface-hover mobile:pr-[22px]",
 				className
 			)}
 		>
@@ -35,7 +35,7 @@ export default function GoogleSignInButton({ className }: Props) {
 			<span
 				className={cn(
 					roboto.className,
-					"text-[28px] font-medium text-black/90"
+					"text-[28px] font-medium text-black/90 sm-mobile:text-[16px] lg-mobile:text-[18px]"
 				)}
 			>
 				Sign in with Google
