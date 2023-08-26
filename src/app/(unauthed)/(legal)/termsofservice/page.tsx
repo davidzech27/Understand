@@ -405,7 +405,7 @@ support@understand.school`
 export default function TermsOfServicePage() {
 	return (
 		<main className="p-28 sm-mobile:p-6 lg-mobile:p-8">
-			<h1 className="mb-4 select-text text-5xl font-extrabold leading-none tracking-tight text-black/80">
+			<h1 className="mb-5 select-text text-5xl font-extrabold leading-none tracking-tight text-black/80">
 				Terms of Service
 			</h1>
 

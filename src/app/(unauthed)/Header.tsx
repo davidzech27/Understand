@@ -1,5 +1,6 @@
 "use client"
 import Link from "next/link"
+import { useRouter, usePathname } from "next/navigation"
 
 import env from "env.mjs"
 import colors from "colors.cjs"
@@ -10,12 +11,18 @@ import FancyButton from "~/components/FancyButton"
 export default function Header() {
 	const { signedIn } = useSignedIn()
 
+	const router = useRouter()
+
+	const pathname = usePathname()
+
 	return (
 		<>
 			<header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between bg-white/70 px-8 py-4 backdrop-blur-xl sm-mobile:px-6">
 				<button
 					onClick={() => {
-						window.scrollTo({ top: 0, behavior: "smooth" })
+						if (pathname === "/")
+							window.scrollTo({ top: 0, behavior: "smooth" })
+						else router.push("/")
 					}}
 					style={{
 						background: `linear-gradient(45deg, ${colors.primary}, ${colors.secondary} 100%)`,
@@ -28,7 +35,9 @@ export default function Header() {
 				<GradientText asChild>
 					<div
 						onClick={() => {
-							window.scrollTo({ top: 0, behavior: "smooth" })
+							if (pathname === "/")
+								window.scrollTo({ top: 0, behavior: "smooth" })
+							else router.push("/")
 						}}
 						className="cursor-pointer text-3xl font-extrabold leading-none tracking-tight transition duration-200 hover:opacity-75 focus-visible:opacity-75 active:opacity-75 mobile:hidden"
 					>
