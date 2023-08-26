@@ -114,10 +114,20 @@ export default function LandingForm({
 							/>
 
 							<FancyButton
-								onClick={() => setScreen("school")}
+								onClick={() =>
+									potentialSchools &&
+									potentialSchools.length > 0 &&
+									setScreen("school")
+								}
 								size="large"
-								type="button"
+								type={
+									potentialSchools &&
+									potentialSchools.length > 0
+										? "button"
+										: "submit"
+								}
 								disabled={nameInput.length === 0}
+								loading={going}
 							>
 								Continue
 							</FancyButton>
@@ -234,7 +244,7 @@ export default function LandingForm({
 								disabled={!schoolButtonClicked}
 								loading={going}
 							>
-								Let&apos;s go
+								Continue
 							</FancyButton>
 						</>
 					),
