@@ -1,8 +1,5 @@
-import Link from "next/link"
-
 import colors from "colors.cjs"
-import getAuthenticationURL from "~/google/getAuthenticationURL"
-import FancyButton from "~/components/FancyButton"
+import GoogleSignInButton from "./GoogleSignInButton"
 
 export const metadata = {
 	title: "Sign in",
@@ -32,20 +29,7 @@ export default function SignInPage() {
 						(it probably hasn&apos;t yet).
 					</h1>
 
-					<Link
-						href={getAuthenticationURL({
-							scopes: [
-								"https://www.googleapis.com/auth/userinfo.email",
-								"https://www.googleapis.com/auth/userinfo.profile",
-							],
-							redirectTo: "/landing",
-						})}
-						passHref
-					>
-						<FancyButton size="large" className="mobile:text-2xl">
-							Sign in with Google
-						</FancyButton>
-					</Link>
+					<GoogleSignInButton className="mx-auto" />
 
 					<img
 						src="/UnverifiedGoogle.png"
