@@ -93,6 +93,9 @@ export const course = mysqlTable("course", {
 	syncedRefreshToken: text("synced_refresh_token"),
 	syncCost: double("sync_cost").notNull().default(0),
 	insightsCost: double("insights_cost").notNull().default(0),
+	createdAt: timestamp("created_at")
+		.notNull()
+		.default(sql`CURRENT_TIMESTAMP`),
 })
 
 export const assignment = mysqlTable(
@@ -106,6 +109,9 @@ export const assignment = mysqlTable(
 		dueAt: timestamp("due_at").default(sql`NULL`),
 		syncedUrl: text("synced_url"),
 		syncedAt: timestamp("synced_at").default(sql`NULL`),
+		createdAt: timestamp("created_at")
+			.notNull()
+			.default(sql`CURRENT_TIMESTAMP`),
 	},
 	(table) => ({
 		cpk: primaryKey(table.courseId, table.assignmentId),

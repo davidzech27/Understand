@@ -223,7 +223,7 @@ const Course = ({ id }: { id: string }) => ({
 			})
 			.from(assignment)
 			.where(eq(assignment.courseId, id))
-			.orderBy(desc(assignment.dueAt))
+			.orderBy(desc(assignment.dueAt), desc(assignment.createdAt))
 
 		return assignments.map((assignment) => ({
 			courseId: assignment.courseId,
