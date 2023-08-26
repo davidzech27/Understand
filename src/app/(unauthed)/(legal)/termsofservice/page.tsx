@@ -9,7 +9,7 @@ We are Understand ("Company," "we," "us," "our").
 We operate the website https://understand.school (the "Site"), as well as any other related products and services that refer or link to these legal terms (the "Legal Terms") (collectively, the "Services").
 
 
-You can contact us by phone at 7078069894, email at support@understand.school
+You can contact us by phone at 17078069894, email at support@understand.school
 
 
 These Legal Terms constitute a legally binding agreement made between you, whether personally or on behalf of an entity ("you"), and Understand, concerning your access to and use of the Services. You agree that by accessing the Services, you have read, understood, and agreed to be bound by all of these Legal Terms. IF YOU DO NOT AGREE WITH ALL OF THESE LEGAL TERMS, THEN YOU ARE EXPRESSLY PROHIBITED FROM USING THE SERVICES AND YOU MUST DISCONTINUE USE IMMEDIATELY.
@@ -186,7 +186,7 @@ We reserve the right to refuse any order placed through the Services. We may, in
 All purchases are non-refundable. You can cancel your subscription at any time by contacting us using the contact information provided below. Your cancellation will take effect at the end of the current paid term.
 
 
-If you are unsatisfied with our Services, please email us at support@understand.school or call us at 2035455478.
+If you are unsatisfied with our Services, please email us at support@understand.school or call us at 17078069894.
 
 
 7. PROHIBITED ACTIVITIES
@@ -399,7 +399,7 @@ In order to resolve a complaint regarding the Services or to receive further inf
 
 
 Understand
-Phone: 2035455478
+Phone: 17078069894
 support@understand.school`
 
 export default function TermsOfServicePage() {
