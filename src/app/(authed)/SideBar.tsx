@@ -11,25 +11,23 @@ import Heading from "~/components/Heading"
 export default async function SideBar() {
 	const { email } = await getAuthOrThrow({ cookies: cookies() })
 
-	const user = User({ email })
-
-	const [profile, coursesTeaching, coursesEnrolled] = await Promise.all([
-		user.get(),
-		user.coursesTeaching(),
-		user.coursesEnrolled(),
+	const [user, coursesTeaching, coursesEnrolled] = await Promise.all([
+		User({ email }).get(),
+		User({ email }).coursesTeaching(),
+		User({ email }).coursesEnrolled(),
 	])
 
-	if (!profile) redirect("/signIn")
+	if (!user) redirect("/signIn")
 
 	return (
 		<Card className="flex h-full w-full flex-col p-3">
 			<NavigationButton
-				text={profile.name}
-				subtext={profile.email}
+				text={user.name}
+				subtext={user.email}
 				photo={
 					<Avatar
-						src={profile.photo ?? undefined}
-						name={profile.name}
+						src={user.photo ?? undefined}
+						name={user.name}
 						fallbackColor="secondary"
 						className="h-full w-full"
 					/>
@@ -111,6 +109,24 @@ export default async function SideBar() {
 					</>
 				)}
 			</div>
+
+			<div className="flex-1" />
+			{user.schoolDistrictName !== undefined &&
+			user.schoolName !== undefined ? (
+				<NavigationButton
+					text={user.schoolName}
+					subtext={user.schoolDistrictName}
+					photo={
+						<Avatar
+							src={undefined}
+							name={user.schoolName}
+							fallbackColor="primary"
+							className="h-full w-full"
+						/>
+					}
+					href="/landing"
+				/>
+			) : null}
 		</Card>
 	)
 }

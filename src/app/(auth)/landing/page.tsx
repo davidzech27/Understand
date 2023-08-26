@@ -12,11 +12,20 @@ export const metadata = {
 	title: "Landing",
 }
 
-// perhaps add extra content to fill awkward whitespace
 export default async function LandingPage() {
-	const profilePromise = getAuthOrThrow({ cookies: cookies() })
-		.then(({ email }) => User({ email }).get())
-		.then((profile) => profile ?? notFound())
+	const emailPromise = getAuthOrThrow({
+		cookies: cookies(),
+	}).then(({ email }) => email)
+
+	const userPromise = emailPromise.then((email) =>
+		User({ email })
+			.get()
+			.then((user) => user ?? notFound())
+	)
+
+	const potentialSchoolsPromise = emailPromise.then((email) =>
+		User({ email }).potentialSchools()
+	)
 
 	return (
 		<main
@@ -34,7 +43,8 @@ export default async function LandingPage() {
 					<div className="flex-[0.875] mobile:hidden" />
 
 					<LandingForm
-						profilePromise={profilePromise}
+						userPromise={userPromise}
+						potentialSchoolsPromise={potentialSchoolsPromise}
 						className="flex flex-1 flex-col space-y-12 mobile:justify-between mobile:space-y-0 mobile:pt-10"
 					/>
 

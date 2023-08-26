@@ -96,6 +96,8 @@ export default function ClassSettingsModal({
 
 		await deleteCourseAction({ id: course.id })
 
+		router.refresh()
+
 		router.push("/home")
 	}
 

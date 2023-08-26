@@ -10,22 +10,48 @@ import {
 	boolean,
 	index,
 	double,
+	mysqlEnum,
 } from "drizzle-orm/mysql-core"
 
 export const user = mysqlTable("user", {
 	email: varchar("email", { length: 100 }).primaryKey(),
 	name: varchar("name", { length: 100 }).notNull(),
 	photo: varchar("photo", { length: 2000 }),
-	createdAt: timestamp("created_at")
-		.notNull()
-		.default(sql`CURRENT_TIMESTAMP`),
+	schoolDistrictName: varchar("school_district_name", { length: 100 }),
+	schoolName: varchar("school_name", { length: 100 }),
+	schoolRole: mysqlEnum("school_role", ["teacher", "student"]),
 	superuser: boolean("superuser").notNull().default(false),
 	feedbackCost: double("feedback_cost").notNull().default(0),
 	followUpCost: double("follow_up_cost").notNull().default(0),
 	insightsCost: double("insights_cost").notNull().default(0),
 	chatCost: double("chat_cost").notNull().default(0),
 	messageBoardCost: double("message_board_cost").notNull().default(0),
+	createdAt: timestamp("created_at")
+		.notNull()
+		.default(sql`CURRENT_TIMESTAMP`),
 })
+
+export const school = mysqlTable(
+	"school",
+	{
+		districtName: varchar("district_name", { length: 100 }).notNull(),
+		name: varchar("name", { length: 100 }).notNull(),
+		teacherEmailDomain: varchar("teacher_email_domain", { length: 100 }),
+		studentEmailDomain: varchar("student_email_domain", { length: 100 }),
+		createdAt: timestamp("created_at")
+			.notNull()
+			.default(sql`CURRENT_TIMESTAMP`),
+	},
+	(table) => ({
+		cpk: primaryKey(table.districtName, table.name),
+		teacherEmailDomainIdx: index("teacher_email_domain_idx").on(
+			table.teacherEmailDomain
+		),
+		studentEmailDomainIdx: index("student_email_domain_idx").on(
+			table.studentEmailDomain
+		),
+	})
+)
 
 export const teacherToCourse = mysqlTable(
 	"teacher_to_course",

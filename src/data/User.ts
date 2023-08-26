@@ -10,6 +10,7 @@ import {
 	studentInsight,
 	feedback,
 	assignment,
+	school,
 } from "~/db/schema"
 import { feedbackListSchema, feedbackInsightsSchema } from "./Feedback"
 
@@ -53,6 +54,9 @@ const User = ({ email }: { email: string }) => ({
 				.select({
 					name: user.name,
 					photo: user.photo,
+					schoolDistrictName: user.schoolDistrictName,
+					schoolName: user.schoolName,
+					schoolRole: user.schoolRole,
 					superuser: user.superuser,
 				})
 				.from(user)
@@ -65,15 +69,33 @@ const User = ({ email }: { email: string }) => ({
 			email,
 			name: row.name,
 			photo: row.photo ?? undefined,
-			superuser: row.superuser ?? false,
+			schoolDistrictName: row.schoolDistrictName ?? undefined,
+			schoolName: row.schoolName ?? undefined,
+			schoolRole: row.schoolRole ?? undefined,
+			superuser: row.superuser,
 		}
 	},
-	update: async ({ name, photo }: { name?: string; photo?: string }) => {
+	update: async ({
+		name,
+		photo,
+		schoolDistrictName,
+		schoolName,
+		schoolRole,
+	}: {
+		name?: string
+		photo?: string
+		schoolDistrictName?: string | null
+		schoolName?: string | null
+		schoolRole?: "teacher" | "student" | null
+	}) => {
 		await db
 			.update(user)
 			.set({
-				...(name !== undefined ? { name } : {}),
-				...(photo !== undefined ? { photo } : {}),
+				name,
+				photo,
+				schoolDistrictName,
+				schoolName,
+				schoolRole,
 			})
 			.where(eq(user.email, email))
 	},
@@ -91,6 +113,37 @@ const User = ({ email }: { email: string }) => ({
 				.where(eq(studentInsight.studentEmail, email)),
 			db.delete(feedback).where(eq(feedback.userEmail, email)),
 		])
+	},
+	potentialSchools: async () => {
+		const emailDomain = email.split("@")[1]
+
+		if (emailDomain === undefined) return []
+
+		return (
+			await db
+				.select({
+					districtName: school.districtName,
+					name: school.name,
+					teacherEmailDomain: school.teacherEmailDomain,
+					studentEmailDomain: school.studentEmailDomain,
+				})
+				.from(school)
+				.where(
+					or(
+						eq(school.teacherEmailDomain, emailDomain),
+						eq(school.studentEmailDomain, emailDomain)
+					)
+				)
+		).map((school) => ({
+			districtName: school.districtName,
+			name: school.name,
+			role:
+				school.teacherEmailDomain === school.studentEmailDomain
+					? undefined
+					: school.teacherEmailDomain === emailDomain
+					? ("teacher" as const)
+					: ("student" as const),
+		}))
 	},
 	coursesTeaching: async () => {
 		const teaching = await db

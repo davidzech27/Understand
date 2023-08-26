@@ -23,13 +23,11 @@ function FancyButton(
 	{ children, onClick, size, loading, disabled, className, ...props }: Props,
 	ref: ForwardedRef<HTMLButtonElement>
 ) {
-	if (loading) disabled = true
-
 	return (
 		<button
 			{...props}
 			onClick={onClick}
-			disabled={disabled}
+			disabled={disabled || loading}
 			ref={ref}
 			style={{
 				background: `linear-gradient(45deg, ${colors.primary}, ${colors.secondary} 100%)`,
@@ -41,7 +39,10 @@ function FancyButton(
 					medium: "rounded-xl px-12 py-4 text-2xl",
 					large: "h-20 w-full rounded-xl text-3xl",
 				}[size],
-				disabled && !loading && "opacity-50",
+				disabled &&
+					"opacity-50 hover:opacity-50 focus-visible:opacity-50 active:opacity-50",
+				loading &&
+					"hover:opacity-100 focus-visible:opacity-100 active:opacity-100",
 				className
 			)}
 		>

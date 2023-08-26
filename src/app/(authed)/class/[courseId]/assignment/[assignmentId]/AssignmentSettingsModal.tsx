@@ -72,6 +72,8 @@ export default function AssignmentSettingsModal({
 			assignmentId: assignment.assignmentId,
 		})
 
+		router.refresh()
+
 		router.push(`/class/${assignment.courseId}`)
 	}
 
