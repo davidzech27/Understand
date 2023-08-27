@@ -26,9 +26,6 @@ export default function ClassCreatePage() {
 				"https://www.googleapis.com/auth/classroom.profile.emails"
 			) ||
 			!googleScopes.includes(
-				"https://www.googleapis.com/auth/classroom.profile.photos"
-			) ||
-			!googleScopes.includes(
 				"https://www.googleapis.com/auth/classroom.student-submissions.students.readonly"
 			) ||
 			!googleScopes.includes(

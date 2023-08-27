@@ -51,9 +51,6 @@ export default async function oauthCallbackHandler(request: NextRequest) {
 				"https://www.googleapis.com/auth/classroom.profile.emails"
 			) &&
 			scopes.includes(
-				"https://www.googleapis.com/auth/classroom.profile.photos"
-			) &&
-			scopes.includes(
 				"https://www.googleapis.com/auth/classroom.student-submissions.students.readonly"
 			) &&
 			scopes.includes(
