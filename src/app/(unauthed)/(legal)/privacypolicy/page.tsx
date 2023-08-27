@@ -34,7 +34,7 @@ iv: Student work import: Students will be able to import work into Understand fr
 
 We use the information we collect to:
 
-a. Provide and improve our service, including personalizing our user experience. b. Support user accounts, authenticate users, and manage access control. c. Ensure the security of our service, detect and prevent fraud, and enforce our terms of service. d. Comply with legal obligations and respond to lawful requests from authorities.
+a. Provide and maintain our service, including personalizing our user experience. b. Support user accounts, authenticate users, and manage access control. c. Ensure the security of our service, detect and prevent fraud, and enforce our terms of service. d. Comply with legal obligations and respond to lawful requests from authorities.
 
 3. Information sharing and disclosure
 
