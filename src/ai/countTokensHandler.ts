@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server"
 import { z } from "zod"
-import { get_encoding } from "tiktoken"
+import { encodingForModel } from "js-tiktoken"
 
 const requestSchema = z.union([
 	z.object({
@@ -35,11 +35,9 @@ ${content}
 					.join("\n")
 					.concat("\n<|im_start|>assistant")
 
-	const encoding = get_encoding("cl100k_base")
+	const encoding = encodingForModel("gpt-4-0613")
 
 	const tokens = encoding.encode(text)
-
-	encoding.free()
 
 	return NextResponse.json(tokens.length)
 }

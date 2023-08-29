@@ -33,6 +33,7 @@
 		"immer": "^10.0.1",
 		"jose": "^4.13.1",
 		"jotai": "^2.3.1",
+		"js-tiktoken": "^1.0.7",
 		"lucide-react": "^0.214.0",
 		"next": "^13.4.18",
 		"next-build-id": "^3.0.0",
@@ -43,7 +44,6 @@
 		"react-dom": "^18.2.0",
 		"react-expanding-textarea": "^2.3.6",
 		"tailwind-merge": "^1.12.0",
-		"tiktoken": "^1.0.10",
 		"zact": "^0.0.2",
 		"zod": "^3.20.6"
 	},
