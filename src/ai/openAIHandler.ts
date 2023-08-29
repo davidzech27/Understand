@@ -40,58 +40,85 @@ export default async function openaiHandler(request: NextRequest) {
 
 	const requestParsed = requestSchema.safeParse(await request.json())
 
-	if (!requestParsed.success) {
+	if (!requestParsed.success)
 		return new Response("Bad Request", { status: 400 })
-	}
 
-	const {
-		messages,
-		model,
-		temperature,
-		presencePenalty,
-		frequencyPenalty,
-		maxTokens,
-		reason,
-	} = requestParsed.data
+	// since no await, may allow users to go over limit if requests are in close proximity. change if users not associated with an onboarded school can send requests
+	const unregisterCompletionStreamPromise = User({
+		email: auth.email,
+	}).registerCompletionStream()
 
-	const openaiResponse = await fetch(
-		"https://api.openai.com/v1/chat/completions",
-		{
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${env.OPENAI_SECRET_KEY}`,
-			},
-			body: JSON.stringify({
-				messages,
-				model,
-				temperature,
-				presence_penalty: presencePenalty,
-				frequency_penalty: frequencyPenalty,
-				max_tokens: maxTokens,
-				stream: true,
-			}),
+	try {
+		const overRateLimit = await User({ email: auth.email }).overRateLimit({
+			school: auth.school,
+		})
+
+		if (overRateLimit) {
+			await (
+				await unregisterCompletionStreamPromise
+			)()
+
+			return new Response("Rate limit exceeded", { status: 429 })
 		}
-	)
 
-	const promptTokensPromise = countTokens({ messages })
+		const {
+			messages,
+			model,
+			temperature,
+			presencePenalty,
+			frequencyPenalty,
+			maxTokens,
+			reason,
+		} = requestParsed.data
 
-	let completionTokens = 0
+		const openaiResponse = await fetch(
+			"https://api.openai.com/v1/chat/completions",
+			{
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${env.OPENAI_SECRET_KEY}`,
+				},
+				body: JSON.stringify({
+					messages,
+					model,
+					temperature,
+					presence_penalty: presencePenalty,
+					frequency_penalty: frequencyPenalty,
+					max_tokens: maxTokens,
+					stream: true,
+				}),
+			}
+		)
 
-	const openaiStream = OpenAIStream(openaiResponse, {
-		onToken: () => {
-			completionTokens++
-		},
-		onFinal: async () => {
-			const promptTokens = await promptTokensPromise
+		const promptTokensPromise = countTokens({ messages })
 
-			await User({ email: auth.email }).increaseCost({
-				[reason]:
-					tokenCost.prompt[model] * promptTokens +
-					tokenCost.completion[model] * completionTokens,
-			})
-		},
-	})
+		let completionTokens = 0
 
-	return new StreamingTextResponse(openaiStream)
+		const openaiStream = OpenAIStream(openaiResponse, {
+			onToken: () => {
+				completionTokens++
+			},
+			onFinal: async () => {
+				const promptTokens = await promptTokensPromise
+
+				await Promise.all([
+					(await unregisterCompletionStreamPromise)(),
+					User({ email: auth.email }).increaseCost({
+						[reason]:
+							tokenCost.prompt[model] * promptTokens +
+							tokenCost.completion[model] * completionTokens,
+					}),
+				])
+			},
+		})
+
+		return new StreamingTextResponse(openaiStream)
+	} catch (error) {
+		console.error(error)
+
+		await (
+			await unregisterCompletionStreamPromise
+		)()
+	}
 }

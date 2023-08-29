@@ -47,52 +47,56 @@ Begin.`,
 		},
 	]
 
-	const completion = await new Promise<string>((res) =>
-		fetchOpenAI({
-			messages,
-			model: "gpt-4-0613",
-			presencePenalty: 0.25,
-			frequencyPenalty: 0.25,
-			temperature: 0,
-			reason: "insights",
-			onContent: () => {},
-			onFinish: res,
-		})
-	)
+	try {
+		const completion = await new Promise<string>((res, rej) =>
+			fetchOpenAI({
+				messages,
+				model: "gpt-4-0613",
+				presencePenalty: 0.25,
+				frequencyPenalty: 0.25,
+				temperature: 0,
+				reason: "insights",
+				onContent: () => {},
+				onRateLimit: () => rej(),
+				onFinish: res,
+			})
+		)
 
-	console.info(
-		messages
-			.map(({ content }) => content)
-			.concat(completion)
-			.join("\n\n\n\n")
-	)
+		console.info(
+			messages
+				.map(({ content }) => content)
+				.concat(completion)
+				.join("\n\n\n\n")
+		)
 
-	return {
-		insights: completion
-			.split("\n\n")
-			.map((insight) => ({
-				type:
-					insight
-						.match(/(?<=^(Insights:[ ]+)?Type:[ ]).+/g)?.[0]
-						.toLowerCase() === "strength"
-						? ("strength" as const)
-						: ("weakness" as const),
-				paragraphs: insight
-					.match(/(?<=\nParagraph number:[ ]).+/g)?.[0]
-					.split(/,[ ]*/)
-					.map(Number),
-				content: insight.match(/(?<=\nContent:[ ]).+/g)?.[0],
-			}))
-			.map((insight) =>
-				insight.paragraphs && insight.content
-					? {
-							type: insight.type,
-							paragraphs: insight.paragraphs,
-							content: insight.content,
-					  }
-					: undefined
-			)
-			.filter(Boolean),
-		rawResponse: completion,
+		return {
+			insights: completion
+				.split("\n\n")
+				.map((insight) => ({
+					type:
+						insight
+							.match(/(?<=^(Insights:[ ]+)?Type:[ ]).+/g)?.[0]
+							.toLowerCase() === "strength"
+							? ("strength" as const)
+							: ("weakness" as const),
+					paragraphs: insight
+						.match(/(?<=\nParagraph number:[ ]).+/g)?.[0]
+						.split(/,[ ]*/)
+						.map(Number),
+					content: insight.match(/(?<=\nContent:[ ]).+/g)?.[0],
+				}))
+				.map((insight) =>
+					insight.paragraphs && insight.content
+						? {
+								type: insight.type,
+								paragraphs: insight.paragraphs,
+								content: insight.content,
+						  }
+						: undefined
+				)
+				.filter(Boolean),
+		}
+	} catch (_) {
+		return { insights: [] }
 	}
 }

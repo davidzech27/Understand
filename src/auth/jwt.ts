@@ -11,6 +11,13 @@ const accessTokenPayloadSchema = z.object({
 	email: z.string(),
 	googleRefreshToken: z.string(),
 	googleScopes: z.enum(scopes).array(),
+	school: z
+		.object({
+			districtName: z.string(),
+			name: z.string(),
+			role: z.enum(["teacher", "student"]).optional(),
+		})
+		.optional(),
 })
 
 const encodeAccessToken = async (

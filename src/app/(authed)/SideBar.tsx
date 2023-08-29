@@ -17,7 +17,7 @@ export default async function SideBar() {
 		User({ email }).coursesEnrolled(),
 	])
 
-	if (!user) redirect("/signIn")
+	if (user === undefined) redirect("/signIn")
 
 	return (
 		<Card className="flex h-full w-full flex-col p-3">

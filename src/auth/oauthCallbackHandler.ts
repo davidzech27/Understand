@@ -23,6 +23,8 @@ export default async function oauthCallbackHandler(request: NextRequest) {
 
 	const { email, name, photo } = await googleAPI.me()
 
+	const existingUserPromise = User({ email }).get()
+
 	await User({ email }).create({ name, photo })
 
 	const redirectTo =
@@ -32,15 +34,27 @@ export default async function oauthCallbackHandler(request: NextRequest) {
 	const response = NextResponse.redirect(new URL(redirectTo))
 
 	await Promise.all([
-		setAuth({
-			cookies: response.cookies,
-			auth: {
-				email,
-				googleRefreshToken: refreshToken,
-				googleScopes: scopes,
-			},
-		}),
-
+		existingUserPromise.then((existingUser) =>
+			setAuth({
+				cookies: response.cookies,
+				auth: {
+					email,
+					googleRefreshToken: refreshToken,
+					googleScopes: scopes,
+					school:
+						existingUser &&
+						existingUser.schoolDistrictName !== undefined &&
+						existingUser.schoolName !== undefined
+							? {
+									districtName:
+										existingUser.schoolDistrictName,
+									name: existingUser.schoolName,
+									role: existingUser.schoolRole,
+							  }
+							: undefined,
+				},
+			})
+		),
 		scopes.includes(
 			"https://www.googleapis.com/auth/classroom.courses.readonly"
 		) &&

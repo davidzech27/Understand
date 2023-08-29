@@ -6,6 +6,7 @@ import { z } from "zod"
 import Assignment from "~/data/Assignment"
 import User from "~/data/User"
 import { getAuthOrThrow } from "~/auth/jwt"
+import Course from "~/data/Course"
 
 const deleteAssignmentAction = zact(
 	z.object({
@@ -19,7 +20,12 @@ const deleteAssignmentAction = zact(
 
 	if (role !== "teacher") return
 
-	await Assignment({ courseId, assignmentId }).delete()
+	await Promise.all([
+		Assignment({ courseId, assignmentId }).delete(),
+		Course({ id: courseId }).deleteResources({
+			filter: { instructionsForAssignmentId: assignmentId },
+		}),
+	])
 })
 
 export default deleteAssignmentAction

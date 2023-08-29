@@ -26,6 +26,8 @@ import FeedbackHeader from "./FeedbackHeader"
 import FeedbackContent from "./FeedbackContent"
 import Button from "~/components/Button"
 import Card from "~/components/Card"
+import FeatureBlockModal from "~/limits/FeatureBlockModal"
+import RateLimitModal from "~/limits/RateLimitModal"
 
 interface Props {
 	assignment: Assignment & { instructions: string }
@@ -181,7 +183,17 @@ export default function Feedback({
 
 	const [generating, setGenerating] = useState(false)
 
+	const [featureBlockModalOpen, setFeatureBlockModalOpen] = useState(false)
+
+	const [rateLimitModalOpen, setRateLimitModalOpen] = useState(false)
+
 	const onGetFeedback = () => {
+		if (
+			user.schoolDistrictName === undefined ||
+			user.schoolName === undefined
+		)
+			return setFeatureBlockModalOpen(true)
+
 		setGenerating(true)
 
 		setEditing(false)
@@ -217,6 +229,11 @@ export default function Feedback({
 						}
 					})
 				)
+			},
+			onRateLimit: () => {
+				setGenerating(false)
+
+				setRateLimitModalOpen(true)
 			},
 			onFinish: async ({ rawResponse }) => {
 				setGenerating(false)
@@ -455,6 +472,11 @@ export default function Feedback({
 						if (lastFollowUp) lastFollowUp.aiMessage = content
 					})
 				),
+			onRateLimit: () => {
+				setGenerating(false)
+
+				setRateLimitModalOpen(true)
+			},
 			onFinish: () => {
 				setGenerating(false)
 
@@ -506,6 +528,17 @@ export default function Feedback({
 					feedbackGivenAt={feedback.givenAt}
 				/>
 			)}
+
+			<FeatureBlockModal
+				open={featureBlockModalOpen}
+				setOpen={setFeatureBlockModalOpen}
+				feature="get feedback on your work"
+			/>
+
+			<RateLimitModal
+				open={rateLimitModalOpen}
+				setOpen={setRateLimitModalOpen}
+			/>
 
 			<Card className="relative h-full bg-white pt-16">
 				<div className="h-full w-full overflow-x-hidden overflow-y-scroll">

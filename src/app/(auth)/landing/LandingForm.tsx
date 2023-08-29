@@ -72,10 +72,15 @@ export default function LandingForm({
 
 		await updateProfileAction({
 			name: nameInput.trim(),
-			school: selectedSchool && {
-				districtName: selectedSchool.districtName,
-				name: selectedSchool.name,
-			},
+			school:
+				selectedSchool !== undefined
+					? {
+							districtName: selectedSchool.districtName,
+							name: selectedSchool.name,
+					  }
+					: schoolButtonClicked
+					? null
+					: undefined,
 		})
 
 		router.refresh()

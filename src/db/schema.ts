@@ -38,6 +38,12 @@ export const school = mysqlTable(
 		name: varchar("name", { length: 100 }).notNull(),
 		teacherEmailDomain: varchar("teacher_email_domain", { length: 100 }),
 		studentEmailDomain: varchar("student_email_domain", { length: 100 }),
+		maxUserMonthlyCost: double("max_user_monthly_cost")
+			.notNull()
+			.default(20),
+		maxCourseMonthlyCost: double("max_course_monthly_cost")
+			.notNull()
+			.default(1000),
 		createdAt: timestamp("created_at")
 			.notNull()
 			.default(sql`CURRENT_TIMESTAMP`),

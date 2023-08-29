@@ -4,9 +4,9 @@ import { notFound } from "next/navigation"
 import { getAuthOrThrow } from "~/auth/jwt"
 import Course from "~/data/Course"
 import User from "~/data/User"
-import FeedbackStream from "./FeedbackStream"
 import cn from "~/utils/cn"
-import MessageBoard from "./MessageBoard"
+import FeedbackStream from "./FeedbackStream"
+import UserFeedbackStream from "./UserFeedbackStream"
 import Card from "~/components/Card"
 import GradientText from "~/components/GradientText"
 import Heading from "~/components/Heading"
@@ -92,12 +92,31 @@ export default async function ClassPage({
 			</>
 		)
 	} else if (role === "student") {
+		const { feedbackStream, cursor } = await User({
+			email,
+		}).feedbackStream({
+			courseId,
+			limit: 20,
+		})
+
 		return (
 			<>
 				{courseHeader}
 
-				<Card className="flex flex-1 flex-col py-5 px-6">
-					<MessageBoard courseId={courseId} />
+				<Card className="flex flex-1 flex-col space-y-2 py-5 px-6">
+					{feedbackStream.length !== 0 ? (
+						<UserFeedbackStream
+							courseId={courseId}
+							userEmail={email}
+							initialFeedbackStream={feedbackStream}
+							cursor={cursor}
+						/>
+					) : (
+						<Heading size="large">
+							When you get feedback on their work, it&apos;ll show
+							up here
+						</Heading>
+					)}
 				</Card>
 			</>
 		)

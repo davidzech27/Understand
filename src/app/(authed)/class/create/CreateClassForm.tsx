@@ -3,6 +3,7 @@ import { use, useState } from "react"
 import { useRouter } from "next/navigation"
 import { X } from "lucide-react"
 
+import { type User } from "~/data/User"
 import createCourseAction from "./createCourseAction"
 import getAuthenticationURL from "~/google/getAuthenticationURL"
 import Heading from "~/components/Heading"
@@ -15,6 +16,7 @@ import FancyButton from "~/components/FancyButton"
 import Modal from "~/components/Modal"
 import SelectList from "~/components/SelectList"
 import AttachmentItem from "~/components/AttachmentItem"
+import FeatureBlockModal from "~/limits/FeatureBlockModal"
 
 interface Props {
 	coursesPromise: Promise<
@@ -38,12 +40,12 @@ interface Props {
 		  }[]
 		| undefined
 	>
-	emailPromise: Promise<string>
+	userPromise: Promise<User>
 }
 
 export default function CreateClassForm({
 	coursesPromise,
-	emailPromise,
+	userPromise,
 }: Props) {
 	const router = useRouter()
 
@@ -83,7 +85,14 @@ export default function CreateClassForm({
 	const onLink = async () => {
 		const courses = await coursesPromise
 
-		if (courses === undefined) {
+		const user = await userPromise
+
+		if (
+			user.schoolDistrictName === undefined ||
+			user.schoolName === undefined
+		) {
+			setFeatureBlockModalOpen(true)
+		} else if (courses === undefined) {
 			setLinkClassExplanationModalOpen(true)
 		} else {
 			setLinkClassModalOpen(true)
@@ -105,6 +114,8 @@ export default function CreateClassForm({
 	}
 
 	const [linkClassModalOpen, setLinkClassModalOpen] = useState(false)
+
+	const [featureBlockModalOpen, setFeatureBlockModalOpen] = useState(false)
 
 	const [linkClassExplanationModalOpen, setLinkClassExplanationModalOpen] =
 		useState(false)
@@ -143,19 +154,19 @@ export default function CreateClassForm({
 
 		course.section && setSectionInput(course.section)
 
-		const profileEmail = await emailPromise
+		const user = await userPromise
 
 		setAdditionalTeacherEmailInputs(
 			roster.teachers
 				.map((teacher) => teacher.email)
 				.filter(Boolean)
-				.filter((email) => email !== profileEmail)
+				.filter((email) => email !== user.email)
 		)
 
 		setStudentEmailInputs(
 			roster.students
 				.map((student) => student.email)
-				.filter((email) => email !== profileEmail)
+				.filter((email) => email !== user.email)
 		)
 
 		setLinkedCourse({
@@ -164,10 +175,10 @@ export default function CreateClassForm({
 				additionalTeacherEmails: roster.teachers
 					.map((teacher) => teacher.email)
 					.filter(Boolean)
-					.filter((email) => email !== profileEmail),
+					.filter((email) => email !== user.email),
 				studentEmails: roster.students
 					.map((student) => student.email)
-					.filter((email) => email !== profileEmail),
+					.filter((email) => email !== user.email),
 			},
 		})
 
@@ -313,22 +324,16 @@ export default function CreateClassForm({
 				<div className="flex h-full flex-col justify-between">
 					<div className="select-text text-lg leading-loose opacity-80">
 						By linking this class with a class in Google Classroom,
-						this class will reflect the roster and all the
-						assignments of that class. Additionally, we use the
-						instructions on the assignments you create to provide
-						your students with more tailored feedback on their work,
-						and we&apos;ll use your Google Classroom class to
-						automatically find instructions on assignments for you.
-						However, we are occasionally unable to find instructions
-						on assignments on Google Classroom, so there is a slight
-						chance that not all instructions on assignments will be
-						imported properly. But ultimately, this should not be
-						detrimental, and this feature should make using this
-						platform much more convenvient for you. However, in
-						order to access your class in Google Classroom,
-						we&apos;ll need to be granted extra permission to access
-						your Google Account, and you&apos;ll need to
-						reauthenticate with Google.
+						your Understand class will reflect the roster and all
+						the assignments of your Google Classroom class.
+						Additionally, we use the instructions on the assignments
+						you create to provide your students with more tailored
+						feedback on their work, and we&apos;ll use your Google
+						Classroom class to automatically find instructions on
+						assignments for you. However, in order to access your
+						Google Classroom classes, we&apos;ll need to be granted
+						extra permission to access your Google Account, and
+						you&apos;ll need to reauthenticate with Google.
 					</div>
 
 					<FancyButton onClick={onReauthenticate} size="large">
@@ -336,6 +341,12 @@ export default function CreateClassForm({
 					</FancyButton>
 				</div>
 			</Modal>
+
+			<FeatureBlockModal
+				open={featureBlockModalOpen}
+				setOpen={setFeatureBlockModalOpen}
+				feature="create a linked course"
+			/>
 
 			<Modal
 				title="Choose a class to import"

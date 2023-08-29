@@ -10,7 +10,6 @@ interface Props {
 	teacherEmailsPromise: Promise<string[]>
 	studentEmailsPromise: Promise<string[]>
 	role: "teacher" | "student"
-	hasResources: boolean
 }
 
 export default function ClassTab({
@@ -18,7 +17,6 @@ export default function ClassTab({
 	teacherEmailsPromise,
 	studentEmailsPromise,
 	role,
-	hasResources,
 }: Props) {
 	const [settingsModalOpen, setSettingsModalOpen] = useState(false)
 
@@ -35,11 +33,7 @@ export default function ClassTab({
 					People
 				</LinkButton>
 
-				{hasResources && (
-					<LinkButton href={`/class/${course.id}/chat`}>
-						Chat
-					</LinkButton>
-				)}
+				<LinkButton href={`/class/${course.id}/chat`}>Chat</LinkButton>
 			</div>
 
 			{role === "teacher" && (

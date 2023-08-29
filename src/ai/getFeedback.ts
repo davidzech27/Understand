@@ -18,6 +18,7 @@ export default async function getFeedback({
 	studentName,
 	submissionText,
 	onContent,
+	onRateLimit,
 	onFinish,
 }: {
 	assignmentTitle: string
@@ -33,6 +34,7 @@ export default async function getFeedback({
 		paragraph?: number
 		sentence?: number
 	}) => void
+	onRateLimit: () => void
 	onFinish: ({ rawResponse }: { rawResponse: string }) => void
 }) {
 	let lastParagraphNumber = undefined as number | undefined
@@ -84,7 +86,7 @@ Commentary
 Identify one area where ${studentName} demonstrates their strengths or unique character as a writer and then the three areas where they could most improve their communication or depth of thought. For each commentary about a potential improvement, ask a question that ${studentName} would have, then respond to it with numerous direct references to their work.
 
 Specific Feedback
-Provide many areas of feedback pertaining to the segments of ${studentName}'s work that your commentary most applies to. In each area of feedback, frequently reference ${studentName}'s work and provide in-depth reasoning in order to best help them understand how to improve their work. Also frequently reference other similar paragraphs in ${studentName}'s work to ensure that every relevant paragraph is addressed. Do not prescribe any particular solution to ${studentName}; instead, cleverly ask them a question or make an insightful comment to lead them in the right direction. Unless required by the assignment prompt, do not suggest that ${studentName} alter their stylistic writing choices or increase the scope of their work. Each area of specific feedback should use the following format:
+Provide many areas of feedback pertaining to the segments of ${studentName}'s work that your commentary most applies to. In each area of feedback, frequently reference ${studentName}'s work and provide in-depth reasoning in order to best help them understand how to improve their work. Also frequently reference other similar paragraphs in ${studentName}'s work to ensure that every relevant paragraph is addressed. Do not prescribe any particular solution or idea to ${studentName}; instead, cleverly ask them a question or make an insightful comment to lead them in the right direction. Unless required by the assignment prompt, do not suggest that ${studentName} alter their stylistic writing choices or increase the scope of their work. Each area of specific feedback should use the following format:
 Paragraph number: {paragraph number of the segment of ${studentName}'s work pertaining to the feedback}
 Sentence number: {sentence number of the segment of ${studentName}'s work pertaining to the feedback, or -1 if the feedback applies to the entire paragraph}
 Feedback: {the feedback to ${studentName}}
@@ -175,6 +177,7 @@ Begin.`,
 				}
 			}
 		},
+		onRateLimit,
 		onFinish: (content) => {
 			console.log(content)
 

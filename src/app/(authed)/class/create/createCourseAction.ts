@@ -32,13 +32,18 @@ const createCourseAction = zact(
 		unsyncedStudentEmails,
 		syncedUrl,
 	}) => {
-		const { email, ...creatorAuth } = await getAuthOrThrow({
+		const { email, ...auth } = await getAuthOrThrow({
 			cookies: cookies(),
 		})
 
 		if (syncedUrl !== undefined) {
+			if (auth.school === undefined)
+				throw new Error(
+					"Must be registered with a school to link to a Google Classroom class"
+				)
+
 			const googleAPI = await GoogleAPI({
-				refreshToken: creatorAuth.googleRefreshToken,
+				refreshToken: auth.googleRefreshToken,
 			})
 
 			const coursesTeaching = await googleAPI.coursesTeaching()
@@ -70,7 +75,7 @@ const createCourseAction = zact(
 				...(syncedUrl !== undefined
 					? {
 							syncedUrl,
-							syncedRefreshToken: creatorAuth.googleRefreshToken,
+							syncedRefreshToken: auth.googleRefreshToken,
 					  }
 					: {
 							syncedUrl: undefined,

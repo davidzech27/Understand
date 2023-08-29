@@ -10,6 +10,7 @@ export default function getFollowUp({
 	studentName,
 	unrevisedSubmissionText,
 	onContent,
+	onRateLimit,
 	onFinish,
 }: {
 	paragraph: number | undefined
@@ -20,6 +21,7 @@ export default function getFollowUp({
 	studentName: string
 	unrevisedSubmissionText: string
 	onContent: (content: string) => void
+	onRateLimit: () => void
 	onFinish: ({ rawResponse }: { rawResponse: string }) => void
 }) {
 	const followUpFeedback = feedback.list.find(
@@ -63,7 +65,7 @@ Feedback: """${feedbackString}"""
 
 ${studentName} responded to the following part of your feedback: """${followUpFeedback.content}"""
 
-You will respond to ${studentName} in a way that helps them understand the subject matter at a deeper, more nuanced level, while frequently referencing their work. Do not prescribe any particular solutions to ${studentName}; instead, make use of the Socratic method to lead ${studentName} in the right direction, generalize to the real world in interesting ways, or walk ${studentName} through an interesting example of a mental process they could take to improve their work. Prioritize unconventional advice, and avoid platitudes. Be conversational but as succinct as possible.
+You will respond to ${studentName} in a way that helps them understand the subject matter at a deeper, more nuanced level, while frequently referencing their work. Do not prescribe any particular solution or idea to ${studentName}; instead, make use of the Socratic method to lead ${studentName} in the right direction, generalize to the real world in interesting ways, or walk ${studentName} through an interesting example of a mental process they could take to improve their work. Be conversational but as succinct as possible.
 
 Now, here they are.`,
 				},
@@ -126,6 +128,7 @@ New content: """${revision.newContent}"""`
 		frequencyPenalty,
 		reason: "followUp",
 		onContent,
+		onRateLimit,
 		onFinish: (content) => {
 			onFinish({
 				rawResponse: content,

@@ -41,12 +41,11 @@ export default async function ClassLayout({
 		.students()
 		.then((students) => students.map(({ email }) => email))
 
-	const [course, role, hasResources] = await Promise.all([
+	const [course, role] = await Promise.all([
 		Course({ id: courseId }).get(),
 		getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
 			User({ email }).courseRole({ id: courseId })
 		),
-		Course({ id: courseId }).hasResources(),
 	])
 
 	if (course === undefined || role === "none") notFound()
@@ -59,7 +58,6 @@ export default async function ClassLayout({
 					teacherEmailsPromise={teacherEmailsPromise}
 					studentEmailsPromise={studentEmailsPromise}
 					role={role}
-					hasResources={hasResources}
 				/>
 			</Card>
 

@@ -3,7 +3,7 @@ import { cookies } from "next/headers"
 import { zact } from "zact/server"
 import { z } from "zod"
 
-import { getAuthOrThrow } from "~/auth/jwt"
+import { getAuthOrThrow, setAuth } from "~/auth/jwt"
 import User from "~/data/User"
 
 const updateProfileAction = zact(
@@ -14,35 +14,38 @@ const updateProfileAction = zact(
 				districtName: z.string(),
 				name: z.string(),
 			})
-			.optional(),
+			.nullish(),
 	})
 )(async ({ name, school }) => {
-	const { email } = await getAuthOrThrow({ cookies: cookies() })
+	const auth = await getAuthOrThrow({ cookies: cookies() })
 
-	let newSchool:
-		| {
-				districtName: string
-				name: string
-				role: "teacher" | "student" | undefined
-		  }
-		| undefined = undefined
+	const { email } = auth
 
-	if (school !== undefined) {
-		const potentialSchools = await User({ email }).potentialSchools()
-
-		newSchool = potentialSchools.find(
+	const newSchool =
+		school &&
+		(await User({ email }).potentialSchools()).find(
 			(potentialSchool) =>
 				potentialSchool.districtName === school.districtName &&
 				potentialSchool.name === school.name
 		)
-	}
 
-	await User({ email }).update({
-		name,
-		schoolDistrictName: newSchool?.districtName ?? null,
-		schoolName: newSchool?.name ?? null,
-		schoolRole: newSchool?.role ?? null,
-	})
+	await Promise.all([
+		User({ email }).update({
+			name,
+			...(school !== undefined
+				? {
+						schoolDistrictName: newSchool?.districtName ?? null,
+						schoolName: newSchool?.name ?? null,
+						schoolRole: newSchool?.role ?? null,
+				  }
+				: {}),
+		}),
+		school !== undefined &&
+			setAuth({
+				auth: { ...auth, school: newSchool ?? undefined },
+				cookies: cookies(),
+			}),
+	])
 })
 
 export default updateProfileAction

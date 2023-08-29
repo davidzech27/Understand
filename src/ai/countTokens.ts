@@ -18,7 +18,8 @@ export default async function countTokens(
 ) {
 	return responseSchema.parse(
 		await (
-			await fetch(`${env.NEXT_PUBLIC_URL}/countTokens`, {
+			await fetch(`${env.NEXT_PUBLIC_URL}/api/countTokens`, {
+				method: "POST",
 				body: textEncoder.encode(JSON.stringify(arg)),
 			})
 		).json()

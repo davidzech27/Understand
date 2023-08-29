@@ -4,6 +4,8 @@ import "./global.css"
 import Providers from "./providers"
 import { getSignedIn } from "~/utils/getSignedIn"
 
+export const preferredRegion = "global"
+
 export const metadata = {
 	title: {
 		template: "%s | Understand",

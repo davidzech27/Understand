@@ -2,8 +2,6 @@ import { NextResponse, type NextRequest } from "next/server"
 import { z } from "zod"
 import { get_encoding } from "tiktoken"
 
-import { getAuth } from "~/auth/jwt"
-
 const requestSchema = z.union([
 	z.object({
 		messages: z.array(
@@ -17,11 +15,6 @@ const requestSchema = z.union([
 ])
 
 export default async function countTokensHandler(request: NextRequest) {
-	const auth = await getAuth({ cookies: request.cookies })
-
-	if (auth === undefined)
-		return new Response("Invalid authorization", { status: 401 })
-
 	const requestParsed = requestSchema.safeParse(await request.json())
 
 	if (!requestParsed.success) {

@@ -1,4 +1,5 @@
 import { cookies } from "next/headers"
+import { notFound } from "next/navigation"
 
 import { getAuthOrThrow } from "~/auth/jwt"
 import CreateClassForm from "./CreateClassForm"
@@ -42,16 +43,16 @@ export default function ClassCreatePage() {
 
 	const emailPromise = authPromise.then(({ email }) => email)
 
-	const superuserPromise = emailPromise.then((email) =>
+	const userPromise = emailPromise.then((email) =>
 		User({ email })
 			.get()
-			.then((user) => user?.superuser ?? false)
+			.then((user) => user ?? notFound())
 	)
 
 	const coursesPromise = googleAPIPromise.then(
 		(googleAPI) =>
 			googleAPI &&
-			superuserPromise.then(async (superuser) =>
+			userPromise.then(async ({ superuser }) =>
 				(superuser
 					? (
 							await Promise.all([
@@ -74,7 +75,7 @@ export default function ClassCreatePage() {
 	return (
 		<CreateClassForm
 			coursesPromise={coursesPromise}
-			emailPromise={emailPromise}
+			userPromise={userPromise}
 		/>
 	)
 }

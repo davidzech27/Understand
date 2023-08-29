@@ -5,7 +5,7 @@ import { getAuth } from "~/auth/jwt"
 import redirectToCookieKey from "~/auth/redirectToCookieKey"
 
 export const config = {
-	matcher: ["/((?=home|class|assignment).+)"],
+	matcher: ["/((?=home|class|assignment|landing).+)"],
 }
 
 export const middleware = async (request: NextRequest) => {

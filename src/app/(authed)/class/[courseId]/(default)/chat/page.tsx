@@ -22,18 +22,29 @@ export default async function ChatPage({
 }: {
 	params: Params
 }) {
-	const [course, role] = await Promise.all([
+	const [course, courseHasResources, [user, role]] = await Promise.all([
 		Course({ id: courseId }).get(),
+		Course({ id: courseId }).hasResources(),
 		getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
-			User({ email }).courseRole({ id: courseId })
+			Promise.all([
+				User({ email }).get(),
+				User({ email }).courseRole({ id: courseId }),
+			])
 		),
 	])
 
-	if (course === undefined || role === "none") notFound()
+	if (course === undefined || user === undefined || role === "none")
+		notFound()
 
 	return (
 		<Card className="flex flex-1 flex-col py-5 px-6">
-			<Chat courseId={courseId} courseName={course.name} role={role} />
+			<Chat
+				courseId={courseId}
+				courseName={course.name}
+				courseHasResources={courseHasResources}
+				user={user}
+				role={role}
+			/>
 		</Card>
 	)
 }

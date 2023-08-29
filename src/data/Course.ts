@@ -468,10 +468,11 @@ const Course = ({ id }: { id: string }) => ({
 				})
 			).matches?.map(({ id }) => id)
 
-			if (ids === undefined) return
+			if (ids === undefined ) return
 
 			await vdb.delete1({
 				ids,
+				namespace,
 			})
 		}
 	},
@@ -480,17 +481,18 @@ const Course = ({ id }: { id: string }) => ({
 
 		const vdb = await vdbPromise
 
-		return (
-			(
-				await vdb.query({
-					queryRequest: {
-						vector: Array(1536).fill(0),
-						topK: 1,
-						namespace,
-					},
-				})
-			).matches?.length === 1
-		)
+		const matches = (
+			await vdb.query({
+				queryRequest: {
+					vector: Array(1536).fill(0),
+					topK: 1,
+					namespace,
+					includeMetadata: true,
+				},
+			})
+		).matches
+
+		return matches?.length === 1
 	},
 	createMessage: async ({
 		fromEmail,
@@ -625,10 +627,13 @@ const Course = ({ id }: { id: string }) => ({
 		fromEmail: string
 		sentAt: Date
 	}) => {
+		const namespace = `message:${id}`
+
 		const vdb = await vdbPromise
 
 		await vdb.delete1({
 			ids: [`message:${id}:${fromEmail}:${sentAt.valueOf()}`],
+			namespace,
 		})
 	},
 	increaseCost: async (cost: { sync?: number; insights?: number }) => {

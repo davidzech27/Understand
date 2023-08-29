@@ -3,25 +3,24 @@ import { useState, useTransition } from "react"
 import Link from "next/link"
 
 import formatDate from "~/utils/formatDate"
-import getFeedbackStreamAction from "./getFeedbackStreamAction"
+import getUserFeedbackStreamAction from "./getUserFeedbackStreamAction"
 import Avatar from "~/components/Avatar"
 import Button from "~/components/Button"
 
 interface Props {
 	courseId: string
+	userEmail: string
 	initialFeedbackStream: {
 		assignmentId: string
 		assignmentTitle: string
-		userEmail: string
-		userName: string
-		userPhoto: string | undefined
 		givenAt: Date
 	}[]
 	cursor: number | undefined
 }
 
-export default function FeedbackStream({
+export default function UserFeedbackStream({
 	courseId,
+	userEmail,
 	initialFeedbackStream,
 	cursor: cursorProp,
 }: Props) {
@@ -34,33 +33,25 @@ export default function FeedbackStream({
 	const onLoadMore = () => {
 		if (cursor !== undefined)
 			loadMore(() => {
-				getFeedbackStreamAction({ courseId, limit: 20, cursor }).then(
-					({ feedbackStream, cursor }) => {
-						setFeedbackStream((previousFeedbackStream) => [
-							...previousFeedbackStream,
-							...feedbackStream,
-						])
+				getUserFeedbackStreamAction({
+					courseId,
+					limit: 20,
+					cursor,
+				}).then(({ feedbackStream, cursor }) => {
+					setFeedbackStream((previousFeedbackStream) => [
+						...previousFeedbackStream,
+						...feedbackStream,
+					])
 
-						setCursor(cursor)
-					}
-				)
+					setCursor(cursor)
+				})
 			})
 	}
 
 	return (
 		<>
 			{feedbackStream.map(
-				(
-					{
-						userName,
-						userEmail,
-						userPhoto,
-						assignmentId,
-						assignmentTitle,
-						givenAt,
-					},
-					index
-				) => (
+				({ assignmentId, assignmentTitle, givenAt }, index) => (
 					<Link
 						key={index}
 						href={`/class/${courseId}/feedback/${assignmentId}/${userEmail}/${givenAt.valueOf()}`}
@@ -68,20 +59,14 @@ export default function FeedbackStream({
 						<div className="flex h-20 select-text items-center justify-between rounded-md border-[0.75px] border-border pl-6 pr-8 transition duration-150 hover:bg-surface-hover">
 							<div className="flex items-center">
 								<Avatar
-									src={userPhoto}
-									name={userName}
+									src={undefined}
+									name={assignmentTitle}
 									fallbackColor="primary"
 									className="h-11 w-11 rounded-full"
 								/>
 
-								<div className="ml-3 flex flex-col">
-									<span className="mb-[2px] font-medium leading-none opacity-90">
-										{userName}
-									</span>
-
-									<span className="text-sm opacity-60">
-										{assignmentTitle}
-									</span>
+								<div className="ml-3 flex flex-col font-medium leading-none opacity-90">
+									{assignmentTitle}
 								</div>
 							</div>
 

@@ -12,9 +12,11 @@ export default async function fetchOpenAI({
 	maxTokens,
 	reason,
 	onContent,
+	onRateLimit,
 	onFinish,
 }: OpenAIRequest & {
 	onContent: (content: string) => void
+	onRateLimit: () => void
 	onFinish: (content: string) => void
 }) {
 	const response = await fetch("/api/openai", {
@@ -31,6 +33,8 @@ export default async function fetchOpenAI({
 			})
 		),
 	})
+
+	if (response.status === 429) return onRateLimit()
 
 	if (response.body) {
 		const reader = response.body.getReader()
