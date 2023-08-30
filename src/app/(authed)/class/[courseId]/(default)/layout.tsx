@@ -41,8 +41,9 @@ export default async function ClassLayout({
 		.students()
 		.then((students) => students.map(({ email }) => email))
 
-	const [course, role] = await Promise.all([
+	const [course, inviteCode, role] = await Promise.all([
 		Course({ id: courseId }).get(),
+		Course({ id: courseId }).inviteCode(),
 		getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
 			User({ email }).courseRole({ id: courseId })
 		),
@@ -58,6 +59,7 @@ export default async function ClassLayout({
 					teacherEmailsPromise={teacherEmailsPromise}
 					studentEmailsPromise={studentEmailsPromise}
 					role={role}
+					inviteCode={role === "teacher" ? inviteCode : undefined}
 				/>
 			</Card>
 

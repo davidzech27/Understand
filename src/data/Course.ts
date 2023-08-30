@@ -87,6 +87,20 @@ const Course = ({ id }: { id: string }) => ({
 			id,
 			name,
 			section,
+			inviteCode: Array(7)
+				.fill(0)
+				.map(() => {
+					const index = Math.floor(Math.random() * 62)
+
+					if (index < 10) {
+						return index.toString()
+					} else if (index < 36) {
+						return String.fromCharCode(index - 10 + 97)
+					} else {
+						return String.fromCharCode(index - 36 + 65)
+					}
+				})
+				.join(""),
 			syncedUrl,
 			syncedRefreshToken,
 		})
@@ -159,6 +173,18 @@ const Course = ({ id }: { id: string }) => ({
 					.from(course)
 					.where(eq(course.id, id))
 			)[0]?.syncedRefreshToken ?? undefined
+		)
+	},
+	inviteCode: async () => {
+		return (
+			(
+				await db
+					.select({
+						inviteCode: course.inviteCode,
+					})
+					.from(course)
+					.where(eq(course.id, id))
+			)[0]?.inviteCode ?? undefined
 		)
 	},
 	teachers: async () => {
@@ -468,7 +494,7 @@ const Course = ({ id }: { id: string }) => ({
 				})
 			).matches?.map(({ id }) => id)
 
-			if (ids === undefined ) return
+			if (ids === undefined) return
 
 			await vdb.delete1({
 				ids,

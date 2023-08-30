@@ -91,18 +91,27 @@ export const studentToCourse = mysqlTable(
 	})
 )
 
-export const course = mysqlTable("course", {
-	id: varchar("id", { length: 100 }).primaryKey(),
-	name: text("name").notNull(),
-	section: text("section"),
-	syncedUrl: text("synced_url"),
-	syncedRefreshToken: text("synced_refresh_token"),
-	syncCost: double("sync_cost").notNull().default(0),
-	insightsCost: double("insights_cost").notNull().default(0),
-	createdAt: timestamp("created_at")
-		.notNull()
-		.default(sql`CURRENT_TIMESTAMP`),
-})
+export const course = mysqlTable(
+	"course",
+	{
+		id: varchar("id", { length: 100 }).primaryKey(),
+		name: text("name").notNull(),
+		section: text("section"),
+		inviteCode: varchar("invite_code", { length: 7 }),
+		syncedUrl: text("synced_url"),
+		syncedRefreshToken: text("synced_refresh_token"),
+		syncCost: double("sync_cost").notNull().default(0),
+		insightsCost: double("insights_cost").notNull().default(0),
+		createdAt: timestamp("created_at")
+			.notNull()
+			.default(sql`CURRENT_TIMESTAMP`),
+	},
+	(table) => ({
+		inviteCodeIdx: uniqueIndex("invite_code_unique_idx").on(
+			table.inviteCode
+		),
+	})
+)
 
 export const assignment = mysqlTable(
 	"assignment",

@@ -154,6 +154,26 @@ const User = ({ email }: { email: string }) => {
 						: ("student" as const),
 			}))
 		},
+		useInviteCode: async ({ inviteCode }: { inviteCode: string }) => {
+			const [courseRow] = await db
+				.select({ courseId: course.id })
+				.from(course)
+				.where(eq(course.inviteCode, inviteCode))
+
+			if (courseRow === undefined) return { courseId: undefined }
+
+			const { courseId } = courseRow
+
+			await db
+				.insert(studentToCourse)
+				.values({
+					studentEmail: email,
+					courseId,
+				})
+				.onDuplicateKeyUpdate({ set: { studentEmail: email } })
+
+			return { courseId }
+		},
 		coursesTeaching: async () => {
 			const teaching = await db
 				.select({
@@ -620,7 +640,7 @@ const User = ({ email }: { email: string }) => {
 					kv.get(monthlyCostKey),
 					kv.get(completionStreamCountKey),
 				])
-			console.log({ completionStreamCount })
+
 			if (
 				(typeof monthlyCost === "number" &&
 					monthlyCost > maxUserMonthlyCost) ||
