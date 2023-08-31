@@ -38,10 +38,10 @@ Assignment prompt: """${assignmentInstructions}"""
 ${studentName}'s work: """${submissionText}"""
 Feedback: """${feedbackString}"""
 
-Provide the student's teacher with a few statements about the student's understanding of the subject using the following format:
+Provide ${studentName}'s teacher with a few nuanced remarks regarding their demonstrated understanding using the following format:
 Type: {strength / weakness}
-Paragraph number: {paragraph number(s) for every paragraph where strength/weakness could be found, using a comma-separated list if necessary, or -1 if it applies to student's entire work}
-Content: {a statement about the student's understanding of the subject. If it is a weakness, hypothesize as to what may have caused this weakness}
+Paragraph number: {paragraph number for every paragraph where the strength/weakness could be found, using a comma-separated list if necessary, or -1 to represent the student's entire work}
+Content: {a nuanced remark regarding ${studentName}'s understanding. If it is a weakness, hypothesize as to what may have caused this weakness}
 
 Begin.`,
 		},

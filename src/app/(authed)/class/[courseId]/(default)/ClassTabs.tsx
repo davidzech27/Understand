@@ -69,10 +69,10 @@ export default function ClassTab({
 				<Modal
 					open={inviteCodeModalOpen}
 					setOpen={setInviteCodeModalOpen}
-					title={"Student invite code"}
+					title="Student invite code"
 				>
 					<div className="flex h-full items-center justify-center">
-						<div className="select-text text-9xl font-extrabold tracking-tight text-black/80">
+						<div className="select-text text-[12rem] font-extrabold tracking-tight text-black/80">
 							{inviteCode}
 						</div>
 					</div>
