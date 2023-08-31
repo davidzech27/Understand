@@ -113,9 +113,9 @@ New content: """${revision.newContent}"""`
 					.filter(Boolean),
 			],
 			model: "gpt-4-0613" as const,
-			temperature: 0.25,
-			presencePenalty: 0.5,
-			frequencyPenalty: 0.75,
+			temperature: 0.0,
+			presencePenalty: 0.0,
+			frequencyPenalty: 0.25,
 		}
 
 	console.info(messages.map(({ content }) => content).join("\n\n\n\n"))

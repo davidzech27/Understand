@@ -99,7 +99,7 @@ Begin.`,
 			],
 			model: "gpt-4-0613" as const,
 			temperature: 0,
-			presencePenalty: 0.25, // setting this and the one below made a huge difference. my theory is that it decreases the model's bias to take on a similar writing style to that of the prompt, increasing its likelihood to follow the instructions and not just attempt to match them in style. consider tweaking these further
+			presencePenalty: 0.0,
 			frequencyPenalty: 0.25,
 		}
 
