@@ -34,17 +34,19 @@ export default function getFollowUp({
 
 	const feedbackLines = feedback.rawResponse.split("\n")
 
-	const specificFeedbackHeaderLineIndex = feedbackLines.findIndex((line) =>
-		line.toLowerCase().startsWith("specific feedback")
+	const specificFeedbackHeaderLineIndex = feedbackLines.findIndex(
+		(line) => line.toLowerCase().search(/[*]*specific feedback/) !== -1
 	)
 
 	const analysisString = feedbackLines
 		.slice(0, specificFeedbackHeaderLineIndex)
 		.join("\n")
+		.trim()
 
 	const feedbackString = feedbackLines
 		.slice(specificFeedbackHeaderLineIndex)
 		.join("\n")
+		.trim()
 
 	const { messages, model, temperature, presencePenalty, frequencyPenalty } =
 		{

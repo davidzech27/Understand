@@ -37,10 +37,10 @@ export default async function getFeedback({
 	onRateLimit: () => void
 	onFinish: ({ rawResponse }: { rawResponse: string }) => void
 }) {
-	let lastParagraphNumber = undefined as number | undefined
-	let lastSentenceNumber = undefined as number | undefined
+	let lastParagraphNumber = -1
+	let lastSentenceNumber = -1
 
-	let previousFeedbackLength = undefined as number | undefined
+	let lastFeedbackIndex = -1
 
 	const { messages, model, temperature, presencePenalty, frequencyPenalty } =
 		{
@@ -105,6 +105,30 @@ Begin.`,
 
 	console.info(messages.map(({ content }) => content).join("\n\n\n\n"))
 
+	const initialMessage = `Alright ${
+		studentName.split(" ")[0]
+	}, let's take a look at your work....`
+
+	const initialMessageSplit = initialMessage.split(/(?=[\s,.])/)
+
+	for (
+		let initialMessagePartIndex = 0;
+		initialMessagePartIndex < initialMessageSplit.length;
+		initialMessagePartIndex++
+	) {
+		setTimeout(
+			() =>
+				onContent({
+					content: initialMessageSplit
+						.slice(0, initialMessagePartIndex + 1)
+						.join(""),
+					paragraph: undefined,
+					sentence: undefined,
+				}),
+			initialMessagePartIndex * 100
+		)
+	}
+
 	fetchOpenAI({
 		messages,
 		model,
@@ -114,7 +138,7 @@ Begin.`,
 		reason: "feedback",
 		onContent: (content) => {
 			const generalFeedbackHeaderIndex = content.search(
-				/\nGeneral Feedback:?\n+.+/
+				/\n[*]*General Feedback:?[*]*\n+.+/
 			)
 
 			if (generalFeedbackHeaderIndex !== -1) {
@@ -123,17 +147,24 @@ Begin.`,
 						content.indexOf("\n", generalFeedbackHeaderIndex + 1) +
 							1
 					),
+					paragraph: undefined,
+					sentence: undefined,
 				})
-			} else if (content.search(/\nSpecific Feedback:?\n/) !== -1) {
-				const feedback = content
-					.match(/(?<=\nFeedback[ ]*:[ ]*).+/g)
-					?.at(-1)
+			} else if (
+				content.search(/\n[*]*Specific Feedback:?[*]*\n/) !== -1
+			) {
+				const feedbackItems = content.match(
+					/(?<=\nFeedback[ ]*:[ ]*).+/g
+				)
+
+				const feedback = feedbackItems?.at(-1)
+
+				const feedbackIndex = (feedbackItems?.length ?? 0) - 1
 
 				if (feedback !== undefined) {
-					if (
-						previousFeedbackLength === undefined ||
-						previousFeedbackLength > feedback.length
-					) {
+					if (feedbackIndex > lastFeedbackIndex) {
+						lastFeedbackIndex = feedbackIndex
+
 						lastParagraphNumber = Number(
 							content
 								.match(
@@ -142,8 +173,7 @@ Begin.`,
 								?.at(-1)
 						)
 
-						if (lastParagraphNumber !== lastParagraphNumber)
-							lastParagraphNumber = undefined
+						if (isNaN(lastParagraphNumber)) lastParagraphNumber = -1
 
 						lastSentenceNumber = Number(
 							content
@@ -153,18 +183,12 @@ Begin.`,
 								?.at(-1)
 						)
 
-						if (lastSentenceNumber !== lastSentenceNumber)
-							lastSentenceNumber = undefined
+						if (isNaN(lastSentenceNumber)) lastSentenceNumber = -1
 					}
 
-					previousFeedbackLength = feedback.length
-
-					if (
-						lastParagraphNumber === undefined ||
-						lastSentenceNumber === undefined
-					) {
+					if (lastParagraphNumber === -1) {
 						console.error(
-							"This shouldn't happen, as lastParagraphNumber and lastSentenceNumber should be defined before feedback is streamed",
+							"lastParagraphNumber should only be -1 if it is not found, which shouldn't happen",
 							{ lastParagraphNumber, lastSentenceNumber }
 						)
 					} else {

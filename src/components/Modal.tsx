@@ -20,10 +20,10 @@ export default function Modal({
 }: Props) {
 	return (
 		<Dialog.Root open={open} onOpenChange={setOpen}>
-			<Dialog.Portal>
-				<Dialog.Overlay className="fixed inset-0 z-50 bg-[#00000060] duration-150" />
+			<Dialog.Portal className="fixed inset-0 h-screen w-screen">
+				<Dialog.Overlay className="fixed inset-0 z-50 bg-[#00000060]" />
 
-				<Dialog.Content className="fixed left-[12.5vw] top-[16.6667vh] z-50 flex h-2/3 w-3/4 flex-col justify-between rounded-md bg-white">
+				<Dialog.Content className="fixed left-[12.5vw] right-[12.5vw] top-[16.6667vh] bottom-[16.6667vh] z-50 flex flex-col justify-between rounded-md bg-white">
 					<div className="mx-6 mt-6 flex items-center justify-between">
 						<Dialog.Title asChild>
 							<Heading size="2xLarge" className="mb-0.5">

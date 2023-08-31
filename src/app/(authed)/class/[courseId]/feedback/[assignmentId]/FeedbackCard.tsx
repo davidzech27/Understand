@@ -181,6 +181,8 @@ export default function FeedbackCard({
 							setValue={setInputText}
 							placeholder={input.placeholder}
 							onEnter={() => {
+								if (input.disabled) return
+
 								input.onSubmit(inputText)
 
 								setInputText("")
