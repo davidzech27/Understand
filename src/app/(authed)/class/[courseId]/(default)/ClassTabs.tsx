@@ -8,7 +8,7 @@ import Button from "~/components/Button"
 import Modal from "~/components/Modal"
 
 interface Props {
-	course: { id: string; name: string; section?: string; linkedUrl?: string }
+	course: { id: string; name: string; section?: string; syncedUrl?: string }
 	teacherEmailsPromise: Promise<string[]>
 	studentEmailsPromise: Promise<string[]>
 	role: "teacher" | "student"

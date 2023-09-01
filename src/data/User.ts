@@ -189,7 +189,7 @@ const User = ({ email }: { email: string }) => {
 			return teaching.map((course) => ({
 				...course,
 				section: course.section ?? undefined,
-				linkedUrl: course.syncedUrl ?? undefined,
+				syncedUrl: course.syncedUrl ?? undefined,
 			}))
 		},
 		coursesEnrolled: async () => {
