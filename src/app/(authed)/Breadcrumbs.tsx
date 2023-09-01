@@ -70,7 +70,10 @@ export default function Breadcrumbs({ coursesPromise }: Props) {
 								</span>
 							),
 							class: course && (
-								<Link href={`/class/${course.id}`}>
+								<Link
+									href={`/class/${course.id}`}
+									className="transition duration-150 hover:opacity-75 focus-visible:opacity-75 active:opacity-75"
+								>
 									{course.section !== undefined ? (
 										<div className="flex flex-col">
 											<span className="mb-0.5 text-base font-medium leading-none text-black/90">
