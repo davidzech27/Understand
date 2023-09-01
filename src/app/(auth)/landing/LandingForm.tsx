@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 
-import updateProfileAction from "./updateProfileAction"
+import updateProfileAction from "../../(authed)/profile/updateProfileAction"
 import cn from "~/utils/cn"
 import useSignedIn from "~/utils/useSignedIn"
 import TextInput from "~/components/TextInput"

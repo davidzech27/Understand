@@ -30,10 +30,21 @@ export default function NavigationButton({
 					: "hover:bg-surface-hover"
 			)}
 		>
-			<div className="h-9 w-9">{photo}</div>
+			{photo !== null ? (
+				<div className="flex h-9 w-9 items-center justify-center">
+					{photo}
+				</div>
+			) : (
+				<div className="h-9 w-0" />
+			)}
 
 			<div className="ml-2.5 flex flex-col">
-				<span className="mb-[1px] text-sm font-medium leading-none opacity-90">
+				<span
+					className={cn(
+						"mb-[1px] font-medium leading-none opacity-90",
+						subtext === undefined ? "text-base" : "text-sm"
+					)}
+				>
 					{text}
 				</span>
 

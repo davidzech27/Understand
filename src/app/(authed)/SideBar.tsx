@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
+import { HomeIcon } from "lucide-react"
 
 import { getAuthOrThrow } from "~/auth/jwt"
 import User from "~/data/User"
@@ -22,14 +23,12 @@ export default async function SideBar() {
 	return (
 		<Card className="flex h-full w-full flex-col p-3">
 			<NavigationButton
-				text={user.name}
-				subtext={user.email}
+				text="Home"
 				photo={
-					<Avatar
-						src={user.photo ?? undefined}
-						name={user.name}
-						fallbackColor="secondary"
-						className="h-full w-full"
+					<HomeIcon
+						size={26}
+						strokeWidth={2.5}
+						className="text-black/90"
 					/>
 				}
 				href="/home"
@@ -111,6 +110,21 @@ export default async function SideBar() {
 			</div>
 
 			<div className="flex-1" />
+
+			<NavigationButton
+				text={user.name}
+				subtext={user.email}
+				photo={
+					<Avatar
+						src={user.photo ?? undefined}
+						name={user.name}
+						fallbackColor="secondary"
+						className="h-full w-full"
+					/>
+				}
+				href="/profile"
+			/>
+
 			{user.schoolDistrictName !== undefined &&
 			user.schoolName !== undefined ? (
 				<NavigationButton
@@ -124,9 +138,16 @@ export default async function SideBar() {
 							className="h-full w-full"
 						/>
 					}
-					href="/landing"
+					href="/profile"
 				/>
-			) : null}
+			) : (
+				<NavigationButton
+					text="No school"
+					subtext="You're not registered with a school"
+					photo={null}
+					href="/profile"
+				/>
+			)}
 		</Card>
 	)
 }

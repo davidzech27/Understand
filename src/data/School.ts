@@ -4,10 +4,10 @@ import { kv } from "@vercel/kv"
 import db from "~/db/db"
 import { school } from "~/db/schema"
 
-export type School = Exclude<
-	Awaited<ReturnType<ReturnType<typeof School>["get"]>>,
-	undefined
->
+export type School = {
+	districtName: string
+	name: string
+}
 
 const School = ({
 	districtName,

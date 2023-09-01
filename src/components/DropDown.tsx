@@ -1,10 +1,11 @@
+import { useState } from "react"
 import * as Select from "@radix-ui/react-select"
 import { ChevronDown } from "lucide-react"
 
 import Heading from "./Heading"
 
 interface Props<TItem> {
-	value?: string
+	value: string
 	setValue: (value: string) => void
 	displayValue: string
 	items: TItem[]
@@ -24,11 +25,14 @@ export function Root<TItem>({
 	id,
 	name,
 }: Props<TItem>) {
+	const [width, setWidth] = useState<number | undefined>(undefined)
+
 	return (
 		<Select.Root name={name} value={value} onValueChange={setValue}>
 			<Select.Trigger
 				id={id}
 				className="flex w-full cursor-pointer justify-between rounded-md border-[0.75px] border-border px-4 py-2.5 outline-none transition-all duration-150 data-[state=open]:bg-white"
+				ref={(element) => setWidth(element?.clientWidth)}
 			>
 				<Select.Value asChild>
 					<Heading size="medium">{displayValue}</Heading>
@@ -42,7 +46,7 @@ export function Root<TItem>({
 				</Select.Icon>
 			</Select.Trigger>
 
-			<Select.Portal>
+			<Select.Portal style={{ width }}>
 				<Select.Content position="popper" sideOffset={4}>
 					<Select.Viewport className="w-full rounded-md border-[0.75px] border-border bg-white">
 						{items.map((item) => (
