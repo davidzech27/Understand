@@ -5,7 +5,7 @@ import { ChevronDown } from "lucide-react"
 import Heading from "./Heading"
 
 interface Props<TItem> {
-	value: string
+	value: string | undefined
 	setValue: (value: string) => void
 	displayValue: string
 	items: TItem[]

@@ -1,5 +1,4 @@
 import { Suspense } from "react"
-import Link from "next/link"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 
@@ -11,7 +10,7 @@ import SideBarLayoutContainer from "./SideBarLayoutContainer"
 import SideBar from "./SideBar"
 import TopActions from "./TopActions"
 import Card from "~/components/Card"
-import GradientText from "~/components/GradientText"
+import Breadcrumbs from "./Breadcrumbs"
 import MobileDisclaimer from "./MobileDisclaimer"
 
 export const preferredRegion = "pdx1"
@@ -23,6 +22,14 @@ export default async function AuthedLayout({
 }) {
 	const auth = await getAuthOrThrow({ cookies: cookies() })
 
+	const coursesPromise = Promise.all([
+		User({ email: auth.email }).coursesTeaching(),
+		User({ email: auth.email }).coursesEnrolled(),
+	]).then(([coursesTeaching, coursesEnrolled]) => [
+		...coursesTeaching,
+		...coursesEnrolled,
+	])
+
 	const layout = (
 		<>
 			<div className="h-screen space-y-2.5 px-3 py-2.5">
@@ -32,16 +39,7 @@ export default async function AuthedLayout({
 					</div>
 
 					<div className="flex flex-1 justify-center">
-						<Link
-							href="/"
-							className="transition-opacity duration-200 hover:opacity-75 focus-visible:opacity-75 active:opacity-75"
-						>
-							<GradientText asChild>
-								<span className="cursor-pointer text-2xl font-extrabold tracking-tight text-white">
-									Understand
-								</span>
-							</GradientText>
-						</Link>
+						<Breadcrumbs coursesPromise={coursesPromise} />
 					</div>
 
 					<div className="flex flex-1 justify-end">

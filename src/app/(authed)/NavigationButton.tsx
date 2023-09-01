@@ -38,11 +38,13 @@ export default function NavigationButton({
 				<div className="h-9 w-0" />
 			)}
 
-			<div className="ml-2.5 flex flex-col">
+			<div className="ml-2.5 flex flex-col gap-[1px]">
 				<span
 					className={cn(
-						"mb-[1px] font-medium leading-none opacity-90",
-						subtext === undefined ? "text-base" : "text-sm"
+						"leading-none opacity-90",
+						subtext === undefined
+							? "text-base font-semibold"
+							: "text-sm font-medium"
 					)}
 				>
 					{text}
