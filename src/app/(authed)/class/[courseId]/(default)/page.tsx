@@ -4,7 +4,6 @@ import { notFound } from "next/navigation"
 import { getAuthOrThrow } from "~/auth/jwt"
 import Course from "~/data/Course"
 import User from "~/data/User"
-import cn from "~/utils/cn"
 import FeedbackStream from "./FeedbackStream"
 import UserFeedbackStream from "./UserFeedbackStream"
 import Card from "~/components/Card"
@@ -37,26 +36,14 @@ export default async function ClassPage({
 				href={course.syncedUrl}
 				target="_blank"
 				rel="noreferrer"
-				className="group flex items-center justify-between"
+				className="flex items-center justify-between transition duration-150 hover:opacity-75 focus-visible:opacity-75 active:opacity-75"
 			>
-				<GradientText
-					className={cn(
-						"text-6xl font-extrabold leading-none tracking-tight mobile:text-2xl",
-						course.syncedUrl !== undefined &&
-							"transition-all duration-150 group-hover:opacity-80 peer-active:opacity-80"
-					)}
-				>
+				<GradientText className="text-6xl font-extrabold leading-none tracking-tight mobile:text-2xl">
 					{course.name}
 				</GradientText>
 
 				{course.section && (
-					<div
-						className={cn(
-							"relative top-1 mr-1 ml-3 flex-shrink-0 text-base font-semibold leading-none text-black/70 mobile:mr-0 mobile:text-sm",
-							course.syncedUrl !== undefined &&
-								"transition-all duration-150 group-hover:opacity-50 group-active:opacity-50"
-						)}
-					>
+					<div className="relative top-1 mr-1 ml-3 flex-shrink-0 text-base font-semibold leading-none text-black/70 mobile:mr-0 mobile:text-sm">
 						{course.section}
 					</div>
 				)}

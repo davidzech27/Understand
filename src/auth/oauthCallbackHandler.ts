@@ -11,6 +11,14 @@ import Course from "~/data/Course"
 export default async function oauthCallbackHandler(request: NextRequest) {
 	const { searchParams } = new URL(request.url)
 
+	const error = searchParams.get("error")
+
+	if (error !== null) {
+		console.error("OAuth callback error:", error)
+
+		return NextResponse.redirect("/signIn")
+	}
+
 	const code = searchParams.get("code")
 
 	if (typeof code !== "string") return new NextResponse(null, { status: 400 })

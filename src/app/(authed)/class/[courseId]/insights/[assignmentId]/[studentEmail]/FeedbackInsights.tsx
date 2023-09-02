@@ -49,8 +49,8 @@ export default function FeedbackInsights({
 						produce((prevInsights) => {
 							if (prevInsights === undefined) return
 
-							if (paragraph !== undefined)
-								prevInsights
+							if (paragraph !== undefined) {
+								const insight = prevInsights
 									.filter((insight) =>
 										insight.paragraphs.includes(paragraph)
 									)
@@ -66,12 +66,21 @@ export default function FeedbackInsights({
 											type: "strength",
 											state: undefined,
 										}
-									).state = state
-							else
+									)
+
+								insight.state =
+									typeof state === "function"
+										? state(insight.state)
+										: state
+							} else {
 								prevInsights.forEach((insight) => {
 									if (insight.paragraphs.includes(-1))
-										insight.state = state
+										insight.state =
+											typeof state === "function"
+												? state(insight.state)
+												: state
 								})
+							}
 						})
 					)
 				}

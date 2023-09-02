@@ -696,7 +696,10 @@ export default function Feedback({
 										)
 
 									if (changedFeedback)
-										changedFeedback.state = state
+										changedFeedback.state =
+											typeof state === "function"
+												? state(changedFeedback.state)
+												: state
 								})
 							)
 						}

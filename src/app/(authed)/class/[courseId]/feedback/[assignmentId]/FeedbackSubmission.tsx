@@ -284,6 +284,12 @@ export default function FeedbackSubmission({
 				parseFloat(computedStyle.marginBottom)
 		}
 
+		// nonexistant paragraph
+		paragraphYOffsets.push({
+			paragraph: currentParagraphNumber + 1,
+			yOffset: ref.current.clientHeight,
+		})
+
 		onChangeParagraphYOffsets(paragraphYOffsets)
 	})
 

@@ -54,7 +54,11 @@ export default function Feedback({
 									feedbackItem.sentence === sentence
 							)
 
-							if (changedFeedback) changedFeedback.state = state
+							if (changedFeedback)
+								changedFeedback.state =
+									typeof state === "function"
+										? state(changedFeedback.state)
+										: state
 						})
 					)
 				}

@@ -12,6 +12,7 @@ type Props = HTMLMotionProps<"div"> & {
 		show: boolean
 		focused: boolean
 		onSubmit: (input: string) => void
+		suggestedInputs?: string[]
 		placeholder: string
 		disabled?: boolean
 	}
@@ -57,6 +58,28 @@ export default function FeedbackCard({
 	const [inputText, setInputText] = useState("")
 
 	const inputRef = useRef<HTMLTextAreaElement>(null)
+
+	const inputContainerRef = useRef<HTMLDivElement>(null)
+
+	const [inputContainerHeight, setInputContainerHeight] = useState(0)
+
+	useEffect(() => {
+		const inputContainerDiv = inputContainerRef.current
+
+		if (inputContainerDiv !== null) {
+			const resizeObserver = new ResizeObserver(
+				([entry]) =>
+					entry?.contentRect.height &&
+					setInputContainerHeight(entry.contentRect.height)
+			)
+
+			resizeObserver.observe(inputContainerDiv)
+
+			return () => {
+				resizeObserver.unobserve(inputContainerDiv)
+			}
+		}
+	}, [])
 
 	useEffect(() => {
 		if (input?.focused) inputRef.current?.focus()
@@ -124,8 +147,9 @@ export default function FeedbackCard({
 			onMouseUp={onUnpress}
 			onTouchEnd={onUnpress}
 			transition={{
-				duration: 0.35,
+				type: "tween",
 				ease: "easeOut",
+				duration: 0.4,
 			}}
 			className={cn(
 				"group flex flex-col rounded-md border border-border bg-surface shadow-sm shadow-[#E5E5E5] transition-shadow duration-500",
@@ -166,16 +190,42 @@ export default function FeedbackCard({
 			{input !== undefined && (
 				<div
 					style={{
-						height: input.show
-							? (inputRef.current?.offsetHeight ?? 0) + 9
-							: 0,
+						height: input.show ? inputContainerHeight + 9 : 0,
 					}}
 					className={cn(
 						"overflow-hidden rounded-b-md bg-surface-hover transition-all",
 						!input.show && "delay-150"
 					)}
 				>
-					<div className="border-t border-border p-1">
+					<div
+						ref={inputContainerRef}
+						className="border-t border-border p-1"
+					>
+						{input.suggestedInputs && inputText === "" && (
+							<div className="mb-1 flex flex-wrap gap-1">
+								{input.suggestedInputs.map(
+									(suggestedInput, index) => (
+										<button
+											key={index}
+											onMouseDown={() =>
+												setInputText(suggestedInput)
+											}
+											onTouchStart={() =>
+												setInputText(suggestedInput)
+											}
+											onKeyDown={(e) =>
+												e.code === "Space" &&
+												setInputText(suggestedInput)
+											}
+											className="rounded-md border border-border bg-surface py-1.5 px-3 text-base text-black/80 transition hover:bg-surface-hover focus-visible:bg-surface-hover active:bg-surface-hover"
+										>
+											{suggestedInput}
+										</button>
+									)
+								)}
+							</div>
+						)}
+
 						<TextArea
 							value={inputText}
 							setValue={setInputText}

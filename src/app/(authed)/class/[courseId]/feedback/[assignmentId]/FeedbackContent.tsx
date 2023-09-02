@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { AnimatePresence } from "framer-motion"
 
 import cn from "~/utils/cn"
@@ -49,7 +49,9 @@ type Props =
 			}: {
 				paragraph?: number
 				sentence?: number
-				state: FeedbackState
+				state:
+					| FeedbackState
+					| ((prevState: FeedbackState) => FeedbackState)
 			}) => void
 	  }
 	| {
@@ -85,7 +87,9 @@ type Props =
 			}: {
 				paragraph?: number
 				sentence?: number
-				state: FeedbackState
+				state:
+					| FeedbackState
+					| ((prevState: FeedbackState) => FeedbackState)
 			}) => void
 	  }
 	| {
@@ -108,7 +112,9 @@ type Props =
 			}: {
 				paragraph?: number
 				sentence?: number
-				state: FeedbackState
+				state:
+					| FeedbackState
+					| ((prevState: FeedbackState) => FeedbackState)
 			}) => void
 	  }
 
@@ -160,15 +166,30 @@ export default function FeedbackContent({
 		(insight) => insight.paragraphs[0] === -1
 	)
 
-	const specificFeedbackColumnRefs = [
-		useRef<HTMLDivElement>(null),
-		useRef<HTMLDivElement>(null),
-	]
+	const ref = useRef<HTMLDivElement>(null)
+
+	const specificFeedbackColumnLeftRef = useRef<HTMLDivElement>(null)
+	const specificFeedbackColumnRightRef = useRef<HTMLDivElement>(null)
+
+	const [submissionWidth, setSubmissionWidth] = useState(0)
+
+	useEffect(() => {
+		if (
+			ref.current !== null &&
+			specificFeedbackColumnLeftRef.current !== null &&
+			specificFeedbackColumnRightRef.current !== null
+		)
+			setSubmissionWidth(
+				ref.current.clientWidth -
+					specificFeedbackColumnLeftRef.current.clientWidth -
+					specificFeedbackColumnRightRef.current.clientWidth
+			)
+	}, [])
 
 	return (
-		<div className="flex">
+		<div className="flex" ref={ref}>
 			<div
-				ref={specificFeedbackColumnRefs[0]}
+				ref={specificFeedbackColumnLeftRef}
 				className="relative min-w-[192px] flex-[0.75]"
 			>
 				<AnimatePresence>
@@ -226,6 +247,11 @@ export default function FeedbackContent({
 												sentence: feedback.sentence,
 												input,
 											}),
+										suggestedInputs: [
+											"Why?",
+											"Give an example",
+											"I disagree",
+										],
 										placeholder: generating
 											? "Generating..."
 											: "Say something",
@@ -254,21 +280,43 @@ export default function FeedbackContent({
 									})
 								}
 								initial={{ opacity: 0, y: 10 }}
-								animate={{ opacity: 1, y: 0 }}
+								animate={{
+									opacity: 1,
+									x:
+										feedback.state === "focus"
+											? (specificFeedbackColumnLeftRef
+													.current?.clientWidth ??
+													0) - 16
+											: 0,
+									y:
+										feedback.state === "focus"
+											? (paragraphYOffsets.find(
+													({ paragraph }) =>
+														paragraph ===
+														feedback.paragraph + 1
+											  )?.yOffset ?? 0) -
+											  (paragraphYOffsets.find(
+													({ paragraph }) =>
+														paragraph ===
+														feedback.paragraph
+											  )?.yOffset ?? 0)
+											: 0,
+									width:
+										feedback.state === "focus"
+											? submissionWidth
+											: "auto",
+								}}
 								exit={{ opacity: 0, y: 10 }}
 								key={`${feedback.paragraph},${feedback.sentence}`}
 								style={{
 									top: (() => {
-										let yOffset = paragraphYOffsets.find(
+										const yOffset = paragraphYOffsets.find(
 											({ paragraph }) =>
 												paragraph === feedback.paragraph
 										)?.yOffset
 
-										if (yOffset !== undefined) yOffset += 10
-
 										const specificFeedbackColumn =
-											specificFeedbackColumnRefs[1]
-												?.current
+											specificFeedbackColumnLeftRef.current
 
 										const previousCard =
 											specificFeedbackColumn?.children &&
@@ -386,28 +434,16 @@ export default function FeedbackContent({
 						onChangeFeedbackState({
 							paragraph,
 							sentence,
-							state:
-								specificFeedback?.find(
-									(feedbackItem) =>
-										feedbackItem.paragraph === paragraph &&
-										feedbackItem.sentence === sentence
-								)?.state === "focus"
-									? "focus"
-									: "hover",
+							state: (prevState) =>
+								prevState === "focus" ? "focus" : "hover",
 						})
 					}
 					onUnhoverHighlight={({ paragraph, sentence }) =>
 						onChangeFeedbackState({
 							paragraph,
 							sentence,
-							state:
-								specificFeedback?.find(
-									(feedbackItem) =>
-										feedbackItem.paragraph === paragraph &&
-										feedbackItem.sentence === sentence
-								)?.state === "focus"
-									? "focus"
-									: undefined,
+							state: (prevState) =>
+								prevState === "focus" ? "focus" : undefined,
 						})
 					}
 					onClickHighlight={({ paragraph, sentence }) =>
@@ -473,6 +509,11 @@ export default function FeedbackContent({
 												onGetFollowUp?.({
 													input,
 												}),
+											suggestedInputs: [
+												"Why?",
+												"Give an example",
+												"I disagree",
+											],
 											placeholder: generating
 												? "Generating..."
 												: "Say something",
@@ -513,7 +554,7 @@ export default function FeedbackContent({
 			</div>
 
 			<div
-				ref={specificFeedbackColumnRefs[1]}
+				ref={specificFeedbackColumnRightRef}
 				className="relative min-w-[192px] flex-1"
 			>
 				<AnimatePresence>
@@ -569,6 +610,11 @@ export default function FeedbackContent({
 												sentence: feedback.sentence,
 												input,
 											}),
+										suggestedInputs: [
+											"Why?",
+											"Give an example",
+											"I disagree",
+										],
 										placeholder: generating
 											? "Generating..."
 											: "Say something",
@@ -597,21 +643,41 @@ export default function FeedbackContent({
 									})
 								}
 								initial={{ opacity: 0, y: 10 }}
-								animate={{ opacity: 1, y: 0 }}
+								animate={{
+									opacity: 1,
+									x:
+										feedback.state === "focus"
+											? `calc(-${submissionWidth}px - 16px)`
+											: 0,
+									y:
+										feedback.state === "focus"
+											? (paragraphYOffsets.find(
+													({ paragraph }) =>
+														paragraph ===
+														feedback.paragraph + 1
+											  )?.yOffset ?? 0) -
+											  (paragraphYOffsets.find(
+													({ paragraph }) =>
+														paragraph ===
+														feedback.paragraph
+											  )?.yOffset ?? 0)
+											: 0,
+									width:
+										feedback.state === "focus"
+											? submissionWidth
+											: "auto",
+								}}
 								exit={{ opacity: 0, y: 10 }}
 								key={`${feedback.paragraph},${feedback.sentence}`}
 								style={{
 									top: (() => {
-										let yOffset = paragraphYOffsets.find(
+										const yOffset = paragraphYOffsets.find(
 											({ paragraph }) =>
 												paragraph === feedback.paragraph
 										)?.yOffset
 
-										if (yOffset !== undefined) yOffset += 10
-
 										const specificFeedbackColumn =
-											specificFeedbackColumnRefs[1]
-												?.current
+											specificFeedbackColumnRightRef.current
 
 										const previousCard =
 											specificFeedbackColumn?.children &&
