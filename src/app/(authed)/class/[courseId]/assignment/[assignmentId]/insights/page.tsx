@@ -1,5 +1,6 @@
 import Assignment from "~/data/Assignment"
 import User from "~/data/User"
+import cn from "~/utils/cn"
 import Card from "~/components/Card"
 import Insight from "./Insight"
 import Heading from "~/components/Heading"
@@ -62,12 +63,17 @@ export default async function AssignmentInsightsPage({
 	).then((students) => new Set(students.map(({ email }) => email)).size)
 
 	return (
-		<Card className="flex flex-col space-y-2 px-6 pt-5 pb-80">
+		<Card
+			className={cn(
+				"flex flex-col space-y-2 px-6 pt-5 pb-80",
+				(assignmentInsights === undefined ||
+					assignmentInsights.length === 0) &&
+					"h-full"
+			)}
+		>
 			{assignmentInsights === undefined ||
 			assignmentInsights.length === 0 ? (
-				<span className="text-lg font-medium opacity-60">
-					No data for assignment
-				</span>
+				<Heading size="large">No insights for assignment yet</Heading>
 			) : (
 				<>
 					<div className="flex justify-between px-1">

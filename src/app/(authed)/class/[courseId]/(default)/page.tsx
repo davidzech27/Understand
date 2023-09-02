@@ -64,11 +64,17 @@ export default async function ClassPage({
 
 				<Card className="flex flex-1 flex-col space-y-2 py-5 px-6">
 					{feedbackStream.length !== 0 ? (
-						<FeedbackStream
-							courseId={courseId}
-							initialFeedbackStream={feedbackStream}
-							cursor={cursor}
-						/>
+						<>
+							<Heading size="large" className="ml-1">
+								Feedback stream
+							</Heading>
+
+							<FeedbackStream
+								courseId={courseId}
+								initialFeedbackStream={feedbackStream}
+								cursor={cursor}
+							/>
+						</>
 					) : (
 						<Heading size="large">
 							When your students get feedback on their work,
@@ -92,12 +98,18 @@ export default async function ClassPage({
 
 				<Card className="flex flex-1 flex-col space-y-2 py-5 px-6">
 					{feedbackStream.length !== 0 ? (
-						<UserFeedbackStream
-							courseId={courseId}
-							userEmail={email}
-							initialFeedbackStream={feedbackStream}
-							cursor={cursor}
-						/>
+						<>
+							<Heading size="large" className="ml-1">
+								Your feedback
+							</Heading>
+
+							<UserFeedbackStream
+								courseId={courseId}
+								userEmail={email}
+								initialFeedbackStream={feedbackStream}
+								cursor={cursor}
+							/>
+						</>
 					) : (
 						<Heading size="large">
 							When you get feedback on their work, it&apos;ll show

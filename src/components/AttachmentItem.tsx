@@ -36,9 +36,12 @@ function AttachmentItem(
 			disabled={disabled}
 			ref={(element) => {
 				if (urlRef.current && element)
-					urlRef.current.style.width = `${
-						element.offsetWidth - 100
-					}px`
+					urlRef.current.style.width = `${Math.min(
+						element.offsetWidth - 100,
+						parseInt(
+							window.getComputedStyle(urlRef.current).width
+						) + 1
+					)}px`
 
 				if (typeof ref === "function") {
 					ref(element)

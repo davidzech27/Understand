@@ -1,3 +1,4 @@
+import cn from "~/utils/cn"
 import Card from "~/components/Card"
 import User from "~/data/User"
 import Insight from "./Insight"
@@ -71,11 +72,16 @@ export default async function StudentInsightsPage({
 	)
 
 	return (
-		<Card className="flex flex-col space-y-2 px-6 pt-5 pb-80">
+		<Card
+			className={cn(
+				"flex flex-col space-y-2 px-6 pt-5 pb-80",
+				(studentInsights === undefined ||
+					studentInsights.length === 0) &&
+					"h-full"
+			)}
+		>
 			{studentInsights === undefined || studentInsights.length === 0 ? (
-				<span className="text-lg font-medium opacity-60">
-					No data for student
-				</span>
+				<Heading size="large">No insights for student yet</Heading>
 			) : (
 				<>
 					<div className="flex justify-between px-1">
