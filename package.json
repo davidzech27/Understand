@@ -22,7 +22,6 @@
 		"@radix-ui/react-toggle": "^1.0.2",
 		"@t3-oss/env-nextjs": "^0.6.0",
 		"@upstash/qstash": "^0.3.6",
-		"@vercel/analytics": "^1.0.2",
 		"@vercel/kv": "^0.2.2",
 		"ai": "^2.2.6",
 		"clsx": "^1.2.1",
