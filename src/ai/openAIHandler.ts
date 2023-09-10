@@ -102,6 +102,14 @@ export default async function openaiHandler(request: NextRequest) {
 			onFinal: async () => {
 				const promptTokens = await promptTokensPromise
 
+				console.info("User OpenAI request", {
+					email: auth.email,
+					reason,
+					cost:
+						tokenCost.prompt[model] * promptTokens +
+						tokenCost.completion[model] * completionTokens,
+				})
+
 				await Promise.all([
 					(await unregisterCompletionStreamPromise)(),
 					User({ email: auth.email }).increaseCost({
