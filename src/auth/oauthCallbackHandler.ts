@@ -42,7 +42,7 @@ export default async function oauthCallbackHandler(request: NextRequest) {
 	const response = NextResponse.redirect(new URL(redirectTo))
 
 	await Promise.all([
-		existingUserPromise.then((existingUser) =>
+		existingUserPromise.then((existingUser) => {
 			setAuth({
 				cookies: response.cookies,
 				auth: {
@@ -62,7 +62,10 @@ export default async function oauthCallbackHandler(request: NextRequest) {
 							: undefined,
 				},
 			})
-		),
+
+			if (existingUser === undefined)
+				console.info("New user", { email, name, photo })
+		}),
 		scopes.includes(
 			"https://www.googleapis.com/auth/classroom.courses.readonly"
 		) &&
