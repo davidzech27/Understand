@@ -1,3 +1,5 @@
+import { Analytics } from "@vercel/analytics/react"
+
 import "./global.css"
 import Providers from "./providers"
 import { getSignedIn } from "~/utils/getSignedIn"
@@ -26,10 +28,12 @@ export default function RootLayout({
 				<head />
 
 				<body
-					className="absolute bottom-0 left-0 right-0 top-0"
+					className="absolute bottom-0 top-0 left-0 right-0"
 					style={{ margin: 0 }} // keep this
 				>
 					<Providers signedIn={getSignedIn()}>{children}</Providers>
+
+					<Analytics />
 				</body>
 			</html>
 		</>
