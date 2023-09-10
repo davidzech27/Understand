@@ -53,7 +53,7 @@ export default function Breadcrumbs({ coursesPromise }: Props) {
 			{pageInfo !== undefined && (
 				<>
 					<ChevronRight
-						size={22}
+						size={20}
 						className="ml-1.5 mr-1 text-black/90"
 					/>
 

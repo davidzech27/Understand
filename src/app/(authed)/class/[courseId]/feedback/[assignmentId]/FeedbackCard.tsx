@@ -10,11 +10,25 @@ type Props = HTMLMotionProps<"div"> & {
 	followUps?: string[]
 	input?: {
 		show: boolean
-		focused: boolean
-		onSubmit: (input: string) => void
-		suggestedInputs?: string[]
-		placeholder: string
+		placeholder?: string
 		disabled?: boolean
+		onSubmit: (input: string) => void
+		buttons?:
+			| {
+					text: string
+					onClick: () => void
+			  }[]
+			| (({
+					input,
+					setInput,
+			  }: {
+					input: string
+					setInput: (input: string) => void
+					focusInput: () => void
+			  }) => {
+					text: string
+					onClick: () => void
+			  }[])
 	}
 	onChangeMouseState: ({
 		focusWithin,
@@ -24,6 +38,7 @@ type Props = HTMLMotionProps<"div"> & {
 		hover: boolean
 	}) => void
 	onClick: () => void
+	focused: boolean
 }
 
 export default function FeedbackCard({
@@ -32,6 +47,7 @@ export default function FeedbackCard({
 	input,
 	onChangeMouseState,
 	onClick,
+	focused,
 	className,
 	...props
 }: Props) {
@@ -81,9 +97,11 @@ export default function FeedbackCard({
 		}
 	}, [])
 
+	const containerRef = useRef<HTMLDivElement>(null)
+
 	useEffect(() => {
-		if (input?.focused) inputRef.current?.focus()
-	}, [input?.focused])
+		if (focused) (inputRef.current ?? containerRef.current)?.focus()
+	}, [focused])
 
 	const scrollerRef = useRef<HTMLDivElement>(null)
 
@@ -151,6 +169,8 @@ export default function FeedbackCard({
 				ease: "easeOut",
 				duration: 0.4,
 			}}
+			tabIndex={0}
+			ref={containerRef}
 			className={cn(
 				"group flex flex-col rounded-md border border-border bg-surface shadow-sm shadow-[#E5E5E5] transition-shadow duration-500",
 				className
@@ -201,30 +221,34 @@ export default function FeedbackCard({
 						ref={inputContainerRef}
 						className="border-t border-border p-1"
 					>
-						{input.suggestedInputs && inputText === "" && (
-							<div className="mb-1 flex flex-wrap gap-1">
-								{input.suggestedInputs.map(
-									(suggestedInput, index) => (
-										<button
-											key={index}
-											onMouseDown={() =>
-												setInputText(suggestedInput)
-											}
-											onTouchStart={() =>
-												setInputText(suggestedInput)
-											}
-											onKeyDown={(e) =>
-												e.code === "Space" &&
-												setInputText(suggestedInput)
-											}
-											className="rounded-md border border-border bg-surface py-1.5 px-3 text-base text-black/80 transition hover:bg-surface-hover focus-visible:bg-surface-hover active:bg-surface-hover"
-										>
-											{suggestedInput}
-										</button>
-									)
-								)}
-							</div>
-						)}
+						{(() => {
+							const buttons =
+								typeof input.buttons === "function"
+									? input.buttons({
+											input: inputText,
+											setInput: setInputText,
+											focusInput: () =>
+												inputRef.current?.focus(),
+									  })
+									: input.buttons
+
+							return (
+								buttons &&
+								buttons.length !== 0 && (
+									<div className="mb-1 flex flex-wrap gap-1">
+										{buttons.map(({ text, onClick }) => (
+											<button
+												key={text}
+												onClick={onClick}
+												className="rounded-md border border-border bg-surface py-1.5 px-3 text-base text-black/80 transition hover:bg-surface-hover focus-visible:bg-surface-hover active:bg-surface-hover"
+											>
+												{text}
+											</button>
+										))}
+									</div>
+								)
+							)
+						})()}
 
 						<TextArea
 							value={inputText}

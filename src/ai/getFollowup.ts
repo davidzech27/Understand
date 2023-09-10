@@ -30,7 +30,8 @@ export default function getFollowUp({
 			feedbackItem.sentence === sentence
 	)
 
-	if (followUpFeedback === undefined) return
+	if (followUpFeedback === undefined)
+		throw new Error("Follow-up feedback not found")
 
 	const feedbackLines = feedback.rawResponse.split("\n")
 
@@ -122,7 +123,7 @@ New content: """${revision.newContent}"""`
 
 	console.info(messages.map(({ content }) => content).join("\n\n\n\n"))
 
-	fetchOpenAI({
+	const { stop } = fetchOpenAI({
 		messages,
 		model,
 		temperature,
@@ -137,4 +138,6 @@ New content: """${revision.newContent}"""`
 			})
 		},
 	})
+
+	return { stopGenerating: stop }
 }

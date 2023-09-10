@@ -2,6 +2,7 @@
 	"name": "understand",
 	"version": "0.1.0",
 	"private": true,
+	"license": "UNLICENSED",
 	"scripts": {
 		"build": "next build",
 		"dev": "next dev",

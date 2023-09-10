@@ -33,6 +33,7 @@ type Props =
 			feedbackInsights?: undefined
 			generating: boolean
 			editing: boolean
+			stopGenerating: () => void
 			onGetFollowUp: ({
 				paragraph,
 				sentence,
@@ -79,6 +80,7 @@ type Props =
 			feedbackInsights?: undefined
 			generating?: undefined
 			editing?: undefined
+			stopGenerating?: undefined
 			onGetFollowUp?: undefined
 			onChangeFeedbackState: ({
 				paragraph,
@@ -104,6 +106,7 @@ type Props =
 			}[]
 			generating?: undefined
 			editing?: undefined
+			stopGenerating?: undefined
 			onGetFollowUp?: undefined
 			onChangeFeedbackState: ({
 				paragraph,
@@ -125,6 +128,7 @@ export default function FeedbackContent({
 	feedbackInsights,
 	generating,
 	editing,
+	stopGenerating,
 	onGetFollowUp,
 	onChangeFeedbackState,
 }: Props) {
@@ -225,10 +229,10 @@ export default function FeedbackContent({
 							(first, second) =>
 								first.paragraph - second.paragraph
 						)
-						.map((feedback, index) => (
+						.map((feedbackItem, index) => (
 							<FeedbackCard
-								content={feedback.content}
-								followUps={feedback.followUps
+								content={feedbackItem.content}
+								followUps={feedbackItem.followUps
 									.map((followUp) => [
 										followUp.userMessage,
 										followUp.aiMessage,
@@ -238,24 +242,65 @@ export default function FeedbackContent({
 								input={
 									onGetFollowUp && {
 										show:
-											feedback.state !== undefined &&
+											feedbackItem.state !== undefined &&
 											onGetFollowUp !== undefined,
-										focused: feedback.state === "focus",
-										onSubmit: (input) =>
-											onGetFollowUp?.({
-												paragraph: feedback.paragraph,
-												sentence: feedback.sentence,
-												input,
-											}),
-										suggestedInputs: [
-											"Why?",
-											"Give an example",
-											"I disagree",
-										],
 										placeholder: generating
 											? "Generating..."
 											: "Say something",
 										disabled: generating,
+										onSubmit: (input) =>
+											onGetFollowUp?.({
+												paragraph:
+													feedbackItem.paragraph,
+												sentence: feedbackItem.sentence,
+												input,
+											}),
+										buttons: ({
+											input,
+											setInput,
+											focusInput,
+										}) =>
+											generating
+												? [
+														{
+															text: "Stop generating",
+															onClick:
+																stopGenerating,
+														},
+												  ]
+												: input === "" &&
+												  feedbackItem.state === "focus"
+												? [
+														{
+															text: "Why?",
+															onClick: () => {
+																setInput("Why?")
+
+																focusInput()
+															},
+														},
+														{
+															text: "Give an example",
+															onClick: () => {
+																setInput(
+																	"Give an example"
+																)
+
+																focusInput()
+															},
+														},
+														{
+															text: "I disagree",
+															onClick: () => {
+																setInput(
+																	"I disagree"
+																)
+
+																focusInput()
+															},
+														},
+												  ]
+												: [],
 									}
 								}
 								onChangeMouseState={({
@@ -263,8 +308,8 @@ export default function FeedbackContent({
 									hover,
 								}) => {
 									onChangeFeedbackState({
-										paragraph: feedback.paragraph,
-										sentence: feedback.sentence,
+										paragraph: feedbackItem.paragraph,
+										sentence: feedbackItem.sentence,
 										state: focusWithin
 											? "focus"
 											: hover
@@ -274,45 +319,48 @@ export default function FeedbackContent({
 								}}
 								onClick={() =>
 									onChangeFeedbackState({
-										paragraph: feedback.paragraph,
-										sentence: feedback.sentence,
+										paragraph: feedbackItem.paragraph,
+										sentence: feedbackItem.sentence,
 										state: "focus",
 									})
 								}
+								focused={feedbackItem.state === "focus"}
 								initial={{ opacity: 0, y: 10 }}
 								animate={{
 									opacity: 1,
 									x:
-										feedback.state === "focus"
+										feedbackItem.state === "focus"
 											? (specificFeedbackColumnLeftRef
 													.current?.clientWidth ??
 													0) - 16
 											: 0,
 									y:
-										feedback.state === "focus"
+										feedbackItem.state === "focus"
 											? (paragraphYOffsets.find(
 													({ paragraph }) =>
 														paragraph ===
-														feedback.paragraph + 1
+														feedbackItem.paragraph +
+															1
 											  )?.yOffset ?? 0) -
 											  (paragraphYOffsets.find(
 													({ paragraph }) =>
 														paragraph ===
-														feedback.paragraph
+														feedbackItem.paragraph
 											  )?.yOffset ?? 0)
 											: 0,
 									width:
-										feedback.state === "focus"
+										feedbackItem.state === "focus"
 											? submissionWidth
 											: "auto",
 								}}
 								exit={{ opacity: 0, y: 10 }}
-								key={`${feedback.paragraph},${feedback.sentence}`}
+								key={`${feedbackItem.paragraph},${feedbackItem.sentence}`}
 								style={{
 									top: (() => {
 										const yOffset = paragraphYOffsets.find(
 											({ paragraph }) =>
-												paragraph === feedback.paragraph
+												paragraph ===
+												feedbackItem.paragraph
 										)?.yOffset
 
 										const specificFeedbackColumn =
@@ -350,17 +398,18 @@ export default function FeedbackContent({
 										)
 									})(),
 									zIndex:
-										feedback.paragraph * 10 +
-										feedback.sentence +
-										(feedback.state === "focus"
+										feedbackItem.paragraph * 10 +
+										feedbackItem.sentence +
+										(feedbackItem.state === "focus"
 											? 40
-											: feedback.state === "hover"
+											: feedbackItem.state === "hover"
 											? 20
 											: 0),
 								}}
 								className={cn(
 									"absolute left-4 right-4 max-h-[400px]",
-									feedback.state !== undefined && "shadow-lg"
+									feedbackItem.state !== undefined &&
+										"shadow-lg"
 								)}
 							/>
 						))}
@@ -503,21 +552,63 @@ export default function FeedbackContent({
 												feedbackItem.state !==
 													undefined &&
 												onGetFollowUp !== undefined,
-											focused:
-												feedbackItem.state === "focus",
-											onSubmit: (input) =>
-												onGetFollowUp?.({
-													input,
-												}),
-											suggestedInputs: [
-												"Why?",
-												"Give an example",
-												"I disagree",
-											],
 											placeholder: generating
 												? "Generating..."
 												: "Say something",
 											disabled: generating,
+											onSubmit: (input) =>
+												onGetFollowUp?.({
+													input,
+												}),
+											buttons: ({
+												input,
+												setInput,
+												focusInput,
+											}) =>
+												generating
+													? [
+															{
+																text: "Stop generating",
+																onClick:
+																	stopGenerating,
+															},
+													  ]
+													: input === "" &&
+													  feedbackItem.state ===
+															"focus"
+													? [
+															{
+																text: "Why?",
+																onClick: () => {
+																	setInput(
+																		"Why?"
+																	)
+
+																	focusInput()
+																},
+															},
+															{
+																text: "Give an example",
+																onClick: () => {
+																	setInput(
+																		"Give an example"
+																	)
+
+																	focusInput()
+																},
+															},
+															{
+																text: "I disagree",
+																onClick: () => {
+																	setInput(
+																		"I disagree"
+																	)
+
+																	focusInput()
+																},
+															},
+													  ]
+													: [],
 										}
 									}
 									onChangeMouseState={({
@@ -537,6 +628,7 @@ export default function FeedbackContent({
 											state: "focus",
 										})
 									}
+									focused={feedbackItem.state === "focus"}
 									initial={{ opacity: 0, y: 35 }}
 									animate={{ opacity: 1, y: 0 }}
 									exit={{ opacity: 0, y: 35 }}
@@ -590,10 +682,10 @@ export default function FeedbackContent({
 							(first, second) =>
 								first.paragraph - second.paragraph
 						)
-						.map((feedback, index) => (
+						.map((feedbackItem, index) => (
 							<FeedbackCard
-								content={feedback.content}
-								followUps={feedback.followUps
+								content={feedbackItem.content}
+								followUps={feedbackItem.followUps
 									.map((followUp) => [
 										followUp.userMessage,
 										followUp.aiMessage,
@@ -602,23 +694,64 @@ export default function FeedbackContent({
 									.filter(Boolean)}
 								input={
 									onGetFollowUp && {
-										show: feedback.state !== undefined,
-										focused: feedback.state === "focus",
-										onSubmit: (input) =>
-											onGetFollowUp?.({
-												paragraph: feedback.paragraph,
-												sentence: feedback.sentence,
-												input,
-											}),
-										suggestedInputs: [
-											"Why?",
-											"Give an example",
-											"I disagree",
-										],
+										show: feedbackItem.state !== undefined,
 										placeholder: generating
 											? "Generating..."
 											: "Say something",
 										disabled: generating,
+										onSubmit: (input) =>
+											onGetFollowUp?.({
+												paragraph:
+													feedbackItem.paragraph,
+												sentence: feedbackItem.sentence,
+												input,
+											}),
+										buttons: ({
+											input,
+											setInput,
+											focusInput,
+										}) =>
+											generating
+												? [
+														{
+															text: "Stop generating",
+															onClick:
+																stopGenerating,
+														},
+												  ]
+												: input === "" &&
+												  feedbackItem.state === "focus"
+												? [
+														{
+															text: "Why?",
+															onClick: () => {
+																setInput("Why?")
+
+																focusInput()
+															},
+														},
+														{
+															text: "Give an example",
+															onClick: () => {
+																setInput(
+																	"Give an example"
+																)
+
+																focusInput()
+															},
+														},
+														{
+															text: "I disagree",
+															onClick: () => {
+																setInput(
+																	"I disagree"
+																)
+
+																focusInput()
+															},
+														},
+												  ]
+												: [],
 									}
 								}
 								onChangeMouseState={({
@@ -626,8 +759,8 @@ export default function FeedbackContent({
 									hover,
 								}) => {
 									onChangeFeedbackState({
-										paragraph: feedback.paragraph,
-										sentence: feedback.sentence,
+										paragraph: feedbackItem.paragraph,
+										sentence: feedbackItem.sentence,
 										state: focusWithin
 											? "focus"
 											: hover
@@ -637,43 +770,46 @@ export default function FeedbackContent({
 								}}
 								onClick={() =>
 									onChangeFeedbackState({
-										paragraph: feedback.paragraph,
-										sentence: feedback.sentence,
+										paragraph: feedbackItem.paragraph,
+										sentence: feedbackItem.sentence,
 										state: "focus",
 									})
 								}
+								focused={feedbackItem.state === "focus"}
 								initial={{ opacity: 0, y: 10 }}
 								animate={{
 									opacity: 1,
 									x:
-										feedback.state === "focus"
+										feedbackItem.state === "focus"
 											? `calc(-${submissionWidth}px - 16px)`
 											: 0,
 									y:
-										feedback.state === "focus"
+										feedbackItem.state === "focus"
 											? (paragraphYOffsets.find(
 													({ paragraph }) =>
 														paragraph ===
-														feedback.paragraph + 1
+														feedbackItem.paragraph +
+															1
 											  )?.yOffset ?? 0) -
 											  (paragraphYOffsets.find(
 													({ paragraph }) =>
 														paragraph ===
-														feedback.paragraph
+														feedbackItem.paragraph
 											  )?.yOffset ?? 0)
 											: 0,
 									width:
-										feedback.state === "focus"
+										feedbackItem.state === "focus"
 											? submissionWidth
 											: "auto",
 								}}
 								exit={{ opacity: 0, y: 10 }}
-								key={`${feedback.paragraph},${feedback.sentence}`}
+								key={`${feedbackItem.paragraph},${feedbackItem.sentence}`}
 								style={{
 									top: (() => {
 										const yOffset = paragraphYOffsets.find(
 											({ paragraph }) =>
-												paragraph === feedback.paragraph
+												paragraph ===
+												feedbackItem.paragraph
 										)?.yOffset
 
 										const specificFeedbackColumn =
@@ -711,17 +847,18 @@ export default function FeedbackContent({
 										)
 									})(),
 									zIndex:
-										feedback.paragraph * 10 +
-										feedback.sentence +
-										(feedback.state === "focus"
+										feedbackItem.paragraph * 10 +
+										feedbackItem.sentence +
+										(feedbackItem.state === "focus"
 											? 40
-											: feedback.state === "hover"
+											: feedbackItem.state === "hover"
 											? 20
 											: 0),
 								}}
 								className={cn(
 									"absolute left-4 right-4 max-h-[400px]",
-									feedback.state !== undefined && "shadow-lg"
+									feedbackItem.state !== undefined &&
+										"shadow-lg"
 								)}
 							/>
 						))}

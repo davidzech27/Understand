@@ -3,7 +3,7 @@ import { type OpenAIRequest } from "./openAIHandler"
 const textEncoder = new TextEncoder()
 const textDecoder = new TextDecoder()
 
-export default async function fetchOpenAI({
+export default function fetchOpenAI({
 	messages,
 	model,
 	temperature,
@@ -19,7 +19,11 @@ export default async function fetchOpenAI({
 	onRateLimit: () => void
 	onFinish: (content: string) => void
 }) {
-	const response = await fetch("/api/openai", {
+	let abortController: AbortController | null = new AbortController()
+
+	let streamedContent = ""
+
+	fetch("/api/openai", {
 		method: "POST",
 		body: textEncoder.encode(
 			JSON.stringify({
@@ -32,27 +36,48 @@ export default async function fetchOpenAI({
 				reason,
 			})
 		),
+		signal: abortController.signal,
 	})
+		.then(async (response) => {
+			if (response.status === 429) return onRateLimit()
 
-	if (response.status === 429) return onRateLimit()
+			if (response.body) {
+				const reader = response.body.getReader()
 
-	if (response.body) {
-		const reader = response.body.getReader()
+				let result = await reader.read()
 
-		let streamedContent = ""
+				while (!result.done) {
+					streamedContent += textDecoder.decode(result.value)
 
-		let result = await reader.read()
+					onContent(streamedContent)
 
-		while (!result.done) {
-			streamedContent += textDecoder.decode(result.value)
+					if (abortController === null) {
+						reader.cancel()
 
-			onContent(streamedContent)
+						break
+					}
 
-			result = await reader.read()
-		}
+					result = await reader.read()
+				}
 
-		onFinish && onFinish(streamedContent)
-	} else {
-		console.error("This shouldn't happen")
+				onFinish && onFinish(streamedContent)
+			} else {
+				console.error("This shouldn't happen")
+			}
+		})
+		.catch((error: Error) => {
+			if (error.name === "AbortError") {
+				onFinish && onFinish(streamedContent)
+			} else {
+				console.error(error.name)
+			}
+		})
+
+	return {
+		stop: () => {
+			abortController?.abort()
+
+			abortController = null
+		},
 	}
 }

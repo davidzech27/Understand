@@ -183,6 +183,8 @@ export default function Feedback({
 
 	const [generating, setGenerating] = useState(false)
 
+	const [stopGenerating, setStopGenerating] = useState(() => () => {})
+
 	const [featureBlockModalOpen, setFeatureBlockModalOpen] = useState(false)
 
 	const [rateLimitModalOpen, setRateLimitModalOpen] = useState(false)
@@ -202,7 +204,7 @@ export default function Feedback({
 
 		const submissionText = htmlToText(submissionHTML)
 
-		getFeedback({
+		const { stopGenerating } = getFeedback({
 			assignmentTitle: assignment.title,
 			assignmentInstructions: assignment.instructions,
 			studentName: user.name,
@@ -284,6 +286,8 @@ export default function Feedback({
 				}
 			},
 		})
+
+		setStopGenerating(() => stopGenerating)
 	}
 
 	const [shareModalOpen, setShareModalOpen] = useState(false)
@@ -450,7 +454,7 @@ export default function Feedback({
 
 		setGenerating(true)
 
-		getFollowup({
+		const { stopGenerating } = getFollowup({
 			paragraph,
 			sentence,
 			feedback: newFeedback,
@@ -500,6 +504,8 @@ export default function Feedback({
 				}
 			},
 		})
+
+		setStopGenerating(() => stopGenerating)
 	}
 
 	return (
@@ -676,6 +682,7 @@ export default function Feedback({
 						feedbackList={feedback.list}
 						editing={editing}
 						generating={generating}
+						stopGenerating={stopGenerating}
 						onGetFollowUp={onGetFollowUp}
 						onChangeFeedbackState={({
 							paragraph,
