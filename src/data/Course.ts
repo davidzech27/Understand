@@ -83,27 +83,32 @@ const Course = ({ id }: { id: string }) => ({
 		syncedUrl: string | undefined
 		syncedRefreshToken: string | undefined
 	}) => {
-		await db.insert(course).values({
-			id,
-			name,
-			section,
-			inviteCode: Array(7)
-				.fill(0)
-				.map(() => {
-					const index = Math.floor(Math.random() * 62)
+		await db
+			.insert(course)
+			.values({
+				id,
+				name,
+				section,
+				inviteCode: Array(7)
+					.fill(0)
+					.map(() => {
+						const index = Math.floor(Math.random() * 62)
 
-					if (index < 10) {
-						return index.toString()
-					} else if (index < 36) {
-						return String.fromCharCode(index - 10 + 97)
-					} else {
-						return String.fromCharCode(index - 36 + 65)
-					}
-				})
-				.join(""),
-			syncedUrl,
-			syncedRefreshToken,
-		})
+						if (index < 10) {
+							return index.toString()
+						} else if (index < 36) {
+							return String.fromCharCode(index - 10 + 97)
+						} else {
+							return String.fromCharCode(index - 36 + 65)
+						}
+					})
+					.join(""),
+				syncedUrl,
+				syncedRefreshToken,
+			})
+			.onDuplicateKeyUpdate({
+				set: { name, section, syncedUrl, syncedRefreshToken },
+			})
 	},
 	get: async () => {
 		const row = (
