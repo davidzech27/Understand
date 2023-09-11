@@ -20,7 +20,7 @@ export default async function HomePage() {
 		await User({ email }).upcomingAssignments()
 
 	return (
-		<Card className="flex h-full flex-col justify-between overflow-y-scroll border py-5 px-6 shadow-lg">
+		<Card className="flex h-full flex-col justify-between overflow-y-scroll border px-6 py-5 shadow-lg">
 			{!isTeaching && !isEnrolled ? (
 				<Heading size="medium">
 					You&apos;re not teaching or enrolled in any classes. Either

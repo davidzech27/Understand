@@ -7,12 +7,16 @@ export default async function getInsights({
 	assignmentInstructions,
 	studentName,
 	submissionText,
+	onRateLimit,
+	onError,
 }: {
 	feedback: Feedback
 	assignmentTitle: string
 	assignmentInstructions: string
 	studentName: string
 	submissionText: string
+	onRateLimit: () => void
+	onError: (error: Error) => void
 }) {
 	const feedbackLines = feedback.rawResponse.split("\n")
 
@@ -57,16 +61,17 @@ Begin.`,
 				temperature: 0.0,
 				reason: "insights",
 				onContent: () => {},
-				onRateLimit: () => rej(),
 				onFinish: res,
-			})
-		)
+				onRateLimit: () => {
+					onRateLimit()
+					rej()
+				},
+				onError: (error) => {
+					onError(error)
 
-		console.info(
-			messages
-				.map(({ content }) => content)
-				.concat(completion)
-				.join("\n\n\n\n")
+					rej()
+				},
+			})
 		)
 
 		return {

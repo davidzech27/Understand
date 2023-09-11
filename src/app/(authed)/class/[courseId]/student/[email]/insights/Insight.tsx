@@ -55,7 +55,7 @@ export default function Insight({
 					/>
 				</div>
 
-				<p className="mt-0.5 mb-3.5 select-text">{content}</p>
+				<p className="mb-3.5 mt-0.5 select-text">{content}</p>
 
 				<Suspense fallback={<div className="h-[36px]" />}>
 					<Await promise={totalAssignmentsPromise}>
@@ -112,7 +112,7 @@ export default function Insight({
 						: { maxHeight: 0 }
 				}
 				className={cn(
-					"absolute right-0 left-0 z-10 overflow-y-hidden rounded-md border-border bg-surface shadow-lg shadow-[#00000012] transition-all duration-150",
+					"absolute left-0 right-0 z-10 overflow-y-hidden rounded-md border-border bg-surface shadow-lg shadow-[#00000012] transition-all duration-150",
 					expanded && "border-x-[0.75px] border-b-[0.75px]"
 				)}
 			>

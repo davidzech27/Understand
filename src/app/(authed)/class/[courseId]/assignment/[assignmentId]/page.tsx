@@ -37,7 +37,7 @@ export default async function AssignmentPage({
 	if (role !== "teacher" || assignment === undefined) notFound()
 
 	return (
-		<Card className="flex h-full flex-col overflow-y-scroll py-5 px-6">
+		<Card className="flex h-full flex-col overflow-y-scroll px-6 py-5">
 			<div className="flex items-center justify-between">
 				<GradientText asChild>
 					<a
@@ -54,7 +54,7 @@ export default async function AssignmentPage({
 					</a>
 				</GradientText>
 
-				<span className="relative bottom-1 mr-3 ml-6 flex-shrink-0 select-text text-base font-semibold leading-none text-black/70">
+				<span className="relative bottom-1 ml-6 mr-3 flex-shrink-0 select-text text-base font-semibold leading-none text-black/70">
 					{assignment.dueAt
 						? `Due ${formatDate(assignment.dueAt)}`
 						: "No due date"}
@@ -63,7 +63,7 @@ export default async function AssignmentPage({
 
 			{assignment.description !== undefined && (
 				<>
-					<Heading size="large" className="ml-1 mb-2">
+					<Heading size="large" className="mb-2 ml-1">
 						Description
 					</Heading>
 
@@ -75,7 +75,7 @@ export default async function AssignmentPage({
 
 			{assignment.instructions !== undefined ? (
 				<>
-					<Heading size="large" className="ml-1 mb-2">
+					<Heading size="large" className="mb-2 ml-1">
 						Instructions
 					</Heading>
 

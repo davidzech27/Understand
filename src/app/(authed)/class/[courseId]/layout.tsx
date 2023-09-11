@@ -1,5 +1,6 @@
 import { cookies } from "next/headers"
 import { notFound } from "next/navigation"
+import { Logger } from "next-axiom"
 
 import { getAuthOrThrow } from "~/auth/jwt"
 import syncCourse from "~/sync/syncCourse"
@@ -18,10 +19,9 @@ export default async function CourseLayout({
 	children: React.ReactNode
 	params: Params
 }) {
-	// //! not sure if adding latency. look into if there's a NextJS app router waterfall
-	try {
-		const { email } = await getAuthOrThrow({ cookies: cookies() })
+	const { email } = await getAuthOrThrow({ cookies: cookies() })
 
+	try {
 		const [role, course] = await Promise.all([
 			User({ email }).courseRole({ id: params.courseId }),
 			Course({ id: params.courseId }).get(),
@@ -40,7 +40,11 @@ export default async function CourseLayout({
 				}),
 		])
 	} catch (error) {
-		console.error(error)
+		const log = new Logger()
+
+		log.error("Error initiating course sync", { email, error })
+
+		await log.flush()
 	}
 
 	return <>{children}</>

@@ -1,3 +1,5 @@
+import { Logger } from "next-axiom"
+
 import getCompletion from "~/ai/getCompletion"
 import GoogleAPI from "~/google/GoogleAPI"
 import Course from "~/data/Course"
@@ -10,6 +12,8 @@ export default async function syncAssignment({
 	courseId: string
 	assignmentId: string
 }) {
+	const log = new Logger()
+
 	const [assignment, courseName] = await Promise.all([
 		(async () => {
 			const refreshToken = await Course({
@@ -17,8 +21,9 @@ export default async function syncAssignment({
 			}).syncedRefreshToken()
 
 			if (refreshToken === undefined)
-				throw new Error(
-					"Linked refresh token could not be found for course"
+				return log.error(
+					"Course linked refresh token could not be found for assignment sync",
+					{ courseId, assignmentId }
 				)
 
 			const googleAPI = await GoogleAPI({
@@ -57,15 +62,22 @@ export default async function syncAssignment({
 		Course({ id: courseId })
 			.get()
 			.then((course) => {
-				if (course === undefined)
-					throw new Error("Course could not be found in database")
-
-				return course.name
+				return course?.name
 			}),
 	])
 
 	if (assignment === undefined) {
-		return console.error("Not found", { courseId, assignmentId })
+		return log.error("Assignment could not be found for assignment sync", {
+			courseId,
+			assignmentId,
+		})
+	}
+
+	if (courseName === undefined) {
+		return log.error("Course could not be found for assignment sync", {
+			courseId,
+			assignmentId,
+		})
 	}
 
 	const usedAttachments: {
@@ -126,15 +138,16 @@ ${attachment.text}
 
 		totalCost += cost
 
-		console.info("Sync", {
-			courseId,
-			assignmentId,
-			assignmentTitle: assignment.title,
-			internalAttachmentMessages: internalAttachmentMessages.concat({
-				role: "assistant",
-				content: completion,
-			}),
-		})
+		log.info(
+			"Assignment sync internal attachment instructions identification",
+			{
+				courseId,
+				assignmentId,
+				internalAttachmentMessages: internalAttachmentMessages
+					.map(({ content }) => content)
+					.concat(completion),
+			}
+		)
 
 		const indexes = completion
 			.replaceAll(/\s/g, "")
@@ -155,7 +168,7 @@ ${attachment.text}
 	}
 
 	if (usedAttachments.length === 0) {
-		const instructionPredictionMessages = [
+		const instructionsPredictionMessages = [
 			{
 				role: "user" as "system" | "user" | "assistant",
 				content: `Briefly respond with something that sounds like it would be the instructions on an assignment titled "${
@@ -170,7 +183,7 @@ ${attachment.text}
 
 		const { completion: predictedInstructionsCompletion, cost } =
 			await getCompletion({
-				messages: instructionPredictionMessages,
+				messages: instructionsPredictionMessages,
 				model: "gpt-3.5-turbo-0613",
 				temperature: 0,
 				presencePenalty: 0,
@@ -180,13 +193,12 @@ ${attachment.text}
 
 		totalCost += cost
 
-		console.info("Sync", {
+		log.info("Assignment sync instructions prediction", {
 			courseId,
 			assignmentId,
-			assignmentTitle: assignment.title,
-			instructionPredictionMessages: instructionPredictionMessages.concat(
-				{ role: "assistant", content: predictedInstructionsCompletion }
-			),
+			instructionsPredictionMessages: instructionsPredictionMessages
+				.map(({ content }) => content)
+				.concat(predictedInstructionsCompletion),
 		})
 
 		const attachmentCandidates = await Course({
@@ -277,15 +289,16 @@ ${attachment.text}
 
 			totalCost += cost
 
-			console.info("Sync", {
-				courseId,
-				assignmentId,
-				assignmentTitle: assignment.title,
-				externalAttachmentMessages: externalAttachmentMessages.concat({
-					role: "assistant",
-					content: completion,
-				}),
-			})
+			log.info(
+				"Assignment sync external attachment instructions identification",
+				{
+					courseId,
+					assignmentId,
+					externalAttachmentMessages: externalAttachmentMessages
+						.map(({ content }) => content)
+						.concat(completion),
+				}
+			)
 
 			const indexes = completion
 				.replaceAll(/\s/g, "")

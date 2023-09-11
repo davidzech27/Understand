@@ -510,7 +510,7 @@ export default function FeedbackContent({
 					generalInsights === undefined ? (
 						<div className="h-[60vh]" />
 					) : (
-						<div className="mt-4 mb-20 flex flex-col gap-2.5">
+						<div className="mb-20 mt-4 flex flex-col gap-2.5">
 							{(
 								generalFeedback?.map(
 									({

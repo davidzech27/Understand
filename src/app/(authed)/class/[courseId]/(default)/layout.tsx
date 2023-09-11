@@ -53,7 +53,7 @@ export default async function ClassLayout({
 
 	return (
 		<div className="-mr-2 flex h-full flex-col space-y-2.5 overflow-y-scroll">
-			<Card className="flex flex-col justify-between py-3 px-4">
+			<Card className="flex flex-col justify-between px-4 py-3">
 				<ClassTabs
 					course={course}
 					teacherEmailsPromise={teacherEmailsPromise}

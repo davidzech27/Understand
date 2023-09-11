@@ -1,6 +1,7 @@
 import { verifySignature } from "@upstash/qstash/nextjs"
 import { type NextApiRequest, type NextApiResponse } from "next"
 import { z } from "zod"
+import { Logger } from "next-axiom"
 
 import callSync from "./callSync"
 import syncRoster from "./syncRoster"
@@ -26,7 +27,7 @@ const syncCallSchema = z.discriminatedUnion("name", [
 export type SyncCall = z.infer<typeof syncCallSchema>
 
 async function syncHandler(req: NextApiRequest, res: NextApiResponse) {
-	console.info("Sync API handler body: ", JSON.stringify(req.body))
+	new Logger().info("Course sync called", req.body)
 
 	const syncCall = syncCallSchema.parse(req.body)
 

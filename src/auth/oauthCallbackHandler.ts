@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { withAxiom, type Logger } from "next-axiom"
 
 import env from "env.mjs"
 import { setAuth } from "~/auth/jwt"
@@ -8,13 +9,15 @@ import GoogleAPI from "~/google/GoogleAPI"
 import User from "~/data/User"
 import Course from "~/data/Course"
 
-export default async function oauthCallbackHandler(request: NextRequest) {
+export default withAxiom(async function oauthCallbackHandler(
+	request: NextRequest & { log: Logger }
+) {
 	const { searchParams } = new URL(request.url)
 
 	const error = searchParams.get("error")
 
 	if (error !== null) {
-		console.error("OAuth callback error:", error)
+		request.log.error("OAuth callback error", { error })
 
 		return NextResponse.redirect("/signIn")
 	}
@@ -64,7 +67,7 @@ export default async function oauthCallbackHandler(request: NextRequest) {
 			})
 
 			if (existingUser === undefined)
-				console.info("New user", { email, name, photo })
+				request.log.info("New user", { email, name, photo })
 		}),
 		scopes.includes(
 			"https://www.googleapis.com/auth/classroom.courses.readonly"
@@ -96,4 +99,4 @@ export default async function oauthCallbackHandler(request: NextRequest) {
 	])
 
 	return response
-}
+})

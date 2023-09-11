@@ -160,7 +160,7 @@ export default function CreateAssignmentForm({
 					</Card>
 				</div>
 
-				<Card className="flex py-5 px-6 shadow-sm">
+				<Card className="flex px-6 py-5 shadow-sm">
 					<FancyButton
 						size="large"
 						type="submit"

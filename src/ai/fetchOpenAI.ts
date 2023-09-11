@@ -12,12 +12,14 @@ export default function fetchOpenAI({
 	maxTokens,
 	reason,
 	onContent,
-	onRateLimit,
 	onFinish,
+	onRateLimit,
+	onError,
 }: OpenAIRequest & {
 	onContent: (content: string) => void
-	onRateLimit: () => void
 	onFinish: (content: string) => void
+	onRateLimit: () => void
+	onError: (error: Error) => void
 }) {
 	let abortController: AbortController | null = new AbortController()
 
@@ -41,35 +43,34 @@ export default function fetchOpenAI({
 		.then(async (response) => {
 			if (response.status === 429) return onRateLimit()
 
-			if (response.body) {
-				const reader = response.body.getReader()
+			if (response.body === null)
+				throw new Error("The response body is empty.")
 
-				let result = await reader.read()
+			const reader = response.body.getReader()
 
-				while (!result.done) {
-					streamedContent += textDecoder.decode(result.value)
+			let result = await reader.read()
 
-					onContent(streamedContent)
+			while (!result.done) {
+				streamedContent += textDecoder.decode(result.value)
 
-					if (abortController === null) {
-						reader.cancel()
+				onContent(streamedContent)
 
-						break
-					}
+				if (abortController === null) {
+					reader.cancel()
 
-					result = await reader.read()
+					break
 				}
 
-				onFinish && onFinish(streamedContent)
-			} else {
-				console.error("This shouldn't happen")
+				result = await reader.read()
 			}
+
+			onFinish(streamedContent)
 		})
 		.catch((error: Error) => {
 			if (error.name === "AbortError") {
-				onFinish && onFinish(streamedContent)
+				onFinish(streamedContent)
 			} else {
-				console.error(error.name)
+				onError(error)
 			}
 		})
 

@@ -161,7 +161,7 @@ export default function TopActions({ schoolRole }: Props) {
 				</NavigationMenu.Item>
 			</NavigationMenu.List>
 
-			<div className="absolute top-[calc(100%+6px)] right-0 z-50">
+			<div className="absolute right-0 top-[calc(100%+6px)] z-50">
 				{/* can't get exit animation to work yet */}
 				<NavigationMenu.Viewport className="animate-[scale-in] rounded-md border-[0.75px] border-border bg-surface shadow-lg shadow-[#00000016] transition-all duration-150" />
 			</div>

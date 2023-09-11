@@ -5,6 +5,7 @@ import {
 	useState,
 	experimental_useEffectEvent as useEffectEvent,
 } from "react"
+import { useLogger } from "next-axiom"
 import { produce } from "immer"
 
 import { type Feedback } from "~/data/Feedback"
@@ -189,6 +190,8 @@ export default function Feedback({
 
 	const [rateLimitModalOpen, setRateLimitModalOpen] = useState(false)
 
+	const log = useLogger()
+
 	const onGetFeedback = () => {
 		if (
 			user.schoolDistrictName === undefined ||
@@ -204,7 +207,7 @@ export default function Feedback({
 
 		const submissionText = htmlToText(submissionHTML)
 
-		const { stopGenerating } = getFeedback({
+		const { stop } = getFeedback({
 			assignmentTitle: assignment.title,
 			assignmentInstructions: assignment.instructions,
 			studentName: user.name,
@@ -231,11 +234,6 @@ export default function Feedback({
 						}
 					})
 				)
-			},
-			onRateLimit: () => {
-				setGenerating(false)
-
-				setRateLimitModalOpen(true)
 			},
 			onFinish: async ({ rawResponse }) => {
 				setGenerating(false)
@@ -273,6 +271,10 @@ export default function Feedback({
 						assignmentInstructions: assignment.instructions,
 						studentName: user.name,
 						submissionText,
+						onRateLimit: () => {},
+						onError: (error) => {
+							log.error("Insights error", { error })
+						},
 					})
 
 					feedback = feedbackRef.current
@@ -285,9 +287,17 @@ export default function Feedback({
 					})
 				}
 			},
+			onRateLimit: () => {
+				setGenerating(false)
+
+				setRateLimitModalOpen(true)
+			},
+			onError: (error) => {
+				log.error("Feedback error", { error })
+			},
 		})
 
-		setStopGenerating(() => stopGenerating)
+		setStopGenerating(() => stop)
 	}
 
 	const [shareModalOpen, setShareModalOpen] = useState(false)
@@ -454,7 +464,7 @@ export default function Feedback({
 
 		setGenerating(true)
 
-		const { stopGenerating } = getFollowup({
+		const { stop } = getFollowup({
 			paragraph,
 			sentence,
 			feedback: newFeedback,
@@ -476,11 +486,6 @@ export default function Feedback({
 						if (lastFollowUp) lastFollowUp.aiMessage = content
 					})
 				),
-			onRateLimit: () => {
-				setGenerating(false)
-
-				setRateLimitModalOpen(true)
-			},
 			onFinish: () => {
 				setGenerating(false)
 
@@ -503,9 +508,17 @@ export default function Feedback({
 					})
 				}
 			},
+			onRateLimit: () => {
+				setGenerating(false)
+
+				setRateLimitModalOpen(true)
+			},
+			onError: (error) => {
+				log.error("Follow-up error", { error })
+			},
 		})
 
-		setStopGenerating(() => stopGenerating)
+		setStopGenerating(() => stop)
 	}
 
 	return (
@@ -665,7 +678,7 @@ export default function Feedback({
 								/>
 							</div>
 
-							<hr className="mt-2 mb-3" />
+							<hr className="mb-3 mt-2" />
 						</div>
 
 						<div className="min-w-[192px] flex-1" />

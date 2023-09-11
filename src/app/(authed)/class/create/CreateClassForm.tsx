@@ -79,6 +79,8 @@ export default function CreateClassForm({
 			syncedUrl: linkedCourse?.url,
 		})
 
+		router.refresh()
+
 		router.push(`/class/${id}`)
 	}
 
@@ -213,7 +215,7 @@ export default function CreateClassForm({
 				className="flex h-full flex-col space-y-2.5"
 			>
 				<div className="flex h-full flex-col space-y-2.5 overflow-y-auto">
-					<Card className="flex flex-col space-y-2 py-5 px-6 shadow-sm">
+					<Card className="flex flex-col space-y-2 px-6 py-5 shadow-sm">
 						<Label>Link class</Label>
 
 						{linkedCourse ? (
@@ -227,7 +229,7 @@ export default function CreateClassForm({
 								<button
 									type="button"
 									onClick={onUnlink}
-									className="group absolute -top-1.5 -right-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full border-[0.75px] border-border bg-surface-selected transition-all duration-150 hover:bg-surface-selected-hover"
+									className="group absolute -right-1.5 -top-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full border-[0.75px] border-border bg-surface-selected transition-all duration-150 hover:bg-surface-selected-hover"
 								>
 									<X
 										size={14}
@@ -304,7 +306,7 @@ export default function CreateClassForm({
 					</Card>
 				</div>
 
-				<Card className="flex space-x-3 py-5 px-6 shadow-sm">
+				<Card className="flex space-x-3 px-6 py-5 shadow-sm">
 					<FancyButton
 						size="large"
 						type="submit"

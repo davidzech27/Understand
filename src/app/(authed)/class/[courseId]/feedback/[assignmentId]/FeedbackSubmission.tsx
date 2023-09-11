@@ -7,6 +7,7 @@ import {
 } from "react"
 import { renderToStaticMarkup } from "react-dom/server"
 import DOMPurify from "dompurify"
+import { useLogger } from "next-axiom"
 
 import splitSentences from "~/utils/splitSentences"
 import colors from "colors.cjs"
@@ -96,6 +97,8 @@ export default function FeedbackSubmission({
 	onChangeParagraphYOffsets,
 }: Props) {
 	const ref = useRef<HTMLDivElement>(null)
+
+	const log = useLogger()
 
 	const addHighlights = useEffectEvent(() => {
 		if (ref.current !== null) {
@@ -211,8 +214,8 @@ export default function FeedbackSubmission({
 					const highlightSpan = document.getElementById(highlightId)
 
 					if (highlightSpan === null) {
-						console.error(
-							"This shouldn't happen. Span corresponding to feedback element should be in DOM",
+						log.error(
+							"Span corresponding to feedback element not found in DOM",
 							{ paragraph, sentence }
 						)
 

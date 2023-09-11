@@ -1,9 +1,9 @@
 export const preferredRegion = "pdx1"
 
 export default function AuthLayout({
-    children,
+	children,
 }: {
-    children: React.ReactNode
+	children: React.ReactNode
 }) {
-    return children
+	return children
 }

@@ -1,8 +1,19 @@
 "use client"
+import { useEffect, useRef } from "react"
+import { useLogger } from "next-axiom"
 
 export default function Error({ error }: { error: Error }) {
-	// TODO - potentially implement better error logging
-	console.error("Error: ", error)
+	const log = useLogger()
+
+	const logged = useRef(false)
+
+	useEffect(() => {
+		if (!logged.current) {
+			log.error("Client-side error", { error })
+
+			logged.current = true
+		}
+	}, [error, log])
 
 	return (
 		<main className="flex h-screen w-screen flex-col bg-black">

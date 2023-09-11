@@ -1,6 +1,7 @@
 import { verifySignature } from "@upstash/qstash/nextjs"
 import { type NextApiRequest, NextApiResponse } from "next"
 import { z } from "zod"
+import { Logger } from "next-axiom"
 
 import callGenerate from "./callGenerate"
 import generateStudentInsights from "./generateStudentInsights"
@@ -27,7 +28,7 @@ const generateCallSchema = z.discriminatedUnion("name", [
 export type GenerateCall = z.infer<typeof generateCallSchema>
 
 async function insightsHandler(req: NextApiRequest, res: NextApiResponse) {
-	console.info("Insights API handler body: ", JSON.stringify(req.body))
+	new Logger().info("Insights sync called", req.body)
 
 	const generateCall = generateCallSchema.parse(req.body)
 

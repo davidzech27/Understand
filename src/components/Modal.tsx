@@ -23,7 +23,7 @@ export default function Modal({
 			<Dialog.Portal className="fixed inset-0 h-screen w-screen">
 				<Dialog.Overlay className="fixed inset-0 z-50 bg-[#00000060]" />
 
-				<Dialog.Content className="fixed left-[12.5vw] right-[12.5vw] top-[16.6667vh] bottom-[16.6667vh] z-50 flex flex-col justify-between rounded-md bg-white">
+				<Dialog.Content className="fixed bottom-[16.6667vh] left-[12.5vw] right-[12.5vw] top-[16.6667vh] z-50 flex flex-col justify-between rounded-md bg-white">
 					<div className="mx-6 mt-6 flex items-center justify-between">
 						<Dialog.Title asChild>
 							<Heading size="2xLarge" className="mb-0.5">

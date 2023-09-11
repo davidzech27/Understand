@@ -36,7 +36,7 @@ export default async function StudentFeedbackPage({
 	if (user === undefined) notFound()
 
 	return (
-		<Card className="flex flex-1 flex-col space-y-2 py-5 px-6">
+		<Card className="flex flex-1 flex-col space-y-2 px-6 py-5">
 			{feedbackStream.length !== 0 ? (
 				<StudentFeedbackStream
 					studentEmail={email}

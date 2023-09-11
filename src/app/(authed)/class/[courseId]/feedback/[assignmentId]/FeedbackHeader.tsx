@@ -19,7 +19,7 @@ export default function FeedbackHeader({ assignment, buttons }: Props) {
 			</div>
 
 			{assignment.description !== undefined && (
-				<p className="mt-3.5 mb-0.5 select-text text-sm text-black/60">
+				<p className="mb-0.5 mt-3.5 select-text text-sm text-black/60">
 					{assignment.description}
 				</p>
 			)}

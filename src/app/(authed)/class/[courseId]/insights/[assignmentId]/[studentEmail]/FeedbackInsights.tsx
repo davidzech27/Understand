@@ -35,7 +35,7 @@ export default function FeedbackInsights({
 				<div className="w-[704px]">
 					<FeedbackHeader assignment={assignment} />
 
-					<hr className="mt-2 mb-3" />
+					<hr className="mb-3 mt-2" />
 				</div>
 
 				<div className="min-w-[192px] flex-1" />

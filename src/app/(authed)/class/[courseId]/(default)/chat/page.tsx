@@ -37,7 +37,7 @@ export default async function ChatPage({
 		notFound()
 
 	return (
-		<Card className="flex flex-1 flex-col py-5 px-6">
+		<Card className="flex flex-1 flex-col px-6 py-5">
 			<Chat
 				courseId={courseId}
 				courseName={course.name}

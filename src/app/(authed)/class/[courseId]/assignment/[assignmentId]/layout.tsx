@@ -45,7 +45,7 @@ export default async function AssignmentLayout({
 
 	return (
 		<div className="-mr-2 flex h-full flex-col space-y-2.5 overflow-y-scroll">
-			<Card className="py-3 px-4">
+			<Card className="px-4 py-3">
 				<AssignmentTabs assignment={assignment} />
 			</Card>
 

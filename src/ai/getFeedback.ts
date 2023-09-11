@@ -18,8 +18,9 @@ export default function getFeedback({
 	studentName,
 	submissionText,
 	onContent,
-	onRateLimit,
 	onFinish,
+	onRateLimit,
+	onError,
 }: {
 	assignmentTitle: string
 	assignmentInstructions: string
@@ -34,8 +35,9 @@ export default function getFeedback({
 		paragraph?: number
 		sentence?: number
 	}) => void
-	onRateLimit: () => void
 	onFinish: ({ rawResponse }: { rawResponse: string }) => void
+	onRateLimit: () => void
+	onError: (error: Error) => void
 }) {
 	let lastParagraphNumber = -1
 	let lastSentenceNumber = -1
@@ -103,8 +105,6 @@ Begin.`,
 			frequencyPenalty: 0.25,
 		}
 
-	console.info(messages.map(({ content }) => content).join("\n\n\n\n"))
-
 	const initialMessage = `Alright ${
 		studentName.split(" ")[0]
 	}, let's take a look at your work....`
@@ -125,7 +125,7 @@ Begin.`,
 					paragraph: undefined,
 					sentence: undefined,
 				}),
-			initialMessagePartIndex * 100
+			initialMessagePartIndex * 200
 		)
 	}
 
@@ -187,9 +187,8 @@ Begin.`,
 					}
 
 					if (lastParagraphNumber === -1) {
-						console.error(
-							"lastParagraphNumber should only be -1 if it is not found, which shouldn't happen",
-							{ lastParagraphNumber, lastSentenceNumber }
+						onError(
+							new Error("Feedback paragraph number not found")
 						)
 					} else {
 						onContent({
@@ -201,15 +200,13 @@ Begin.`,
 				}
 			}
 		},
-		onRateLimit,
-		onFinish: (content) => {
-			console.log(content)
-
+		onFinish: (content) =>
 			onFinish({
 				rawResponse: content,
-			})
-		},
+			}),
+		onRateLimit,
+		onError,
 	})
 
-	return { stopGenerating: stop }
+	return { stop }
 }

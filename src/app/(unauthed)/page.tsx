@@ -74,7 +74,7 @@ Both teachers and students are empowered to
 
 
 */}
-						<p className="mr-36 mb-8 mt-4 select-text text-xl font-medium text-black/70 mobile:mr-0 mobile:text-lg">
+						<p className="mb-8 mr-36 mt-4 select-text text-xl font-medium text-black/70 mobile:mr-0 mobile:text-lg">
 							Understand provides students with instant, in-depth
 							feedback on their writing that they can respond to,
 							and aggregates this feedback into nuanced and
@@ -98,7 +98,7 @@ Both teachers and students are empowered to
 						<img
 							src="/TeacherInsights.png"
 							alt="Screenshot of student feedback"
-							className="absolute -top-32 -left-8 w-96 origin-top-left rounded-xl border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016] transition-all duration-[400ms] ease-out hover:z-20 hover:scale-125 hover:shadow-xl active:scale-125"
+							className="absolute -left-8 -top-32 w-96 origin-top-left rounded-xl border-[0.5px] border-border object-cover shadow-lg shadow-[#00000016] transition-all duration-[400ms] ease-out hover:z-20 hover:scale-125 hover:shadow-xl active:scale-125"
 						/>
 					</div>
 				</div>
@@ -116,7 +116,7 @@ Both teachers and students are empowered to
 								Teachers create assignments for their classes
 							</h2>
 
-							<p className="mt-4 ml-0.5 select-text text-lg font-medium text-black/70 mobile:text-base">
+							<p className="ml-0.5 mt-4 select-text text-lg font-medium text-black/70 mobile:text-base">
 								Teachers add assignments to Understand either
 								manually or automatically via a sync with a
 								Google Classroom class. Understand will use
@@ -132,7 +132,7 @@ Both teachers and students are empowered to
 								Students receive feedback on their work
 							</h2>
 
-							<p className="mt-4 ml-0.5 select-text text-lg font-medium text-black/70 mobile:text-base">
+							<p className="ml-0.5 mt-4 select-text text-lg font-medium text-black/70 mobile:text-base">
 								Understand provides students with in-depth,
 								interactive AI feedback on their work whenever
 								they want it. Students can respond to feedback
@@ -150,7 +150,7 @@ Both teachers and students are empowered to
 								teachers
 							</h2>
 
-							<p className="mt-4 ml-0.5 select-text text-lg font-medium text-black/70 mobile:text-base">
+							<p className="ml-0.5 mt-4 select-text text-lg font-medium text-black/70 mobile:text-base">
 								The feedback students receive is aggregated into
 								nuanced and actionable insights for teachers.
 								Assignment insights display the strengths and

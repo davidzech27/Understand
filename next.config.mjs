@@ -1,3 +1,4 @@
+import { withAxiom } from "next-axiom"
 import nextBundleAnalyzer from "@next/bundle-analyzer"
 
 import "./env.mjs"
@@ -18,4 +19,4 @@ const config = {
 	},
 }
 
-export default nextBundleAnalyzer({ enabled: false })(config)
+export default nextBundleAnalyzer({ enabled: false })(withAxiom(config))

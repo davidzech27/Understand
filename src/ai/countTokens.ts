@@ -6,7 +6,7 @@ const responseSchema = z.number()
 
 const textEncoder = new TextEncoder()
 
-export default async function countTokens(
+export default (async function countTokens(
 	arg:
 		| { text: string }
 		| {
@@ -24,4 +24,4 @@ export default async function countTokens(
 			})
 		).json()
 	)
-}
+})

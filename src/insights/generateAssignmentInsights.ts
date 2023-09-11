@@ -1,3 +1,5 @@
+import { Logger } from "next-axiom"
+
 import Assignment from "~/data/Assignment"
 import getCompletion from "~/ai/getCompletion"
 import Feedback from "~/data/Feedback"
@@ -10,6 +12,8 @@ export default async function generateAssignmentInsights({
 	courseId: string
 	assignmentId: string
 }) {
+	const log = new Logger()
+
 	const [previousAssignmentInsights, unsyncedFeedbackInsights, assignment] =
 		await Promise.all([
 			Assignment({ courseId, assignmentId }).insights(),
@@ -18,7 +22,7 @@ export default async function generateAssignmentInsights({
 		])
 
 	if (assignment === undefined) {
-		console.error("Assignment could not be found", {
+		log.error("Assignment could not be found for insight generation", {
 			courseId,
 			assignmentId,
 		})
@@ -100,12 +104,13 @@ Begin.`,
 		frequencyPenalty: 0.0,
 	})
 
-	console.info(
-		"Merged insight prompt messages: ",
-		mergedInsightsPromptMessages
-	)
-
-	console.info("Merged insight completion: ", mergedInsightsCompletion)
+	log.info("Assignment insights merged", {
+		courseId,
+		assignmentId,
+		messages: mergedInsightsPromptMessages
+			.map(({ content }) => content)
+			.concat(mergedInsightsCompletion),
+	})
 
 	const mergedInsights = mergedInsightsCompletion
 		.split("\n\n")

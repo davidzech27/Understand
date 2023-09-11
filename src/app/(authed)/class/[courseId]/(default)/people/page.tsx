@@ -74,7 +74,7 @@ export default async function PeoplePage({
 								note={
 									!signedUp ? "Not yet signed up" : undefined
 								}
-								disabled={role !== "teacher"}
+								disabled={role !== "teacher" || !signedUp}
 								key={email}
 							/>
 						),

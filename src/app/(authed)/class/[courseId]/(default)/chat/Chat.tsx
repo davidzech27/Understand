@@ -1,5 +1,6 @@
 "use client"
 import { useRef, useState } from "react"
+import { useLogger } from "next-axiom"
 import { Send } from "lucide-react"
 
 import { type User } from "~/data/User"
@@ -38,6 +39,18 @@ export default function Chat({
 	const [featureBlockModalOpen, setFeatureBlockModalOpen] = useState(false)
 
 	const [rateLimitModalOpen, setRateLimitModalOpen] = useState(false)
+
+	const log = useLogger()
+
+	const onRateLimit = () => {
+		setGenerating(false)
+
+		setRateLimitModalOpen(true)
+	}
+
+	const onError = (error: Error) => {
+		log.error("Chat error", { error })
+	}
 
 	const onSend = async () => {
 		if (
@@ -88,14 +101,7 @@ If the above conversation contains a request for your help, respond with somethi
 				maxTokens: 100,
 				reason: "chat",
 				onContent: () => {},
-				onRateLimit: () => {
-					setGenerating(false)
-
-					setRateLimitModalOpen(true)
-				},
 				onFinish: async (content) => {
-					console.info("Predicted similar resources: ", content)
-
 					if (content === "N/A") {
 						fetchOpenAI({
 							messages: [
@@ -153,14 +159,11 @@ ${newMessages[0]}`,
 									})
 								}
 							},
-							onRateLimit: () => {
-								setGenerating(false)
-
-								setRateLimitModalOpen(true)
-							},
 							onFinish: () => {
 								setGenerating(false)
 							},
+							onRateLimit,
+							onError,
 						})
 					} else {
 						const similarResources =
@@ -168,8 +171,6 @@ ${newMessages[0]}`,
 								courseId,
 								similarText: content,
 							})
-
-						console.info("Similar resources: ", similarResources)
 
 						fetchOpenAI({
 							messages: [
@@ -239,17 +240,16 @@ ${newMessages[0]}`,
 									})
 								}
 							},
-							onRateLimit: () => {
-								setGenerating(false)
-
-								setRateLimitModalOpen(true)
-							},
 							onFinish: () => {
 								setGenerating(false)
 							},
+							onRateLimit,
+							onError,
 						})
 					}
 				},
+				onRateLimit,
+				onError,
 			})
 		} else {
 			fetchOpenAI({
@@ -303,14 +303,11 @@ ${newMessages[0]}`,
 						})
 					}
 				},
-				onRateLimit: () => {
-					setGenerating(false)
-
-					setRateLimitModalOpen(true)
-				},
 				onFinish: () => {
 					setGenerating(false)
 				},
+				onRateLimit,
+				onError,
 			})
 		}
 	}
@@ -331,7 +328,7 @@ ${newMessages[0]}`,
 			<div className="relative h-full">
 				<div
 					ref={scrollerRef}
-					className="absolute top-0 left-0 right-0 bottom-0 flex flex-col space-y-1 overflow-y-scroll rounded-md border-[0.75px] border-border bg-surface-hover pl-3 pr-1 pt-3 pb-[57.5px]"
+					className="absolute bottom-0 left-0 right-0 top-0 flex flex-col space-y-1 overflow-y-scroll rounded-md border-[0.75px] border-border bg-surface-hover pb-[57.5px] pl-3 pr-1 pt-3"
 				>
 					{messages.map((message, index) => (
 						<div
@@ -345,7 +342,7 @@ ${newMessages[0]}`,
 					))}
 				</div>
 
-				<div className="absolute right-3 left-3 bottom-3 backdrop-blur-sm">
+				<div className="absolute bottom-3 left-3 right-3 backdrop-blur-sm">
 					<TextArea
 						value={messageInput}
 						setValue={setMessageInput}
@@ -360,7 +357,7 @@ ${newMessages[0]}`,
 						style={{
 							height: messageInput.length === 0 ? 42 : "auto",
 						}}
-						className="py-2 px-3"
+						className="px-3 py-2"
 					/>
 
 					<Send

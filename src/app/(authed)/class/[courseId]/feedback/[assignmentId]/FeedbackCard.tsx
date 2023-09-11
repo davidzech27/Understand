@@ -240,7 +240,7 @@ export default function FeedbackCard({
 											<button
 												key={text}
 												onClick={onClick}
-												className="rounded-md border border-border bg-surface py-1.5 px-3 text-base text-black/80 transition hover:bg-surface-hover focus-visible:bg-surface-hover active:bg-surface-hover"
+												className="rounded-md border border-border bg-surface px-3 py-1.5 text-base text-black/80 transition hover:bg-surface-hover focus-visible:bg-surface-hover active:bg-surface-hover"
 											>
 												{text}
 											</button>
@@ -263,7 +263,7 @@ export default function FeedbackCard({
 							}}
 							autoComplete="off"
 							ref={inputRef}
-							className="py-1.5 px-3 text-base text-black/80"
+							className="px-3 py-1.5 text-base text-black/80"
 						/>
 					</div>
 				</div>

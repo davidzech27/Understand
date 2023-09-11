@@ -50,7 +50,7 @@ export default async function StudentLayout({
 
 	return (
 		<div className="-mr-2 flex h-full flex-col space-y-2.5 overflow-y-scroll">
-			<Card className="flex flex-col justify-between py-3 px-4">
+			<Card className="flex flex-col justify-between px-4 py-3">
 				<div className="flex space-x-1.5">
 					<LinkButton
 						href={`/class/${courseId}/student/${email}/insights`}
@@ -66,7 +66,7 @@ export default async function StudentLayout({
 				</div>
 			</Card>
 
-			<Card className="flex items-center py-5 px-6">
+			<Card className="flex items-center px-6 py-5">
 				<Avatar
 					src={student.photo}
 					name={student.name}

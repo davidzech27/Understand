@@ -1,3 +1,5 @@
+import { Logger } from "next-axiom"
+
 import Assignment from "~/data/Assignment"
 import Course from "~/data/Course"
 import GoogleAPI from "~/google/GoogleAPI"
@@ -428,7 +430,10 @@ export default async function syncResources({
 		),
 	]
 
-	console.info("Assignment ids to sync: ", assignmentIdsToSync)
+	new Logger().info("Assignment ids initiated for sync", {
+		courseId,
+		assignmentIdsToSync,
+	})
 
 	return {
 		assignmentIdsToSync,

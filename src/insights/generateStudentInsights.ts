@@ -1,3 +1,5 @@
+import { Logger } from "next-axiom"
+
 import User from "~/data/User"
 import getCompletion from "~/ai/getCompletion"
 import Feedback from "~/data/Feedback"
@@ -10,6 +12,8 @@ export default async function generateStudentInsights({
 	courseId: string
 	studentEmail: string
 }) {
+	const log = new Logger()
+
 	const [
 		previousStudentInsights,
 		unsyncedFeedbackInsights,
@@ -25,7 +29,8 @@ export default async function generateStudentInsights({
 	])
 
 	if (student === undefined) {
-		console.error("Student could not be found", {
+		log.error("Student could not be found for insight generation", {
+			courseId,
 			studentEmail,
 		})
 
@@ -117,12 +122,13 @@ Begin.`,
 		frequencyPenalty: 0.0,
 	})
 
-	console.info(
-		"Merged insight prompt messages: ",
-		mergedInsightsPromptMessages
-	)
-
-	console.info("Merged insight completion: ", mergedInsightsCompletion)
+	log.info("Student insights merged", {
+		courseId,
+		studentEmail,
+		messages: mergedInsightsPromptMessages
+			.map(({ content }) => content)
+			.concat(mergedInsightsCompletion),
+	})
 
 	const mergedInsights = mergedInsightsCompletion
 		.split("\n\n")

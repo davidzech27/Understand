@@ -43,7 +43,7 @@ export default async function ClassPage({
 				</GradientText>
 
 				{course.section && (
-					<div className="relative top-1 mr-1 ml-3 flex-shrink-0 text-base font-semibold leading-none text-black/70 mobile:mr-0 mobile:text-sm">
+					<div className="relative top-1 ml-3 mr-1 flex-shrink-0 text-base font-semibold leading-none text-black/70 mobile:mr-0 mobile:text-sm">
 						{course.section}
 					</div>
 				)}
@@ -62,7 +62,7 @@ export default async function ClassPage({
 			<>
 				{courseHeader}
 
-				<Card className="flex flex-1 flex-col space-y-2 py-5 px-6">
+				<Card className="flex flex-1 flex-col space-y-2 px-6 py-5">
 					{feedbackStream.length !== 0 ? (
 						<>
 							<Heading size="large" className="ml-1">
@@ -96,7 +96,7 @@ export default async function ClassPage({
 			<>
 				{courseHeader}
 
-				<Card className="flex flex-1 flex-col space-y-2 py-5 px-6">
+				<Card className="flex flex-1 flex-col space-y-2 px-6 py-5">
 					{feedbackStream.length !== 0 ? (
 						<>
 							<Heading size="large" className="ml-1">

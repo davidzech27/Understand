@@ -1,6 +1,7 @@
-import { type NextRequest } from "next/server"
+import { NextRequest } from "next/server"
 import { z } from "zod"
 import { OpenAIStream, StreamingTextResponse } from "ai"
+import { withAxiom, type Logger } from "next-axiom"
 
 import env from "env.mjs"
 import { getAuth } from "~/auth/jwt"
@@ -32,7 +33,9 @@ const requestSchema = z.object({
 
 export type OpenAIRequest = z.infer<typeof requestSchema>
 
-export default async function openaiHandler(request: NextRequest) {
+export default withAxiom(async function openaiHandler(
+	request: NextRequest & { log: Logger }
+) {
 	const auth = await getAuth({ cookies: request.cookies })
 
 	if (auth === undefined)
@@ -42,6 +45,16 @@ export default async function openaiHandler(request: NextRequest) {
 
 	if (!requestParsed.success)
 		return new Response("Bad Request", { status: 400 })
+
+	const {
+		messages,
+		model,
+		temperature,
+		presencePenalty,
+		frequencyPenalty,
+		maxTokens,
+		reason,
+	} = requestParsed.data
 
 	// since no await, may allow users to go over limit if requests are in close proximity. change if users not associated with an onboarded school can send requests
 	const unregisterCompletionStreamPromise = User({
@@ -60,16 +73,6 @@ export default async function openaiHandler(request: NextRequest) {
 
 			return new Response("Rate limit exceeded", { status: 429 })
 		}
-
-		const {
-			messages,
-			model,
-			temperature,
-			presencePenalty,
-			frequencyPenalty,
-			maxTokens,
-			reason,
-		} = requestParsed.data
 
 		const openaiResponse = await fetch(
 			"https://api.openai.com/v1/chat/completions",
@@ -99,12 +102,15 @@ export default async function openaiHandler(request: NextRequest) {
 			onToken: () => {
 				completionTokens++
 			},
-			onFinal: async () => {
+			onFinal: async (completion) => {
 				const promptTokens = await promptTokensPromise
 
-				console.info("User OpenAI request", {
+				request.log.info("User OpenAI request", {
 					email: auth.email,
 					reason,
+					messages: messages
+						.map(({ content }) => content)
+						.concat(completion),
 					cost:
 						tokenCost.prompt[model] * promptTokens +
 						tokenCost.completion[model] * completionTokens,
@@ -123,10 +129,14 @@ export default async function openaiHandler(request: NextRequest) {
 
 		return new StreamingTextResponse(openaiStream)
 	} catch (error) {
-		console.error(error)
+		request.log.error("User OpenAI request error", {
+			email: auth.email,
+			reason,
+			error,
+		})
 
 		await (
 			await unregisterCompletionStreamPromise
 		)()
 	}
-}
+})

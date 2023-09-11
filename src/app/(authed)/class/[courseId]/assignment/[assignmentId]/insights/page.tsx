@@ -1,3 +1,5 @@
+import { notFound } from "next/navigation"
+
 import Assignment from "~/data/Assignment"
 import User from "~/data/User"
 import cn from "~/utils/cn"
@@ -23,30 +25,39 @@ export default async function AssignmentInsightsPage({
 }: {
 	params: Params
 }) {
-	const assignmentInsights = (
-		await Assignment({
+	const [assignmentInsights, assignment] = await Promise.all([
+		Assignment({
 			courseId,
 			assignmentId,
-		}).insights()
-	)?.map((insight) => ({
-		...insight,
-		sources: insight.sources.map((source) => ({
-			student: User({
-				email: source.studentEmail,
-			})
-				.get()
-				.then((student) => student ?? { email: "", name: "" }),
-			submission: User({
-				email: source.studentEmail,
-			})
-				.lastFeedbackInsights({ courseId, assignmentId })
-				.then(
-					(lastFeedbackInsights) =>
-						lastFeedbackInsights?.submissionHTML ?? ""
-				),
-			paragraphs: source.paragraphs,
-		})),
-	}))
+		})
+			.insights()
+			.then((insights) =>
+				insights?.map((insight) => ({
+					...insight,
+					sources: insight.sources.map((source) => ({
+						student: User({
+							email: source.studentEmail,
+						})
+							.get()
+							.then(
+								(student) => student ?? { email: "", name: "" }
+							),
+						submission: User({
+							email: source.studentEmail,
+						})
+							.lastFeedbackInsights({ courseId, assignmentId })
+							.then(
+								(lastFeedbackInsights) =>
+									lastFeedbackInsights?.submissionHTML ?? ""
+							),
+						paragraphs: source.paragraphs,
+					})),
+				}))
+			),
+		Assignment({ courseId, assignmentId }).get(),
+	])
+
+	if (assignment === undefined) notFound()
 
 	const strengths = (assignmentInsights ?? []).filter(
 		(insight) => insight.type === "strength"
@@ -65,7 +76,7 @@ export default async function AssignmentInsightsPage({
 	return (
 		<Card
 			className={cn(
-				"flex flex-col space-y-2 px-6 pt-5 pb-80",
+				"flex flex-col space-y-2 px-6 pb-80 pt-5",
 				(assignmentInsights === undefined ||
 					assignmentInsights.length === 0) &&
 					"h-full"
@@ -73,7 +84,9 @@ export default async function AssignmentInsightsPage({
 		>
 			{assignmentInsights === undefined ||
 			assignmentInsights.length === 0 ? (
-				<Heading size="large">No insights for assignment yet</Heading>
+				<Heading size="large">
+					No insights from {assignment.title} yet
+				</Heading>
 			) : (
 				<>
 					<div className="flex justify-between px-1">

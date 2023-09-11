@@ -53,7 +53,7 @@ export default async function AssignmentStudentsPage({
 	}))
 
 	return (
-		<Card className="flex h-full flex-col px-6 pt-5 pb-80">
+		<Card className="flex h-full flex-col px-6 pb-80 pt-5">
 			<ClassFeedback
 				courseId={courseId}
 				assignmentId={assignmentId}

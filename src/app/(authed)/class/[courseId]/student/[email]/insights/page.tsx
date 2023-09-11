@@ -1,3 +1,5 @@
+import { notFound } from "next/navigation"
+
 import cn from "~/utils/cn"
 import Card from "~/components/Card"
 import User from "~/data/User"
@@ -25,34 +27,44 @@ export default async function StudentInsightsPage({
 }) {
 	email = decodeURIComponent(email)
 
-	const studentInsights = (
-		await User({
+	const [studentInsights, student] = await Promise.all([
+		User({
 			email,
-		}).insights({ courseId })
-	)?.map((insight) => ({
-		...insight,
-		sources: insight.sources.map((source) => ({
-			assignment: Assignment({
-				courseId,
-				assignmentId: source.assignmentId,
-			})
-				.get()
-				.then(
-					(assignment) =>
-						assignment ?? { assignmentId: "", title: "" }
-				),
-			submissionHTML: User({ email })
-				.lastFeedbackInsights({
-					courseId,
-					assignmentId: source.assignmentId,
-				})
-				.then(
-					(lastFeedbackInsights) =>
-						lastFeedbackInsights?.submissionHTML ?? ""
-				),
-			paragraphs: source.paragraphs,
-		})),
-	}))
+		})
+			.insights({ courseId })
+			.then((insights) =>
+				insights?.map((insight) => ({
+					...insight,
+					sources: insight.sources.map((source) => ({
+						assignment: Assignment({
+							courseId,
+							assignmentId: source.assignmentId,
+						})
+							.get()
+							.then(
+								(assignment) =>
+									assignment ?? {
+										assignmentId: "",
+										title: "",
+									}
+							),
+						submissionHTML: User({ email })
+							.lastFeedbackInsights({
+								courseId,
+								assignmentId: source.assignmentId,
+							})
+							.then(
+								(lastFeedbackInsights) =>
+									lastFeedbackInsights?.submissionHTML ?? ""
+							),
+						paragraphs: source.paragraphs,
+					})),
+				}))
+			),
+		User({ email }).get(),
+	])
+
+	if (student === undefined) notFound()
 
 	const strengths = (studentInsights ?? []).filter(
 		(insight) => insight.type === "strength"
@@ -74,14 +86,16 @@ export default async function StudentInsightsPage({
 	return (
 		<Card
 			className={cn(
-				"flex flex-col space-y-2 px-6 pt-5 pb-80",
+				"flex flex-col space-y-2 px-6 pb-80 pt-5",
 				(studentInsights === undefined ||
 					studentInsights.length === 0) &&
 					"h-full"
 			)}
 		>
 			{studentInsights === undefined || studentInsights.length === 0 ? (
-				<Heading size="large">No insights for student yet</Heading>
+				<Heading size="large">
+					No insights from {student.name}&apos;s work yet
+				</Heading>
 			) : (
 				<>
 					<div className="flex justify-between px-1">

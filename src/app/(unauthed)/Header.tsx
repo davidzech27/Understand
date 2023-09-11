@@ -17,7 +17,7 @@ export default function Header() {
 
 	return (
 		<>
-			<header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between bg-white/70 px-8 py-4 backdrop-blur-xl sm-mobile:px-6">
+			<header className="fixed left-0 right-0 top-0 z-50 flex items-center justify-between bg-white/70 px-8 py-4 backdrop-blur-xl sm-mobile:px-6">
 				<button
 					onClick={() => {
 						if (pathname === "/")

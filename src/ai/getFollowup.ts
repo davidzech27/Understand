@@ -10,8 +10,9 @@ export default function getFollowUp({
 	studentName,
 	unrevisedSubmissionText,
 	onContent,
-	onRateLimit,
 	onFinish,
+	onRateLimit,
+	onError,
 }: {
 	paragraph: number | undefined
 	sentence: number | undefined
@@ -21,8 +22,9 @@ export default function getFollowUp({
 	studentName: string
 	unrevisedSubmissionText: string
 	onContent: (content: string) => void
-	onRateLimit: () => void
 	onFinish: ({ rawResponse }: { rawResponse: string }) => void
+	onRateLimit: () => void
+	onError: (error: Error) => void
 }) {
 	const followUpFeedback = feedback.list.find(
 		(feedbackItem) =>
@@ -121,8 +123,6 @@ New content: """${revision.newContent}"""`
 			frequencyPenalty: 0.25,
 		}
 
-	console.info(messages.map(({ content }) => content).join("\n\n\n\n"))
-
 	const { stop } = fetchOpenAI({
 		messages,
 		model,
@@ -131,13 +131,14 @@ New content: """${revision.newContent}"""`
 		frequencyPenalty,
 		reason: "followUp",
 		onContent,
-		onRateLimit,
 		onFinish: (content) => {
 			onFinish({
 				rawResponse: content,
 			})
 		},
+		onRateLimit,
+		onError,
 	})
 
-	return { stopGenerating: stop }
+	return { stop }
 }
