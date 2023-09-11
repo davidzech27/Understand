@@ -85,7 +85,7 @@ export default function Breadcrumbs({ coursesPromise }: Props) {
 											</span>
 										</div>
 									) : (
-										<span className="text-xl font-semibold leading-none text-black/90">
+										<span className="text-xl font-semibold text-black/90">
 											{course.name}
 										</span>
 									)}
