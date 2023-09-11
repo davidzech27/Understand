@@ -33,7 +33,7 @@ const requestSchema = z.object({
 export type OpenAIRequest = z.infer<typeof requestSchema>
 
 export default withAxiom(async function openaiHandler(request: AxiomRequest) {
-	if (!("cookies"  in request)) return
+	if (!("cookies" in request)) return
 
 	const auth = await getAuth({ cookies: request.cookies })
 

@@ -1,4 +1,4 @@
-import { type NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { withAxiom, type AxiomRequest } from "next-axiom"
 
 import env from "env.mjs"
@@ -103,4 +103,4 @@ export default withAxiom(async function oauthCallbackHandler(
 	])
 
 	return response
-}) as (request: NextRequest) => NextResponse
+})
