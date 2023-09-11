@@ -1,7 +1,7 @@
-import { NextResponse, type NextRequest } from "next/server"
+import { NextResponse } from "next/server"
 import { z } from "zod"
 import { encodingForModel } from "js-tiktoken"
-import { withAxiom } from "next-axiom"
+import { withAxiom, type AxiomRequest } from "next-axiom"
 
 const requestSchema = z.union([
 	z.object({
@@ -16,7 +16,7 @@ const requestSchema = z.union([
 ])
 
 export default withAxiom(async function countTokensHandler(
-	request: NextRequest
+	request: AxiomRequest
 ) {
 	const requestParsed = requestSchema.safeParse(await request.json())
 

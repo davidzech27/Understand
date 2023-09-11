@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from "next/server"
-import { withAxiom, type Logger } from "next-axiom"
+import { NextResponse } from "next/server"
+import { withAxiom, type AxiomRequest } from "next-axiom"
 
 import env from "env.mjs"
 import { setAuth } from "~/auth/jwt"
@@ -10,8 +10,10 @@ import User from "~/data/User"
 import Course from "~/data/Course"
 
 export default withAxiom(async function oauthCallbackHandler(
-	request: NextRequest & { log: Logger }
+	request: AxiomRequest
 ) {
+	if (!("cookies" in request)) return
+
 	const { searchParams } = new URL(request.url)
 
 	const error = searchParams.get("error")

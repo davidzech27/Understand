@@ -1,7 +1,6 @@
-import { NextRequest } from "next/server"
 import { z } from "zod"
 import { OpenAIStream, StreamingTextResponse } from "ai"
-import { withAxiom, type Logger } from "next-axiom"
+import { withAxiom, type AxiomRequest } from "next-axiom"
 
 import env from "env.mjs"
 import { getAuth } from "~/auth/jwt"
@@ -33,9 +32,9 @@ const requestSchema = z.object({
 
 export type OpenAIRequest = z.infer<typeof requestSchema>
 
-export default withAxiom(async function openaiHandler(
-	request: NextRequest & { log: Logger }
-) {
+export default withAxiom(async function openaiHandler(request: AxiomRequest) {
+	if (!("cookies"  in request)) return
+
 	const auth = await getAuth({ cookies: request.cookies })
 
 	if (auth === undefined)
@@ -135,8 +134,6 @@ export default withAxiom(async function openaiHandler(
 			error,
 		})
 
-		await (
-			await unregisterCompletionStreamPromise
-		)()
+		await (await unregisterCompletionStreamPromise)()
 	}
 })
