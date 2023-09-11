@@ -36,6 +36,8 @@ export default withAxiom(async function oauthCallbackHandler(
 
 	const existingUserPromise = User({ email }).get()
 
+	request.log.info("Sign in", { email, name, photo })
+
 	await User({ email }).create({ name, photo })
 
 	const redirectTo =
