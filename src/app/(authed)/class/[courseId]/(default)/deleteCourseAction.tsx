@@ -10,7 +10,7 @@ import { getAuthOrThrow } from "~/auth/jwt"
 const deleteCourseAction = zact(
 	z.object({
 		id: z.string(),
-	})
+	}),
 )(async ({ id }) => {
 	const { email } = await getAuthOrThrow({ cookies: cookies() })
 

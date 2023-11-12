@@ -14,7 +14,7 @@ const registerFeedbackAction = zact(
 		submissionHTML: z.string(),
 		list: feedbackListSchema,
 		rawResponse: z.string(),
-	})
+	}),
 )(async ({ courseId, assignmentId, list, submissionHTML, rawResponse }) => {
 	const { email } = await getAuthOrThrow({ cookies: cookies() })
 

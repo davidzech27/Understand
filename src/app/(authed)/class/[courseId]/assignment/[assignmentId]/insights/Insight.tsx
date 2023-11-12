@@ -72,7 +72,7 @@ export default function Insight({
 										className={cn(
 											"h-2.5 rounded-l-md bg-primary opacity-80",
 											totalStudents - sources.length ===
-												0 && "rounded-r-md"
+												0 && "rounded-r-md",
 										)}
 									/>
 
@@ -113,7 +113,7 @@ export default function Insight({
 				}
 				className={cn(
 					"absolute left-0 right-0 z-10 overflow-y-hidden rounded-md border-border bg-surface shadow-lg shadow-[#00000012] transition-all duration-150",
-					expanded && "border-x-[0.75px] border-b-[0.75px]"
+					expanded && "border-x-[0.75px] border-b-[0.75px]",
 				)}
 			>
 				<div ref={sourceListRef}>
@@ -222,7 +222,7 @@ function SubmissionPreview({
 	const submissionPortions = useMemo(() => {
 		const submissionWithoutFontSizeStyle = submission.replaceAll(
 			/font-size:\w+;/g,
-			""
+			"",
 		)
 
 		if (paragraphs[0] === -1) return [submissionWithoutFontSizeStyle]
@@ -235,7 +235,7 @@ function SubmissionPreview({
 					line.textContent !== null &&
 					line.textContent.indexOf(".") !== -1 &&
 					line.textContent.indexOf(".") !==
-						line.textContent.lastIndexOf(".")
+						line.textContent.lastIndexOf("."),
 			)
 			.filter((_, index) => paragraphs.includes(index + 1))
 			.map((paragraph) => paragraph.outerHTML)

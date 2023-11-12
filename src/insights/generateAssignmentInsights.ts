@@ -1,5 +1,3 @@
-import { Logger } from "next-axiom"
-
 import Assignment from "~/data/Assignment"
 import getCompletion from "~/ai/getCompletion"
 import Feedback from "~/data/Feedback"
@@ -12,8 +10,6 @@ export default async function generateAssignmentInsights({
 	courseId: string
 	assignmentId: string
 }) {
-	const log = new Logger()
-
 	const [previousAssignmentInsights, unsyncedFeedbackInsights, assignment] =
 		await Promise.all([
 			Assignment({ courseId, assignmentId }).insights(),
@@ -22,7 +18,7 @@ export default async function generateAssignmentInsights({
 		])
 
 	if (assignment === undefined) {
-		log.error("Assignment could not be found for insight generation", {
+		console.error("Assignment could not be found for insight generation", {
 			courseId,
 			assignmentId,
 		})
@@ -31,21 +27,21 @@ export default async function generateAssignmentInsights({
 	}
 
 	const unsyncedStudentEmailSet = new Set(
-		unsyncedFeedbackInsights.map((insight) => insight.studentEmail)
+		unsyncedFeedbackInsights.map((insight) => insight.studentEmail),
 	)
 
 	const previousAssignmentInsightsWithoutUnsynced = previousAssignmentInsights
 		?.map((insight) => ({
 			...insight,
 			sources: insight.sources.filter(
-				(source) => !unsyncedStudentEmailSet.has(source.studentEmail)
+				(source) => !unsyncedStudentEmailSet.has(source.studentEmail),
 			),
 		}))
 		.filter((insight) => insight.sources.length !== 0)
 
 	const concatenatedInsights = (
 		previousAssignmentInsightsWithoutUnsynced?.map(
-			({ type, content, sources }) => ({ type, content, sources })
+			({ type, content, sources }) => ({ type, content, sources }),
 		) ?? []
 	).concat(
 		unsyncedFeedbackInsights
@@ -59,9 +55,9 @@ export default async function generateAssignmentInsights({
 							paragraphs: insight.paragraphs,
 						},
 					],
-				}))
+				})),
 			)
-			.flat()
+			.flat(),
 	)
 
 	const mergedInsightsPromptMessages = [
@@ -82,7 +78,7 @@ Type: ${insight.type}
 Student emails: ${insight.sources
 			.map(({ studentEmail }) => studentEmail)
 			.join(", ")}
-Content: ${insight.content}`
+Content: ${insight.content}`,
 	)
 	.join("\n\n")}
 
@@ -98,13 +94,13 @@ Begin.`,
 
 	const { completion: mergedInsightsCompletion, cost } = await getCompletion({
 		messages: mergedInsightsPromptMessages,
-		model: "gpt-4-0613",
+		model: "gpt-4",
 		temperature: 0,
 		presencePenalty: 0.0,
 		frequencyPenalty: 0.0,
 	})
 
-	log.info("Assignment insights merged", {
+	console.info("Assignment insights merged", {
 		courseId,
 		assignmentId,
 		messages: mergedInsightsPromptMessages
@@ -134,7 +130,7 @@ Begin.`,
 						content: insight.content,
 						sources: insight.sources,
 				  }
-				: undefined
+				: undefined,
 		)
 		.filter(Boolean)
 		.map((insight) => ({
@@ -145,7 +141,7 @@ Begin.`,
 				insight.sources
 					.map(
 						(sourceIndex) =>
-							concatenatedInsights[sourceIndex - 1]?.sources
+							concatenatedInsights[sourceIndex - 1]?.sources,
 					)
 					.filter(Boolean)
 					.flat()
@@ -157,11 +153,11 @@ Begin.`,
 								cur.paragraphs.includes(-1)
 									? [-1]
 									: (prev[cur.studentEmail] ?? []).concat(
-											cur.paragraphs
+											cur.paragraphs,
 									  ),
 						}),
-						{} as Record<string, number[]>
-					)
+						{} as Record<string, number[]>,
+					),
 			).map(([studentEmail, paragraphs]) => ({
 				studentEmail,
 				paragraphs,
@@ -175,7 +171,7 @@ Begin.`,
 				assignmentId,
 				userEmail: insight.studentEmail,
 				givenAt: insight.givenAt,
-			}).updateSynced({ insights: insight.insights })
+			}).updateSynced({ insights: insight.insights }),
 		),
 		Assignment({ courseId, assignmentId }).upsertInsights({
 			insights: mergedInsights,

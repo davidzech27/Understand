@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import { produce } from "immer"
+import { flushSync } from "react-dom"
 import { Plus } from "lucide-react"
 
 import cn from "../utils/cn"
@@ -36,7 +36,7 @@ export default function InputList({
 		if (singleWord) {
 			if (!wordsSplit.current) {
 				setValues((values) =>
-					values.map((value) => value.split(" ")).flat()
+					values.map((value) => value.split(" ")).flat(),
 				)
 
 				wordsSplit.current = true
@@ -49,20 +49,22 @@ export default function InputList({
 	const lastInputRef = useRef<HTMLInputElement>(null)
 
 	const [previousValuesLength, setPreviousValuesLength] = useState(
-		values.length
+		values.length,
 	)
 
 	if (previousValuesLength !== values.length) {
-		setPreviousValuesLength(values.length)
+		flushSync(() => {
+			setPreviousValuesLength(values.length)
+		})
 
-		Promise.resolve().then(() => lastInputRef.current?.focus())
+		lastInputRef.current?.focus()
 	}
 
 	return (
 		<div
 			className={cn(
 				"flex h-full w-full flex-wrap gap-x-3 gap-y-2.5",
-				className
+				className,
 			)}
 		>
 			{values.map((value, index) => (
@@ -70,11 +72,11 @@ export default function InputList({
 					key={index}
 					value={value}
 					setValue={(value) =>
-						setValues(
-							produce((values) => {
-								values[index] = value
-							})
-						)
+						setValues((values) => [
+							...values.slice(0, index),
+							value,
+							...values.slice(index + 1),
+						])
 					}
 					autoComplete={autoComplete}
 					id={id}
@@ -108,7 +110,7 @@ export default function InputList({
 				}}
 				className={cn(
 					"flex items-center justify-center self-center rounded-md border-[0.75px] border-border bg-surface outline-none transition-all duration-150 hover:border-[1px] hover:bg-surface-hover focus-visible:border-[1px] focus-visible:bg-surface-hover",
-					buttonClassName
+					buttonClassName,
 				)} // using an active selector might not be maintaining stylistic consistency
 			>
 				<Plus size={24} color="black" className="opacity-90" />

@@ -51,12 +51,12 @@ export const school = mysqlTable(
 	(table) => ({
 		cpk: primaryKey(table.districtName, table.name),
 		teacherEmailDomainIdx: index("teacher_email_domain_idx").on(
-			table.teacherEmailDomain
+			table.teacherEmailDomain,
 		),
 		studentEmailDomainIdx: index("student_email_domain_idx").on(
-			table.studentEmailDomain
+			table.studentEmailDomain,
 		),
-	})
+	}),
 )
 
 export const teacherToCourse = mysqlTable(
@@ -70,9 +70,9 @@ export const teacherToCourse = mysqlTable(
 		cpk: primaryKey(table.teacherEmail, table.courseId),
 		idx: uniqueIndex("course_id_teacher_email_unique_idx").on(
 			table.courseId,
-			table.teacherEmail
+			table.teacherEmail,
 		),
-	})
+	}),
 )
 
 export const studentToCourse = mysqlTable(
@@ -86,9 +86,9 @@ export const studentToCourse = mysqlTable(
 		cpk: primaryKey(table.studentEmail, table.courseId),
 		idx: uniqueIndex("course_id_student_email_unique_idx").on(
 			table.courseId,
-			table.studentEmail
+			table.studentEmail,
 		),
-	})
+	}),
 )
 
 export const course = mysqlTable(
@@ -108,9 +108,9 @@ export const course = mysqlTable(
 	},
 	(table) => ({
 		inviteCodeIdx: uniqueIndex("invite_code_unique_idx").on(
-			table.inviteCode
+			table.inviteCode,
 		),
-	})
+	}),
 )
 
 export const assignment = mysqlTable(
@@ -130,7 +130,7 @@ export const assignment = mysqlTable(
 	},
 	(table) => ({
 		cpk: primaryKey(table.courseId, table.assignmentId),
-	})
+	}),
 )
 
 export const feedback = mysqlTable(
@@ -153,16 +153,16 @@ export const feedback = mysqlTable(
 			table.courseId,
 			table.assignmentId,
 			table.userEmail,
-			table.givenAt
+			table.givenAt,
 		),
 		idx: index("course_id_given_at_idx").on(table.courseId, table.givenAt),
 		courseIdStudentEmailSyncedIdx: index(
-			"course_id_user_email_synced_insights_at_idx"
+			"course_id_user_email_synced_insights_at_idx",
 		).on(table.courseId, table.userEmail, table.syncedInsightsAt),
 		courseIdAssignmentIdSyncedIdx: index(
-			"course_id_assignment_id_synced_insights_at_idx"
+			"course_id_assignment_id_synced_insights_at_idx",
 		).on(table.courseId, table.assignmentId, table.syncedInsightsAt),
-	})
+	}),
 )
 
 export const studentInsight = mysqlTable(
@@ -177,7 +177,7 @@ export const studentInsight = mysqlTable(
 	},
 	(table) => ({
 		cpk: primaryKey(table.courseId, table.studentEmail),
-	})
+	}),
 )
 
 export const assignmentInsight = mysqlTable(
@@ -192,5 +192,5 @@ export const assignmentInsight = mysqlTable(
 	},
 	(table) => ({
 		cpk: primaryKey(table.courseId, table.assignmentId),
-	})
+	}),
 )

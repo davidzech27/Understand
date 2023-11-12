@@ -15,36 +15,32 @@ const registerFollowUpAction = zact(
 		paragraph: z.number().optional(),
 		sentence: z.number().optional(),
 		followUp: followUpSchema,
-	})
-)(
-	async ({
+	}),
+)(async ({
+	courseId,
+	assignmentId,
+	feedbackGivenAt,
+	paragraph,
+	sentence,
+	followUp,
+}) => {
+	const { email } = await getAuthOrThrow({ cookies: cookies() })
+
+	const role = await User({ email }).courseRole({ id: courseId })
+
+	if (role === "none")
+		throw new Error("User must be in class to register feedback follow-ups")
+
+	await Feedback({
 		courseId,
 		assignmentId,
-		feedbackGivenAt,
-		paragraph,
-		sentence,
+		userEmail: email,
+		givenAt: feedbackGivenAt,
+	}).addFollowUp({
+		paragraph: paragraph,
+		sentence: sentence,
 		followUp,
-	}) => {
-		const { email } = await getAuthOrThrow({ cookies: cookies() })
-
-		const role = await User({ email }).courseRole({ id: courseId })
-
-		if (role === "none")
-			throw new Error(
-				"User must be in class to register feedback follow-ups"
-			)
-
-		await Feedback({
-			courseId,
-			assignmentId,
-			userEmail: email,
-			givenAt: feedbackGivenAt,
-		}).addFollowUp({
-			paragraph: paragraph,
-			sentence: sentence,
-			followUp,
-		})
-	}
-)
+	})
+})
 
 export default registerFollowUpAction

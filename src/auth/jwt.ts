@@ -3,7 +3,7 @@ import * as jose from "jose"
 import { z } from "zod"
 
 import scopes from "~/google/scopes"
-import env from "env.mjs"
+import env from "~/env.mjs"
 
 const authorizationCookieKey = "Authorization"
 
@@ -21,7 +21,7 @@ const accessTokenPayloadSchema = z.object({
 })
 
 const encodeAccessToken = async (
-	payload: z.infer<typeof accessTokenPayloadSchema>
+	payload: z.infer<typeof accessTokenPayloadSchema>,
 ) =>
 	await new jose.SignJWT(payload)
 		.setProtectedHeader({ alg: "HS256" })
@@ -33,9 +33,9 @@ const decodeAccessToken = async ({ accessToken }: { accessToken: string }) =>
 		(
 			await jose.jwtVerify(
 				accessToken,
-				new TextEncoder().encode(env.JWT_SECRET)
+				new TextEncoder().encode(env.JWT_SECRET),
 			)
-		).payload
+		).payload,
 	)
 
 export async function getAuth({

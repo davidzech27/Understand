@@ -145,7 +145,7 @@ export default async function GoogleAPI({
 						headers: {
 							Authorization: `Bearer ${accessToken}`,
 						},
-					}
+					},
 				)
 			).json()) as {
 				emailAddresses?: { value: string }[]
@@ -164,10 +164,10 @@ export default async function GoogleAPI({
 		coursesTeaching: async (
 			{ includeArchived }: { includeArchived: boolean } = {
 				includeArchived: false,
-			}
+			},
 		) => {
 			type Response = {
-				courses: (unknown & { alternateLink: unknown })[] | undefined
+				courses: { alternateLink: unknown }[] | undefined
 				nextPageToken: string | undefined
 			}
 
@@ -180,7 +180,7 @@ export default async function GoogleAPI({
 						headers: {
 							Authorization: `Bearer ${accessToken}`,
 						},
-					}
+					},
 				)
 			).json()) as Response
 
@@ -198,7 +198,7 @@ export default async function GoogleAPI({
 							headers: {
 								Authorization: `Bearer ${accessToken}`,
 							},
-						}
+						},
 					)
 				).json()) as Response
 
@@ -211,19 +211,19 @@ export default async function GoogleAPI({
 				(courses ?? []).map((course) => ({
 					...course,
 					url: course.alternateLink,
-				}))
+				})),
 			)
 		},
 		coursesEnrolled: async (
 			{ includeArchived }: { includeArchived: boolean } = {
 				includeArchived: false,
-			}
+			},
 		) => {
 			type Response = {
 				courses:
-					| (unknown & {
+					| {
 							alternateLink: unknown
-					  })[]
+					  }[]
 					| undefined
 				nextPageToken: string | undefined
 			}
@@ -237,7 +237,7 @@ export default async function GoogleAPI({
 						headers: {
 							Authorization: `Bearer ${accessToken}`,
 						},
-					}
+					},
 				)
 			).json()) as Response
 
@@ -255,7 +255,7 @@ export default async function GoogleAPI({
 							headers: {
 								Authorization: `Bearer ${accessToken}`,
 							},
-						}
+						},
 					)
 				).json()) as Response
 
@@ -268,7 +268,7 @@ export default async function GoogleAPI({
 				(courses ?? []).map((course) => ({
 					...course,
 					url: course.alternateLink,
-				}))
+				})),
 			)
 		},
 		courseRoster: async ({ courseId }: { courseId: string }) => {
@@ -305,7 +305,7 @@ export default async function GoogleAPI({
 						headers: {
 							Authorization: `Bearer ${accessToken}`,
 						},
-					}
+					},
 				).then((response) => response.json()),
 				fetch(
 					`https://classroom.googleapis.com/v1/courses/${courseId}/students`,
@@ -313,7 +313,7 @@ export default async function GoogleAPI({
 						headers: {
 							Authorization: `Bearer ${accessToken}`,
 						},
-					}
+					},
 				).then((response) => response.json()),
 			])) as [TeachersResponse, StudentsResponse]
 
@@ -334,9 +334,9 @@ export default async function GoogleAPI({
 								headers: {
 									Authorization: `Bearer ${accessToken}`,
 								},
-							}
+							},
 						).then((response) =>
-							response.json()
+							response.json(),
 						)) as TeachersResponse
 
 						teachers?.push(...(response.teachers ?? []))
@@ -352,9 +352,9 @@ export default async function GoogleAPI({
 								headers: {
 									Authorization: `Bearer ${accessToken}`,
 								},
-							}
+							},
 						).then((response) =>
-							response.json()
+							response.json(),
 						)) as StudentsResponse
 
 						students?.push(...(response.students ?? []))
@@ -441,7 +441,7 @@ export default async function GoogleAPI({
 						headers: {
 							Authorization: `Bearer ${accessToken}`,
 						},
-					}
+					},
 				)
 			).json()) as Response
 
@@ -457,7 +457,7 @@ export default async function GoogleAPI({
 							headers: {
 								Authorization: `Bearer ${accessToken}`,
 							},
-						}
+						},
 					)
 				).json()) as Response
 
@@ -539,7 +539,7 @@ export default async function GoogleAPI({
 															form.thumbnailUrl,
 													},
 												}
-										}
+										},
 									),
 									dueAt: (() => {
 										const date =
@@ -556,15 +556,15 @@ export default async function GoogleAPI({
 															dueDate.month - 1,
 															dueDate.day,
 															dueTime.hours,
-															dueTime.minutes
-														)
+															dueTime.minutes,
+														),
 												  )
 												: undefined
 
 										return date
 									})(),
 							  }
-							: undefined
+							: undefined,
 				)
 				.filter(Boolean)
 
@@ -635,7 +635,7 @@ export default async function GoogleAPI({
 						headers: {
 							Authorization: `Bearer ${accessToken}`,
 						},
-					}
+					},
 				)
 			).json()) as Response
 
@@ -698,7 +698,7 @@ export default async function GoogleAPI({
 									thumbnailUrl: form.thumbnailUrl,
 								},
 							}
-					}
+					},
 				),
 				dueAt: (() => {
 					const date =
@@ -715,8 +715,8 @@ export default async function GoogleAPI({
 										dueDate.month - 1,
 										dueDate.day,
 										dueTime.hours,
-										dueTime.minutes
-									)
+										dueTime.minutes,
+									),
 							  )
 							: undefined
 
@@ -791,7 +791,7 @@ export default async function GoogleAPI({
 						headers: {
 							Authorization: `Bearer ${accessToken}`,
 						},
-					}
+					},
 				)
 			).json()) as Response
 
@@ -807,12 +807,12 @@ export default async function GoogleAPI({
 							headers: {
 								Authorization: `Bearer ${accessToken}`,
 							},
-						}
+						},
 					)
 				).json()) as Response
 
 				courseWorkMaterial?.push(
-					...(response?.courseWorkMaterial ?? [])
+					...(response?.courseWorkMaterial ?? []),
 				)
 
 				nextPageToken = response.nextPageToken
@@ -876,7 +876,7 @@ export default async function GoogleAPI({
 										thumbnailUrl: form.thumbnailUrl,
 									},
 								}
-						}
+						},
 					),
 					dueAt: (() => {
 						return dueDate &&
@@ -892,12 +892,12 @@ export default async function GoogleAPI({
 										dueDate.month - 1,
 										dueDate.day,
 										dueTime.hours,
-										dueTime.minutes
-									)
+										dueTime.minutes,
+									),
 							  )
 							: undefined
 					})(),
-				})
+				}),
 			)
 
 			return materialSchema.array().parse(courseWorkMaterialTransformed)
@@ -967,7 +967,7 @@ export default async function GoogleAPI({
 						headers: {
 							Authorization: `Bearer ${accessToken}`,
 						},
-					}
+					},
 				)
 			).json()) as Response
 
@@ -985,12 +985,12 @@ export default async function GoogleAPI({
 							headers: {
 								Authorization: `Bearer ${accessToken}`,
 							},
-						}
+						},
 					)
 				).json()) as Response
 
 				studentSubmissions?.push(
-					...(response?.studentSubmissions ?? [])
+					...(response?.studentSubmissions ?? []),
 				)
 
 				nextPageToken = response.nextPageToken
@@ -1042,9 +1042,9 @@ export default async function GoogleAPI({
 												thumbnailUrl: form.thumbnailUrl,
 											},
 										}
-								}
+								},
 						  )
-						: undefined
+						: undefined,
 				)
 				.flat()
 				.filter(Boolean)
@@ -1061,7 +1061,7 @@ export default async function GoogleAPI({
 						headers: {
 							Authorization: `Bearer ${accessToken}`,
 						},
-					}
+					},
 				)
 			).text()
 		},
@@ -1073,7 +1073,7 @@ export default async function GoogleAPI({
 						headers: {
 							Authorization: `Bearer ${accessToken}`,
 						},
-					}
+					},
 				)
 			).text()
 		},

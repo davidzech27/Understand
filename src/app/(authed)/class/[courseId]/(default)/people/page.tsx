@@ -26,7 +26,7 @@ export default async function PeoplePage({
 }) {
 	const [role, teachers, students] = await Promise.all([
 		getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
-			User({ email }).courseRole({ id: courseId })
+			User({ email }).courseRole({ id: courseId }),
 		),
 		Course({ id: courseId }).teachers(),
 		Course({ id: courseId }).students(),

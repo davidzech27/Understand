@@ -34,7 +34,7 @@ export default function LinkedSubmissionModal({
 					selectionType="single"
 					selectionSet={
 						new Set(
-							selectedSubmissionId ? [selectedSubmissionId] : []
+							selectedSubmissionId ? [selectedSubmissionId] : [],
 						)
 					}
 					setSelectionSet={(value) => {
@@ -47,10 +47,10 @@ export default function LinkedSubmissionModal({
 										new Set(
 											selectedSubmissionId
 												? [selectedSubmissionId]
-												: []
-										)
+												: [],
+										),
 									),
-								][0]
+								][0],
 							)
 						}
 					}}

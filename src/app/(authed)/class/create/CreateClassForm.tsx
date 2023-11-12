@@ -70,11 +70,11 @@ export default function CreateClassForm({
 				additionalTeacherEmailInputs.filter(
 					(email) =>
 						!linkedCourse?.roster.additionalTeacherEmails.includes(
-							email
-						)
+							email,
+						),
 				),
 			unsyncedStudentEmails: studentEmailInputs.filter(
-				(email) => !linkedCourse?.roster.studentEmails.includes(email)
+				(email) => !linkedCourse?.roster.studentEmails.includes(email),
 			),
 			syncedUrl: linkedCourse?.url,
 		})
@@ -162,13 +162,13 @@ export default function CreateClassForm({
 			roster.teachers
 				.map((teacher) => teacher.email)
 				.filter(Boolean)
-				.filter((email) => email !== user.email)
+				.filter((email) => email !== user.email),
 		)
 
 		setStudentEmailInputs(
 			roster.students
 				.map((student) => student.email)
-				.filter((email) => email !== user.email)
+				.filter((email) => email !== user.email),
 		)
 
 		setLinkedCourse({
@@ -207,10 +207,8 @@ export default function CreateClassForm({
 	return (
 		<>
 			<form
-				onSubmit={(e) => {
-					e.preventDefault()
-
-					onCreate()
+				action={async () => {
+					await onCreate()
 				}}
 				className="flex h-full flex-col space-y-2.5"
 			>
@@ -239,10 +237,8 @@ export default function CreateClassForm({
 							</div>
 						) : (
 							<Button
-								onClick={(e) => {
-									e.preventDefault()
-
-									onLink()
+								formAction={async () => {
+									await onLink()
 								}}
 								id="link-class"
 								size="large"
@@ -381,7 +377,7 @@ export default function CreateClassForm({
 							selectionType="single"
 							selectionSet={
 								new Set(
-									selectedCourseId ? [selectedCourseId] : []
+									selectedCourseId ? [selectedCourseId] : [],
 								)
 							}
 							setSelectionSet={(updateSelectionSet) =>
@@ -392,13 +388,13 @@ export default function CreateClassForm({
 													new Set(
 														selectedCourseId
 															? [selectedCourseId]
-															: []
-													)
+															: [],
+													),
 												),
-											][0]
+											][0],
 									  )
 									: setSelectedCourseId(
-											[...updateSelectionSet][0]
+											[...updateSelectionSet][0],
 									  )
 							}
 						/>

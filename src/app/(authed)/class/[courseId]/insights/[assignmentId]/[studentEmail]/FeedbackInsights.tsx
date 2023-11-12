@@ -1,6 +1,5 @@
 "use client"
 import { useState } from "react"
-import { produce } from "immer"
 
 import { type FeedbackInsights } from "~/data/Feedback"
 import { type Assignment } from "~/data/Assignment"
@@ -24,7 +23,7 @@ export default function FeedbackInsights({
 		insightsProp.map((insight) => ({
 			...insight,
 			state: undefined as FeedbackState,
-		}))
+		})),
 	)
 
 	return (
@@ -44,45 +43,45 @@ export default function FeedbackInsights({
 			<FeedbackContent
 				submissionHTML={submissionHTML}
 				feedbackInsights={insights}
-				onChangeFeedbackState={({ paragraph, state }) =>
-					setInsights(
-						produce((prevInsights) => {
-							if (prevInsights === undefined) return
+				onChangeFeedbackState={({ paragraph, state: feedbackState }) =>
+					setInsights((state) => {
+						const newState = structuredClone(state)
 
-							if (paragraph !== undefined) {
-								const insight = prevInsights
-									.filter((insight) =>
-										insight.paragraphs.includes(paragraph)
-									)
-									.reduce<(typeof prevInsights)[0]>(
-										(prev, cur) =>
-											cur.paragraphs.length <
-											prev.paragraphs.length
-												? cur
-												: prev,
-										{
-											paragraphs: Array(9999).fill(0),
-											content: "",
-											type: "strength",
-											state: undefined,
-										}
-									)
+						if (paragraph !== undefined) {
+							const insight = newState
+								.filter((insight) =>
+									insight.paragraphs.includes(paragraph),
+								)
+								.reduce<(typeof newState)[0]>(
+									(prev, cur) =>
+										cur.paragraphs.length <
+										prev.paragraphs.length
+											? cur
+											: prev,
+									{
+										paragraphs: Array<number>(9999).fill(0),
+										content: "",
+										type: "strength",
+										state: undefined,
+									},
+								)
 
-								insight.state =
-									typeof state === "function"
-										? state(insight.state)
-										: state
-							} else {
-								prevInsights.forEach((insight) => {
-									if (insight.paragraphs.includes(-1))
-										insight.state =
-											typeof state === "function"
-												? state(insight.state)
-												: state
-								})
-							}
-						})
-					)
+							insight.state =
+								typeof feedbackState === "function"
+									? feedbackState(insight.state)
+									: feedbackState
+						} else {
+							newState.forEach((insight) => {
+								if (insight.paragraphs.includes(-1))
+									insight.state =
+										typeof feedbackState === "function"
+											? feedbackState(insight.state)
+											: feedbackState
+							})
+						}
+
+						return newState
+					})
 				}
 			/>
 		</div>

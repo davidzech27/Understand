@@ -86,7 +86,7 @@ export default function FeedbackCard({
 			const resizeObserver = new ResizeObserver(
 				([entry]) =>
 					entry?.contentRect.height &&
-					setInputContainerHeight(entry.contentRect.height)
+					setInputContainerHeight(entry.contentRect.height),
 			)
 
 			resizeObserver.observe(inputContainerDiv)
@@ -113,7 +113,7 @@ export default function FeedbackCard({
 			Math.abs(
 				scrollerRef.current.scrollHeight -
 					scrollerRef.current.scrollTop -
-					scrollerRef.current.clientHeight
+					scrollerRef.current.clientHeight,
 			) < 50 &&
 			interacted
 		) {
@@ -135,7 +135,7 @@ export default function FeedbackCard({
 			Math.abs(
 				scrollerRef.current.scrollHeight -
 					scrollerRef.current.scrollTop -
-					scrollerRef.current.clientHeight
+					scrollerRef.current.clientHeight,
 			) < 50
 		) {
 			scrollerRef.current?.scroll({
@@ -175,7 +175,7 @@ export default function FeedbackCard({
 				"group flex flex-col rounded-md border border-border bg-surface shadow-sm shadow-[#E5E5E5] transition-shadow duration-500",
 				className
 					?.split(" ")
-					.filter((className) => className.search(/(^|-)h-/g) === -1)
+					.filter((className) => className.search(/(^|-)h-/g) === -1),
 			)}
 		>
 			<div
@@ -185,8 +185,8 @@ export default function FeedbackCard({
 					className
 						?.split(" ")
 						.filter(
-							(className) => className.search(/(^|-)h-/g) !== -1
-						)
+							(className) => className.search(/(^|-)h-/g) !== -1,
+						),
 				)}
 			>
 				<div className="px-3 py-2">
@@ -214,7 +214,7 @@ export default function FeedbackCard({
 					}}
 					className={cn(
 						"overflow-hidden rounded-b-md bg-surface-hover transition-all",
-						!input.show && "delay-150"
+						!input.show && "delay-150",
 					)}
 				>
 					<div

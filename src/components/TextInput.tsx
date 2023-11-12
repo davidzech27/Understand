@@ -10,7 +10,7 @@ interface Props extends HTMLProps<HTMLInputElement> {
 
 function TextInput(
 	{ value, setValue, className, ...props }: Props,
-	ref: ForwardedRef<HTMLInputElement>
+	ref: ForwardedRef<HTMLInputElement>,
 ) {
 	return (
 		<input
@@ -21,7 +21,7 @@ function TextInput(
 			ref={ref}
 			className={cn(
 				"w-full cursor-pointer select-text resize-none rounded-md border-[1px] border-border bg-surface px-4 py-2.5 font-medium opacity-80 outline-none transition-all duration-150 focus:cursor-auto focus:bg-surface-bright",
-				className
+				className,
 			)}
 		/>
 	)

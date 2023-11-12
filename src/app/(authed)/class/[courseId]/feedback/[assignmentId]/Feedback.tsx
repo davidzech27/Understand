@@ -5,8 +5,6 @@ import {
 	useState,
 	experimental_useEffectEvent as useEffectEvent,
 } from "react"
-import { useLogger } from "next-axiom"
-import { produce } from "immer"
 
 import { type Feedback } from "~/data/Feedback"
 import { type Assignment } from "~/data/Assignment"
@@ -56,7 +54,7 @@ function removeTailwindFromHTML(html: string) {
 				.getAttribute("style")
 				?.split(";")
 				.filter((style) => !style.includes("--tw"))
-				.join(";") ?? ""
+				.join(";") ?? "",
 		)
 
 		for (const child of element.children) {
@@ -89,7 +87,7 @@ export default function Feedback({
 	linkedSubmissions,
 }: Props) {
 	const [feedbackHistory, setFeedbackHistory] = useState(
-		initialFeedbackHistory
+		initialFeedbackHistory,
 	)
 
 	const [linkedSubmissionModalOpen, setLinkedSubmissionModalOpen] =
@@ -97,7 +95,7 @@ export default function Feedback({
 
 	const onPickLinkedSubmission = async ({ id }: { id: string }) => {
 		const pickedLinkedSubmission = linkedSubmissions.find(
-			(linkedSubmission) => linkedSubmission.id === id
+			(linkedSubmission) => linkedSubmission.id === id,
 		)
 
 		const pickedHTML = await pickedLinkedSubmission?.htmlPromise
@@ -168,9 +166,9 @@ export default function Feedback({
 
 	const [editing, setEditing] = useState(true)
 
-	const updateFeedbackSubmission = useEffectEvent(() => {
+	const updateFeedbackSubmission = useEffectEvent(async () => {
 		if (feedback.givenAt)
-			updateFeedbackSubmissionAction({
+			await updateFeedbackSubmissionAction({
 				courseId: assignment.courseId,
 				assignmentId: assignment.assignmentId,
 				givenAt: feedback.givenAt,
@@ -179,7 +177,9 @@ export default function Feedback({
 	})
 
 	useEffect(() => {
-		if (!editing) updateFeedbackSubmission()
+		if (!editing) {
+			void updateFeedbackSubmission()
+		}
 	}, [editing])
 
 	const [generating, setGenerating] = useState(false)
@@ -189,8 +189,6 @@ export default function Feedback({
 	const [featureBlockModalOpen, setFeatureBlockModalOpen] = useState(false)
 
 	const [rateLimitModalOpen, setRateLimitModalOpen] = useState(false)
-
-	const log = useLogger()
 
 	const onGetFeedback = () => {
 		if (
@@ -213,79 +211,83 @@ export default function Feedback({
 			studentName: user.name,
 			submissionText,
 			onContent: ({ content, paragraph, sentence }) => {
-				setFeedback(
-					produce((feedback) => {
-						const feedbackItem = feedback.list.find(
-							(feedback) =>
-								feedback.paragraph === paragraph &&
-								feedback.sentence === sentence
-						)
+				setFeedback((state) => {
+					const newState = structuredClone(state)
 
-						if (feedbackItem) {
-							feedbackItem.content = content
-						} else {
-							feedback.list.push({
-								paragraph,
-								sentence,
-								content,
-								followUps: [],
-								state: undefined,
-							})
-						}
-					})
-				)
-			},
-			onFinish: async ({ rawResponse }) => {
-				setGenerating(false)
+					const feedbackItem = newState.list.find(
+						(feedback) =>
+							feedback.paragraph === paragraph &&
+							feedback.sentence === sentence,
+					)
 
-				let feedback = feedbackRef.current
+					if (feedbackItem) {
+						feedbackItem.content = content
+					} else {
+						newState.list.push({
+							paragraph,
+							sentence,
+							content,
+							followUps: [],
+							state: undefined,
+						})
+					}
 
-				const { givenAt } = await registerFeedbackAction({
-					courseId: assignment.courseId,
-					assignmentId: assignment.assignmentId,
-					submissionHTML,
-					list: feedback.list,
-					rawResponse,
+					return newState
 				})
+			},
+			onFinish: ({ rawResponse }) => {
+				void (async () => {
+					setGenerating(false)
 
-				feedback = feedbackRef.current
+					let feedback = feedbackRef.current
 
-				const newFeedback = {
-					...feedback,
-					givenAt,
-					rawResponse,
-					unrevisedSubmissionHTML: submissionHTML,
-				}
-
-				setFeedback(newFeedback)
-
-				setFeedbackHistory((feedbackHistory) => [
-					...feedbackHistory,
-					newFeedback,
-				])
-
-				if (role === "student") {
-					const { insights } = await getInsights({
-						feedback: newFeedback,
-						assignmentTitle: assignment.title,
-						assignmentInstructions: assignment.instructions,
-						studentName: user.name,
-						submissionText,
-						onRateLimit: () => {},
-						onError: (error) => {
-							log.error("Insights error", { error })
-						},
+					const { givenAt } = await registerFeedbackAction({
+						courseId: assignment.courseId,
+						assignmentId: assignment.assignmentId,
+						submissionHTML,
+						list: feedback.list,
+						rawResponse,
 					})
 
 					feedback = feedbackRef.current
 
-					registerInsightsAction({
-						courseId: assignment.courseId,
-						assignmentId: assignment.assignmentId,
+					const newFeedback = {
+						...feedback,
 						givenAt,
-						insights,
-					})
-				}
+						rawResponse,
+						unrevisedSubmissionHTML: submissionHTML,
+					}
+
+					setFeedback(newFeedback)
+
+					setFeedbackHistory((feedbackHistory) => [
+						...feedbackHistory,
+						newFeedback,
+					])
+
+					if (role === "student") {
+						const { insights } = await getInsights({
+							feedback: newFeedback,
+							assignmentTitle: assignment.title,
+							assignmentInstructions: assignment.instructions,
+							studentName: user.name,
+							submissionText,
+							onRateLimit: () => {},
+							onError: (error) => {
+								console.error("Insights error", { error })
+							},
+						})
+
+						feedback = feedbackRef.current
+
+						await registerInsightsAction({
+							courseId: assignment.courseId,
+							assignmentId: assignment.assignmentId,
+							givenAt,
+							insights,
+						})
+					}
+				})()
 			},
 			onRateLimit: () => {
 				setGenerating(false)
@@ -293,7 +295,7 @@ export default function Feedback({
 				setRateLimitModalOpen(true)
 			},
 			onError: (error) => {
-				log.error("Feedback error", { error })
+				console.error("Feedback error", { error })
 			},
 		})
 
@@ -331,7 +333,7 @@ export default function Feedback({
 		input: string
 	}) => {
 		const unrevisedSubmissionText = htmlToText(
-			feedback.unrevisedSubmissionHTML
+			feedback.unrevisedSubmissionHTML,
 		)
 		const revisedSubmissionText = htmlToText(feedback.submissionHTML)
 
@@ -340,14 +342,14 @@ export default function Feedback({
 			.filter(
 				(line) =>
 					line.indexOf(".") !== -1 &&
-					line.indexOf(".") !== line.lastIndexOf(".")
+					line.indexOf(".") !== line.lastIndexOf("."),
 			)
 		const revisedParagraphs = revisedSubmissionText
 			.split("\n")
 			.filter(
 				(line) =>
 					line.indexOf(".") !== -1 &&
-					line.indexOf(".") !== line.lastIndexOf(".")
+					line.indexOf(".") !== line.lastIndexOf("."),
 			)
 
 		const revisions: {
@@ -373,20 +375,20 @@ export default function Feedback({
 				.find(
 					(feedbackItem) =>
 						feedbackItem.paragraph === paragraph &&
-						feedbackItem.sentence === sentence
+						feedbackItem.sentence === sentence,
 				)
 				?.followUps.forEach(({ revisions }) =>
 					revisions.forEach((revision) => {
 						preLastRevisionParagraph = applyParagraphDiff(
 							preLastRevisionParagraph,
-							revision
+							revision,
 						)
-					})
+					}),
 				)
 
 			const paragraphDiff = diffParagraph(
 				preLastRevisionParagraph,
-				revisedParagraph
+				revisedParagraph,
 			)
 
 			if (paragraphDiff !== undefined)
@@ -406,7 +408,7 @@ export default function Feedback({
 						.find(
 							(feedbackItem) =>
 								feedbackItem.paragraph === undefined &&
-								feedbackItem.sentence === undefined
+								feedbackItem.sentence === undefined,
 						)
 						?.followUps.forEach(({ revisions }) =>
 							revisions.forEach((revision) => {
@@ -414,14 +416,14 @@ export default function Feedback({
 									preLastRevisionParagraph =
 										applyParagraphDiff(
 											preLastRevisionParagraph,
-											revision
+											revision,
 										)
-							})
+							}),
 						)
 
 					const paragraphDiff = diffParagraph(
 						preLastRevisionParagraph,
-						revisedParagraph
+						revisedParagraph,
 					)
 
 					if (paragraphDiff !== undefined)
@@ -429,7 +431,7 @@ export default function Feedback({
 							paragraph,
 							...paragraphDiff,
 						})
-				}
+				},
 			)
 		}
 
@@ -439,24 +441,24 @@ export default function Feedback({
 		)
 			return
 
-		const newFeedback = {
+		const newFeedback = structuredClone({
+			...feedback,
 			givenAt: feedback.givenAt,
 			rawResponse: feedback.rawResponse,
-			...produce<typeof feedback>((feedback) => {
-				feedback.list
-					.find(
-						(feedbackItem) =>
-							feedbackItem.paragraph === paragraph &&
-							feedbackItem.sentence === sentence
-					)
-					?.followUps.push({
-						userMessage: input,
-						revisions,
-						aiMessage: "",
-						sentAt: new Date(),
-					})
-			})(feedback),
-		}
+		})
+
+		newFeedback.list
+			.find(
+				(feedbackItem) =>
+					feedbackItem.paragraph === paragraph &&
+					feedbackItem.sentence === sentence,
+			)
+			?.followUps.push({
+				userMessage: input,
+				revisions,
+				aiMessage: "",
+				sentAt: new Date(),
+			})
 
 		setFeedback(newFeedback)
 
@@ -473,19 +475,21 @@ export default function Feedback({
 			studentName: user.name,
 			unrevisedSubmissionText,
 			onContent: (content) =>
-				setFeedback(
-					produce((feedback) => {
-						const lastFollowUp = feedback.list
-							.find(
-								(feedbackItem) =>
-									feedbackItem.paragraph === paragraph &&
-									feedbackItem.sentence === sentence
-							)
-							?.followUps.at(-1)
+				setFeedback((state) => {
+					const newState = structuredClone(state)
 
-						if (lastFollowUp) lastFollowUp.aiMessage = content
-					})
-				),
+					const lastFollowUp = newState.list
+						.find(
+							(feedbackItem) =>
+								feedbackItem.paragraph === paragraph &&
+								feedbackItem.sentence === sentence,
+						)
+						?.followUps.at(-1)
+
+					if (lastFollowUp) lastFollowUp.aiMessage = content
+
+					return newState
+				}),
 			onFinish: () => {
 				setGenerating(false)
 
@@ -493,12 +497,12 @@ export default function Feedback({
 					.find(
 						(feedbackItem) =>
 							feedbackItem.paragraph === paragraph &&
-							feedbackItem.sentence === sentence
+							feedbackItem.sentence === sentence,
 					)
 					?.followUps.at(-1)
 
 				if (feedback.givenAt && lastFollowUp) {
-					registerFollowUpAction({
+					void registerFollowUpAction({
 						courseId: assignment.courseId,
 						assignmentId: assignment.assignmentId,
 						feedbackGivenAt: feedback.givenAt,
@@ -514,7 +518,7 @@ export default function Feedback({
 				setRateLimitModalOpen(true)
 			},
 			onError: (error) => {
-				log.error("Follow-up error", { error })
+				console.error("Follow-up error", { error })
 			},
 		})
 
@@ -607,7 +611,7 @@ export default function Feedback({
 													<Button
 														onClick={() =>
 															setLinkedSubmissionModalOpen(
-																true
+																true,
 															)
 														}
 														size="medium"
@@ -634,7 +638,7 @@ export default function Feedback({
 													<Button
 														onClick={() =>
 															setLinkedSubmissionModalOpen(
-																true
+																true,
 															)
 														}
 														size="medium"
@@ -700,28 +704,27 @@ export default function Feedback({
 						onChangeFeedbackState={({
 							paragraph,
 							sentence,
-							state,
+							state: feedbackState,
 						}) =>
-							setFeedback(
-								produce((prevFeedback) => {
-									if (prevFeedback === undefined) return
+							setFeedback((state) => {
+								const newState = structuredClone(state)
 
-									const changedFeedback =
-										prevFeedback.list.find(
-											(feedbackItem) =>
-												feedbackItem.paragraph ===
-													paragraph &&
-												feedbackItem.sentence ===
-													sentence
-										)
+								const changedFeedback = newState.list.find(
+									(feedbackItem) =>
+										feedbackItem.paragraph === paragraph &&
+										feedbackItem.sentence === sentence,
+								)
 
-									if (changedFeedback)
-										changedFeedback.state =
-											typeof state === "function"
-												? state(changedFeedback.state)
-												: state
-								})
-							)
+								if (changedFeedback)
+									changedFeedback.state =
+										typeof feedbackState === "function"
+											? feedbackState(
+													changedFeedback.state,
+											  )
+											: feedbackState
+
+								return newState
+							})
 						}
 					/>
 				</div>

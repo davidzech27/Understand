@@ -19,7 +19,7 @@ interface Props {
 
 function UserItem(
 	{ email, name, photo, note, href, disabled, selected, className }: Props,
-	ref: ForwardedRef<HTMLLIElement>
+	ref: ForwardedRef<HTMLLIElement>,
 ) {
 	const inner = (
 		<>
@@ -54,7 +54,7 @@ function UserItem(
 					prefetch={true}
 					className={cn(
 						"flex h-20 items-center justify-between",
-						className
+						className,
 					)}
 				>
 					{inner}
@@ -69,7 +69,7 @@ function UserItem(
 				ref={ref}
 				className={cn(
 					"flex h-20 items-center justify-between",
-					className
+					className,
 				)}
 			>
 				{inner}

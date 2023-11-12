@@ -7,7 +7,7 @@ interface Props extends React.PropsWithChildren {
 export default function Label({ children, htmlFor }: Props) {
 	if (typeof children !== "string")
 		throw new Error(
-			"String must be passed to a Label component's children prop"
+			"String must be passed to a Label component's children prop",
 		)
 
 	return (

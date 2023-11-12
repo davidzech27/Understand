@@ -10,7 +10,7 @@
 		"noEmit": true,
 		"esModuleInterop": true,
 		"module": "esnext",
-		"moduleResolution": "bundler",
+		"moduleResolution": "node",
 		"resolveJsonModule": true,
 		"isolatedModules": true,
 		"jsx": "preserve",
@@ -28,13 +28,17 @@
 		"disableReferencedProjectLoad": true
 	},
 	"include": [
+		".eslintrc.cjs",
+		"reset.d.ts",
+		"next.config.mjs",
 		"next-env.d.ts",
-		"**/*.ts",
-		"**/*.tsx",
-		"**/*.cjs",
-		"**/*.mjs",
-		".next/types/**/*.ts",
-		"reset.d.ts"
+		"tailwind.config.ts",
+		"colors.cjs",
+		"./src/**/*.ts",
+		"./src/**/*.tsx",
+		"./src/**/*.cjs",
+		"./src/**/*.mjs",
+		".next/types/**/*.ts"
 	],
 	"exclude": ["node_modules"]
 }

@@ -11,7 +11,7 @@ const getStudentFeedbackStreamAction = zact(
 		courseId: z.string(),
 		limit: z.number(),
 		cursor: z.number(),
-	})
+	}),
 )(async ({ courseId, limit, cursor }) => {
 	const { email } = await getAuthOrThrow({ cookies: cookies() })
 
@@ -19,7 +19,7 @@ const getStudentFeedbackStreamAction = zact(
 
 	if (role !== "teacher")
 		throw new Error(
-			"Must be teacher of course to get student feedback stream"
+			"Must be teacher of course to get student feedback stream",
 		)
 
 	return await User({ email }).feedbackStream({ courseId, limit, cursor })

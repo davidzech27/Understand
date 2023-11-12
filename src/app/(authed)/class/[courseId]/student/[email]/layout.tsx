@@ -42,7 +42,7 @@ export default async function StudentLayout({
 	const [student, role] = await Promise.all([
 		User({ email }).get(),
 		getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
-			User({ email }).courseRole({ id: courseId })
+			User({ email }).courseRole({ id: courseId }),
 		),
 	])
 

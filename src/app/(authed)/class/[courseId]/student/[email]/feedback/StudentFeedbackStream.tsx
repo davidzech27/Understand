@@ -32,8 +32,8 @@ export default function StudentFeedbackStream({
 
 	const onLoadMore = () => {
 		if (cursor !== undefined)
-			loadMore(() => {
-				getStudentFeedbackStreamAction({
+			loadMore(async () => {
+				await getStudentFeedbackStreamAction({
 					courseId,
 					limit: 20,
 					cursor,
@@ -75,7 +75,7 @@ export default function StudentFeedbackStream({
 							</span>
 						</div>
 					</Link>
-				)
+				),
 			)}
 
 			{cursor && (

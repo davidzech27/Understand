@@ -17,7 +17,7 @@ interface Props<TItem extends { id: string }> {
 	selectionType: "multiple" | "single" | "none"
 	selectionSet: Set<string>
 	setSelectionSet: (
-		value: Set<string> | ((prevSelectionSet: Set<string>) => Set<string>)
+		value: Set<string> | ((prevSelectionSet: Set<string>) => Set<string>),
 	) => void
 	className?: string
 }
@@ -38,7 +38,7 @@ export default function SelectList<TItem extends { id: string }>({
 					return new Set(
 						selectionType === "multiple"
 							? [...selectionSet].filter((id) => id !== itemId)
-							: []
+							: [],
 					)
 				} else {
 					return new Set([

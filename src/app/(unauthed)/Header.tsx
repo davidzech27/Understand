@@ -2,7 +2,7 @@
 import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
 
-import env from "env.mjs"
+import env from "~/env.mjs"
 import colors from "colors.cjs"
 import useSignedIn from "~/utils/useSignedIn"
 import GradientText from "~/components/GradientText"
@@ -46,38 +46,26 @@ export default function Header() {
 				</GradientText>
 
 				<nav className="flex h-full items-center space-x-6 mobile:space-x-4">
-					{!signedIn ? (
-						<Link href="/signIn" passHref>
-							<GradientText className="cursor-pointer text-xl font-bold transition hover:opacity-75 focus-visible:opacity-75 active:opacity-75 mobile:text-lg">
-								Sign in
-							</GradientText>
-						</Link>
-					) : (
-						<GradientText asChild>
-							<a
-								href={env.NEXT_PUBLIC_BOOK_MEETING_URL}
-								target="_blank"
-								rel="noreferrer"
-								className="cursor-pointer text-xl font-bold transition hover:opacity-75 focus-visible:opacity-75 active:opacity-75 mobile:text-lg"
-							>
-								Book a meeting
-							</a>
-						</GradientText>
-					)}
-
-					{!signedIn ? (
+					<GradientText asChild>
 						<a
 							href={env.NEXT_PUBLIC_BOOK_MEETING_URL}
 							target="_blank"
 							rel="noreferrer"
+							className="cursor-pointer text-xl font-bold transition hover:opacity-75 focus-visible:opacity-75 active:opacity-75 mobile:text-lg"
 						>
+							Contact us
+						</a>
+					</GradientText>
+
+					{!signedIn ? (
+						<Link href="/signIn" passHref>
 							<FancyButton
 								size="small"
-								className="mobile:text-base"
+								className="sm-mobile:px-4 lg-mobile:px-5 mobile:text-base"
 							>
-								Book a meeting
+								Free for teachers
 							</FancyButton>
-						</a>
+						</Link>
 					) : (
 						<Link href="/home" passHref>
 							<FancyButton

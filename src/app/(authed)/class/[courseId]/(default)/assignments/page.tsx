@@ -27,18 +27,18 @@ export default async function AssignmentsPage({
 	const [assignments, role] = await Promise.all([
 		Course({ id: courseId }).assignments(),
 		getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
-			User({ email }).courseRole({ id: courseId })
+			User({ email }).courseRole({ id: courseId }),
 		),
 	])
 
 	if (role === "none") notFound()
 
 	const assignmentsWithInstructions = assignments.filter(
-		(assignment) => assignment.instructions !== undefined
+		(assignment) => assignment.instructions !== undefined,
 	)
 
 	const assignmentsWithoutInstructions = assignments.filter(
-		(assignment) => assignment.instructions === undefined
+		(assignment) => assignment.instructions === undefined,
 	)
 
 	return (

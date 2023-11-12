@@ -3,7 +3,7 @@ import { zact } from "zact/server"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 
-const signOutAction = zact()(async () => {
+const signOutAction = zact()(() => {
 	cookies()
 		.getAll()
 		.forEach((cookie) => {

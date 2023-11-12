@@ -45,7 +45,7 @@ export default async function InsightsPage({
 		}),
 		Assignment({ courseId, assignmentId }).get(),
 		getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
-			User({ email }).courseRole({ id: courseId })
+			User({ email }).courseRole({ id: courseId }),
 		),
 	])
 

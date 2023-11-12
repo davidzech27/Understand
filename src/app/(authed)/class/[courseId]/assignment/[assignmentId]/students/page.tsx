@@ -39,8 +39,8 @@ export default async function AssignmentStudentsPage({
 			.where(
 				and(
 					eq(feedback.courseId, courseId),
-					eq(feedback.assignmentId, assignmentId)
-				)
+					eq(feedback.assignmentId, assignmentId),
+				),
 			)
 			.then((rows) => new Set(rows.map(({ userEmail }) => userEmail))),
 	])

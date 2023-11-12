@@ -1,8 +1,8 @@
+import { cookies } from "next/headers"
 import { z } from "zod"
 import { OpenAIStream, StreamingTextResponse } from "ai"
-import { withAxiom, type AxiomRequest } from "next-axiom"
 
-import env from "env.mjs"
+import env from "~/env.mjs"
 import { getAuth } from "~/auth/jwt"
 import countTokens from "./countTokens"
 import tokenCost from "./tokenCost"
@@ -15,14 +15,10 @@ const requestSchema = z.object({
 				role: z.enum(["assistant", "user", "system"]),
 				content: z.string(),
 				name: z.string().optional(),
-			})
+			}),
 		)
 		.min(1),
-	model: z.enum([
-		"gpt-4-0613",
-		"gpt-3.5-turbo-0613",
-		"gpt-3.5-turbo-16k-0613",
-	]),
+	model: z.enum(["gpt-4", "gpt-3.5-turbo", "gpt-3.5-turbo-16k"]),
 	temperature: z.number().min(0).max(2),
 	presencePenalty: z.number().min(-2).max(2),
 	frequencyPenalty: z.number().min(-2).max(2),
@@ -32,10 +28,10 @@ const requestSchema = z.object({
 
 export type OpenAIRequest = z.infer<typeof requestSchema>
 
-export default withAxiom(async function openaiHandler(request: AxiomRequest) {
+export default (async function openaiHandler(request: Request) {
 	if (!("cookies" in request)) return
 
-	const auth = await getAuth({ cookies: request.cookies })
+	const auth = await getAuth({ cookies: cookies() })
 
 	if (auth === undefined)
 		return new Response("Invalid authorization", { status: 401 })
@@ -85,26 +81,28 @@ export default withAxiom(async function openaiHandler(request: AxiomRequest) {
 					messages,
 					model,
 					temperature,
-					presence_penalty: presencePenalty,
-					frequency_penalty: frequencyPenalty,
-					max_tokens: maxTokens,
+					presencePenalty,
+					frequencyPenalty,
+					maxTokens: maxTokens,
 					stream: true,
 				}),
-			}
+			},
 		)
 
 		const promptTokensPromise = countTokens({ messages })
 
+		let completion = ""
 		let completionTokens = 0
 
 		const openaiStream = OpenAIStream(openaiResponse, {
-			onToken: () => {
+			onToken: (token) => {
+				completion += token
 				completionTokens++
 			},
-			onFinal: async (completion) => {
+			onFinal: async () => {
 				const promptTokens = await promptTokensPromise
 
-				request.log.info("User OpenAI request", {
+				console.info("User OpenAI request", {
 					email: auth.email,
 					reason,
 					messages: messages
@@ -128,12 +126,14 @@ export default withAxiom(async function openaiHandler(request: AxiomRequest) {
 
 		return new StreamingTextResponse(openaiStream)
 	} catch (error) {
-		request.log.error("User OpenAI request error", {
+		console.error("User OpenAI request error", {
 			email: auth.email,
 			reason,
 			error,
 		})
 
-		await (await unregisterCompletionStreamPromise)()
+		await (
+			await unregisterCompletionStreamPromise
+		)()
 	}
 })

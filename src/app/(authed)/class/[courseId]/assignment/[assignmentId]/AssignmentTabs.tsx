@@ -49,9 +49,9 @@ export default function AssignmentTabs({ assignment }: Props) {
 					</Link>
 
 					<Button
-						onClick={() => {
-							navigator.clipboard.writeText(
-								`${window.location.protocol}//${window.location.host}/class/${assignment.courseId}/feedback/${assignment.assignmentId}`
+						onClick={async () => {
+							await navigator.clipboard.writeText(
+								`${window.location.protocol}//${window.location.host}/class/${assignment.courseId}/feedback/${assignment.assignmentId}`,
 							)
 
 							setFeedbackLinkCopied(true)

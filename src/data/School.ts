@@ -55,8 +55,8 @@ const School = ({
 				.where(
 					and(
 						eq(school.districtName, districtName),
-						eq(school.name, name)
-					)
+						eq(school.name, name),
+					),
 				)
 
 			return (
@@ -81,8 +81,8 @@ const School = ({
 						.where(
 							and(
 								eq(school.districtName, districtName),
-								eq(school.name, name)
-							)
+								eq(school.name, name),
+							),
 						)
 				)[0]?.maxUserMonthlyCost ?? 0
 
@@ -105,8 +105,8 @@ const School = ({
 						.where(
 							and(
 								eq(school.districtName, districtName),
-								eq(school.name, name)
-							)
+								eq(school.name, name),
+							),
 						)
 				)[0]?.maxCourseMonthlyCost ?? 0
 
@@ -137,8 +137,8 @@ const School = ({
 					.where(
 						and(
 							eq(school.districtName, districtName),
-							eq(school.name, name)
-						)
+							eq(school.name, name),
+						),
 					),
 				maxUserMonthlyCost !== undefined &&
 					kv.set(maxUserMonthlyCostKey, maxUserMonthlyCost),
@@ -153,8 +153,8 @@ const School = ({
 					.where(
 						and(
 							eq(school.districtName, districtName),
-							eq(school.name, name)
-						)
+							eq(school.name, name),
+						),
 					),
 				kv.del(maxUserMonthlyCostKey),
 				kv.del(maxCourseMonthlyCostKey),

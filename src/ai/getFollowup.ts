@@ -29,7 +29,7 @@ export default function getFollowUp({
 	const followUpFeedback = feedback.list.find(
 		(feedbackItem) =>
 			feedbackItem.paragraph === paragraph &&
-			feedbackItem.sentence === sentence
+			feedbackItem.sentence === sentence,
 	)
 
 	if (followUpFeedback === undefined)
@@ -38,7 +38,7 @@ export default function getFollowUp({
 	const feedbackLines = feedback.rawResponse.split("\n")
 
 	const specificFeedbackHeaderLineIndex = feedbackLines.findIndex(
-		(line) => line.toLowerCase().search(/[*]*specific feedback/) !== -1
+		(line) => line.toLowerCase().search(/[*]*specific feedback/) !== -1,
 	)
 
 	const analysisString = feedbackLines
@@ -55,11 +55,6 @@ export default function getFollowUp({
 		{
 			messages: [
 				{
-					role: "system" as "user" | "system" | "assistant",
-					content:
-						"You are an uncommonly creative tutor for high school students.",
-				},
-				{
 					role: "user" as "user" | "system" | "assistant",
 					content: `You have just given a high school student named ${studentName} feedback on an assignment titled "${assignmentTitle}". The following is information about the assignment, ${studentName}'s work, your analysis of ${studentName}'s work, and your feedback on it:
 
@@ -70,7 +65,7 @@ Feedback: """${feedbackString}"""
 
 ${studentName} responded to the following part of your feedback: """${followUpFeedback.content}"""
 
-You will respond to ${studentName} in a way that helps them understand the subject matter at a deeper, more nuanced level, while frequently referencing their work. Do not prescribe any particular solution or idea to ${studentName}; instead, make use of the Socratic method to lead ${studentName} in the right direction, generalize to the real world in interesting ways, or walk ${studentName} through an interesting example of a mental process they could take to improve their work. Be conversational, but be succinct and omit unnecessary text from your responses.
+You will respond to ${studentName} in a way that helps them understand the subject matter at a deeper, more nuanced level, while frequently referencing their work. Do not prescribe any particular solution or idea to ${studentName}; instead, make use of the Socratic method to lead ${studentName} in the right direction, generalize to the real world in interesting ways, walk ${studentName} through an interesting example of a mental process they could take to improve their work, or suggest that ${studentName} perform a Google search for any topic with which they are unfamiliar. Be conversational, but be succinct and omit unnecessary text from your responses.
 
 Now, here they are.`,
 				},
@@ -101,7 +96,7 @@ New content: """${revision.newContent}"""`
 		: revision.newContent !== ""
 		? `Added content: """${revision.newContent}"""`
 		: ""
-}`
+}`,
 	)
 	.join("\n\n")}`,
 						},
@@ -117,7 +112,7 @@ New content: """${revision.newContent}"""`
 					.flat()
 					.filter(Boolean),
 			],
-			model: "gpt-4-0613" as const,
+			model: "gpt-4" as const,
 			temperature: 0.0,
 			presencePenalty: 0.0,
 			frequencyPenalty: 0.25,

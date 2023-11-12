@@ -12,7 +12,7 @@ const deleteAssignmentAction = zact(
 	z.object({
 		courseId: z.string(),
 		assignmentId: z.string(),
-	})
+	}),
 )(async ({ courseId, assignmentId }) => {
 	const { email } = await getAuthOrThrow({ cookies: cookies() })
 

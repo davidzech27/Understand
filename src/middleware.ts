@@ -12,8 +12,8 @@ export const middleware = async (request: NextRequest) => {
 	if ((await getAuth({ cookies: request.cookies })) === undefined) {
 		const response = NextResponse.redirect(
 			new URL(
-				`${request.nextUrl.protocol}//${request.nextUrl.host}/signIn`
-			)
+				`${request.nextUrl.protocol}//${request.nextUrl.host}/signIn`,
+			),
 		)
 
 		response.cookies.set(redirectToCookieKey, request.url)

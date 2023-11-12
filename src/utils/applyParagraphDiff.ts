@@ -6,7 +6,7 @@ export default function applyParagraphDiff(
 		sentence: number
 		oldContent: string
 		newContent: string
-	}
+	},
 ) {
 	const sentences = splitSentences(paragraph)
 

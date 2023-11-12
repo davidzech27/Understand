@@ -27,7 +27,7 @@ export default function NavigationButton({
 				"flex items-center rounded-xl px-3 py-2.5 transition-colors duration-150",
 				pathname?.startsWith(href)
 					? "bg-surface-selected hover:bg-surface-selected-hover"
-					: "hover:bg-surface-hover"
+					: "hover:bg-surface-hover",
 			)}
 		>
 			{photo !== null ? (
@@ -44,7 +44,7 @@ export default function NavigationButton({
 						"leading-none opacity-90",
 						subtext === undefined
 							? "text-base font-semibold"
-							: "text-sm font-medium"
+							: "text-sm font-medium",
 					)}
 				>
 					{text}

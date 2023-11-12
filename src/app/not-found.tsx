@@ -1,6 +1,6 @@
 import Link from "next/link"
 
-import env from "env.mjs"
+import env from "~/env.mjs"
 
 export const runtime = "edge"
 
@@ -19,7 +19,8 @@ export default function NotFoundPage() {
 
 			<div className="flex cursor-default select-text flex-col items-center justify-center gap-12 whitespace-pre-wrap px-48 text-[5rem] font-extrabold tracking-tight text-white">
 				This link does not exist. If you think it should, please contact
-				us.{"\n"}
+				us.
+				{"\n"}
 				<Link
 					href="/home"
 					className="block transition duration-200 hover:opacity-75 focus-visible:opacity-75 active:opacity-75"

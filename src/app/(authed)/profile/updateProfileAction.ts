@@ -15,7 +15,7 @@ const updateProfileAction = zact(
 				name: z.string(),
 			})
 			.nullish(),
-	})
+	}),
 )(async ({ name, school }) => {
 	const auth = await getAuthOrThrow({ cookies: cookies() })
 
@@ -26,7 +26,7 @@ const updateProfileAction = zact(
 		(await User({ email }).potentialSchools()).find(
 			(potentialSchool) =>
 				potentialSchool.districtName === school.districtName &&
-				potentialSchool.name === school.name
+				potentialSchool.name === school.name,
 		)
 
 	await Promise.all([

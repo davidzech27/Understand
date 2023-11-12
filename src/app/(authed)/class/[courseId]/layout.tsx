@@ -1,12 +1,9 @@
 import { cookies } from "next/headers"
 import { notFound } from "next/navigation"
-import { Logger } from "next-axiom"
 
 import { getAuthOrThrow } from "~/auth/jwt"
-import syncCourse from "~/sync/syncCourse"
 import generateInsights from "~/insights/generateInsights"
 import User from "~/data/User"
-import Course from "~/data/Course"
 
 interface Params {
 	courseId: string
@@ -22,29 +19,17 @@ export default async function CourseLayout({
 	const { email } = await getAuthOrThrow({ cookies: cookies() })
 
 	try {
-		const [role, course] = await Promise.all([
-			User({ email }).courseRole({ id: params.courseId }),
-			Course({ id: params.courseId }).get(),
-		])
+		const [role] = await User({ email }).courseRole({ id: params.courseId })
 
-		if (role === "none" || course === undefined) notFound()
+		if (role === "none") notFound()
 
-		await Promise.all([
-			course.syncedUrl !== undefined &&
-				syncCourse({
-					id: params.courseId,
-				}),
-			role === "teacher" &&
-				generateInsights({
-					courseId: params.courseId,
-				}),
-		])
+		if (role === "teacher") {
+			await generateInsights({
+				courseId: params.courseId,
+			})
+		}
 	} catch (error) {
-		const log = new Logger()
-
-		log.error("Error initiating course sync", { email, error })
-
-		await log.flush()
+		console.error("Error initiating course sync", { email, error })
 	}
 
 	return <>{children}</>

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
-import { withAxiom, type AxiomRequest } from "next-axiom"
+import { cookies } from "next/headers"
 
-import env from "env.mjs"
+import env from "~/env.mjs"
 import { setAuth } from "~/auth/jwt"
 import redirectToCookieKey from "./redirectToCookieKey"
 import { getCredentialsFromCode } from "~/google/credentials"
@@ -9,9 +9,7 @@ import GoogleAPI from "~/google/GoogleAPI"
 import User from "~/data/User"
 import Course from "~/data/Course"
 
-export default withAxiom(async function oauthCallbackHandler(
-	request: AxiomRequest
-) {
+export default async function oauthCallbackHandler(request: Request) {
 	if (!("cookies" in request)) return
 
 	const { searchParams } = new URL(request.url)
@@ -19,7 +17,7 @@ export default withAxiom(async function oauthCallbackHandler(
 	const error = searchParams.get("error")
 
 	if (error !== null) {
-		request.log.error("OAuth callback error", { error })
+		console.error("OAuth callback error", { error })
 
 		return NextResponse.redirect("/signIn")
 	}
@@ -36,57 +34,73 @@ export default withAxiom(async function oauthCallbackHandler(
 
 	const { email, name, photo } = await googleAPI.me()
 
-	const existingUserPromise = User({ email }).get()
+	const existingUser = await User({ email }).get()
 
-	request.log.info("Sign in", { email, name, photo })
+	if (existingUser === undefined)
+		console.info("New user", { email, name, photo })
 
-	await User({ email }).create({ name, photo })
+	console.info("Sign in", { email, name, photo })
+
+	await User({ email }).create({
+		name,
+		photo,
+		...(existingUser &&
+		existingUser.schoolDistrictName !== undefined &&
+		existingUser.schoolName !== undefined
+			? {
+					schoolDistrictName: existingUser.schoolDistrictName,
+					schoolName: existingUser.schoolName,
+					schoolRole: existingUser.schoolRole,
+			  }
+			: {
+					schoolDistrictName: "Understand",
+					schoolName: "Understand Beta Testing",
+			  }),
+	})
 
 	const redirectTo =
-		request.cookies.get(redirectToCookieKey)?.value ??
+		cookies().get(redirectToCookieKey)?.value ??
 		`${env.NEXT_PUBLIC_URL}/landing`
 
 	const response = NextResponse.redirect(new URL(redirectTo))
 
 	await Promise.all([
-		existingUserPromise.then((existingUser) => {
-			setAuth({
-				cookies: response.cookies,
-				auth: {
-					email,
-					googleRefreshToken: refreshToken,
-					googleScopes: scopes,
-					school:
-						existingUser &&
-						existingUser.schoolDistrictName !== undefined &&
-						existingUser.schoolName !== undefined
-							? {
-									districtName:
-										existingUser.schoolDistrictName,
-									name: existingUser.schoolName,
-									role: existingUser.schoolRole,
-							  }
-							: undefined,
-				},
-			})
-
-			if (existingUser === undefined)
-				request.log.info("New user", { email, name, photo })
+		setAuth({
+			cookies: response.cookies,
+			auth: {
+				email,
+				googleRefreshToken: refreshToken,
+				googleScopes: scopes,
+				school:
+					existingUser &&
+					existingUser.schoolDistrictName !== undefined &&
+					existingUser.schoolName !== undefined
+						? {
+								districtName: existingUser.schoolDistrictName,
+								name: existingUser.schoolName,
+								role: existingUser.schoolRole,
+						  }
+						: {
+								districtName: "Understand",
+								name: "Understand Beta Testing",
+						  },
+			},
 		}),
+
 		scopes.includes(
-			"https://www.googleapis.com/auth/classroom.courses.readonly"
+			"https://www.googleapis.com/auth/classroom.courses.readonly",
 		) &&
 			scopes.includes(
-				"https://www.googleapis.com/auth/classroom.rosters.readonly"
+				"https://www.googleapis.com/auth/classroom.rosters.readonly",
 			) &&
 			scopes.includes(
-				"https://www.googleapis.com/auth/classroom.profile.emails"
+				"https://www.googleapis.com/auth/classroom.profile.emails",
 			) &&
 			scopes.includes(
-				"https://www.googleapis.com/auth/classroom.student-submissions.students.readonly"
+				"https://www.googleapis.com/auth/classroom.student-submissions.students.readonly",
 			) &&
 			scopes.includes(
-				"https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly"
+				"https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly",
 			) &&
 			scopes.includes("https://www.googleapis.com/auth/drive.readonly") &&
 			User({ email })
@@ -96,11 +110,11 @@ export default withAxiom(async function oauthCallbackHandler(
 						coursesTeaching.map(({ id }) =>
 							Course({ id }).update({
 								syncedRefreshToken: refreshToken,
-							})
-						)
-					)
+							}),
+						),
+					),
 				),
 	])
 
 	return response
-})
+}

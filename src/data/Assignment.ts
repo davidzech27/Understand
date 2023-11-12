@@ -85,8 +85,8 @@ const Assignment = ({
 				.where(
 					and(
 						eq(assignment.courseId, courseId),
-						eq(assignment.assignmentId, assignmentId)
-					)
+						eq(assignment.assignmentId, assignmentId),
+					),
 				)
 		)[0]
 
@@ -128,8 +128,8 @@ const Assignment = ({
 			.where(
 				and(
 					eq(assignment.courseId, courseId),
-					eq(assignment.assignmentId, assignmentId)
-				)
+					eq(assignment.assignmentId, assignmentId),
+				),
 			)
 	},
 	delete: async () => {
@@ -139,16 +139,16 @@ const Assignment = ({
 				.where(
 					and(
 						eq(assignment.courseId, courseId),
-						eq(assignment.assignmentId, assignmentId)
-					)
+						eq(assignment.assignmentId, assignmentId),
+					),
 				),
 			db
 				.delete(feedback)
 				.where(
 					and(
 						eq(feedback.courseId, courseId),
-						eq(feedback.assignmentId, assignmentId)
-					)
+						eq(feedback.assignmentId, assignmentId),
+					),
 				),
 			Course({ id: courseId }).deleteResources({
 				filter: {
@@ -165,8 +165,8 @@ const Assignment = ({
 				.where(
 					and(
 						eq(assignmentInsight.courseId, courseId),
-						eq(assignmentInsight.assignmentId, assignmentId)
-					)
+						eq(assignmentInsight.assignmentId, assignmentId),
+					),
 				),
 		])
 	},
@@ -193,8 +193,8 @@ const Assignment = ({
 				.where(
 					and(
 						eq(assignmentInsight.courseId, courseId),
-						eq(assignmentInsight.assignmentId, assignmentId)
-					)
+						eq(assignmentInsight.assignmentId, assignmentId),
+					),
 				)
 		)[0]
 
@@ -215,15 +215,15 @@ const Assignment = ({
 					eq(feedback.courseId, courseId),
 					eq(feedback.assignmentId, assignmentId),
 					isNull(feedback.syncedInsightsAt),
-					isNotNull(feedback.insights)
-				)
+					isNotNull(feedback.insights),
+				),
 			)
 			.then((insights) =>
 				insights.map((insight) => ({
 					studentEmail: insight.studentEmail,
 					givenAt: insight.givenAt,
 					insights: feedbackInsightsSchema.parse(insight.insights),
-				}))
+				})),
 			)
 	},
 })

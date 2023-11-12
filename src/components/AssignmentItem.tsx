@@ -16,7 +16,7 @@ interface Props {
 
 function AssignmentItem(
 	{ title, href, dueAt, selected, disabled, className }: Props,
-	ref: ForwardedRef<HTMLLIElement>
+	ref: ForwardedRef<HTMLLIElement>,
 ) {
 	return (
 		<ListItem

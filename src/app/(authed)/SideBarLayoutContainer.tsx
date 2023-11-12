@@ -20,7 +20,7 @@ export default function SideBarLayoutContainer({
 			data-open={sideBarOpen}
 			className={cn(
 				"group relative flex space-x-3 mobile:space-x-0",
-				className
+				className,
 			)}
 		>
 			<div className="h-full w-72 shrink-0 transition-all duration-150 group-data-[open=false]:mr-[-300px] group-data-[open=false]:opacity-0 mobile:absolute mobile:inset-0 mobile:z-10 mobile:w-auto mobile:group-data-[open=false]:mr-0 mobile:group-data-[open=false]:translate-x-[-100vw]">

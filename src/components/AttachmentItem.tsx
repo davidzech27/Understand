@@ -25,7 +25,7 @@ function AttachmentItem(
 		className,
 		...props
 	}: Props,
-	ref: ForwardedRef<HTMLLIElement>
+	ref: ForwardedRef<HTMLLIElement>,
 ) {
 	const urlRef = useRef<HTMLAnchorElement>(null)
 
@@ -39,8 +39,8 @@ function AttachmentItem(
 					urlRef.current.style.width = `${Math.min(
 						element.offsetWidth - 100,
 						parseInt(
-							window.getComputedStyle(urlRef.current).width
-						) + 1
+							window.getComputedStyle(urlRef.current).width,
+						) + 1,
 					)}px`
 
 				if (typeof ref === "function") {

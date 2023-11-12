@@ -56,7 +56,7 @@ export default async function FeedbackPage({
 		}).get(),
 		Assignment({ courseId, assignmentId }).get(),
 		getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
-			Promise.all([email, User({ email }).courseRole({ id: courseId })])
+			Promise.all([email, User({ email }).courseRole({ id: courseId })]),
 		),
 	])
 

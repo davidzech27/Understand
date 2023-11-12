@@ -1,5 +1,3 @@
-import { Logger } from "next-axiom"
-
 import User from "~/data/User"
 import getCompletion from "~/ai/getCompletion"
 import Feedback from "~/data/Feedback"
@@ -12,8 +10,6 @@ export default async function generateStudentInsights({
 	courseId: string
 	studentEmail: string
 }) {
-	const log = new Logger()
-
 	const [
 		previousStudentInsights,
 		unsyncedFeedbackInsights,
@@ -29,7 +25,7 @@ export default async function generateStudentInsights({
 	])
 
 	if (student === undefined) {
-		log.error("Student could not be found for insight generation", {
+		console.error("Student could not be found for insight generation", {
 			courseId,
 			studentEmail,
 		})
@@ -38,27 +34,27 @@ export default async function generateStudentInsights({
 	}
 
 	const unsyncedAssignmentIdSet = new Set(
-		unsyncedFeedbackInsights.map((insight) => insight.assignmentId)
+		unsyncedFeedbackInsights.map((insight) => insight.assignmentId),
 	)
 
 	const previousStudentInsightsWithoutUnsynced = previousStudentInsights
 		?.map((insight) => ({
 			...insight,
 			sources: insight.sources.filter(
-				(source) => !unsyncedAssignmentIdSet.has(source.assignmentId) // consider removing student insight entirely if any of its sources are unsynced. however, then you'd have to fetch all the insights on these student insights, not just the unsynced ones
+				(source) => !unsyncedAssignmentIdSet.has(source.assignmentId), // consider removing student insight entirely if any of its sources are unsynced. however, then you'd have to fetch all the insights on these student insights, not just the unsynced ones
 			),
 		}))
 		.filter((insight) => insight.sources.length !== 0)
 
 	const concatenatedInsights = (
 		previousStudentInsightsWithoutUnsynced?.map(
-			({ type, content, sources }) => ({ type, content, sources })
+			({ type, content, sources }) => ({ type, content, sources }),
 		) ?? []
 	).concat(
 		unsyncedFeedbackInsights
 			.sort(
 				(feedback1, feedback2) =>
-					feedback1.givenAt.valueOf() - feedback2.givenAt.valueOf()
+					feedback1.givenAt.valueOf() - feedback2.givenAt.valueOf(),
 			)
 			.map((assignmentInsights) =>
 				assignmentInsights.insights.map((insight) => ({
@@ -70,13 +66,13 @@ export default async function generateStudentInsights({
 							paragraphs: insight.paragraphs,
 						},
 					],
-				}))
+				})),
 			)
-			.flat()
+			.flat(),
 	)
 
 	const assignmentIdToTitleMap = new Map(
-		assignments.map(({ assignmentId, title }) => [assignmentId, title])
+		assignments.map(({ assignmentId, title }) => [assignmentId, title]),
 	)
 
 	const mergedInsightsPromptMessages = [
@@ -98,11 +94,11 @@ Assignment titles: ${insight.sources
 			.map(({ assignmentId }) => assignmentIdToTitleMap.get(assignmentId))
 			.filter(Boolean)
 			.join(", ")}
-Content: ${insight.content}`
+Content: ${insight.content}`,
 	)
 	.join("\n\n")}
 
-Given that these are in chronological order and may express ${
+Given that these are in chronoconsoleical order and may express ${
 				student.name
 			}'s progress over time, rewrite the above strengths and weaknesses, combining ones that are identical or nearly identical, using the following format:
 Title: {short title}
@@ -116,13 +112,13 @@ Begin.`,
 
 	const { completion: mergedInsightsCompletion, cost } = await getCompletion({
 		messages: mergedInsightsPromptMessages,
-		model: "gpt-4-0613",
+		model: "gpt-4",
 		temperature: 0,
 		presencePenalty: 0.0,
 		frequencyPenalty: 0.0,
 	})
 
-	log.info("Student insights merged", {
+	console.info("Student insights merged", {
 		courseId,
 		studentEmail,
 		messages: mergedInsightsPromptMessages
@@ -152,7 +148,7 @@ Begin.`,
 						content: insight.content,
 						sources: insight.sources,
 				  }
-				: undefined
+				: undefined,
 		)
 		.filter(Boolean)
 		.map((insight) => ({
@@ -163,7 +159,7 @@ Begin.`,
 				insight.sources
 					.map(
 						(sourceIndex) =>
-							concatenatedInsights[sourceIndex - 1]?.sources
+							concatenatedInsights[sourceIndex - 1]?.sources,
 					)
 					.filter(Boolean)
 					.flat()
@@ -175,11 +171,11 @@ Begin.`,
 								cur.paragraphs.includes(-1)
 									? [-1]
 									: (prev[cur.assignmentId] ?? []).concat(
-											cur.paragraphs
+											cur.paragraphs,
 									  ),
 						}),
-						{} as Record<string, number[]>
-					)
+						{} as Record<string, number[]>,
+					),
 			).map(([assignmentId, paragraphs]) => ({
 				assignmentId,
 				paragraphs,
@@ -193,7 +189,7 @@ Begin.`,
 				assignmentId: insight.assignmentId,
 				userEmail: studentEmail,
 				givenAt: insight.givenAt,
-			}).updateSynced({ insights: insight.insights })
+			}).updateSynced({ insights: insight.insights }),
 		),
 		User({ email: studentEmail }).upsertInsights({
 			courseId,

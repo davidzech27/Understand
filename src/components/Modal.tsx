@@ -20,7 +20,7 @@ export default function Modal({
 }: Props) {
 	return (
 		<Dialog.Root open={open} onOpenChange={setOpen}>
-			<Dialog.Portal className="fixed inset-0 h-screen w-screen">
+			<Dialog.Portal>
 				<Dialog.Overlay className="fixed inset-0 z-50 bg-[#00000060]" />
 
 				<Dialog.Content className="fixed bottom-[16.6667vh] left-[12.5vw] right-[12.5vw] top-[16.6667vh] z-50 flex flex-col justify-between rounded-md bg-white">

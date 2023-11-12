@@ -69,13 +69,13 @@ ${submissionText
 	.filter(
 		(line) =>
 			line.indexOf(".") !== -1 &&
-			line.indexOf(".") !== line.lastIndexOf(".")
+			line.indexOf(".") !== line.lastIndexOf("."),
 	)
 	.map(
 		(paragraph, paragraphIndex) =>
 			`Paragraph ${paragraphIndex + 1} sentence count: ${
 				splitSentences(paragraph).length
-			}`
+			}`,
 	)
 	.join("\n")}
 
@@ -85,12 +85,12 @@ Synopsis
 Construct a fine-grained summary of ${studentName}'s work and its stylistic choices.
 
 Commentary
-Identify one area where ${studentName} demonstrates their strengths or unique character as a writer and then the two areas where they could most improve their communication or depth of thought. For each commentary about a potential improvement, ask a question that ${studentName} would have, then respond to it with numerous direct references to their work.
+Identify one area where ${studentName} demonstrates their strengths or unique character as a writer and then the three areas where they could most improve their communication or depth of thought. For each commentary about a potential improvement, ask a question that ${studentName} would have, then respond to it with numerous direct references to their work.
 
 Specific Feedback
 Provide many areas of feedback pertaining to the segments of ${studentName}'s work that your commentary most applies to. In each area of feedback, frequently reference ${studentName}'s work and provide in-depth reasoning in order to best help them understand how to improve their work. Also frequently reference other similar paragraphs in ${studentName}'s work to ensure that every relevant paragraph is addressed. Do not prescribe any particular solution or idea to ${studentName}; instead, cleverly ask them a question or make an insightful comment to lead them in the right direction. Unless required by the assignment prompt, do not suggest that ${studentName} alter their stylistic writing choices or increase the scope of their work. Each area of specific feedback should use the following format:
-Paragraph number: {paragraph number of the segment of ${studentName}'s work pertaining to the feedback}
-Sentence number: {sentence number of the segment of ${studentName}'s work pertaining to the feedback, or -1 if the feedback applies to the entire paragraph}
+Paragraph number: {paragraph number pertaining to the feedback}
+Sentence number: {sentence number pertaining to the feedback, or -1 if the feedback pertains to the entire paragraph}
 Feedback: {the feedback to ${studentName}}
 
 General Feedback
@@ -99,7 +99,7 @@ Conclude your feedback by making references to and extending upon the feedback y
 Begin.`,
 				},
 			],
-			model: "gpt-4-0613" as const,
+			model: "gpt-4" as const,
 			temperature: 0,
 			presencePenalty: 0.0,
 			frequencyPenalty: 0.25,
@@ -108,7 +108,7 @@ Begin.`,
 	const initialMessage = `Alright ${
 		studentName.split(" ")[0]
 	}, let's take a look at your work....`
-
+	console.log(...messages.map(({ content }) => content))
 	const initialMessageSplit = initialMessage.split(/(?=[\s,.])/)
 
 	for (
@@ -125,7 +125,7 @@ Begin.`,
 					paragraph: undefined,
 					sentence: undefined,
 				}),
-			initialMessagePartIndex * 200
+			initialMessagePartIndex * 200,
 		)
 	}
 
@@ -138,14 +138,14 @@ Begin.`,
 		reason: "feedback",
 		onContent: (content) => {
 			const generalFeedbackHeaderIndex = content.search(
-				/\n[*]*General Feedback:?[*]*\n+.+/
+				/\n[*]*General Feedback:?[*]*\n+.+/,
 			)
 
 			if (generalFeedbackHeaderIndex !== -1) {
 				onContent({
 					content: content.slice(
 						content.indexOf("\n", generalFeedbackHeaderIndex + 1) +
-							1
+							1,
 					),
 					paragraph: undefined,
 					sentence: undefined,
@@ -154,7 +154,7 @@ Begin.`,
 				content.search(/\n[*]*Specific Feedback:?[*]*\n/) !== -1
 			) {
 				const feedbackItems = content.match(
-					/(?<=\nFeedback[ ]*:[ ]*).+/g
+					/(?<=\nFeedback[ ]*:[ ]*).+/g,
 				)
 
 				const feedback = feedbackItems?.at(-1)
@@ -168,9 +168,9 @@ Begin.`,
 						lastParagraphNumber = Number(
 							content
 								.match(
-									/(?<=\n(\d\.[ ]*)?[ ]*Paragraph( number)?[ ]*:?[ ]*)\d+/g
+									/(?<=\n(\d\.[ ]*)?[ ]*Paragraph( number)?[ ]*:?[ ]*)\d+/g,
 								)
-								?.at(-1)
+								?.at(-1),
 						)
 
 						if (isNaN(lastParagraphNumber)) lastParagraphNumber = -1
@@ -178,9 +178,9 @@ Begin.`,
 						lastSentenceNumber = Number(
 							content
 								.match(
-									/(?<=\n[ ]*Sentence( number)?[ ]*:?[ ]*)-?\d+/g
+									/(?<=\n[ ]*Sentence( number)?[ ]*:?[ ]*)-?\d+/g,
 								)
-								?.at(-1)
+								?.at(-1),
 						)
 
 						if (isNaN(lastSentenceNumber)) lastSentenceNumber = -1
@@ -188,7 +188,7 @@ Begin.`,
 
 					if (lastParagraphNumber === -1) {
 						onError(
-							new Error("Feedback paragraph number not found")
+							new Error("Feedback paragraph number not found"),
 						)
 					} else {
 						onContent({

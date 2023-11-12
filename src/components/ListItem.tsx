@@ -11,7 +11,7 @@ interface Props extends HTMLProps<HTMLLIElement> {
 
 function ListItem(
 	{ selected = false, disabled = false, className, ...props }: Props,
-	ref: ForwardedRef<HTMLLIElement>
+	ref: ForwardedRef<HTMLLIElement>,
 ) {
 	return (
 		<li
@@ -25,9 +25,9 @@ function ListItem(
 							"cursor-pointer focus-visible:outline-border",
 							selected
 								? "bg-surface-selected hover:bg-surface-selected-hover"
-								: "bg-surface hover:bg-surface-hover"
+								: "bg-surface hover:bg-surface-hover",
 					  ),
-				className
+				className,
 			)}
 		/>
 	)

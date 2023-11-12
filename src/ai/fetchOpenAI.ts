@@ -36,7 +36,7 @@ export default function fetchOpenAI({
 				frequencyPenalty,
 				maxTokens,
 				reason,
-			})
+			}),
 		),
 		signal: abortController.signal,
 	})
@@ -56,7 +56,7 @@ export default function fetchOpenAI({
 				onContent(streamedContent)
 
 				if (abortController === null) {
-					reader.cancel()
+					await reader.cancel()
 
 					break
 				}

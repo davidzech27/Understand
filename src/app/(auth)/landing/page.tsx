@@ -12,7 +12,7 @@ export const metadata = {
 	title: "Landing",
 }
 
-export default async function LandingPage() {
+export default function LandingPage() {
 	const emailPromise = getAuthOrThrow({
 		cookies: cookies(),
 	}).then(({ email }) => email)
@@ -20,11 +20,11 @@ export default async function LandingPage() {
 	const userPromise = emailPromise.then((email) =>
 		User({ email })
 			.get()
-			.then((user) => user ?? notFound())
+			.then((user) => user ?? notFound()),
 	)
 
 	const potentialSchoolsPromise = emailPromise.then((email) =>
-		User({ email }).potentialSchools()
+		User({ email }).potentialSchools(),
 	)
 
 	return (

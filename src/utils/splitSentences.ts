@@ -1,7 +1,7 @@
 export default function splitSentences(text: string) {
 	if (Intl.Segmenter === undefined) {
 		return text.split(
-			/(?<!\b(?:Mr|Mrs|Dr|Ms|Prof|Sr|Jr|St|e\.g|i\.e|etc)\.)(?<=[.?!][’”']?)\s+(?=[A-Z0-9])/g
+			/(?<!\b(?:Mr|Mrs|Dr|Ms|Prof|Sr|Jr|St|e\.g|i\.e|etc)\.)(?<=[.?!][’”']?)\s+(?=[A-Z0-9])/g,
 		)
 	}
 

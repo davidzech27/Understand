@@ -1,4 +1,4 @@
-import env from "env.mjs"
+import env from "~/env.mjs"
 import tokenCost from "./tokenCost"
 
 export default async function getCompletion({
@@ -10,11 +10,7 @@ export default async function getCompletion({
 	maxTokens,
 }: {
 	messages: { role: "assistant" | "user" | "system"; content: string }[]
-	model:
-		| "gpt-4-0613"
-		| "gpt-3.5-turbo-0613"
-		| "gpt-3.5-turbo-16k-0613"
-		| "gpt-3.5-turbo-0301"
+	model: "gpt-4" | "gpt-3.5-turbo" | "gpt-3.5-turbo-16k"
 	temperature: number
 	presencePenalty: number
 	frequencyPenalty: number
@@ -31,9 +27,9 @@ export default async function getCompletion({
 				messages,
 				model,
 				temperature,
-				presence_penalty: presencePenalty,
-				frequency_penalty: frequencyPenalty,
-				max_tokens: maxTokens,
+				presencePenalty,
+				frequencyPenalty,
+				maxTokens,
 			}),
 		})
 	).json()) as

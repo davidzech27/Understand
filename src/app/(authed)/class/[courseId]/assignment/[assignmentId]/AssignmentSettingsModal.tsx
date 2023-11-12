@@ -27,10 +27,10 @@ export default function AssignmentSettingsModal({
 
 	const [titleInput, setTitleInput] = useState(assignment.title)
 	const [descriptionInput, setDescriptionInput] = useState(
-		assignment.description ?? ""
+		assignment.description ?? "",
 	)
 	const [instructionsInput, setInstructionsInput] = useState(
-		assignment.instructions ?? ""
+		assignment.instructions ?? "",
 	)
 
 	const updateDisabled =
@@ -80,10 +80,8 @@ export default function AssignmentSettingsModal({
 	return (
 		<Modal open={open} setOpen={setOpen} title="Assignment settings">
 			<form
-				onSubmit={(e) => {
-					e.preventDefault()
-
-					onUpdateAssignment()
+				action={async () => {
+					await onUpdateAssignment()
 				}}
 				className="relative h-full"
 			>

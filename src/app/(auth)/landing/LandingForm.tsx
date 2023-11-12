@@ -35,7 +35,7 @@ export default function LandingForm({
 	const [user, setUser] = useState<Awaited<typeof userPromise>>()
 
 	useEffect(() => {
-		userPromise.then((user) => {
+		void userPromise.then((user) => {
 			setUser(user)
 			setNameInput(user.name)
 		})
@@ -47,7 +47,7 @@ export default function LandingForm({
 		useState<Awaited<typeof potentialSchoolsPromise>>()
 
 	useEffect(() => {
-		potentialSchoolsPromise.then((potentialSchools) => {
+		void potentialSchoolsPromise.then((potentialSchools) => {
 			setPotentialSchools(potentialSchools)
 		})
 	}, [potentialSchoolsPromise])
@@ -90,10 +90,8 @@ export default function LandingForm({
 
 	return (
 		<form
-			onSubmit={(e) => {
-				e.preventDefault()
-
-				onGo()
+			action={async () => {
+				await onGo()
 			}}
 			className={cn("flex flex-col", className)}
 		>
@@ -154,11 +152,11 @@ export default function LandingForm({
 									<div className="space-y-2.5" id="school">
 										<Button
 											key={potentialSchools[0].districtName.concat(
-												potentialSchools[0].name
+												potentialSchools[0].name,
 											)}
 											onClick={() => {
 												setSelectedSchool(
-													potentialSchools[0]
+													potentialSchools[0],
 												)
 
 												setSchoolButtonClicked(true)
@@ -205,7 +203,7 @@ export default function LandingForm({
 										{potentialSchools?.map((school) => (
 											<Button
 												key={school.districtName.concat(
-													school.name
+													school.name,
 												)}
 												onClick={() => {
 													setSelectedSchool(school)

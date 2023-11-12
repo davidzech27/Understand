@@ -2,7 +2,7 @@ import splitSentences from "./splitSentences"
 
 export default function diffParagraph(
 	oldParagraph: string,
-	newParagraph: string
+	newParagraph: string,
 ) {
 	if (oldParagraph.trim() === newParagraph.trim()) return undefined
 
@@ -48,14 +48,14 @@ export default function diffParagraph(
 		oldContent: oldSentences
 			.slice(
 				firstDifferenceSentenceIndex,
-				oldSentences.length - lastDifferenceSentenceReverseIndex
+				oldSentences.length - lastDifferenceSentenceReverseIndex,
 			)
 			.join("")
 			.trim(),
 		newContent: newSentences
 			.slice(
 				firstDifferenceSentenceIndex,
-				newSentences.length - lastDifferenceSentenceReverseIndex
+				newSentences.length - lastDifferenceSentenceReverseIndex,
 			)
 			.join("")
 			.trim(),

@@ -8,7 +8,7 @@ import {
 
 export default function useStickyState<S>(
 	defaultValue: S,
-	key: string
+	key: string,
 ): [S, Dispatch<SetStateAction<S>>] {
 	const [value, setValue] = useState<S>(
 		typeof window !== "undefined"
@@ -19,7 +19,7 @@ export default function useStickyState<S>(
 						? (JSON.parse(stickyValue) as S)
 						: defaultValue
 			  }
-			: defaultValue
+			: defaultValue,
 	)
 
 	const oldKey = useRef(key)

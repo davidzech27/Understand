@@ -21,7 +21,7 @@ interface Props
 
 function FancyButton(
 	{ children, onClick, size, loading, disabled, className, ...props }: Props,
-	ref: ForwardedRef<HTMLButtonElement>
+	ref: ForwardedRef<HTMLButtonElement>,
 ) {
 	return (
 		<button
@@ -43,7 +43,7 @@ function FancyButton(
 					"opacity-50 hover:opacity-50 focus-visible:opacity-50 active:opacity-50",
 				loading &&
 					"hover:opacity-100 focus-visible:opacity-100 active:opacity-100",
-				className
+				className,
 			)}
 		>
 			{loading ? <LoadingSpinner /> : children}

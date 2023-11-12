@@ -96,8 +96,8 @@ const Feedback = ({
 						eq(feedback.courseId, courseId),
 						eq(feedback.assignmentId, assignmentId),
 						eq(feedback.userEmail, userEmail),
-						eq(feedback.givenAt, givenAt)
-					)
+						eq(feedback.givenAt, givenAt),
+					),
 				)
 		)[0]
 
@@ -133,8 +133,8 @@ const Feedback = ({
 					eq(feedback.courseId, courseId),
 					eq(feedback.assignmentId, assignmentId),
 					eq(feedback.userEmail, userEmail),
-					eq(feedback.givenAt, givenAt)
-				)
+					eq(feedback.givenAt, givenAt),
+				),
 			)
 	},
 	delete: async () => {
@@ -145,8 +145,8 @@ const Feedback = ({
 					eq(feedback.courseId, courseId),
 					eq(feedback.assignmentId, assignmentId),
 					eq(feedback.userEmail, userEmail),
-					eq(feedback.givenAt, givenAt)
-				)
+					eq(feedback.givenAt, givenAt),
+				),
 			)
 	},
 	addFollowUp: async ({
@@ -170,17 +170,17 @@ const Feedback = ({
 									eq(feedback.courseId, courseId),
 									eq(feedback.assignmentId, assignmentId),
 									eq(feedback.userEmail, userEmail),
-									eq(feedback.givenAt, givenAt)
-								)
+									eq(feedback.givenAt, givenAt),
+								),
 							)
-					)[0]?.list
+					)[0]?.list,
 				)
 
 				feedbackList
 					.find(
 						(feedback) =>
 							feedback.paragraph === paragraph &&
-							feedback.sentence === sentence
+							feedback.sentence === sentence,
 					)
 					?.followUps.push(followUp)
 
@@ -192,13 +192,13 @@ const Feedback = ({
 							eq(feedback.courseId, courseId),
 							eq(feedback.assignmentId, assignmentId),
 							eq(feedback.userEmail, userEmail),
-							eq(feedback.givenAt, givenAt)
-						)
+							eq(feedback.givenAt, givenAt),
+						),
 					)
 			},
 			{
 				isolationLevel: "serializable",
-			}
+			},
 		)
 	},
 	insights: async () => {
@@ -214,8 +214,8 @@ const Feedback = ({
 						eq(feedback.courseId, courseId),
 						eq(feedback.assignmentId, assignmentId),
 						eq(feedback.userEmail, userEmail),
-						eq(feedback.givenAt, givenAt)
-					)
+						eq(feedback.givenAt, givenAt),
+					),
 				)
 		)[0]
 
@@ -243,10 +243,10 @@ const Feedback = ({
 									eq(feedback.courseId, courseId),
 									eq(feedback.assignmentId, assignmentId),
 									eq(feedback.userEmail, userEmail),
-									eq(feedback.givenAt, givenAt)
-								)
+									eq(feedback.givenAt, givenAt),
+								),
 							)
-					)[0]?.insights
+					)[0]?.insights,
 				)
 
 				if (
@@ -261,14 +261,14 @@ const Feedback = ({
 								eq(feedback.courseId, courseId),
 								eq(feedback.assignmentId, assignmentId),
 								eq(feedback.userEmail, userEmail),
-								eq(feedback.givenAt, givenAt)
-							)
+								eq(feedback.givenAt, givenAt),
+							),
 						)
 				}
 			},
 			{
 				isolationLevel: "serializable",
-			}
+			},
 		)
 	},
 })

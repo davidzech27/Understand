@@ -48,14 +48,35 @@ const User = ({ email }: { email: string }) => {
 		create: async ({
 			name,
 			photo,
+			schoolDistrictName,
+			schoolName,
+			schoolRole,
 		}: {
 			name: string
 			photo: string | undefined
+			schoolDistrictName?: string
+			schoolName?: string
+			schoolRole?: "teacher" | "student"
 		}) => {
 			await db
 				.insert(user)
-				.values({ email, name, photo })
-				.onDuplicateKeyUpdate({ set: { email, photo } }) // remove when feature to change photo is added
+				.values({
+					email,
+					name,
+					photo,
+					schoolDistrictName,
+					schoolName,
+					schoolRole,
+				})
+				.onDuplicateKeyUpdate({
+					set: {
+						email,
+						photo,
+						schoolDistrictName,
+						schoolName,
+						schoolRole,
+					},
+				}) // remove when feature to change photo is added
 		},
 		get: async () => {
 			const row = (
@@ -140,8 +161,8 @@ const User = ({ email }: { email: string }) => {
 					.where(
 						or(
 							eq(school.teacherEmailDomain, emailDomain),
-							eq(school.studentEmailDomain, emailDomain)
-						)
+							eq(school.studentEmailDomain, emailDomain),
+						),
 					)
 			).map((school) => ({
 				districtName: school.districtName,
@@ -254,8 +275,8 @@ const User = ({ email }: { email: string }) => {
 					.where(
 						and(
 							eq(teacherToCourse.teacherEmail, email),
-							eq(teacherToCourse.courseId, id)
-						)
+							eq(teacherToCourse.courseId, id),
+						),
 					)
 			}
 
@@ -265,8 +286,8 @@ const User = ({ email }: { email: string }) => {
 					.where(
 						and(
 							eq(studentToCourse.studentEmail, email),
-							eq(studentToCourse.courseId, id)
-						)
+							eq(studentToCourse.courseId, id),
+						),
 					)
 			}
 		},
@@ -278,8 +299,8 @@ const User = ({ email }: { email: string }) => {
 					.where(
 						and(
 							eq(teacherToCourse.courseId, id),
-							eq(teacherToCourse.teacherEmail, email)
-						)
+							eq(teacherToCourse.teacherEmail, email),
+						),
 					)
 					.then((rows) => rows[0]),
 				db
@@ -288,8 +309,8 @@ const User = ({ email }: { email: string }) => {
 					.where(
 						and(
 							eq(studentToCourse.courseId, id),
-							eq(studentToCourse.studentEmail, email)
-						)
+							eq(studentToCourse.studentEmail, email),
+						),
 					)
 					.then((rows) => rows[0]),
 			])
@@ -315,16 +336,16 @@ const User = ({ email }: { email: string }) => {
 					.from(teacherToCourse)
 					.leftJoin(
 						assignment,
-						eq(assignment.courseId, teacherToCourse.courseId)
+						eq(assignment.courseId, teacherToCourse.courseId),
 					)
 					.where(
 						and(
 							eq(teacherToCourse.teacherEmail, email),
 							or(
 								gt(assignment.dueAt, new Date()),
-								isNull(assignment.dueAt)
-							)
-						)
+								isNull(assignment.dueAt),
+							),
+						),
 					)
 					.then((rows) => ({
 						isTeaching: rows.length !== 0,
@@ -339,7 +360,7 @@ const User = ({ email }: { email: string }) => {
 											title: row.title,
 											dueAt: row.dueAt,
 									  }
-									: undefined
+									: undefined,
 							)
 							.filter(Boolean),
 					})),
@@ -353,16 +374,16 @@ const User = ({ email }: { email: string }) => {
 					.from(studentToCourse)
 					.leftJoin(
 						assignment,
-						eq(assignment.courseId, studentToCourse.courseId)
+						eq(assignment.courseId, studentToCourse.courseId),
 					)
 					.where(
 						and(
 							eq(studentToCourse.studentEmail, email),
 							or(
 								gt(assignment.dueAt, new Date()),
-								isNull(assignment.dueAt)
-							)
-						)
+								isNull(assignment.dueAt),
+							),
+						),
 					)
 					.then((rows) => ({
 						isEnrolled: rows.length !== 0,
@@ -377,7 +398,7 @@ const User = ({ email }: { email: string }) => {
 											title: row.title,
 											dueAt: row.dueAt,
 									  }
-									: undefined
+									: undefined,
 							)
 							.filter(Boolean),
 					})),
@@ -413,8 +434,8 @@ const User = ({ email }: { email: string }) => {
 						and(
 							eq(feedback.courseId, courseId),
 							eq(feedback.assignmentId, assignmentId),
-							eq(feedback.userEmail, email)
-						)
+							eq(feedback.userEmail, email),
+						),
 					)
 			).map(
 				({
@@ -433,7 +454,7 @@ const User = ({ email }: { email: string }) => {
 						rawResponse,
 						shared,
 					}
-				}
+				},
 			)
 		},
 		feedbackStream: async ({
@@ -456,13 +477,13 @@ const User = ({ email }: { email: string }) => {
 					cursor === undefined
 						? and(
 								eq(feedback.courseId, courseId),
-								eq(feedback.userEmail, email)
+								eq(feedback.userEmail, email),
 						  )
 						: and(
 								eq(feedback.courseId, courseId),
 								eq(feedback.userEmail, email),
-								lt(feedback.givenAt, new Date(cursor))
-						  )
+								lt(feedback.givenAt, new Date(cursor)),
+						  ),
 				)
 				.orderBy(desc(feedback.givenAt))
 				.limit(limit)
@@ -471,8 +492,8 @@ const User = ({ email }: { email: string }) => {
 					assignment,
 					and(
 						eq(assignment.courseId, courseId),
-						eq(assignment.assignmentId, feedback.assignmentId)
-					)
+						eq(assignment.assignmentId, feedback.assignmentId),
+					),
 				)
 
 			return {
@@ -512,8 +533,8 @@ const User = ({ email }: { email: string }) => {
 					.where(
 						and(
 							eq(studentInsight.courseId, courseId),
-							eq(studentInsight.studentEmail, email)
-						)
+							eq(studentInsight.studentEmail, email),
+						),
 					)
 			)[0]
 
@@ -536,8 +557,8 @@ const User = ({ email }: { email: string }) => {
 					and(
 						eq(feedback.courseId, courseId),
 						eq(feedback.assignmentId, assignmentId),
-						isNotNull(feedback.insights)
-					)
+						isNotNull(feedback.insights),
+					),
 				)
 				.orderBy(desc(feedback.givenAt))
 				.limit(1)
@@ -567,8 +588,8 @@ const User = ({ email }: { email: string }) => {
 							eq(feedback.courseId, courseId),
 							eq(feedback.userEmail, email),
 							isNull(feedback.syncedInsightsAt),
-							isNotNull(feedback.insights)
-						)
+							isNotNull(feedback.insights),
+						),
 					)
 			).map((row) => ({
 				...row,
@@ -607,7 +628,7 @@ const User = ({ email }: { email: string }) => {
 						(cost.followUp ?? 0) +
 						(cost.insights ?? 0) +
 						(cost.chat ?? 0) +
-						(cost.messageBoard ?? 0)
+						(cost.messageBoard ?? 0),
 				),
 			])
 		},

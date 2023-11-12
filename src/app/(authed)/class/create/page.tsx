@@ -18,27 +18,27 @@ export default function ClassCreatePage() {
 	const googleAPIPromise = authPromise.then(
 		({ googleRefreshToken, googleScopes }) =>
 			!googleScopes.includes(
-				"https://www.googleapis.com/auth/classroom.courses.readonly"
+				"https://www.googleapis.com/auth/classroom.courses.readonly",
 			) ||
 			!googleScopes.includes(
-				"https://www.googleapis.com/auth/classroom.rosters.readonly"
+				"https://www.googleapis.com/auth/classroom.rosters.readonly",
 			) ||
 			!googleScopes.includes(
-				"https://www.googleapis.com/auth/classroom.profile.emails"
+				"https://www.googleapis.com/auth/classroom.profile.emails",
 			) ||
 			!googleScopes.includes(
-				"https://www.googleapis.com/auth/classroom.student-submissions.students.readonly"
+				"https://www.googleapis.com/auth/classroom.student-submissions.students.readonly",
 			) ||
 			!googleScopes.includes(
-				"https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly"
+				"https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly",
 			) ||
 			!googleScopes.includes(
-				"https://www.googleapis.com/auth/drive.readonly"
+				"https://www.googleapis.com/auth/drive.readonly",
 			)
 				? undefined
 				: GoogleAPI({
 						refreshToken: googleRefreshToken,
-				  })
+				  }),
 	)
 
 	const emailPromise = authPromise.then(({ email }) => email)
@@ -46,30 +46,31 @@ export default function ClassCreatePage() {
 	const userPromise = emailPromise.then((email) =>
 		User({ email })
 			.get()
-			.then((user) => user ?? notFound())
+			.then((user) => user ?? notFound()),
 	)
 
 	const coursesPromise = googleAPIPromise.then(
 		(googleAPI) =>
 			googleAPI &&
-			userPromise.then(async ({ superuser }) =>
-				(superuser
-					? (
-							await Promise.all([
-								googleAPI.coursesTeaching({
-									includeArchived: true,
-								}),
-								googleAPI.coursesEnrolled({
-									includeArchived: true,
-								}),
-							])
-					  ).flat()
-					: await googleAPI.coursesTeaching()
-				)?.map((course) => ({
-					...course,
-					roster: googleAPI.courseRoster({ courseId: course.id }),
-				}))
-			)
+			userPromise.then(
+				async ({ superuser }) =>
+					(superuser
+						? (
+								await Promise.all([
+									googleAPI.coursesTeaching({
+										includeArchived: true,
+									}),
+									googleAPI.coursesEnrolled({
+										includeArchived: true,
+									}),
+								])
+						  ).flat()
+						: await googleAPI.coursesTeaching()
+					)?.map((course) => ({
+						...course,
+						roster: googleAPI.courseRoster({ courseId: course.id }),
+					})),
+			),
 	)
 
 	return (

@@ -58,10 +58,8 @@ export default function CreateAssignmentForm({
 	return (
 		<>
 			<form
-				onSubmit={(e) => {
-					e.preventDefault()
-
-					onCreate()
+				action={async () => {
+					await onCreate()
 				}}
 				className="flex h-full flex-col space-y-2.5"
 			>
@@ -132,7 +130,7 @@ export default function CreateAssignmentForm({
 												? coursesTeaching.find(
 														(course) =>
 															course.id ===
-															courseId
+															courseId,
 												  )?.name ?? "No class selected"
 												: "You're not teaching any classes!"
 										}
@@ -154,7 +152,7 @@ export default function CreateAssignmentForm({
 							autoComplete="off"
 							className={cn(
 								"py-2.5 pl-4 text-base",
-								instructionsInput === "" && "h-[46px]"
+								instructionsInput === "" && "h-[46px]",
 							)}
 						/>
 					</Card>

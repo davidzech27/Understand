@@ -13,7 +13,7 @@ const registerInsightsAction = zact(
 		assignmentId: z.string(),
 		givenAt: z.date(),
 		insights: feedbackInsightsSchema,
-	})
+	}),
 )(async ({ courseId, assignmentId, givenAt, insights }) => {
 	const { email } = await getAuthOrThrow({ cookies: cookies() })
 

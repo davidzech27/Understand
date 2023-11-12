@@ -2,7 +2,7 @@ import { z } from "zod"
 
 import redirectURL from "./redirectURL"
 import scopes from "./scopes"
-import env from "env.mjs"
+import env from "~/env.mjs"
 
 const tokensSchema = z.object({
 	accessToken: z.string(),
@@ -68,13 +68,14 @@ export async function getCredentialsFromRefreshToken(refreshToken: string) {
 
 	if (tokens === undefined) throw new Error("No Google tokens")
 
-	if ("error" in tokens)
+	if ("error" in tokens && typeof tokens.error === "string")
 		throw new Error(
 			`Google credentials error: ${tokens.error}${
-				"error_description" in tokens
+				"error_description" in tokens &&
+				typeof tokens.error_description === "string"
 					? `: ${tokens.error_description}`
 					: ""
-			}`
+			}`,
 		)
 
 	return tokensSchema.parse({

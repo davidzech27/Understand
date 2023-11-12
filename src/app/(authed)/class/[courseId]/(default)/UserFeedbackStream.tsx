@@ -32,19 +32,20 @@ export default function UserFeedbackStream({
 
 	const onLoadMore = () => {
 		if (cursor !== undefined)
-			loadMore(() => {
-				getUserFeedbackStreamAction({
-					courseId,
-					limit: 20,
-					cursor,
-				}).then(({ feedbackStream, cursor }) => {
-					setFeedbackStream((previousFeedbackStream) => [
-						...previousFeedbackStream,
-						...feedbackStream,
-					])
+			loadMore(async () => {
+				const { feedbackStream, cursor: newCursor } =
+					await getUserFeedbackStreamAction({
+						courseId,
+						limit: 20,
+						cursor,
+					})
 
-					setCursor(cursor)
-				})
+				setFeedbackStream((previousFeedbackStream) => [
+					...previousFeedbackStream,
+					...feedbackStream,
+				])
+
+				setCursor(newCursor)
 			})
 	}
 
@@ -75,7 +76,7 @@ export default function UserFeedbackStream({
 							</span>
 						</div>
 					</Link>
-				)
+				),
 			)}
 
 			{cursor && (

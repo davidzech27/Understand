@@ -27,7 +27,7 @@ export default function Avatar({
 			}}
 			className={cn(
 				"flex h-full w-full items-center justify-center rounded-full font-semibold text-white",
-				fallbackColor === "primary" ? "bg-primary" : "bg-secondary"
+				fallbackColor === "primary" ? "bg-primary" : "bg-secondary",
 			)}
 		>
 			{name[0].toUpperCase()}
@@ -36,7 +36,7 @@ export default function Avatar({
 		<div
 			className={cn(
 				"h-full w-full rounded-full bg-white",
-				border && "border-[0.75px] border-border"
+				border && "border-[0.75px] border-border",
 			)}
 		/>
 	)
@@ -50,7 +50,7 @@ export default function Avatar({
 			className={cn(
 				"h-full w-full rounded-full",
 				border && "border-[0.75px] border-border",
-				className
+				className,
 			)}
 		/>
 	) : (

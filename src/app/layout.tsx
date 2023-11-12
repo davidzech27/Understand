@@ -1,6 +1,3 @@
-import { AxiomWebVitals } from "next-axiom"
-import { Analytics } from "@vercel/analytics/react"
-
 import "./global.css"
 import Providers from "./providers"
 import { getSignedIn } from "~/utils/getSignedIn"
@@ -33,10 +30,6 @@ export default function RootLayout({
 					style={{ margin: 0 }} // keep this
 				>
 					<Providers signedIn={getSignedIn()}>{children}</Providers>
-
-					<AxiomWebVitals />
-
-					<Analytics />
 				</body>
 			</html>
 		</>

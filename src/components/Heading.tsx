@@ -11,7 +11,7 @@ interface Props extends React.PropsWithChildren {
 
 function Heading(
 	{ size = "medium", asChild, className, children }: Props,
-	ref: ForwardedRef<HTMLDivElement>
+	ref: ForwardedRef<HTMLDivElement>,
 ) {
 	const Component = asChild ? Slot : "div"
 
@@ -27,7 +27,7 @@ function Heading(
 					xLarge: "text-xl",
 					"2xLarge": "text-2xl",
 				}[size],
-				className
+				className,
 			)}
 		>
 			{children}

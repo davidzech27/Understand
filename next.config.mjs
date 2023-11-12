@@ -1,22 +1,23 @@
-import { withAxiom } from "next-axiom"
 import nextBundleAnalyzer from "@next/bundle-analyzer"
 
-import "./env.mjs"
+import "./src/env.mjs"
 
 /** @type {import("next").NextConfig} */
 const config = {
 	reactStrictMode: true,
 	experimental: {
-		serverActions: true,
+		optimizeServerReact: true,
 	},
 	webpack: (config) => {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 		config.experiments = {
 			asyncWebAssembly: true,
 			layers: true,
 		}
 
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 		return config
 	},
 }
 
-export default nextBundleAnalyzer({ enabled: false })(withAxiom(config))
+export default nextBundleAnalyzer({ enabled: false })(config)

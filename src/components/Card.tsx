@@ -10,7 +10,7 @@ export default function Card({ children, className }: Props) {
 		<div
 			className={cn(
 				"rounded-md border border-border bg-surface shadow-lg shadow-[#00000016]",
-				className
+				className,
 			)}
 		>
 			{children}

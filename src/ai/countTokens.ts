@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-import env from "env.mjs"
+import env from "~/env.mjs"
 
 const responseSchema = z.number()
 
@@ -14,7 +14,7 @@ export default (async function countTokens(
 					role: "assistant" | "user" | "system"
 					content: string
 				}[]
-		  }
+		  },
 ) {
 	return responseSchema.parse(
 		await (
@@ -22,6 +22,6 @@ export default (async function countTokens(
 				method: "POST",
 				body: textEncoder.encode(JSON.stringify(arg)),
 			})
-		).json()
+		).json(),
 	)
 })

@@ -45,7 +45,7 @@ export default async function ClassLayout({
 		Course({ id: courseId }).get(),
 		Course({ id: courseId }).inviteCode(),
 		getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
-			User({ email }).courseRole({ id: courseId })
+			User({ email }).courseRole({ id: courseId }),
 		),
 	])
 

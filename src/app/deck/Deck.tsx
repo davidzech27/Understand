@@ -91,7 +91,7 @@ export default function Deck() {
 		const arrowKeyHandler = ({ keyCode }: { keyCode: number }) => {
 			if (keyCode === 39 || keyCode === 40) {
 				setSlideIndex((slideIndex) =>
-					Math.min(slideIndex + 1, slides.length - 1)
+					Math.min(slideIndex + 1, slides.length - 1),
 				)
 			}
 
@@ -118,7 +118,7 @@ export default function Deck() {
 			<div
 				className={cn(
 					"absolute bottom-12 text-xl font-medium leading-none text-white transition duration-300",
-					navigated && "opacity-0"
+					navigated && "opacity-0",
 				)}
 			>
 				Use your arrow keys to navigate

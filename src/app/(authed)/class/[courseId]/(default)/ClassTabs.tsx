@@ -38,8 +38,6 @@ export default function ClassTab({
 				<LinkButton href={`/class/${course.id}/people`}>
 					People
 				</LinkButton>
-
-				<LinkButton href={`/class/${course.id}/chat`}>Chat</LinkButton>
 			</div>
 
 			{role === "teacher" && (

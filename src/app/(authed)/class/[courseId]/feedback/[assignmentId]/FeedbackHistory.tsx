@@ -35,7 +35,7 @@ export default function FeedbackHistory({
 							selectedFeedback?.givenAt.valueOf() ===
 								feedback.givenAt.valueOf()
 								? "bg-surface-selected hover:bg-surface-selected-hover"
-								: "hover:bg-surface-hover"
+								: "hover:bg-surface-hover",
 						)}
 					>
 						<span className="font-medium opacity-80">

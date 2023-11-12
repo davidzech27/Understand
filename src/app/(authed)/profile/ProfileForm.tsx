@@ -21,7 +21,7 @@ export default function ProfileForm({ user, potentialSchools }: Props) {
 	const [nameInput, setNameInput] = useState(user.name)
 
 	const [schoolName, setSchoolName] = useState<string | undefined>(
-		user?.schoolName
+		user?.schoolName,
 	)
 
 	const router = useRouter()
@@ -40,7 +40,7 @@ export default function ProfileForm({ user, potentialSchools }: Props) {
 					? undefined
 					: potentialSchools.find(
 							(potentialSchool) =>
-								potentialSchool.name === schoolName
+								potentialSchool.name === schoolName,
 					  ) ?? null,
 		})
 
@@ -51,18 +51,16 @@ export default function ProfileForm({ user, potentialSchools }: Props) {
 
 	const [signingOut, setSigningOut] = useState(false)
 
-	const onSignOut = () => {
+	const onSignOut = async () => {
 		setSigningOut(true)
 
-		signOutAction({})
+		await signOutAction({})
 	}
 
 	return (
 		<form
-			onSubmit={(e) => {
-				e.preventDefault()
-
-				onSaveChanges()
+			action={async () => {
+				await onSaveChanges()
 			}}
 			className="flex h-full flex-col gap-2"
 		>
@@ -90,12 +88,12 @@ export default function ProfileForm({ user, potentialSchools }: Props) {
 							setSchoolName(
 								schoolName === "None of these"
 									? undefined
-									: schoolName
+									: schoolName,
 							)
 						}
 						items={(user.schoolName !== undefined &&
 						potentialSchools.find(
-							(school) => school.name === user.schoolName
+							(school) => school.name === user.schoolName,
 						) === undefined
 							? [
 									{ name: user.schoolName } as

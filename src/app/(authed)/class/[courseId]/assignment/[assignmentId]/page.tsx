@@ -29,7 +29,7 @@ export default async function AssignmentPage({
 }) {
 	const [role, assignment] = await Promise.all([
 		getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
-			User({ email }).courseRole({ id: courseId })
+			User({ email }).courseRole({ id: courseId }),
 		),
 		Assignment({ courseId, assignmentId }).get(),
 	])
@@ -47,7 +47,7 @@ export default async function AssignmentPage({
 						className={cn(
 							"pb-5 text-6xl font-extrabold tracking-tight",
 							assignment.syncedUrl !== undefined &&
-								"transition-all duration-150 hover:opacity-80"
+								"transition-all duration-150 hover:opacity-80",
 						)}
 					>
 						{assignment.title}

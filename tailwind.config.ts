@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-const colors = require("./colors.cjs")
+import colors from "colors.cjs"
 
 /** @type {import('tailwindcss').Config} */
 const config = {

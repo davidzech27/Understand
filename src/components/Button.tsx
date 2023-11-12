@@ -20,7 +20,7 @@ interface Props
 
 function Button(
 	{ children, onClick, size, loading, disabled, className, ...props }: Props,
-	ref: ForwardedRef<HTMLButtonElement>
+	ref: ForwardedRef<HTMLButtonElement>,
 ) {
 	if (loading) disabled = true
 
@@ -40,7 +40,7 @@ function Button(
 				disabled
 					? "opacity-50"
 					: "hover:bg-surface-selected-hover focus-visible:bg-surface-selected-hover active:bg-surface-selected-hover",
-				className
+				className,
 			)}
 		>
 			{loading ? (

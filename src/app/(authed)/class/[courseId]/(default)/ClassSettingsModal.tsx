@@ -44,11 +44,11 @@ export default function ClassSettingsModal({
 			sectionInput === course.section &&
 			teacherEmails.length === teacherEmailInputs.length &&
 			teacherEmails.every(
-				(email, index) => teacherEmailInputs[index] === email
+				(email, index) => teacherEmailInputs[index] === email,
 			) &&
 			studentEmails.length === studentEmailInputs.length &&
 			studentEmails.every(
-				(email, index) => studentEmailInputs[index] === email
+				(email, index) => studentEmailInputs[index] === email,
 			)) ||
 		nameInput.trim().length === 0
 
@@ -69,16 +69,16 @@ export default function ClassSettingsModal({
 			name: nameInput.trim(),
 			section: sectionInput.trim() || undefined,
 			addTeacherEmails: teacherEmailInputsFiltered.filter(
-				(email) => !teacherEmails.includes(email)
+				(email) => !teacherEmails.includes(email),
 			),
 			removeTeacherEmails: teacherEmails.filter(
-				(email) => !teacherEmailInputsFiltered.includes(email)
+				(email) => !teacherEmailInputsFiltered.includes(email),
 			),
 			addStudentEmails: studentEmailInputsFiltered.filter(
-				(email) => !studentEmails.includes(email)
+				(email) => !studentEmails.includes(email),
 			),
 			removeStudentEmails: studentEmails.filter(
-				(email) => !studentEmailInputsFiltered.includes(email)
+				(email) => !studentEmailInputsFiltered.includes(email),
 			),
 		})
 
@@ -104,10 +104,8 @@ export default function ClassSettingsModal({
 	return (
 		<Modal open={open} setOpen={setOpen} title="Class settings">
 			<form
-				onSubmit={(e) => {
-					e.preventDefault()
-
-					onUpdateCourse()
+				action={async () => {
+					await onUpdateCourse()
 				}}
 				className="relative h-full"
 			>

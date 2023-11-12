@@ -15,30 +15,28 @@ const updateAssignmentAction = zact(
 		description: z.string().min(1).optional(),
 		instructions: z.string().min(1),
 		dueAt: z.date().optional(),
-	})
-)(
-	async ({
-		courseId,
-		assignmentId,
+	}),
+)(async ({
+	courseId,
+	assignmentId,
+	title,
+	description,
+	instructions,
+	dueAt,
+}) => {
+	const { email } = await getAuthOrThrow({ cookies: cookies() })
+
+	const role = await User({ email }).courseRole({ id: courseId })
+
+	if (role !== "teacher") return
+
+	await Assignment({ courseId, assignmentId }).update({
 		title,
-		description,
+		description: description ?? null,
 		instructions,
-		dueAt,
-	}) => {
-		const { email } = await getAuthOrThrow({ cookies: cookies() })
-
-		const role = await User({ email }).courseRole({ id: courseId })
-
-		if (role !== "teacher") return
-
-		await Assignment({ courseId, assignmentId }).update({
-			title,
-			description: description ?? null,
-			instructions,
-			dueAt: dueAt ?? null,
-			syncedAt: null,
-		})
-	}
-)
+		dueAt: dueAt ?? null,
+		syncedAt: null,
+	})
+})
 
 export default updateAssignmentAction

@@ -23,7 +23,7 @@ export default function AssignmentField({
 				onClick={() => setSettingsModalOpen(true)}
 				className={cn(
 					"cursor-pointer select-text whitespace-pre-line rounded-md border-[0.75px] border-border px-3 py-2 font-medium opacity-80 transition duration-150 hover:bg-surface-hover",
-					className
+					className,
 				)}
 			>
 				{children}

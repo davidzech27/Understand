@@ -11,7 +11,7 @@ interface Props extends React.PropsWithChildren {
 
 export default forwardRef<HTMLDivElement, Props>(function GradientText(
 	{ asChild, children, className },
-	ref
+	ref,
 ) {
 	const Component = asChild ? Slot : "div"
 

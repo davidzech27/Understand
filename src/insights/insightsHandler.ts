@@ -1,7 +1,6 @@
 import { verifySignature } from "@upstash/qstash/nextjs"
-import { type NextApiRequest, NextApiResponse } from "next"
+import { type NextApiRequest, type NextApiResponse } from "next"
 import { z } from "zod"
-import { Logger } from "next-axiom"
 
 import callGenerate from "./callGenerate"
 import generateStudentInsights from "./generateStudentInsights"
@@ -28,7 +27,7 @@ const generateCallSchema = z.discriminatedUnion("name", [
 export type GenerateCall = z.infer<typeof generateCallSchema>
 
 async function insightsHandler(req: NextApiRequest, res: NextApiResponse) {
-	new Logger().info("Insights sync called", req.body)
+	console.info("Insights sync called", req.body)
 
 	const generateCall = generateCallSchema.parse(req.body)
 
@@ -39,13 +38,13 @@ async function insightsHandler(req: NextApiRequest, res: NextApiResponse) {
 
 		const unsyncedAssignmentIds = [
 			...new Set(
-				unsyncedFeedbackInsights.map((insight) => insight.assignmentId)
+				unsyncedFeedbackInsights.map((insight) => insight.assignmentId),
 			),
 		]
 
 		const unsyncedStudentEmails = [
 			...new Set(
-				unsyncedFeedbackInsights.map((insight) => insight.studentEmail)
+				unsyncedFeedbackInsights.map((insight) => insight.studentEmail),
 			),
 		]
 
@@ -55,14 +54,14 @@ async function insightsHandler(req: NextApiRequest, res: NextApiResponse) {
 					name: "assignment",
 					courseId: generateCall.courseId,
 					assignmentId,
-				})
+				}),
 			),
 			...unsyncedStudentEmails.map((studentEmail) =>
 				callGenerate({
 					name: "student",
 					courseId: generateCall.courseId,
 					studentEmail,
-				})
+				}),
 			),
 		])
 	} else if (generateCall.name === "student") {

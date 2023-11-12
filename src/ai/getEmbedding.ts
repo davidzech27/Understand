@@ -1,4 +1,4 @@
-import env from "env.mjs"
+import env from "~/env.mjs"
 import tokenCost from "./tokenCost"
 
 export default async function getEmbedding(text: string) {

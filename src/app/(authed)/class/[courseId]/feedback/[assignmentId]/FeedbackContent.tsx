@@ -145,7 +145,7 @@ export default function FeedbackContent({
 						sentence: feedbackItem.sentence,
 						...feedbackItem,
 				  }
-				: undefined
+				: undefined,
 		)
 		.filter(Boolean)
 
@@ -158,16 +158,16 @@ export default function FeedbackContent({
 						sentence: feedbackItem.sentence,
 						...feedbackItem,
 				  }
-				: undefined
+				: undefined,
 		)
 		.filter(Boolean)
 
 	const specificInsights = feedbackInsights?.filter(
-		(insight) => insight.paragraphs[0] !== -1
+		(insight) => insight.paragraphs[0] !== -1,
 	)
 
 	const generalInsights = feedbackInsights?.filter(
-		(insight) => insight.paragraphs[0] === -1
+		(insight) => insight.paragraphs[0] === -1,
 	)
 
 	const ref = useRef<HTMLDivElement>(null)
@@ -186,7 +186,7 @@ export default function FeedbackContent({
 			setSubmissionWidth(
 				ref.current.clientWidth -
 					specificFeedbackColumnLeftRef.current.clientWidth -
-					specificFeedbackColumnRightRef.current.clientWidth
+					specificFeedbackColumnRightRef.current.clientWidth,
 			)
 	}, [])
 
@@ -213,7 +213,7 @@ export default function FeedbackContent({
 									content,
 									followUps,
 									state,
-								})
+								}),
 							) ??
 						specificInsights
 							?.filter((_, index) => index % 2 === 1)
@@ -227,7 +227,7 @@ export default function FeedbackContent({
 					)
 						?.sort(
 							(first, second) =>
-								first.paragraph - second.paragraph
+								first.paragraph - second.paragraph,
 						)
 						.map((feedbackItem, index) => (
 							<FeedbackCard
@@ -283,7 +283,7 @@ export default function FeedbackContent({
 															text: "Give an example",
 															onClick: () => {
 																setInput(
-																	"Give an example"
+																	"Give an example",
 																)
 
 																focusInput()
@@ -293,7 +293,7 @@ export default function FeedbackContent({
 															text: "I disagree",
 															onClick: () => {
 																setInput(
-																	"I disagree"
+																	"I disagree",
 																)
 
 																focusInput()
@@ -340,12 +340,12 @@ export default function FeedbackContent({
 													({ paragraph }) =>
 														paragraph ===
 														feedbackItem.paragraph +
-															1
+															1,
 											  )?.yOffset ?? 0) -
 											  (paragraphYOffsets.find(
 													({ paragraph }) =>
 														paragraph ===
-														feedbackItem.paragraph
+														feedbackItem.paragraph,
 											  )?.yOffset ?? 0)
 											: 0,
 									width:
@@ -360,7 +360,7 @@ export default function FeedbackContent({
 										const yOffset = paragraphYOffsets.find(
 											({ paragraph }) =>
 												paragraph ===
-												feedbackItem.paragraph
+												feedbackItem.paragraph,
 										)?.yOffset
 
 										const specificFeedbackColumn =
@@ -383,7 +383,7 @@ export default function FeedbackContent({
 												previousCard
 													.computedStyleMap()
 													.get("top")
-													?.toString() ?? "0"
+													?.toString() ?? "0",
 											) +
 											(previousCard.firstElementChild
 												?.clientHeight ?? 0) +
@@ -394,7 +394,7 @@ export default function FeedbackContent({
 
 										return Math.max(
 											yOffset,
-											alternativeYOffset
+											alternativeYOffset,
 										)
 									})(),
 									zIndex:
@@ -409,7 +409,7 @@ export default function FeedbackContent({
 								className={cn(
 									"absolute left-4 right-4 max-h-[400px]",
 									feedbackItem.state !== undefined &&
-										"shadow-lg"
+										"shadow-lg",
 								)}
 							/>
 						))}
@@ -427,7 +427,7 @@ export default function FeedbackContent({
 								paragraph,
 								sentence,
 								dark: state !== undefined,
-							})
+							}),
 						) ??
 						specificInsights
 							?.map(({ paragraphs, state }) =>
@@ -435,7 +435,7 @@ export default function FeedbackContent({
 									paragraph,
 									sentence: -1,
 									dark: state !== undefined,
-								}))
+								})),
 							)
 							.flat()
 							.reduce<
@@ -448,7 +448,7 @@ export default function FeedbackContent({
 								const previousParagraphInsightIndex =
 									prev.findIndex(
 										({ paragraph }) =>
-											paragraph === cur.paragraph
+											paragraph === cur.paragraph,
 									)
 
 								const previousParagraphInsight =
@@ -463,7 +463,7 @@ export default function FeedbackContent({
 									return [
 										...prev.slice(
 											0,
-											previousParagraphInsightIndex
+											previousParagraphInsightIndex,
 										),
 										{
 											...previousParagraphInsight,
@@ -472,7 +472,7 @@ export default function FeedbackContent({
 												cur.dark,
 										},
 										...prev.slice(
-											previousParagraphInsightIndex + 1
+											previousParagraphInsightIndex + 1,
 										),
 									]
 								}
@@ -525,7 +525,7 @@ export default function FeedbackContent({
 										content,
 										followUps,
 										state,
-									})
+									}),
 								) ??
 								generalInsights?.map(
 									({ paragraphs, content, state }) => ({
@@ -534,7 +534,7 @@ export default function FeedbackContent({
 										content,
 										followUps: [],
 										state,
-									})
+									}),
 								)
 							)?.map((feedbackItem, index) => (
 								<FeedbackCard
@@ -581,7 +581,7 @@ export default function FeedbackContent({
 																text: "Why?",
 																onClick: () => {
 																	setInput(
-																		"Why?"
+																		"Why?",
 																	)
 
 																	focusInput()
@@ -591,7 +591,7 @@ export default function FeedbackContent({
 																text: "Give an example",
 																onClick: () => {
 																	setInput(
-																		"Give an example"
+																		"Give an example",
 																	)
 
 																	focusInput()
@@ -601,7 +601,7 @@ export default function FeedbackContent({
 																text: "I disagree",
 																onClick: () => {
 																	setInput(
-																		"I disagree"
+																		"I disagree",
 																	)
 
 																	focusInput()
@@ -636,7 +636,7 @@ export default function FeedbackContent({
 									className={cn(
 										"max-h-[85vh]",
 										feedbackItem.state !== undefined &&
-											"shadow-lg"
+											"shadow-lg",
 									)}
 								/>
 							))}
@@ -666,7 +666,7 @@ export default function FeedbackContent({
 									content,
 									followUps,
 									state,
-								})
+								}),
 							) ??
 						specificInsights
 							?.filter((_, index) => index % 2 === 0)
@@ -680,7 +680,7 @@ export default function FeedbackContent({
 					)
 						?.sort(
 							(first, second) =>
-								first.paragraph - second.paragraph
+								first.paragraph - second.paragraph,
 						)
 						.map((feedbackItem, index) => (
 							<FeedbackCard
@@ -734,7 +734,7 @@ export default function FeedbackContent({
 															text: "Give an example",
 															onClick: () => {
 																setInput(
-																	"Give an example"
+																	"Give an example",
 																)
 
 																focusInput()
@@ -744,7 +744,7 @@ export default function FeedbackContent({
 															text: "I disagree",
 															onClick: () => {
 																setInput(
-																	"I disagree"
+																	"I disagree",
 																)
 
 																focusInput()
@@ -789,12 +789,12 @@ export default function FeedbackContent({
 													({ paragraph }) =>
 														paragraph ===
 														feedbackItem.paragraph +
-															1
+															1,
 											  )?.yOffset ?? 0) -
 											  (paragraphYOffsets.find(
 													({ paragraph }) =>
 														paragraph ===
-														feedbackItem.paragraph
+														feedbackItem.paragraph,
 											  )?.yOffset ?? 0)
 											: 0,
 									width:
@@ -809,7 +809,7 @@ export default function FeedbackContent({
 										const yOffset = paragraphYOffsets.find(
 											({ paragraph }) =>
 												paragraph ===
-												feedbackItem.paragraph
+												feedbackItem.paragraph,
 										)?.yOffset
 
 										const specificFeedbackColumn =
@@ -832,7 +832,7 @@ export default function FeedbackContent({
 												previousCard
 													.computedStyleMap()
 													.get("top")
-													?.toString() ?? "0"
+													?.toString() ?? "0",
 											) +
 											(previousCard.firstElementChild
 												?.clientHeight ?? 0) +
@@ -843,7 +843,7 @@ export default function FeedbackContent({
 
 										return Math.max(
 											yOffset,
-											alternativeYOffset
+											alternativeYOffset,
 										)
 									})(),
 									zIndex:
@@ -858,7 +858,7 @@ export default function FeedbackContent({
 								className={cn(
 									"absolute left-4 right-4 max-h-[400px]",
 									feedbackItem.state !== undefined &&
-										"shadow-lg"
+										"shadow-lg",
 								)}
 							/>
 						))}

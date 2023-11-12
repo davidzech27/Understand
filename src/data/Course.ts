@@ -1,8 +1,6 @@
-import { desc, eq, and, lt, inArray, isNotNull, isNull, sql } from "drizzle-orm"
-import { z } from "zod"
+import { desc, eq, and, lt, isNotNull, isNull, sql } from "drizzle-orm"
 
 import vdbPromise from "~/db/vdb"
-import getEmbedding from "~/ai/getEmbedding"
 import db from "~/db/db"
 import {
 	user,
@@ -15,56 +13,6 @@ import {
 	assignmentInsight,
 } from "~/db/schema"
 import { feedbackInsightsSchema } from "./Feedback"
-import User from "./User"
-
-const resourceMetadataSchema = z.intersection(
-	z.object({
-		text: z.string(),
-	}),
-	z.union([
-		z.intersection(
-			z.object({
-				driveId: z.string(),
-				driveTitle: z.string().optional(),
-				instructionsForAssignmentId: z.string().optional(),
-			}),
-			z.union([
-				z.object({
-					attachmentOnAssignmentId: z.string(),
-				}),
-				z.object({
-					attachmentOnMaterialId: z.string(),
-				}),
-			])
-		),
-		z.object({
-			instructionsForAssignmentId: z.string(),
-		}),
-	])
-)
-
-type Resource = z.infer<typeof resourceMetadataSchema>
-
-const messageMetadataSchema = z.object({
-	fromEmail: z.string(),
-	content: z.string(),
-	sentAt: z.date(),
-})
-
-const getFormattedResourceText = (resource: Resource) =>
-	`${
-		"instructionsForAssignmentTitle" in resource
-			? `Instructions for assignment title: ${resource.instructionsForAssignmentTitle}\n\n`
-			: "attachmentOnAssignmentTitle" in resource
-			? `Attachment on assignment title: ${resource.attachmentOnAssignmentTitle}\n\n`
-			: "attachmentOnMaterialTitle" in resource
-			? `Attachment on material title: ${resource.attachmentOnMaterialTitle}\n\n`
-			: ""
-	}${
-		"driveTitle" in resource
-			? `Document title: ${resource.driveTitle}\n\n`
-			: ""
-	}Content: ${resource.text}`
 
 export type Course = Exclude<
 	Awaited<ReturnType<ReturnType<typeof Course>["get"]>>,
@@ -160,7 +108,7 @@ const Course = ({ id }: { id: string }) => ({
 				vdb.delete1({
 					deleteAll: true,
 					namespace: `resource:${id}`,
-				})
+				}),
 			),
 			db.delete(studentInsight).where(eq(studentInsight.courseId, id)),
 			db
@@ -213,7 +161,7 @@ const Course = ({ id }: { id: string }) => ({
 						photo: teacher.photo ?? undefined,
 						syncedAt: teacher.syncedAt ?? undefined,
 				  }
-				: { signedUp: false as const, email: teacher.email }
+				: { signedUp: false as const, email: teacher.email },
 		)
 	},
 	students: async () => {
@@ -237,7 +185,7 @@ const Course = ({ id }: { id: string }) => ({
 						photo: student.photo ?? undefined,
 						syncedAt: student.syncedAt ?? undefined,
 				  }
-				: { signedUp: false as const, email: student.email }
+				: { signedUp: false as const, email: student.email },
 		)
 	},
 	assignments: async () => {
@@ -290,8 +238,8 @@ const Course = ({ id }: { id: string }) => ({
 						? eq(feedback.courseId, id)
 						: and(
 								eq(feedback.courseId, id),
-								lt(feedback.givenAt, new Date(cursor))
-						  )
+								lt(feedback.givenAt, new Date(cursor)),
+						  ),
 				)
 				.orderBy(desc(feedback.givenAt))
 				.limit(limit)
@@ -300,8 +248,8 @@ const Course = ({ id }: { id: string }) => ({
 					assignment,
 					and(
 						eq(assignment.courseId, id),
-						eq(assignment.assignmentId, feedback.assignmentId)
-					)
+						eq(assignment.assignmentId, feedback.assignmentId),
+					),
 				)
 		).map(({ userPhoto, ...feedback }) => ({
 			...feedback,
@@ -329,343 +277,13 @@ const Course = ({ id }: { id: string }) => ({
 					and(
 						eq(feedback.courseId, id),
 						isNull(feedback.syncedInsightsAt),
-						isNotNull(feedback.insights)
-					)
+						isNotNull(feedback.insights),
+					),
 				)
 		).map((row) => ({
 			...row,
 			insights: feedbackInsightsSchema.parse(row.insights),
 		}))
-	},
-	createResource: async (resource: Resource) => {
-		const namespace = `resource:${id}`
-
-		const { embedding, cost } = await getEmbedding(
-			getFormattedResourceText(resource)
-		)
-
-		const vdb = await vdbPromise
-
-		await Promise.all([
-			vdb.upsert({
-				upsertRequest: {
-					vectors: [
-						{
-							id: `resource:${id}:${
-								"driveId" in resource
-									? "drive"
-									: "instructionsForAssignmentId" in resource
-									? "description" // outdated, because now non-synced resources are indexed as well
-									: ""
-							}:${
-								"driveId" in resource
-									? resource.driveId
-									: "instructionsForAssignmentId" in resource
-									? resource.instructionsForAssignmentId
-									: ""
-							}`,
-							values: embedding,
-							metadata: resource,
-						},
-					],
-					namespace,
-				},
-			}),
-			Course({ id }).increaseCost({ sync: cost }),
-		])
-	},
-	getResources: async ({ filter }: { filter: object }) => {
-		const namespace = `resource:${id}`
-
-		const vdb = await vdbPromise
-
-		return (
-			(
-				await vdb.query({
-					queryRequest: {
-						vector: Array(1536).fill(0),
-						filter:
-							Object.keys(filter).length === 0
-								? undefined
-								: filter,
-						topK: 10_000,
-						includeMetadata: true,
-						namespace,
-					},
-				})
-			).matches ?? []
-		).map((match) => resourceMetadataSchema.parse(match.metadata))
-	},
-	searchResources: async ({
-		similarText,
-		filter,
-		topK,
-		userEmail,
-	}: {
-		similarText: string
-		filter: object
-		topK: number
-		userEmail?: string
-	}) => {
-		const namespace = `resource:${id}`
-
-		const { embedding, cost } = await getEmbedding(similarText)
-
-		const vdb = await vdbPromise
-
-		const [{ matches }] = await Promise.all([
-			vdb.query({
-				queryRequest: {
-					vector: embedding,
-					filter:
-						Object.keys(filter).length === 0 ? undefined : filter,
-					topK,
-					includeMetadata: true,
-					namespace,
-				},
-			}),
-			userEmail &&
-				User({ email: userEmail }).increaseCost({ messageBoard: cost }),
-		])
-
-		return (matches ?? []).map((match) =>
-			resourceMetadataSchema.parse(match.metadata)
-		)
-	},
-	updateResources: async ({
-		set,
-		filter,
-	}: {
-		set: Partial<Resource>
-		filter: object
-	}) => {
-		const namespace = `resource:${id}`
-
-		const [vdb, embeddingResponse] = await Promise.all([
-			vdbPromise,
-			set.text !== undefined ? await getEmbedding(set.text) : undefined,
-		])
-
-		await Promise.all([
-			...(
-				(
-					await vdb.query({
-						queryRequest: {
-							vector: Array(1536).fill(0),
-							filter:
-								Object.keys(filter).length === 0
-									? undefined
-									: filter,
-							topK: 10_000,
-							namespace,
-						},
-					})
-				).matches ?? []
-			).map(({ id }) =>
-				vdb.update({
-					updateRequest: {
-						id,
-						...(embeddingResponse !== undefined
-							? { values: embeddingResponse.embedding }
-							: {}),
-						setMetadata: set,
-						namespace,
-					},
-				})
-			),
-			embeddingResponse &&
-				Course({ id }).increaseCost({ sync: embeddingResponse.cost }),
-		])
-	},
-	deleteResources: async ({ filter }: { filter: object }) => {
-		const namespace = `resource:${id}`
-
-		const vdb = await vdbPromise
-
-		if (Object.keys(filter).length === 0) {
-			await vdb.delete1({
-				deleteAll: true,
-				namespace,
-			})
-		} else {
-			const ids = (
-				await vdb.query({
-					queryRequest: {
-						vector: Array(1536).fill(0),
-						filter,
-						topK: 10_000,
-						namespace,
-					},
-				})
-			).matches?.map(({ id }) => id)
-
-			if (ids === undefined) return
-
-			await vdb.delete1({
-				ids,
-				namespace,
-			})
-		}
-	},
-	hasResources: async () => {
-		const namespace = `resource:${id}`
-
-		const vdb = await vdbPromise
-
-		const matches = (
-			await vdb.query({
-				queryRequest: {
-					vector: Array(1536).fill(0),
-					topK: 1,
-					namespace,
-					includeMetadata: true,
-				},
-			})
-		).matches
-
-		return matches?.length === 1
-	},
-	createMessage: async ({
-		fromEmail,
-		content,
-	}: {
-		fromEmail: string
-		content: string
-	}) => {
-		const namespace = `message:${id}`
-
-		const sentAt = new Date()
-
-		const [vdb, { embedding, cost }] = await Promise.all([
-			vdbPromise,
-			getEmbedding(content),
-		])
-
-		await Promise.all([
-			vdb.upsert({
-				upsertRequest: {
-					vectors: [
-						{
-							id: `message:${id}:${fromEmail}:${sentAt.valueOf()}`,
-							values: embedding,
-							metadata: {
-								fromEmail,
-								content,
-								sentAt: sentAt.valueOf(),
-							},
-						},
-					],
-					namespace,
-				},
-			}),
-			User({ email: fromEmail }).increaseCost({ messageBoard: cost }),
-		])
-
-		return {
-			sentAt,
-		}
-	},
-	// consider including score
-	getSimilarMessages: async ({
-		content,
-		limit,
-		userEmail,
-	}: {
-		content: string
-		limit: number
-		userEmail?: string
-	}) => {
-		const namespace = `message:${id}`
-
-		const { embedding, cost } = await getEmbedding(content)
-
-		const increaseCostPromise =
-			userEmail &&
-			User({ email: userEmail }).increaseCost({
-				messageBoard: cost,
-			})
-
-		const vdb = await vdbPromise
-
-		const { matches } = await vdb.query({
-			queryRequest: {
-				vector: embedding,
-				topK: limit,
-				includeMetadata: true,
-				namespace,
-			},
-		})
-
-		const messages = (matches ?? [])
-			.map(({ metadata }) => {
-				if (
-					metadata !== undefined &&
-					"sentAt" in metadata &&
-					typeof metadata.sentAt === "number"
-				) {
-					return messageMetadataSchema.parse({
-						...metadata,
-						sentAt: new Date(metadata.sentAt),
-					})
-				} else return undefined
-			})
-			.filter(Boolean)
-
-		const users =
-			messages.length !== 0
-				? await db
-						.select({
-							email: user.email,
-							name: user.name,
-							photo: user.photo,
-						})
-						.from(user)
-						.where(
-							inArray(
-								user.email,
-								messages.map((message) => message.fromEmail)
-							)
-						)
-				: []
-
-		const profileByEmailMap = new Map(
-			users.map(({ email, name, photo }) => [
-				email,
-				{ name, photo: photo ?? undefined },
-			])
-		)
-
-		await increaseCostPromise
-
-		return messages
-			.map(({ fromEmail, content, sentAt }) => ({
-				from: {
-					email: fromEmail,
-					...profileByEmailMap.get(fromEmail),
-				},
-				content,
-				sentAt,
-			}))
-			.map(({ from, content, sentAt }) =>
-				from.name !== undefined ? { from, content, sentAt } : undefined
-			)
-			.filter(Boolean)
-	},
-	deleteMessage: async ({
-		fromEmail,
-		sentAt,
-	}: {
-		fromEmail: string
-		sentAt: Date
-	}) => {
-		const namespace = `message:${id}`
-
-		const vdb = await vdbPromise
-
-		await vdb.delete1({
-			ids: [`message:${id}:${fromEmail}:${sentAt.valueOf()}`],
-			namespace,
-		})
 	},
 	increaseCost: async (cost: { sync?: number; insights?: number }) => {
 		await db

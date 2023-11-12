@@ -11,7 +11,7 @@ const getUserFeedbackStreamAction = zact(
 		courseId: z.string(),
 		limit: z.number(),
 		cursor: z.number(),
-	})
+	}),
 )(async ({ courseId, limit, cursor }) => {
 	const { email } = await getAuthOrThrow({ cookies: cookies() })
 

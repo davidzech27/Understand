@@ -39,10 +39,10 @@ export default function ShareModal({
 					<div className="mt-2 flex gap-1.5">
 						<Button
 							size="medium"
-							onClick={() => {
+							onClick={async () => {
 								onChangeShared(false)
 
-								updateFeedbackSharedAction({
+								await updateFeedbackSharedAction({
 									courseId,
 									assignmentId,
 									givenAt: feedbackGivenAt,
@@ -56,10 +56,10 @@ export default function ShareModal({
 
 						<Button
 							size="medium"
-							onClick={() => {
+							onClick={async () => {
 								onChangeShared(true)
 
-								updateFeedbackSharedAction({
+								await updateFeedbackSharedAction({
 									courseId,
 									assignmentId,
 									givenAt: feedbackGivenAt,
@@ -76,13 +76,13 @@ export default function ShareModal({
 				<div className="flex gap-3">
 					<Button
 						size="large"
-						onClick={() => {
+						onClick={async () => {
 							setLinkCopied(true)
 
-							navigator.clipboard.writeText(
+							await navigator.clipboard.writeText(
 								`${
 									window.location.href
-								}/${email}/${feedbackGivenAt.valueOf()}`
+								}/${email}/${feedbackGivenAt.valueOf()}`,
 							)
 						}}
 					>

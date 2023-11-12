@@ -9,7 +9,7 @@ export default async function generateInsights({
 		name: "course",
 		courseId,
 		deduplicationId: `insights-${courseId}-${Math.floor(
-			new Date().valueOf() / (1000 * 60 * 1)
+			new Date().valueOf() / (1000 * 60 * 1),
 		)}`,
 	})
 }

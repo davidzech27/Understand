@@ -45,7 +45,7 @@ export default function SectionList<TItem>({
 							className="mb-2.5 mt-2"
 						/>
 					</Fragment>
-				)
+				),
 			)}
 		</div>
 	)

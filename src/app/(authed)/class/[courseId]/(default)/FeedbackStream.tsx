@@ -33,17 +33,20 @@ export default function FeedbackStream({
 
 	const onLoadMore = () => {
 		if (cursor !== undefined)
-			loadMore(() => {
-				getFeedbackStreamAction({ courseId, limit: 20, cursor }).then(
-					({ feedbackStream, cursor }) => {
-						setFeedbackStream((previousFeedbackStream) => [
-							...previousFeedbackStream,
-							...feedbackStream,
-						])
+			loadMore(async () => {
+				const { feedbackStream, cursor: newCursor } =
+					await getFeedbackStreamAction({
+						courseId,
+						limit: 20,
+						cursor,
+					})
 
-						setCursor(cursor)
-					}
-				)
+				setFeedbackStream((previousFeedbackStream) => [
+					...previousFeedbackStream,
+					...feedbackStream,
+				])
+
+				setCursor(newCursor)
 			})
 	}
 
@@ -59,7 +62,7 @@ export default function FeedbackStream({
 						assignmentTitle,
 						givenAt,
 					},
-					index
+					index,
 				) => (
 					<Link
 						key={index}
@@ -90,7 +93,7 @@ export default function FeedbackStream({
 							</span>
 						</div>
 					</Link>
-				)
+				),
 			)}
 
 			{cursor && (

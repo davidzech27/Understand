@@ -7,7 +7,6 @@ import {
 } from "react"
 import { renderToStaticMarkup } from "react-dom/server"
 import DOMPurify from "dompurify"
-import { useLogger } from "next-axiom"
 
 import splitSentences from "~/utils/splitSentences"
 import colors from "colors.cjs"
@@ -43,7 +42,7 @@ interface Props {
 		sentence: number
 	}) => void
 	onChangeParagraphYOffsets: (
-		paragraphYOffsets: { paragraph: number; yOffset: number }[]
+		paragraphYOffsets: { paragraph: number; yOffset: number }[],
 	) => void
 }
 
@@ -78,7 +77,7 @@ const removeHighlightSpansFromChildren = (element: Element) => {
 		if (child.id.startsWith(highlightIdPrefix)) {
 			element.innerHTML = element.innerHTML.replace(
 				child.outerHTML,
-				child.innerHTML
+				child.innerHTML,
 			)
 		}
 
@@ -97,8 +96,6 @@ export default function FeedbackSubmission({
 	onChangeParagraphYOffsets,
 }: Props) {
 	const ref = useRef<HTMLDivElement>(null)
-
-	const log = useLogger()
 
 	const addHighlights = useEffectEvent(() => {
 		if (ref.current !== null) {
@@ -154,8 +151,8 @@ export default function FeedbackSubmission({
 						child
 							.getAttribute("style")
 							?.match(
-								/(?<=line-height:\s*)(\d|\.)+(?=\s*;)/g
-							)?.[0]
+								/(?<=line-height:\s*)(\d|\.)+(?=\s*;)/g,
+							)?.[0],
 					)
 
 					if (isNaN(inlineStyleLineHeight))
@@ -194,8 +191,8 @@ export default function FeedbackSubmission({
 									zIndex: sentence === -1 ? 0 : 10,
 								}}
 								className="transition"
-							/>
-						)
+							/>,
+						),
 					)
 
 					child.innerHTML = newParagraphHTML
@@ -214,9 +211,9 @@ export default function FeedbackSubmission({
 					const highlightSpan = document.getElementById(highlightId)
 
 					if (highlightSpan === null) {
-						log.error(
+						console.error(
 							"Span corresponding to feedback element not found in DOM",
-							{ paragraph, sentence }
+							{ paragraph, sentence },
 						)
 
 						break
@@ -226,21 +223,21 @@ export default function FeedbackSubmission({
 						onClickHighlight({
 							paragraph,
 							sentence,
-						})
+						}),
 					)
 
 					highlightSpan.addEventListener("pointerenter", () =>
 						onHoverHighlight({
 							paragraph,
 							sentence,
-						})
+						}),
 					)
 
 					highlightSpan.addEventListener("pointerleave", () =>
 						onUnhoverHighlight({
 							paragraph,
 							sentence,
-						})
+						}),
 					)
 				}
 			})
@@ -316,7 +313,7 @@ export default function FeedbackSubmission({
 				return () => {
 					window.removeEventListener(
 						"resize",
-						updateParagraphYOffsets
+						updateParagraphYOffsets,
 					)
 				}
 			}
@@ -329,7 +326,7 @@ export default function FeedbackSubmission({
 				getHighlightId({
 					paragraph,
 					sentence,
-				})
+				}),
 			)
 
 			if (highlightSpan !== null)
@@ -341,7 +338,7 @@ export default function FeedbackSubmission({
 	}, [highlights])
 
 	const runOnChangeHTML = useEffectEvent(
-		() => ref.current && onChangeHTML(ref.current.innerHTML)
+		() => ref.current && onChangeHTML(ref.current.innerHTML),
 	)
 
 	useEffect(() => {

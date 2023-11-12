@@ -16,19 +16,25 @@ export default function Footer() {
 			}}
 			className="p-8"
 		>
-			<div className="flex justify-between">
-				{" "}
-				<button
-					onClick={() => {
-						if (pathname === "/")
-							window.scrollTo({ top: 0, behavior: "smooth" })
-						else router.push("/")
-					}}
-					className="text-3xl font-extrabold tracking-tight text-white transition duration-200 hover:opacity-75 focus-visible:opacity-75 active:opacity-75"
-				>
-					Understand
-				</button>
-				<div className="flex items-center gap-4">
+			<div className="flex h-24 items-start justify-between">
+				<div className="flex flex-col items-start space-y-2">
+					<button
+						onClick={() => {
+							if (pathname === "/")
+								window.scrollTo({ top: 0, behavior: "smooth" })
+							else router.push("/")
+						}}
+						className="text-3xl font-extrabold tracking-tight text-white transition duration-200 hover:opacity-75 focus-visible:opacity-75 active:opacity-75"
+					>
+						Understand
+					</button>
+
+					<span className="text-sm font-medium text-white">
+						© 2023 Understand Labs Inc.
+					</span>
+				</div>
+
+				<div className="flex items-center space-x-4">
 					<a
 						href="https://www.linkedin.com/company/understandschool"
 						target="_blank"
@@ -68,20 +74,26 @@ export default function Footer() {
 				</div>
 			</div>
 
-			<div className="mt-2.5 flex flex-col gap-2.5">
-				<Link
-					href="/privacypolicy"
-					className="w-fit font-bold leading-none tracking-tight text-white transition duration-200 hover:opacity-75 focus-visible:opacity-75 active:opacity-75"
-				>
-					Privacy Policy
-				</Link>
+			<div className="flex h-24">
+				<div className="flex flex-col space-y-2">
+					<span className="w-fit text-lg font-bold tracking-tight text-white">
+						Legal
+					</span>
 
-				<Link
-					href="/termsofservice"
-					className="w-fit font-bold leading-none tracking-tight text-white transition duration-200 hover:opacity-75 focus-visible:opacity-75 active:opacity-75"
-				>
-					Terms of Service
-				</Link>
+					<Link
+						href="/privacypolicy"
+						className="w-fit text-sm font-medium tracking-tight text-white transition duration-200 hover:opacity-75 focus-visible:opacity-75 active:opacity-75"
+					>
+						Privacy Policy
+					</Link>
+
+					<Link
+						href="/termsofservice"
+						className="w-fit text-sm font-medium tracking-tight text-white transition duration-200 hover:opacity-75 focus-visible:opacity-75 active:opacity-75"
+					>
+						Terms of Service
+					</Link>
+				</div>
 			</div>
 		</footer>
 	)

@@ -12,7 +12,7 @@ interface Props extends TextareaProps {
 
 function TextArea(
 	{ value, setValue, onEnter, className, ...props }: Props,
-	ref: ForwardedRef<HTMLTextAreaElement>
+	ref: ForwardedRef<HTMLTextAreaElement>,
 ) {
 	return (
 		<ExpandingTextArea
@@ -29,7 +29,7 @@ function TextArea(
 			ref={ref}
 			className={cn(
 				"-mb-1.5 h-full w-full cursor-pointer select-text resize-none rounded-md border-[1px] border-border bg-surface px-4 py-2.5 font-medium opacity-80 outline-none transition-colors duration-150 focus:cursor-auto focus:bg-surface-bright",
-				className
+				className,
 			)}
 		/>
 	)

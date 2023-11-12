@@ -1,6 +1,5 @@
 "use client"
 import { useState } from "react"
-import { produce } from "immer"
 
 import { type Feedback } from "~/data/Feedback"
 import { type Assignment } from "~/data/Assignment"
@@ -43,24 +42,28 @@ export default function Feedback({
 			<FeedbackContent
 				submissionHTML={feedback.submissionHTML}
 				feedbackList={feedback.list}
-				onChangeFeedbackState={({ paragraph, sentence, state }) =>
-					setFeedback(
-						produce((prevFeedback) => {
-							if (prevFeedback === undefined) return
+				onChangeFeedbackState={({
+					paragraph,
+					sentence,
+					state: feedbackState,
+				}) =>
+					setFeedback((state) => {
+						const newState = structuredClone(state)
 
-							const changedFeedback = prevFeedback.list.find(
-								(feedbackItem) =>
-									feedbackItem.paragraph === paragraph &&
-									feedbackItem.sentence === sentence
-							)
+						const changedFeedback = newState.list.find(
+							(feedbackItem) =>
+								feedbackItem.paragraph === paragraph &&
+								feedbackItem.sentence === sentence,
+						)
 
-							if (changedFeedback)
-								changedFeedback.state =
-									typeof state === "function"
-										? state(changedFeedback.state)
-										: state
-						})
-					)
+						if (changedFeedback)
+							changedFeedback.state =
+								typeof feedbackState === "function"
+									? feedbackState(changedFeedback.state)
+									: feedbackState
+
+						return newState
+					})
 				}
 			/>
 		</div>

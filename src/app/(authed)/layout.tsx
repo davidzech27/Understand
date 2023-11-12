@@ -81,7 +81,7 @@ export default async function AuthedLayout({
 			getAuthenticationURL({
 				redirectTo: "/home",
 				scopes: ["https://www.googleapis.com/auth/userinfo.profile"],
-			})
+			}),
 		)
 	}
 

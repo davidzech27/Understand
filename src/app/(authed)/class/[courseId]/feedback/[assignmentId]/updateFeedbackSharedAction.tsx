@@ -13,7 +13,7 @@ const updateFeedbackSharedAction = zact(
 		assignmentId: z.string(),
 		givenAt: z.date(),
 		shared: z.boolean(),
-	})
+	}),
 )(async ({ courseId, assignmentId, givenAt, shared }) => {
 	const { email } = await getAuthOrThrow({ cookies: cookies() })
 

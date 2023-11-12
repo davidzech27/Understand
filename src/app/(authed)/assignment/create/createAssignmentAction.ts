@@ -16,36 +16,34 @@ const createAssignmentAction = zact(
 		instructions: z.string().min(1),
 		description: z.string().min(1).optional(),
 		dueAt: z.date().optional(),
-	})
-)(
-	async ({
-		courseId,
-		assignmentId,
-		title,
-		instructions,
-		description,
-		dueAt,
-	}) => {
-		const { email } = await getAuthOrThrow({ cookies: cookies() })
+	}),
+)(async ({
+	courseId,
+	assignmentId,
+	title,
+	instructions,
+	description,
+	dueAt,
+}) => {
+	const { email } = await getAuthOrThrow({ cookies: cookies() })
 
-		const role = await User({ email }).courseRole({ id: courseId })
+	const role = await User({ email }).courseRole({ id: courseId })
 
-		if (role !== "teacher") return
+	if (role !== "teacher") return
 
-		await Promise.all([
-			Assignment({ courseId, assignmentId }).create({
-				title,
-				description,
-				instructions,
-				dueAt,
-				syncedUrl: undefined,
-			}),
-			Course({ id: courseId }).createResource({
-				instructionsForAssignmentId: assignmentId,
-				text: instructions,
-			}),
-		])
-	}
-)
+	await Promise.all([
+		Assignment({ courseId, assignmentId }).create({
+			title,
+			description,
+			instructions,
+			dueAt,
+			syncedUrl: undefined,
+		}),
+		Course({ id: courseId }).createResource({
+			instructionsForAssignmentId: assignmentId,
+			text: instructions,
+		}),
+	])
+})
 
 export default createAssignmentAction

@@ -21,7 +21,7 @@ export default async function getInsights({
 	const feedbackLines = feedback.rawResponse.split("\n")
 
 	const specificFeedbackHeaderLineIndex = feedbackLines.findIndex((line) =>
-		line.toLowerCase().startsWith("specific feedback")
+		line.toLowerCase().startsWith("specific feedback"),
 	)
 
 	const feedbackString = feedbackLines
@@ -29,11 +29,6 @@ export default async function getInsights({
 		.join("\n")
 
 	const messages = [
-		{
-			role: "system" as const,
-			content:
-				"You are an uncommonly creative and nuanced teacher's assistant.",
-		},
 		{
 			role: "user" as const,
 			content: `A high school student named ${studentName} received feedback on an assignment titled "${assignmentTitle}". The following is information about the assignment, ${studentName}'s work, and the feedback on it:
@@ -55,7 +50,7 @@ Begin.`,
 		const completion = await new Promise<string>((res, rej) =>
 			fetchOpenAI({
 				messages,
-				model: "gpt-4-0613",
+				model: "gpt-4",
 				presencePenalty: 0.0,
 				frequencyPenalty: 0.25,
 				temperature: 0.0,
@@ -71,7 +66,7 @@ Begin.`,
 
 					rej()
 				},
-			})
+			}),
 		)
 
 		return {
@@ -97,7 +92,7 @@ Begin.`,
 								paragraphs: insight.paragraphs,
 								content: insight.content,
 						  }
-						: undefined
+						: undefined,
 				)
 				.filter(Boolean),
 		}

@@ -11,7 +11,7 @@ export default function LoadingSpinner({ className }: Props) {
 				aria-hidden="true"
 				className={cn(
 					"h-8 w-8 animate-spin fill-white duration-700",
-					className
+					className,
 				)}
 				viewBox="0 0 100 101"
 				fill="none"

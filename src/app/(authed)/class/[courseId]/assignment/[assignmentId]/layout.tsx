@@ -36,7 +36,7 @@ export default async function AssignmentLayout({
 }) {
 	const [role, assignment] = await Promise.all([
 		getAuthOrThrow({ cookies: cookies() }).then(({ email }) =>
-			User({ email }).courseRole({ id: courseId })
+			User({ email }).courseRole({ id: courseId }),
 		),
 		Assignment({ courseId, assignmentId }).get(),
 	])

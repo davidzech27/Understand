@@ -64,7 +64,7 @@ export default async function FeedbackPage({
 							.map((submission) =>
 								submission.type === "driveFile"
 									? submission.driveFile
-									: undefined
+									: undefined,
 							)
 							.filter(Boolean)
 							.map((submission) => ({
@@ -75,7 +75,7 @@ export default async function FeedbackPage({
 							}))
 					}),
 				User({ email }).feedbackHistory({ courseId, assignmentId }),
-			])
+			]),
 		),
 		Assignment({ courseId, assignmentId }).get(),
 		Course({ id: courseId }).get(),

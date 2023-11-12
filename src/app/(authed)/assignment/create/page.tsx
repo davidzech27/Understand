@@ -12,7 +12,7 @@ export const runtime = "edge"
 
 export default function AssignmentCreatePage() {
 	const coursesTeachingPromise = getAuthOrThrow({ cookies: cookies() }).then(
-		({ email }) => User({ email }).coursesTeaching()
+		({ email }) => User({ email }).coursesTeaching(),
 	)
 
 	return (

@@ -32,34 +32,36 @@ export default async function StudentInsightsPage({
 			email,
 		})
 			.insights({ courseId })
-			.then((insights) =>
-				insights?.map((insight) => ({
-					...insight,
-					sources: insight.sources.map((source) => ({
-						assignment: Assignment({
-							courseId,
-							assignmentId: source.assignmentId,
-						})
-							.get()
-							.then(
-								(assignment) =>
-									assignment ?? {
-										assignmentId: "",
-										title: "",
-									}
-							),
-						submissionHTML: User({ email })
-							.lastFeedbackInsights({
+			.then(
+				(insights) =>
+					insights?.map((insight) => ({
+						...insight,
+						sources: insight.sources.map((source) => ({
+							assignment: Assignment({
 								courseId,
 								assignmentId: source.assignmentId,
 							})
-							.then(
-								(lastFeedbackInsights) =>
-									lastFeedbackInsights?.submissionHTML ?? ""
-							),
-						paragraphs: source.paragraphs,
+								.get()
+								.then(
+									(assignment) =>
+										assignment ?? {
+											assignmentId: "",
+											title: "",
+										},
+								),
+							submissionHTML: User({ email })
+								.lastFeedbackInsights({
+									courseId,
+									assignmentId: source.assignmentId,
+								})
+								.then(
+									(lastFeedbackInsights) =>
+										lastFeedbackInsights?.submissionHTML ??
+										"",
+								),
+							paragraphs: source.paragraphs,
+						})),
 					})),
-				}))
 			),
 		User({ email }).get(),
 	])
@@ -67,20 +69,20 @@ export default async function StudentInsightsPage({
 	if (student === undefined) notFound()
 
 	const strengths = (studentInsights ?? []).filter(
-		(insight) => insight.type === "strength"
+		(insight) => insight.type === "strength",
 	)
 
 	const weaknesses = (studentInsights ?? []).filter(
-		(insight) => insight.type === "weakness"
+		(insight) => insight.type === "weakness",
 	)
 
 	const totalAssignmentsPromise = Promise.all(
 		studentInsights
 			?.map(({ sources }) => sources.map(({ assignment }) => assignment))
-			.flat() ?? []
+			.flat() ?? [],
 	).then(
 		(assignments) =>
-			new Set(assignments.map(({ assignmentId }) => assignmentId)).size
+			new Set(assignments.map(({ assignmentId }) => assignmentId)).size,
 	)
 
 	return (
@@ -89,7 +91,7 @@ export default async function StudentInsightsPage({
 				"flex flex-col space-y-2 px-6 pb-80 pt-5",
 				(studentInsights === undefined ||
 					studentInsights.length === 0) &&
-					"h-full"
+					"h-full",
 			)}
 		>
 			{studentInsights === undefined || studentInsights.length === 0 ? (

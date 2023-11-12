@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 import { encodingForModel } from "js-tiktoken"
-import { withAxiom, type AxiomRequest } from "next-axiom"
 
 const requestSchema = z.union([
 	z.object({
@@ -9,15 +8,13 @@ const requestSchema = z.union([
 			z.object({
 				role: z.enum(["assistant", "user", "system"]),
 				content: z.string(),
-			})
+			}),
 		),
 	}),
 	z.object({ text: z.string() }),
 ])
 
-export default withAxiom(async function countTokensHandler(
-	request: AxiomRequest
-) {
+export default (async function countTokensHandler(request: Request) {
 	const requestParsed = requestSchema.safeParse(await request.json())
 
 	if (!requestParsed.success) {
@@ -33,7 +30,7 @@ export default withAxiom(async function countTokensHandler(
 					.map(
 						({ role, content }) => `<|im_start|>${role}
 ${content}
-<|im_end|>`
+<|im_end|>`,
 					)
 					.join("\n")
 					.concat("\n<|im_start|>assistant")

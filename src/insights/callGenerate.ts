@@ -1,6 +1,6 @@
 import { type GenerateCall } from "./insightsHandler"
 import qstash from "~/qstash/qstash"
-import env from "env.mjs"
+import env from "~/env.mjs"
 
 export default async function callGenerate({
 	deduplicationId,

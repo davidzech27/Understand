@@ -13,7 +13,7 @@ const updateFeedbackSubmissionAction = zact(
 		assignmentId: z.string(),
 		givenAt: z.date(),
 		submissionHTML: z.string(),
-	})
+	}),
 )(async ({ courseId, assignmentId, givenAt, submissionHTML }) => {
 	const { email } = await getAuthOrThrow({ cookies: cookies() })
 
@@ -21,7 +21,7 @@ const updateFeedbackSubmissionAction = zact(
 
 	if (role === "none")
 		throw new Error(
-			"User must be in class to update submission on feedback"
+			"User must be in class to update submission on feedback",
 		)
 
 	await Feedback({
